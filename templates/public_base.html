@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AgriLens &bull; See Agriculture Through Data | Rwanda{% endblock %}</title>
+    <meta name="description" content="AgriLens transforms official NISR agricultural datasets into productivity gap analysis, practice insights, and policy decision support for Rwanda.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS for Rwanda Mapping -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/static/css/public.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="public-body">
+    <!-- Slim Top Announcement Bar -->
+    <div class="top-announcement-bar">
+        <div class="announcement-content">
+            <span class="announcement-pill">NISR Hackathon 2026</span>
+            <span class="announcement-text">
+                Track 1: Agricultural Productivity &bull; Aligned with <strong>NST2 &amp; Vision 2050</strong>
+            </span>
+            <a href="https://statistics.gov.rw/about/hackathon/2026-hackathon-competition" target="_blank" rel="noopener noreferrer" class="announcement-link">
+                Official Portal &rarr;
+            </a>
+        </div>
+    </div>
+
+    <!-- Clean Navigation Header -->
+    <header class="public-header" id="public-header">
+        <div class="nav-container">
+            <a href="/" class="brand-container" id="brand-logo-link">
+                <div class="brand-icon-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+                        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-title">AgriLens</span>
+                    <span class="brand-subtitle">Rwanda AgData</span>
+                </div>
+            </a>
+
+            <nav class="public-nav-menu" id="public-nav-menu">
+                <a href="#overview" class="public-nav-link">Overview</a>
+                <a href="#productivity-gap" class="public-nav-link">Productivity Gaps</a>
+                <a href="#rwanda-map" class="public-nav-link">Geographic Map</a>
+                <a href="#practices" class="public-nav-link">Agricultural Practices</a>
+                <a href="#post-harvest" class="public-nav-link">Post-Harvest</a>
+                <a href="#lineage" class="public-nav-link">NISR Lineage</a>
+            </nav>
+
+            <div class="header-action-group">
+                <a href="/dashboard/" class="btn-primary-action" id="btn-explore-dashboard">
+                    <span>Explore Dashboard</span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Public Content -->
+    <main class="public-main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Clean Public Footer -->
+    <footer class="public-footer">
+        <div class="footer-top-container">
+            <div class="footer-col brand-col">
+                <div class="brand-container">
+                    <div class="brand-icon-box">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+                            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+                        </svg>
+                    </div>
+                    <div class="brand-text">
+                        <span class="brand-title">AgriLens</span>
+                        <span class="brand-subtitle">See Agriculture Through Data</span>
+                    </div>
+                </div>
+                <p class="footer-description">
+                    Agricultural intelligence and decision-support platform developed for the 
+                    <strong>2026 NISR Big Data Hackathon (Track 1)</strong>. Converting official Seasonal 
+                    Agricultural Surveys into practical evidence for Rwanda.
+                </p>
+                <div class="footer-tagline-badge">
+                    Data &bull; Knowledge &bull; Insight &bull; Decision Support
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="footer-heading">Platform Modules</h4>
+                <ul class="footer-links">
+                    <li><a href="#productivity-gap">Productivity Gap Intelligence</a></li>
+                    <li><a href="#rwanda-map">Interactive Rwanda Map (Leaflet)</a></li>
+                    <li><a href="#practices">Irrigation &amp; Input Adoption</a></li>
+                    <li><a href="#post-harvest">Post-Harvest Loss Analytics</a></li>
+                    <li><a href="#lineage">Data Lineage &amp; Variable Audit</a></li>
+                    <li><a href="/api/">REST API Endpoints</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="footer-heading">Data Foundations</h4>
+                <ul class="footer-links">
+                    <li><a href="https://statistics.gov.rw" target="_blank" rel="noopener noreferrer">National Institute of Statistics of Rwanda</a></li>
+                    <li><a href="#lineage">Seasonal Agricultural Survey (SAS 2023–2025)</a></li>
+                    <li><a href="#lineage">Agriculture Household Survey (AHS 2024)</a></li>
+                    <li><a href="https://www.minagri.gov.rw" target="_blank" rel="noopener noreferrer">Ministry of Agriculture (MINAGRI)</a></li>
+                    <li><a href="#hackathon-alignment">NST2 &amp; Vision 2050 Priorities</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="footer-heading">Methodology &amp; Standards</h4>
+                <p class="footer-methodology-note">
+                    Strict adherence to NISR survey weights (<code>weighted_sum</code>, <code>weighted_mean</code>), 
+                    zero synthetic data fabrication, and verified variable lineage.
+                </p>
+                <div class="hackathon-footer-card">
+                    <span class="hackathon-badge-mini">Track 1 Entry</span>
+                    <p>Agricultural Productivity Challenge</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom-container">
+            <p>&copy; 2026 AgriLens &bull; NISR Big Data Hackathon &bull; Kigali, Rwanda</p>
+            <div class="footer-bottom-links">
+                <a href="#lineage">Data Lineage</a>
+                <span>&bull;</span>
+                <a href="#productivity-gap">Methodology</a>
+                <span>&bull;</span>
+                <a href="/api/">API Specs</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS & Client Script -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="/static/js/public_home.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
