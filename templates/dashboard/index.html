@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}AgriLens Dashboard | Rwanda Agricultural Intelligence{% endblock %}
+{% block section_title %}National Agricultural Overview{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <section class="metrics-grid">
+        <div class="metric-card">
+            <span class="metric-label">Priority Crops Tracked</span>
+            <span class="metric-value">12</span>
+            <span class="metric-delta positive">+2 vs previous season</span>
+        </div>
+        <div class="metric-card">
+            <span class="metric-label">Monitored Districts</span>
+            <span class="metric-value">30 / 30</span>
+            <span class="metric-status">All 5 Provinces</span>
+        </div>
+        <div class="metric-card">
+            <span class="metric-label">Active Seasonal Surveys</span>
+            <span class="metric-value">4,820</span>
+            <span class="metric-delta positive">98% QA Validated</span>
+        </div>
+        <div class="metric-card">
+            <span class="metric-label">Estimated National Yield Index</span>
+            <span class="metric-value">114.2</span>
+            <span class="metric-delta positive">+4.8% YoY</span>
+        </div>
+    </section>
+
+    <section class="content-split-grid">
+        <div class="panel-card">
+            <div class="panel-header">
+                <h3>Geographic Productivity Distribution</h3>
+            </div>
+            <div class="panel-body">
+                <p class="placeholder-text">District choropleth and agro-climatic productivity map layer.</p>
+            </div>
+        </div>
+        <div class="panel-card">
+            <div class="panel-header">
+                <h3>Commodity Price Trends (RWF / Kg)</h3>
+            </div>
+            <div class="panel-body">
+                <p class="placeholder-text">Market price index across Kimironko, Musanze, Huye, and Nyabugogo.</p>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AgriLens Rwanda | Agricultural Analytics Platform{% endblock %}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="/static/css/main.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="agrilens-body">
+    <div class="app-layout">
+        {% include "includes/sidebar.html" %}
+        <div class="main-content-wrapper">
+            {% include "includes/navbar.html" %}
+            <main class="page-content">
+                {% block content %}{% endblock %}
+            </main>
+            {% include "includes/footer.html" %}
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
