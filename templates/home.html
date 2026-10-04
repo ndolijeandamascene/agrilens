@@ -1,10 +1,10 @@
 {% extends "public_base.html" %}
 
-{% block title %}AgriLens &bull; See Agriculture Through Data | Rwanda Agricultural Intelligence{% endblock %}
+{% block title %}AgriLens &bull; National Agricultural Productivity Intelligence | Rwanda{% endblock %}
 
 {% block content %}
 <!-- =========================================================================
-     1. HERO SECTION (CLEAN & MODERN)
+     1. HERO SECTION: FACTUAL & DECISION-FOCUSED
      ========================================================================= -->
 <section class="hero-section" id="overview">
     <div class="hero-backdrop-glow"></div>
@@ -12,34 +12,34 @@
         <div class="hero-badge-container">
             <span class="hero-badge">
                 <span class="badge-dot"></span>
-                <span>Official NISR Agricultural Intelligence &bull; Track 1 Solution</span>
+                <span>NISR Big Data Hackathon 2026 &bull; Track 1: Agricultural Productivity</span>
             </span>
         </div>
 
         <h1 class="hero-title">
-            See Agriculture Through <span class="gradient-text">Data</span>
+            National Agricultural <span class="gradient-text">Productivity Intelligence</span>
         </h1>
 
         <p class="hero-lead">
-            Transforming official <strong>NISR Seasonal Agricultural Surveys</strong> into actionable productivity intelligence, 
-            district-level gap analysis, and practical decision support for Rwandan agriculture.
+            An evidence-based decision-support platform utilizing official <strong>National Institute of Statistics of Rwanda (NISR)</strong> 
+            Seasonal Agricultural Surveys to quantify yield gaps, assess farming practice adoption, and support targeted policy planning across Rwanda.
         </p>
 
         <div class="hero-cta-group">
             <a href="#productivity-gap" class="btn-hero-primary" id="hero-btn-gap">
-                <span>Explore Productivity Gaps</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <span>View Productivity Gap Analysis</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <polyline points="19 12 12 19 5 12"></polyline>
                 </svg>
             </a>
             <a href="#rwanda-map" class="btn-hero-secondary" id="hero-btn-map">
-                <span>Interactive Rwanda Map</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
                     <line x1="8" y1="2" x2="8" y2="18"></line>
                     <line x1="16" y1="6" x2="16" y2="22"></line>
                 </svg>
+                <span>Administrative Map</span>
             </a>
         </div>
 
@@ -47,63 +47,62 @@
         <div class="hero-stats-grid">
             <div class="stat-card">
                 <div class="stat-number">30 / 30</div>
-                <div class="stat-label">Districts Covered</div>
-                <div class="stat-sub">Across all 5 Rwandan Provinces</div>
+                <div class="stat-label">Administrative Districts</div>
+                <div class="stat-sub">Complete national coverage across 5 provinces</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number">10+</div>
-                <div class="stat-label">Priority Crops</div>
-                <div class="stat-sub">Maize, Irish Potato, Beans, Rice</div>
+                <div class="stat-label">Monitored Crops</div>
+                <div class="stat-sub">Maize, Irish Potato, Beans, Rice, Cassava</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">SAS 2023–25</div>
-                <div class="stat-label">NISR Survey Data</div>
-                <div class="stat-sub">Seasonal Surveys A, B, &amp; C</div>
+                <div class="stat-number">SAS 2023–2025</div>
+                <div class="stat-label">NISR Survey Framework</div>
+                <div class="stat-sub">Seasonal Surveys A, B, and C</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number">100%</div>
-                <div class="stat-label">Traceable Lineage</div>
-                <div class="stat-sub">Zero synthetic or fabricated data</div>
+                <div class="stat-label">Verifiable Lineage</div>
+                <div class="stat-sub">Raw variable traceability with zero synthetic data</div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- =========================================================================
-     2. SIGNATURE INNOVATION: PRODUCTIVITY GAP INTELLIGENCE
+     2. SIGNATURE FEATURE: PRODUCTIVITY GAP INTELLIGENCE
      ========================================================================= -->
 <section class="section-wrapper bg-alt" id="productivity-gap">
     <div class="section-container">
         <div class="section-header text-center">
-            <span class="section-kicker">Signature Feature</span>
+            <span class="section-kicker">Core Analytics</span>
             <h2 class="section-heading">Productivity Gap Intelligence</h2>
             <p class="section-subheading">
-                Compare actual crop yields between districts and seasons. 
-                Surface observed differences alongside contextual indicators like irrigation, seeds, and fertilizer.
+                Empirical yield comparisons across districts and seasons, contextualized by adoption rates of irrigation, certified seed, mineral fertilizer, and post-harvest losses.
             </p>
         </div>
 
-        <!-- Clean Interactive Simulator Container -->
+        <!-- Simulator Container -->
         <div class="simulator-card">
-            <!-- Crop Selector Tabs -->
+            <!-- Crop Selector Tabs without Emojis -->
             <div class="simulator-crop-tabs" id="crop-selector-tabs">
-                <button class="crop-tab active" data-crop="maize" id="tab-maize">🌽 Maize</button>
-                <button class="crop-tab" data-crop="potato" id="tab-potato">🥔 Irish Potato</button>
-                <button class="crop-tab" data-crop="beans" id="tab-beans">🌱 Climbing Beans</button>
-                <button class="crop-tab" data-crop="rice" id="tab-rice">🌾 Marshland Rice</button>
+                <button class="crop-tab active" data-crop="maize" id="tab-maize">Maize</button>
+                <button class="crop-tab" data-crop="potato" id="tab-potato">Irish Potato</button>
+                <button class="crop-tab" data-crop="beans" id="tab-beans">Climbing Beans</button>
+                <button class="crop-tab" data-crop="rice" id="tab-rice">Marshland Rice</button>
             </div>
 
             <!-- Dynamic Comparison Grid -->
             <div class="comparison-display-grid">
                 <!-- District A Card -->
                 <div class="district-comparison-card district-lead" id="card-district-a">
-                    <div class="card-status-chip">Benchmark Reference</div>
+                    <div class="card-status-chip">Reference District</div>
                     <h3 class="district-name" id="dist-a-name">Musanze District</h3>
                     <span class="province-badge" id="dist-a-prov">Northern Province</span>
 
                     <div class="yield-display">
                         <div class="yield-number" id="dist-a-yield">4,200</div>
-                        <div class="yield-unit">kg / hectare (avg)</div>
+                        <div class="yield-unit">kg / hectare (seasonal average)</div>
                     </div>
 
                     <div class="practice-bars-container">
@@ -116,21 +115,21 @@
                         </div>
                         <div class="practice-row">
                             <div class="practice-label-group">
-                                <span>Improved Seed Usage</span>
+                                <span>Certified Seed Usage</span>
                                 <strong id="dist-a-seed-val">71%</strong>
                             </div>
                             <div class="progress-track"><div class="progress-fill green" id="dist-a-seed-bar" style="width: 71%;"></div></div>
                         </div>
                         <div class="practice-row">
                             <div class="practice-label-group">
-                                <span>Inorganic Fertilizer (DAP/Urea)</span>
+                                <span>Inorganic Fertilizer (DAP / Urea)</span>
                                 <strong id="dist-a-fert-val">64%</strong>
                             </div>
                             <div class="progress-track"><div class="progress-fill green" id="dist-a-fert-bar" style="width: 64%;"></div></div>
                         </div>
                         <div class="practice-row">
                             <div class="practice-label-group">
-                                <span>Mechanization Adoption</span>
+                                <span>Mechanization Rate</span>
                                 <strong id="dist-a-mech-val">28%</strong>
                             </div>
                             <div class="progress-track"><div class="progress-fill green" id="dist-a-mech-bar" style="width: 28%;"></div></div>
@@ -148,9 +147,9 @@
                 <!-- Center Gap Metric Column -->
                 <div class="gap-metric-column">
                     <div class="gap-pill">
-                        <span class="gap-title">Observed Gap</span>
+                        <span class="gap-title">Observed Difference</span>
                         <div class="gap-value" id="gap-percent-val">-35.7%</div>
-                        <span class="gap-subtext" id="gap-subtext-val">Yield difference between districts</span>
+                        <span class="gap-subtext" id="gap-subtext-val">Yield gap between comparison districts</span>
                     </div>
 
                     <div class="gap-vs-divider">
@@ -164,13 +163,13 @@
 
                 <!-- District B Card -->
                 <div class="district-comparison-card district-lag" id="card-district-b">
-                    <div class="card-status-chip lag">Opportunity Target</div>
+                    <div class="card-status-chip lag">Comparison Target</div>
                     <h3 class="district-name" id="dist-b-name">Bugesera District</h3>
                     <span class="province-badge" id="dist-b-prov">Eastern Province</span>
 
                     <div class="yield-display">
                         <div class="yield-number" id="dist-b-yield">2,700</div>
-                        <div class="yield-unit">kg / hectare (avg)</div>
+                        <div class="yield-unit">kg / hectare (seasonal average)</div>
                     </div>
 
                     <div class="practice-bars-container">
@@ -183,21 +182,21 @@
                         </div>
                         <div class="practice-row">
                             <div class="practice-label-group">
-                                <span>Improved Seed Usage</span>
+                                <span>Certified Seed Usage</span>
                                 <strong id="dist-b-seed-val">49%</strong>
                             </div>
                             <div class="progress-track"><div class="progress-fill orange" id="dist-b-seed-bar" style="width: 49%;"></div></div>
                         </div>
                         <div class="practice-row">
                             <div class="practice-label-group">
-                                <span>Inorganic Fertilizer (DAP/Urea)</span>
+                                <span>Inorganic Fertilizer (DAP / Urea)</span>
                                 <strong id="dist-b-fert-val">41%</strong>
                             </div>
                             <div class="progress-track"><div class="progress-fill orange" id="dist-b-fert-bar" style="width: 41%;"></div></div>
                         </div>
                         <div class="practice-row">
                             <div class="practice-label-group">
-                                <span>Mechanization Adoption</span>
+                                <span>Mechanization Rate</span>
                                 <strong id="dist-b-mech-val">11%</strong>
                             </div>
                             <div class="progress-track"><div class="progress-fill orange" id="dist-b-mech-bar" style="width: 11%;"></div></div>
@@ -215,14 +214,19 @@
 
             <!-- Scientific Methodological Rigor Alert -->
             <div class="scientific-caution-box">
-                <div class="caution-icon">⚖️</div>
+                <div class="caution-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </div>
                 <div class="caution-body">
-                    <h4>Scientific &amp; Methodological Caution</h4>
+                    <h4>Methodological Notice on Causation</h4>
                     <p>
-                        AgriLens strictly observes econometric guidelines: 
-                        <strong>Observed differences reflect statistical associations, not automatic causal claims.</strong> 
-                        These indicators highlight areas with high potential for targeted agronomic interventions, 
-                        irrigation investments, and field extension follow-ups.
+                        In accordance with statistical standards: 
+                        <strong>Observed differences represent empirical survey associations rather than demonstrated causal mechanisms.</strong> 
+                        These indicators identify priority geographic clusters for field agronomic investigation, extension service allocation, and infrastructure evaluation.
                     </p>
                 </div>
             </div>
@@ -231,35 +235,96 @@
 </section>
 
 <!-- =========================================================================
-     3. INTERACTIVE RWANDA GEOGRAPHIC MAP (LEAFLET)
+     3. INTERACTIVE RWANDA GEOGRAPHIC MAP (LEAFLET + REAL GEOJSON)
      ========================================================================= -->
 <section class="section-wrapper" id="rwanda-map">
     <div class="section-container">
         <div class="section-header">
-            <span class="section-kicker">Geographic Intelligence</span>
-            <h2 class="section-heading">Interactive Rwanda Agricultural Map</h2>
+            <span class="section-kicker">Geospatial Distribution</span>
+            <h2 class="section-heading">Spatial Distribution of Agricultural Indicators</h2>
             <p class="section-subheading">
-                Explore district-level productivity across Rwanda's 5 provinces. 
-                Click any key agricultural hub to view local yield profiles and adoption rates.
+                Interactive spatial visualization of 30 administrative districts and 416 sectors. Filter by administrative tier or examine choropleth indicator layers.
             </p>
         </div>
 
-        <div class="map-layout-grid">
-            <!-- Leaflet Container -->
-            <div class="map-wrapper-card">
-                <div class="map-filter-bar">
-                    <span class="filter-label">Indicator:</span>
-                    <button class="map-pill-btn active" data-layer="yield" id="map-btn-yield">Crop Yield</button>
-                    <button class="map-pill-btn" data-layer="irrigation" id="map-btn-irrig">Irrigation %</button>
-                    <button class="map-pill-btn" data-layer="fertilizer" id="map-btn-fert">Fertilizer %</button>
-                    <button class="map-pill-btn" data-layer="loss" id="map-btn-loss">Loss Rate %</button>
+        <div class="map-controls-panel">
+            <!-- Cascading Filters: Province -> District -> Sector -->
+            <div class="geo-filter-toolbar">
+                <div class="filter-col">
+                    <label for="filter-province" class="filter-label">Province</label>
+                    <div class="select-wrapper">
+                        <select id="filter-province" class="geo-select">
+                            <option value="">All Provinces (Rwanda)</option>
+                            <option value="Kigali">City of Kigali</option>
+                            <option value="North">Northern Province</option>
+                            <option value="South">Southern Province</option>
+                            <option value="East">Eastern Province</option>
+                            <option value="West">Western Province</option>
+                        </select>
+                    </div>
                 </div>
-                <div id="rwanda-leaflet-map" class="leaflet-map-element" style="height: 500px; width: 100%;"></div>
+
+                <div class="filter-col">
+                    <label for="filter-district" class="filter-label">District</label>
+                    <div class="select-wrapper">
+                        <select id="filter-district" class="geo-select">
+                            <option value="">All Districts (30)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter-col">
+                    <label for="filter-sector" class="filter-label">Sector</label>
+                    <div class="select-wrapper">
+                        <select id="filter-sector" class="geo-select" disabled>
+                            <option value="">Select District first</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter-col filter-action-col">
+                    <button id="btn-reset-filters" class="btn-reset-geo" title="Reset filters to all Rwanda">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                            <path d="M3 3v5h5"></path>
+                        </svg>
+                        <span>Reset</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- District Detail Panel -->
+            <!-- Indicator Layer Switcher -->
+            <div class="map-layer-toggles">
+                <span class="layer-toggle-label">Choropleth Layer:</span>
+                <button class="map-pill-btn active" data-layer="province" id="map-btn-prov">Administrative Provinces</button>
+                <button class="map-pill-btn" data-layer="yield" id="map-btn-yield">Crop Yield</button>
+                <button class="map-pill-btn" data-layer="irrigation" id="map-btn-irrig">Irrigation %</button>
+                <button class="map-pill-btn" data-layer="fertilizer" id="map-btn-fert">Fertilizer %</button>
+                <button class="map-pill-btn" data-layer="loss" id="map-btn-loss">Loss Rate %</button>
+            </div>
+        </div>
+
+        <div class="map-layout-grid">
+            <!-- Real Leaflet Container -->
+            <div class="map-wrapper-card">
+                <div id="rwanda-leaflet-map" class="leaflet-map-element" style="height: 540px; width: 100%;"></div>
+                <!-- Interactive Map Legend -->
+                <div class="map-legend-bar" id="map-legend-bar">
+                    <span class="legend-title" id="legend-title">5 Provinces of Rwanda (NISR Palette):</span>
+                    <div class="legend-items" id="legend-items">
+                        <span class="legend-chip"><span class="legend-color-box" style="background: #D4A000;"></span> Eastern</span>
+                        <span class="legend-chip"><span class="legend-color-box" style="background: #46962B;"></span> Northern</span>
+                        <span class="legend-chip"><span class="legend-color-box" style="background: #00AEEF;"></span> Western</span>
+                        <span class="legend-chip"><span class="legend-color-box" style="background: #005CAB;"></span> Southern</span>
+                        <span class="legend-chip"><span class="legend-color-box" style="background: #002B54;"></span> Kigali</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- District / Sector Detail Panel -->
             <div class="district-inspect-card" id="district-inspector">
                 <div class="inspect-header">
+                    <div class="inspect-level-badge" id="inspect-level">District Level</div>
                     <span class="inspect-badge" id="inspect-province">Northern Province</span>
                     <h3 class="inspect-title" id="inspect-title">Musanze District</h3>
                     <p class="inspect-desc" id="inspect-desc">Highland agro-ecological zone with volcanic fertile soils.</p>
@@ -271,7 +336,7 @@
                         <strong class="value" id="inspect-crops">Irish Potato, Maize, Beans</strong>
                     </div>
                     <div class="inspect-stat-row">
-                        <span class="label">Average Maize Yield</span>
+                        <span class="label">Average Yield</span>
                         <strong class="value highlight-val" id="inspect-yield">4,200 kg/ha</strong>
                     </div>
                     <div class="inspect-stat-row">
@@ -279,22 +344,30 @@
                         <strong class="value" id="inspect-irrig">32% (Hillside &amp; Gravity)</strong>
                     </div>
                     <div class="inspect-stat-row">
-                        <span class="label">Inorganic Fertilizer</span>
+                        <span class="label">Fertilizer (Mineral)</span>
                         <strong class="value" id="inspect-fert">64% (DAP &amp; NPK)</strong>
+                    </div>
+                    <div class="inspect-stat-row">
+                        <span class="label">Mechanization</span>
+                        <strong class="value" id="inspect-mech">28% (Tractor &amp; Threshers)</strong>
                     </div>
                     <div class="inspect-stat-row">
                         <span class="label">Post-Harvest Loss</span>
                         <strong class="value" id="inspect-loss">7.2% (Cold storage)</strong>
                     </div>
                     <div class="inspect-stat-row">
-                        <span class="label">Main Market Hub</span>
+                        <span class="label">Market Hub</span>
                         <strong class="value" id="inspect-market">Musanze Modern Market</strong>
+                    </div>
+                    <div class="inspect-stat-row" id="inspect-sector-count-row">
+                        <span class="label">Monitored Sectors</span>
+                        <strong class="value" id="inspect-sectors">15 Sectors</strong>
                     </div>
                 </div>
 
                 <div class="inspect-footer">
                     <a href="/dashboard/" class="btn-inspect-action">
-                        <span>View District Profile in Dashboard &rarr;</span>
+                        <span>Open Detailed District Analytics &rarr;</span>
                     </a>
                 </div>
             </div>
@@ -308,101 +381,129 @@
 <section class="section-wrapper bg-alt" id="practices">
     <div class="section-container">
         <div class="section-header text-center">
-            <span class="section-kicker">Platform Architecture</span>
-            <h2 class="section-heading">Core Agricultural Intelligence Modules</h2>
+            <span class="section-kicker">Analytical Architecture</span>
+            <h2 class="section-heading">Core Intelligence Modules</h2>
             <p class="section-subheading">
-                Structured to address every dimension of Track 1: from field cultivation and practices to post-harvest storage and markets.
+                Comprehensive data processing addressing cultivation practices, harvest yields, post-harvest losses, and trade dynamics.
             </p>
         </div>
 
         <div class="modules-grid">
             <!-- 1. Productivity Intelligence -->
             <div class="module-card">
-                <div class="module-icon-box">📊</div>
-                <h3 class="module-title">Productivity Intelligence</h3>
+                <div class="module-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                </div>
+                <h3 class="module-title">Productivity &amp; Yield Dynamics</h3>
                 <p class="module-text">
-                    Seasonal yield benchmarking, multi-year production growth tracking, 
-                    and district ranking to uncover regional yield potentials.
+                    Multi-season yield tracking (kg/ha), production growth indices, and comparative performance rankings across administrative boundaries.
                 </p>
                 <ul class="module-bullet-list">
-                    <li>Yield (kg/ha) across Seasons A, B, and C</li>
-                    <li>Historical production growth rates</li>
-                    <li>District &amp; provincial productivity league tables</li>
+                    <li>Seasonal yield disaggregation across Seasons A, B, and C</li>
+                    <li>Year-over-year production growth rates</li>
+                    <li>District and provincial productivity benchmarks</li>
                 </ul>
             </div>
 
             <!-- 2. Agricultural Practices -->
             <div class="module-card">
-                <div class="module-icon-box">💧</div>
-                <h3 class="module-title">Agricultural Practices</h3>
+                <div class="module-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="module-title">Agricultural Practice Adoption</h3>
                 <p class="module-text">
-                    Tracking modern farming techniques: small-scale irrigation, 
-                    improved seed adoption, organic/inorganic fertilizer, and mechanization.
+                    Monitoring technical input adoption including small-scale irrigation, certified seed usage, mineral and organic fertilizers, and mechanization.
                 </p>
                 <ul class="module-bullet-list">
-                    <li>Gravity, motorized, and marshland irrigation</li>
-                    <li>DAP, Urea, NPK, and lime application</li>
-                    <li>Ox plough and tractor mechanization</li>
+                    <li>Gravity, hillside, and marshland irrigation systems</li>
+                    <li>Application rates for DAP, Urea, NPK, and agricultural lime</li>
+                    <li>Power tiller and tractor mechanization rates</li>
                 </ul>
             </div>
 
             <!-- 3. Post-Harvest Intelligence -->
             <div class="module-card" id="post-harvest">
-                <div class="module-icon-box">📦</div>
-                <h3 class="module-title">Post-Harvest Intelligence</h3>
+                <div class="module-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                </div>
+                <h3 class="module-title">Post-Harvest Loss Assessment</h3>
                 <p class="module-text">
-                    Pinpointing loss hotspots across harvesting, transit, storage, and processing 
-                    to reduce waste and strengthen food security.
+                    Quantitative breakdown of loss rates along the post-harvest chain to identify critical points for storage and collection interventions.
                 </p>
                 <ul class="module-bullet-list">
-                    <li>Loss Rate: <code>total_loss / production &times; 100</code></li>
-                    <li>Storage facilities &amp; warehouse availability</li>
-                    <li>Processing and value-addition rates</li>
+                    <li>Loss Rate Formulation: <code>total_loss_kg / production_kg &times; 100</code></li>
+                    <li>Disaggregation by harvest, transport, and storage stages</li>
+                    <li>On-farm storage and processing facility utilization</li>
                 </ul>
             </div>
 
             <!-- 4. Market & Value Addition -->
             <div class="module-card">
-                <div class="module-icon-box">🏪</div>
-                <h3 class="module-title">Market Intelligence</h3>
+                <div class="module-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </div>
+                <h3 class="module-title">Market &amp; Value Addition</h3>
                 <p class="module-text">
-                    Monitoring commodity prices and sales volumes across Kigali and provincial trade hubs, 
-                    identifying commercialization opportunities.
+                    Tracking wholesale and retail commodity pricing across urban and provincial commercial hubs, alongside household sales rates.
                 </p>
                 <ul class="module-bullet-list">
-                    <li>Prices at Kimironko, Nyabugogo, Musanze, Huye</li>
-                    <li>Sales rate vs. household consumption ratio</li>
-                    <li>Agro-processing &amp; value addition tracking</li>
+                    <li>Price monitoring across Kigali, Musanze, and Huye hubs</li>
+                    <li>Commercial sales ratio vs. subsistence consumption</li>
+                    <li>Value-addition and primary processing tracking</li>
                 </ul>
             </div>
 
             <!-- 5. Smart Insights & Alerts -->
             <div class="module-card">
-                <div class="module-icon-box">⚡</div>
-                <h3 class="module-title">Smart Insights &amp; Alerts</h3>
+                <div class="module-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                </div>
+                <h3 class="module-title">Threshold Alerts &amp; Synthesis</h3>
                 <p class="module-text">
-                    Automated rule-based detection for significant yield deficits, unusual loss spikes, 
-                    and lagging input adoption rates.
+                    Deterministic indicator threshold monitoring to highlight severe productivity deficits, elevated loss rates, or lagging input adoption.
                 </p>
                 <ul class="module-bullet-list">
-                    <li>Early warning risk detection by sector</li>
-                    <li>Data-driven narrative summaries</li>
-                    <li>Prioritization briefs for agricultural planners</li>
+                    <li>Automated outlier identification at district level</li>
+                    <li>Evidence synthesis briefs for agricultural planners</li>
+                    <li>Early warning triggers for post-harvest loss spikes</li>
                 </ul>
             </div>
 
             <!-- 6. Survey Weighting & Lineage -->
             <div class="module-card">
-                <div class="module-icon-box">📐</div>
-                <h3 class="module-title">Statistical Rigor &amp; Lineage</h3>
+                <div class="module-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </div>
+                <h3 class="module-title">Statistical Weighting &amp; Methodology</h3>
                 <p class="module-text">
-                    Methodological fidelity to NISR's survey weights (<code>weighted_sum</code>, <code>weighted_mean</code>) 
-                    and 100% auditable data provenance.
+                    Rigorous computation applying official NISR sampling weights (<code>weighted_sum</code>, <code>weighted_mean</code>) to ensure representative estimators.
                 </p>
                 <ul class="module-bullet-list">
-                    <li>Representative sampling weights applied</li>
-                    <li>Zero variable fabrication policy</li>
-                    <li>Audit trail from SAS raw file to dashboard</li>
+                    <li>Sampling weights applied for population-level validity</li>
+                    <li>End-to-end data provenance and transformation records</li>
+                    <li>Audit traceability from raw questionnaire variables</li>
                 </ul>
             </div>
         </div>
@@ -416,17 +517,17 @@
     <div class="section-container">
         <div class="section-header text-center">
             <span class="section-kicker">Data Integrity</span>
-            <h2 class="section-heading">Official NISR Data Lineage &amp; ETL Pipeline</h2>
+            <h2 class="section-heading">Data Ingestion and Processing Pipeline</h2>
             <p class="section-subheading">
-                Every metric in AgriLens traces directly back to official NISR survey records with zero synthetic fabrication.
+                All platform metrics are computed from official NISR datasets through a documented and auditable ETL process.
             </p>
         </div>
 
         <div class="lineage-pipeline-flow">
             <div class="pipeline-step">
                 <div class="step-num">1</div>
-                <h4>Official NISR Data</h4>
-                <p>SAS 2025, 2024, 2023 &amp; AHS 2024 raw survey files.</p>
+                <h4>Source Dataset</h4>
+                <p>NISR Seasonal Agricultural Survey (SAS 2023–2025) and AHS 2024 records.</p>
                 <span class="step-tag">data/raw/</span>
             </div>
             <div class="pipeline-arrow">&rarr;</div>
@@ -434,7 +535,7 @@
             <div class="pipeline-step">
                 <div class="step-num">2</div>
                 <h4>Validation &amp; Schema</h4>
-                <p>Rwanda GPS bounding box checks, survey weight validation.</p>
+                <p>Variable audit, missing value checks, and Rwanda coordinate bounds verification.</p>
                 <span class="step-tag">etl/validation/</span>
             </div>
             <div class="pipeline-arrow">&rarr;</div>
@@ -442,96 +543,176 @@
             <div class="pipeline-step">
                 <div class="step-num">3</div>
                 <h4>Normalization</h4>
-                <p>Standardizing units (ares to ha, bags to kg, crop codes).</p>
+                <p>Standardizing unit measures (ares to hectares, local sacks to kg) and crop taxonomies.</p>
                 <span class="step-tag">etl/transform/</span>
             </div>
             <div class="pipeline-arrow">&rarr;</div>
 
             <div class="pipeline-step">
                 <div class="step-num">4</div>
-                <h4>PostgreSQL &amp; PostGIS</h4>
-                <p>Structured relational records with administrative spatial layers.</p>
+                <h4>Relational Core</h4>
+                <p>Structured PostgreSQL tables with PostGIS administrative spatial layers.</p>
                 <span class="step-tag">apps/agriculture/</span>
             </div>
             <div class="pipeline-arrow">&rarr;</div>
 
             <div class="pipeline-step">
                 <div class="step-num">5</div>
-                <h4>AgriLens Insights</h4>
-                <p>Weighted indicators, gap analysis, and interactive Leaflet map.</p>
-                <span class="step-tag">Live Platform</span>
+                <h4>Indicator Analytics</h4>
+                <p>Weighted aggregation and interactive choropleth generation.</p>
+                <span class="step-tag">Platform API</span>
+            </div>
+        </div>
+
+        <!-- Official NISR Brand Identity & Color Specifications -->
+        <div class="brand-standards-card">
+            <div class="brand-standards-header">
+                <div class="brand-standards-title-group">
+                    <h3>Official NISR Brand Identity &amp; Color System</h3>
+                    <p>Standardized brand identity system for the 2026 NISR Big Data Hackathon</p>
+                </div>
+                <div class="card-status-chip" style="background: var(--nisr-blue-subtle); color: var(--nisr-blue); border: 1px solid var(--nisr-blue-border);">
+                    Brand Guidelines Compliant
+                </div>
+            </div>
+            <div class="nisr-swatch-grid">
+                <div class="nisr-swatch-item">
+                    <div class="swatch-color-bar" style="background-color: #005CAB;"></div>
+                    <div class="swatch-details">
+                        <div class="swatch-name">Pantone 2728 C (Royal Blue)</div>
+                        <div class="swatch-spec-row"><strong>CMYK:</strong> 96 69 0 0</div>
+                        <div class="swatch-spec-row"><strong>RGB:</strong> 0 92 171</div>
+                        <div class="swatch-spec-row"><strong>HEX:</strong> #005CAB</div>
+                    </div>
+                </div>
+                <div class="nisr-swatch-item">
+                    <div class="swatch-color-bar" style="background-color: #00AEEF;"></div>
+                    <div class="swatch-details">
+                        <div class="swatch-name">Pantone Cyan (Sky Cyan)</div>
+                        <div class="swatch-spec-row"><strong>CMYK:</strong> 100 0 0 0</div>
+                        <div class="swatch-spec-row"><strong>RGB:</strong> 0 174 239</div>
+                        <div class="swatch-spec-row"><strong>HEX:</strong> #00AEEF</div>
+                    </div>
+                </div>
+                <div class="nisr-swatch-item">
+                    <div class="swatch-color-bar" style="background-color: #46962B;"></div>
+                    <div class="swatch-details">
+                        <div class="swatch-name">Pantone 362 C (Forest Green)</div>
+                        <div class="swatch-spec-row"><strong>CMYK:</strong> 70 0 100 9</div>
+                        <div class="swatch-spec-row"><strong>RGB:</strong> 70 155 45</div>
+                        <div class="swatch-spec-row"><strong>HEX:</strong> #46962B</div>
+                    </div>
+                </div>
+                <div class="nisr-swatch-item">
+                    <div class="swatch-color-bar" style="background-color: #F3EA00; border-bottom: 1px solid #E2E8F0;"></div>
+                    <div class="swatch-details">
+                        <div class="swatch-name">Pantone 3965 C (Highlight Yellow)</div>
+                        <div class="swatch-spec-row"><strong>CMYK:</strong> 8 0 100 0</div>
+                        <div class="swatch-spec-row"><strong>RGB:</strong> 243 234 0</div>
+                        <div class="swatch-spec-row"><strong>HEX:</strong> #F3EA00</div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- 10 NISR Developer Rules Summary Box -->
         <div class="rules-summary-banner">
             <div class="rules-title-group">
-                <span class="shield-icon">🛡️</span>
+                <div class="shield-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--nisr-blue)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
                 <div>
-                    <h3>10 NISR Data Principles Enforced in AgriLens</h3>
-                    <p>Ensuring absolute compliance with official statistical methodologies</p>
+                    <h3>NISR Data Compliance Principles</h3>
+                    <p>Mandatory standards governing data processing within AgriLens</p>
                 </div>
             </div>
             <div class="rules-grid-mini">
-                <div class="rule-chip">✓ Use Authorized Datasets Only</div>
-                <div class="rule-chip">✓ Preserve Source Provenance</div>
-                <div class="rule-chip">✓ Maintain End-to-End Variable Lineage</div>
-                <div class="rule-chip">✓ Validate Variables Before Import</div>
-                <div class="rule-chip">✓ Never Invent NISR Variables</div>
-                <div class="rule-chip">✓ Never Fabricate Missing Values</div>
-                <div class="rule-chip">✓ Never Hardcode Statistics</div>
-                <div class="rule-chip">✓ Document All Transformations</div>
-                <div class="rule-chip">✓ Document Statistical Assumptions</div>
-                <div class="rule-chip">✓ Separate Raw Data from Processed Data</div>
+                <div class="rule-chip">Authorized Datasets Only</div>
+                <div class="rule-chip">Preserved Source Provenance</div>
+                <div class="rule-chip">End-to-End Variable Lineage</div>
+                <div class="rule-chip">Pre-Import Variable Validation</div>
+                <div class="rule-chip">Zero Invented Variables</div>
+                <div class="rule-chip">No Synthetic Value Fabrication</div>
+                <div class="rule-chip">No Hardcoded Statistics</div>
+                <div class="rule-chip">Documented Transformations</div>
+                <div class="rule-chip">Explicit Statistical Assumptions</div>
+                <div class="rule-chip">Separation of Raw and Processed Tiers</div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- =========================================================================
-     6. WHO AGRILENS SERVES (TANGIBLE IMPACT)
+     6. TARGET USERS (OPERATIONAL IMPACT)
      ========================================================================= -->
 <section class="section-wrapper bg-alt" id="impact">
     <div class="section-container">
         <div class="section-header text-center">
-            <span class="section-kicker">Tangible Impact</span>
-            <h2 class="section-heading">Designed for Real-World Stakeholders in Rwanda</h2>
+            <span class="section-kicker">Stakeholders</span>
+            <h2 class="section-heading">Operational Utility &amp; Decision Support</h2>
             <p class="section-subheading">
-                Delivering practical evidence to drive agricultural transformation across the entire value chain.
+                Structured to provide actionable evidence across agricultural planning, research, and resource allocation.
             </p>
         </div>
 
         <div class="impact-cards-grid">
             <div class="impact-card">
-                <div class="impact-icon">👨‍🌾</div>
+                <div class="impact-icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
                 <h3>Farmers &amp; Cooperatives</h3>
                 <p>
-                    Benchmark local plot yields against district leaders. Identify yield gaps and evaluate 
-                    returns on improved seed, organic manure, and small-scale irrigation.
+                    Benchmark local plot yields against district averages. Evaluate regional returns on certified seed, organic manure, and small-scale irrigation schemes.
                 </p>
             </div>
             <div class="impact-card">
-                <div class="impact-icon">📋</div>
+                <div class="impact-icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                    </svg>
+                </div>
                 <h3>Agricultural Planners (RAB / MINAGRI)</h3>
                 <p>
-                    Identify lagging sectors and districts in need of extension services, targeted input 
-                    distribution (Smart Nkunganire), and post-harvest storage facilities.
+                    Identify lagging sectors requiring targeted extension support, input subsidy allocation (Smart Nkunganire), and post-harvest storage facilities.
                 </p>
             </div>
             <div class="impact-card">
-                <div class="impact-icon">🏛️</div>
-                <h3>National Policymakers</h3>
+                <div class="impact-icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21h18"></path>
+                        <path d="M3 10h18"></path>
+                        <path d="M5 6l7-3 7 3"></path>
+                        <path d="M4 10v11"></path>
+                        <path d="M20 10v11"></path>
+                        <path d="M8 14v4"></path>
+                        <path d="M12 14v4"></path>
+                        <path d="M16 14v4"></path>
+                    </svg>
+                </div>
+                <h3>Policy Institutions</h3>
                 <p>
-                    Formulate evidence-based agricultural policies and evaluate progress toward 
-                    <strong>NST2</strong> productivity targets and <strong>Vision 2050</strong> food security goals.
+                    Evaluate national progress against <strong>NST2 (2024–2029)</strong> agricultural transformation targets and <strong>Vision 2050</strong> productivity goals.
                 </p>
             </div>
             <div class="impact-card">
-                <div class="impact-icon">🤝</div>
-                <h3>Development Partners &amp; NGOs</h3>
+                <div class="impact-icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                </div>
+                <h3>Development Partners &amp; Researchers</h3>
                 <p>
-                    Direct donor resources to high-impact geographic areas with verified productivity deficits 
-                    and monitor interventions using standardized NISR indicators.
+                    Direct intervention resources to verified productivity deficit zones and evaluate project outcomes using standardized NISR indicators.
                 </p>
             </div>
         </div>
@@ -539,23 +720,22 @@
 </section>
 
 <!-- =========================================================================
-     7. CALL TO ACTION / HACKATHON ALIGNMENT
+     7. ACCESS PLATFORM
      ========================================================================= -->
 <section class="section-wrapper cta-section" id="hackathon-alignment">
     <div class="section-container text-center">
         <div class="cta-inner-card">
-            <span class="badge-gold">NISR Big Data Hackathon 2026 &bull; Track 1 Entry</span>
-            <h2 class="cta-title">Ready to Explore Rwanda's Agricultural Intelligence?</h2>
+            <span class="badge-gold">NISR Big Data Hackathon 2026 &bull; Track 1</span>
+            <h2 class="cta-title">Agricultural Intelligence Platform</h2>
             <p class="cta-text">
-                Dive into live district comparisons, explore spatial productivity maps, 
-                and inspect the data pipeline.
+                Access district indicators, examine seasonal historical trends, and inspect the methodological data pipeline.
             </p>
             <div class="cta-buttons">
                 <a href="/dashboard/" class="btn-cta-primary">
-                    <span>Launch National Dashboard &rarr;</span>
+                    <span>Enter Analytical Dashboard &rarr;</span>
                 </a>
                 <a href="https://statistics.gov.rw/about/hackathon/2026-hackathon-competition" target="_blank" rel="noopener noreferrer" class="btn-cta-secondary">
-                    <span>View NISR Competition Portal</span>
+                    <span>NISR Competition Guidelines</span>
                 </a>
             </div>
         </div>
