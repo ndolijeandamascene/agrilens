@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends request.user.is_authenticated|yesno:"base.html,public_base.html" %}
 
 {% block title %}{{ district.name }} District | AgriLens Rwanda{% endblock %}
 {% block section_title %}{{ district.name }} District &bull; Geographic Intelligence{% endblock %}

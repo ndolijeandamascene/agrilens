@@ -1671,3 +1671,142 @@ body.public-body {
     .footer-top-container { grid-template-columns: 1fr; }
     .cta-title { font-size: 1.7rem; }
 }
+
+/* ==========================================================================
+   PUBLIC AUTHENTICATION & SINGLE-USE SETUP PAGES
+   ========================================================================== */
+.public-auth-section {
+    min-height: calc(100vh - 300px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 20px;
+    background: radial-gradient(circle at 50% 15%, rgba(0, 174, 239, 0.06) 0%, rgba(248, 250, 252, 0) 70%), var(--bg-page);
+}
+
+.public-auth-card {
+    max-width: 490px;
+    width: 100%;
+    background: #FFFFFF;
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px -12px rgba(0, 31, 59, 0.09), 0 4px 12px -2px rgba(0, 31, 59, 0.04);
+    overflow: hidden;
+    position: relative;
+}
+
+.auth-brand-stripe {
+    height: 4px;
+    width: 100%;
+    display: flex;
+}
+
+.auth-brand-stripe span {
+    flex: 1;
+    height: 100%;
+}
+.auth-brand-stripe .stripe-blue { background-color: var(--nisr-blue); }
+.auth-brand-stripe .stripe-cyan { background-color: var(--nisr-cyan); }
+.auth-brand-stripe .stripe-green { background-color: var(--nisr-green); }
+.auth-brand-stripe .stripe-yellow { background-color: var(--nisr-yellow); }
+
+.public-auth-header {
+    padding: 26px 28px 20px 28px;
+    border-bottom: 1px solid var(--border-subtle);
+    background: #FAFCFE;
+}
+
+.public-auth-header-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+
+.auth-header-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--nisr-blue) 0%, var(--nisr-blue-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(0, 92, 171, 0.25);
+}
+
+.auth-title {
+    color: #001F3B;
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.auth-subtitle {
+    margin: 3px 0 0 0;
+    font-size: 0.82rem;
+    color: #64748B;
+}
+
+.auth-role-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #E8F7FE;
+    color: var(--nisr-blue);
+    font-size: 0.74rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.public-auth-body {
+    padding: 28px;
+}
+
+.public-auth-footer {
+    padding: 14px 28px;
+    background: #F8FAFC;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+}
+
+.public-auth-footer a {
+    color: var(--nisr-blue);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.15s;
+}
+
+.public-auth-footer a:hover {
+    color: var(--nisr-blue-dark);
+    text-decoration: underline;
+}
+
+.auth-tier-box {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 0.82rem;
+    color: #64748B;
+    line-height: 1.6;
+}
+
+.auth-tier-box strong {
+    color: #0F172A;
+}
+
+.auth-tier-list {
+    margin: 8px 0 0 16px;
+    padding: 0;
+}
+
+.auth-tier-list li {
+    margin-bottom: 4px;
+}
+

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends request.user.is_authenticated|yesno:"base.html,public_base.html" %}
 
 {% block title %}Crops &amp; Agricultural Seasons | AgriLens Rwanda{% endblock %}
 {% block section_title %}National Crop Taxonomy &amp; Seasonal Calendars{% endblock %}

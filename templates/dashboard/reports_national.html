@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends request.user.is_authenticated|yesno:"base.html,public_base.html" %}
 
 {% block title %}{{ page_title }} | AgriLens Rwanda{% endblock %}
 {% block section_title %}National Agricultural Analytics Bulletin{% endblock %}

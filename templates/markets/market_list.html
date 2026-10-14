@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends request.user.is_authenticated|yesno:"base.html,public_base.html" %}
 
 {% block title %}Commodity Markets &amp; Prices | AgriLens Rwanda{% endblock %}
 {% block section_title %}Commodity Market Price Surveillance{% endblock %}

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends request.user.is_authenticated|yesno:"base.html,public_base.html" %}
 {% block section_title %}Market Price Monitoring{% endblock %}
 {% block content %}
 <div class="panel-card">
