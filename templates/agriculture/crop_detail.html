@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}{{ crop.name }} | AgriLens Rwanda{% endblock %}
+{% block section_title %}Crop Intelligence &bull; {{ crop.name }}{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div style="margin-bottom: 16px;">
+        <a href="{% url 'agriculture:crop_list' %}" style="color: #005CAB; font-weight: 600; text-decoration: none; font-size: 0.875rem;">
+            &larr; Back to Crops Registry
+        </a>
+    </div>
+
+    <!-- Header Card -->
+    <div class="panel-card" style="margin-bottom: 24px;">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <h3>{{ crop.name }} {% if crop.kinyarwanda_name %}({{ crop.kinyarwanda_name }}){% endif %}</h3>
+                <p class="panel-subtitle">Category: <strong>{{ crop.category.name }}</strong> &bull; Scientific Name: <em>{{ crop.scientific_name|default:"Not specified" }}</em></p>
+            </div>
+            <div>
+                {% if crop.is_priority_crop %}
+                <span class="panel-badge blue" style="background: #E8F7FE; color: #005CAB; font-weight: 700; padding: 6px 14px; border-radius: 6px;">
+                    NST2 Strategic Priority Crop
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="panel-body" style="padding: 24px;">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;">
+                <div style="padding: 16px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
+                    <div style="font-size: 0.8rem; color: #64748B;">Total Validated Observations</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: #001F3B; margin-top: 4px;">{{ total_obs }}</div>
+                    <div style="font-size: 0.75rem; color: #46962B; margin-top: 2px;">NISR SAS Survey Plots</div>
+                </div>
+
+                <div style="padding: 16px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
+                    <div style="font-size: 0.8rem; color: #64748B;">Yield Gap Analytics</div>
+                    <div style="margin-top: 8px;">
+                        <a href="{% url 'indicators:productivity' %}?crop={{ crop.name }}" style="color: #005CAB; font-weight: 700; text-decoration: none; font-size: 0.9rem;">
+                            View Benchmark Gap &rarr;
+                        </a>
+                    </div>
+                </div>
+
+                <div style="padding: 16px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
+                    <div style="font-size: 0.8rem; color: #64748B;">Market Price Monitoring</div>
+                    <div style="margin-top: 8px;">
+                        <a href="{% url 'markets:market_list' %}" style="color: #005CAB; font-weight: 700; text-decoration: none; font-size: 0.9rem;">
+                            View Commodity Prices &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Microdata Observations for this crop -->
+    <div class="panel-card">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <h3>Recent Verified Plot Microdata for {{ crop.name }}</h3>
+                <p class="panel-subtitle">Audited sample plots from SAS 2024 and SAS 2025</p>
+            </div>
+            <span class="panel-badge green">Verified Records</span>
+        </div>
+        <div class="panel-body no-padding">
+            <div class="table-responsive">
+                <table class="lineage-table">
+                    <thead>
+                        <tr>
+                            <th>Provenance</th>
+                            <th>District</th>
+                            <th>Season</th>
+                            <th>Plot Area</th>
+                            <th>Observed Yield</th>
+                            <th>Irrigation</th>
+                            <th>Mineral Fertilizer</th>
+                            <th>Improved Seed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obs in recent_obs %}
+                        <tr>
+                            <td><code>{{ obs.provenance }}</code></td>
+                            <td><strong>{{ obs.district.name }}</strong></td>
+                            <td>{{ obs.season }}</td>
+                            <td>{{ obs.plot_area_ha }} ha</td>
+                            <td><strong style="color: #005CAB;">{{ obs.calculated_yield_kg_per_ha }} kg/ha</strong></td>
+                            <td>{{ obs.is_irrigated|yesno:"Yes,No" }}</td>
+                            <td>{{ obs.uses_inorganic_fertilizer|yesno:"Yes,No" }}</td>
+                            <td>{{ obs.is_improved_seed|yesno:"Yes,No" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 32px; color: #64748B;">
+                                No verified survey plot microdata records recorded for this crop yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

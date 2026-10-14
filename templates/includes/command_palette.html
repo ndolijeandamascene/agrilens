@@ -1,0 +1,128 @@
+<!-- Quick Command Palette Modal (Ctrl + K) -->
+<div x-show="paletteOpen" 
+     x-cloak 
+     @keydown.escape.window="paletteOpen = false" 
+     style="position: fixed; inset: 0; z-index: 2000; display: flex; align-items: flex-start; justify-content: center; padding-top: 10vh;"
+     x-transition:enter="transition ease-out duration-150"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-100"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0">
+
+    <!-- Backdrop -->
+    <div @click="paletteOpen = false" style="position: fixed; inset: 0; background: rgba(0, 20, 45, 0.7); backdrop-filter: blur(4px);"></div>
+
+    <!-- Palette Box -->
+    <div class="command-palette-card" 
+         x-data="{ 
+             search: '',
+             selectedIndex: 0,
+             districts: [
+                 'Bugesera', 'Burera', 'Gakenke', 'Gasabo', 'Gatsibo', 'Gicumbi', 'Gisagara', 'Huye',
+                 'Kamonyi', 'Karongi', 'Kayonza', 'Kicukiro', 'Kirehe', 'Muhanga', 'Musanze', 'Ngoma',
+                 'Ngororero', 'Nyabihu', 'Nyagatare', 'Nyamagabe', 'Nyamasheke', 'Nyanza', 'Nyarugenge',
+                 'Nyaruguru', 'Rubavu', 'Ruhango', 'Rulindo', 'Rusizi', 'Rutsiro', 'Rwamagana'
+             ],
+             get filteredDistricts() {
+                 if (!this.search.trim()) return this.districts.slice(0, 8);
+                 return this.districts.filter(d => d.toLowerCase().includes(this.search.toLowerCase())).slice(0, 10);
+             }
+         }"
+         style="position: relative; width: 100%; max-width: 600px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 20px 40px -15px rgba(0, 31, 59, 0.35); overflow: hidden; border: 1px solid #CBD5E1; z-index: 2010;">
+        
+        <!-- Search Input Bar -->
+        <div style="display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid #E2E8F0; background: #F8FAFC;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#005CAB" stroke-width="2.3">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" 
+                   x-ref="paletteInput" 
+                   x-model="search" 
+                   x-init="$watch('paletteOpen', val => { if (val) $nextTick(() => $refs.paletteInput.focus()) })"
+                   placeholder="Jump to district, report, or module... (e.g. Musanze, Maize, National Report)" 
+                   style="flex: 1; border: none; background: none; font-size: 0.95rem; font-weight: 600; color: #0F172A; outline: none; font-family: inherit;">
+            <kbd style="background: #E2E8F0; border-radius: 4px; padding: 2px 6px; font-size: 0.7rem; font-family: monospace; font-weight: 700; color: #475569;">ESC</kbd>
+        </div>
+
+        <!-- Search Results & Suggestions -->
+        <div style="max-height: 380px; overflow-y: auto; padding: 10px 12px;">
+
+            <!-- Quick Navigation Modules -->
+            <div style="margin-bottom: 12px;">
+                <div style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #64748B; padding: 6px 8px;">
+                    Core Intelligence &amp; Reports
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                    <a href="/dashboard/" class="palette-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: #1E293B; font-size: 0.86rem; font-weight: 600;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="color: #005CAB;">📊</span>
+                            <span>National Agricultural Dashboard</span>
+                        </div>
+                        <span style="font-size: 0.72rem; color: #64748B;">/dashboard/</span>
+                    </a>
+                    <a href="/dashboard/reports/national/" class="palette-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: #1E293B; font-size: 0.86rem; font-weight: 600;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="color: #00AEEF;">📄</span>
+                            <span>National Agricultural Report &amp; Bulletins</span>
+                        </div>
+                        <span style="font-size: 0.72rem; color: #64748B;">/dashboard/reports/national/</span>
+                    </a>
+                    <a href="/indicators/productivity/" class="palette-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: #1E293B; font-size: 0.86rem; font-weight: 600;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="color: #46962B;">📈</span>
+                            <span>Yield Gap Intelligence &amp; Rankings</span>
+                        </div>
+                        <span style="font-size: 0.72rem; color: #64748B;">/indicators/productivity/</span>
+                    </a>
+                    <a href="/data-management/manual/" class="palette-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: #1E293B; font-size: 0.86rem; font-weight: 600;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="color: #F59E0B;">📝</span>
+                            <span>Manual Observation Registry</span>
+                        </div>
+                        <span style="font-size: 0.72rem; color: #64748B;">/data-management/manual/</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Rwanda 30 Districts Jump -->
+            <div>
+                <div style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #64748B; padding: 6px 8px; display: flex; justify-content: space-between;">
+                    <span>Rwanda Districts (Jump to Dossier)</span>
+                    <span x-text="filteredDistricts.length + ' shown'"></span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px;">
+                    <template x-for="d in filteredDistricts" :key="d">
+                        <a :href="'/dashboard/reports/district/'" 
+                           class="palette-item" 
+                           style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: #0F172A; font-size: 0.84rem; font-weight: 600;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#005CAB" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            <span x-text="d + ' District'"></span>
+                        </a>
+                    </template>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Palette Footer -->
+        <div style="padding: 10px 16px; background: #F8FAFC; border-top: 1px solid #E2E8F0; font-size: 0.72rem; color: #64748B; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span>Navigation: <kbd style="background: #E2E8F0; padding: 1px 4px; border-radius: 3px;">&uarr;</kbd> <kbd style="background: #E2E8F0; padding: 1px 4px; border-radius: 3px;">&darr;</kbd></span>
+                <span>Select: <kbd style="background: #E2E8F0; padding: 1px 4px; border-radius: 3px;">Enter</kbd></span>
+            </div>
+            <span>NISR AgriLens 2026</span>
+        </div>
+    </div>
+</div>
+
+<style>
+.palette-item:hover {
+    background: #E0F2FE !important;
+    color: #0369A1 !important;
+}
+</style>

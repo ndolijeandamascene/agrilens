@@ -4,5 +4,7 @@ from . import views
 app_name = 'agriculture'
 
 urlpatterns = [
-    # Crop catalog and seasonal calendar endpoints
+    path('', views.crop_list, name='crop_list'),
+    path('<int:pk>/', views.crop_detail, name='crop_detail'),
 ]
+

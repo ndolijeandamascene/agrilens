@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Commodity Markets &amp; Prices | AgriLens Rwanda{% endblock %}
+{% block section_title %}Commodity Market Price Surveillance{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <!-- Filter Bar -->
+    <div class="panel-card" style="margin-bottom: 24px;">
+        <div class="panel-body" style="padding: 16px 24px;">
+            <form method="GET" action="{% url 'markets:market_list' %}" style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+                <div style="display: flex; gap: 12px; flex: 1; min-width: 280px;">
+                    <select name="crop" class="dash-compact-select" style="min-width: 180px; height: 42px;">
+                        <option value="">All Commodities</option>
+                        {% for c in priority_crops %}
+                        <option value="{{ c.name }}" {% if selected_crop == c.name %}selected{% endif %}>{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="market" class="dash-compact-select" style="min-width: 180px; height: 42px;">
+                        <option value="">All Market Hubs</option>
+                        {% for m in markets %}
+                        <option value="{{ m.id }}" {% if selected_market == m.id|stringformat:'s' %}selected{% endif %}>{{ m.name }} ({{ m.district.name }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn-action primary" style="padding: 10px 20px; background: #005CAB; color: #FFFFFF; font-weight: 700; border: none; border-radius: 8px; cursor: pointer;">
+                        Filter Prices
+                    </button>
+                    {% if selected_crop or selected_market %}
+                    <a href="{% url 'markets:market_list' %}" class="btn-action" style="padding: 10px 16px; background: #F1F5F9; color: #475569; text-decoration: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">
+                        Clear
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Surveillance Table -->
+    <div class="panel-card">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <h3>Wholesale &amp; Retail Commodity Price Registry</h3>
+                <p class="panel-subtitle">Official agricultural price monitoring across commercial trade hubs</p>
+            </div>
+            <span class="panel-badge blue">e-Soko &bull; NISR Survey</span>
+        </div>
+        <div class="panel-body no-padding">
+            <div class="table-responsive">
+                <table class="lineage-table">
+                    <thead>
+                        <tr>
+                            <th>Commodity</th>
+                            <th>Market Location</th>
+                            <th>District</th>
+                            <th>Retail Price (RWF / kg)</th>
+                            <th>Wholesale Price (RWF / kg)</th>
+                            <th>Date Recorded</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in page_obj %}
+                        <tr>
+                            <td><strong style="color: #001F3B;">{{ p.crop.name }}</strong></td>
+                            <td>{{ p.market.name }}</td>
+                            <td>{{ p.market.district.name }}</td>
+                            <td><strong style="color: #005CAB;">{{ p.price_per_kg_rwf }} RWF</strong></td>
+                            <td>{% if p.wholesale_price_rwf %}{{ p.wholesale_price_rwf }} RWF{% else %}—{% endif %}</td>
+                            <td>{{ p.date_recorded }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 40px 24px;">
+                                <div style="max-width: 480px; margin: 0 auto; color: #64748B;">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px;">
+                                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                    </svg>
+                                    <h4 style="color: #001F3B; margin-bottom: 6px;">No Market Price Records Found</h4>
+                                    <p style="font-size: 0.85rem; line-height: 1.5;">
+                                        Market price surveys are collected weekly via e-Soko and MINAGRI consumer surveys. No quotes currently match the active filter criteria.
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-top: 1px solid #E2E8F0; font-size: 0.875rem;">
+                <span style="color: #64748B;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                <div style="display: flex; gap: 8px;">
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #0F172A;">Previous</a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #0F172A;">Next</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

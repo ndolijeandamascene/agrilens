@@ -4,5 +4,6 @@ from . import views
 app_name = 'farmers'
 
 urlpatterns = [
-    # Farmer records and cooperative listings
+    path('', views.farmer_list, name='farmer_list'),
 ]
+

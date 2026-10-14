@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | AgriLens Rwanda{% endblock %}
+{% block section_title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="max-width: 900px; margin: 24px auto; padding: 0 20px;">
+    <!-- Navigation Return Strip -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <a href="{% url 'accounts:user_list' %}" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #64748B; font-size: 0.88rem; font-weight: 600;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Back to Officers Registry</span>
+        </a>
+        {% if officer %}
+        <a href="{% url 'accounts:user_detail' pk=officer.pk %}" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #005CAB; font-size: 0.88rem; font-weight: 600;">
+            <span>View Officer Dossier &rarr;</span>
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Activation Link Notification Banner (Condition 6 Compliance) -->
+    {% if setup_link %}
+    <div style="background: #F0FDF4; border: 2px solid #86EFAC; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(22, 101, 52, 0.08);">
+        <div style="display: flex; gap: 14px; align-items: flex-start;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: #DCFCE7; color: #16A34A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <div style="flex: 1;">
+                <h3 style="margin: 0 0 6px 0; color: #166534; font-size: 1.15rem; font-weight: 800;">
+                    Officer Account Created Successfully!
+                </h3>
+                <p style="margin: 0 0 14px 0; font-size: 0.88rem; color: #15803D; line-height: 1.5;">
+                    Per institutional security protocol (Milestone 4 Condition 6), raw passwords are <strong>never</strong> transmitted or displayed. Provide the following single-use cryptographic activation link to the officer to configure their official password.
+                </p>
+
+                <div style="display: flex; gap: 10px; align-items: center; background: #FFFFFF; border: 1px solid #86EFAC; padding: 10px 14px; border-radius: 8px;">
+                    <input id="activation-link-input" type="text" readonly value="{{ setup_link }}" style="flex: 1; border: none; font-family: monospace; font-size: 0.86rem; color: #0F172A; background: transparent; outline: none;">
+                    <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('activation-link-input').value); alert('Activation link copied to clipboard!');" style="padding: 6px 14px; background: #16A34A; color: #FFFFFF; border: none; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer; white-space: nowrap;">
+                        Copy Link
+                    </button>
+                </div>
+                <div style="margin-top: 8px; font-size: 0.78rem; color: #166534;">
+                    * This single-use link automatically expires in 3 days or immediately upon first successful password submission.
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Form Panel -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 4px 12px -2px rgba(0, 31, 59, 0.05); overflow: hidden;">
+        <div style="background: #F8FAFC; border-bottom: 1px solid #E2E8F0; padding: 20px 28px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: #001F3B;">
+                    {% if officer %}Edit Officer Account &bull; {{ officer.username }}{% else %}Register Institutional Officer{% endif %}
+                </h2>
+                <p style="margin: 4px 0 0 0; font-size: 0.82rem; color: #64748B;">
+                    {% if officer %}Update organizational details, role clearances, and geographic jurisdictions.{% else %}Create official credential shell with role-based and geographic clearances.{% endif %}
+                </p>
+            </div>
+            {% if officer %}
+            <span style="font-size: 0.78rem; padding: 4px 10px; border-radius: 6px; font-weight: 700; {% if officer.is_active %}background: #DCFCE7; color: #166534;{% else %}background: #FEE2E2; color: #991B1B;{% endif %}">
+                {% if officer.is_active %}Active Account{% else %}Suspended / Inactive{% endif %}
+            </span>
+            {% endif %}
+        </div>
+
+        <form method="post" style="padding: 28px;">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div style="padding: 12px 18px; border-radius: 8px; margin-bottom: 24px; font-size: 0.88rem; background: #FEF2F2; color: #991B1B; border: 1px solid #FCA5A5;">
+                {% for error in form.non_field_errors %}
+                    <p style="margin: 0;">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Section 1: Officer Identity -->
+            <div style="margin-bottom: 28px;">
+                <h3 style="font-size: 0.95rem; font-weight: 800; color: #001F3B; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
+                    1. Account Identity &amp; Contact
+                </h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
+                    {% if form.username %}
+                    <div>
+                        <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">
+                            Username <span style="color: #DC2626;">*</span>
+                        </label>
+                        {{ form.username }}
+                        {% if form.username.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.username.errors.0 }}</div>{% endif %}
+                        <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">Letters, digits, and @/./+/-/_ only.</div>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">
+                            Official Email <span style="color: #DC2626;">*</span>
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.email.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
+                    <div>
+                        <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">First Name</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.first_name.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">Last Name</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.last_name.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+                    <div>
+                        <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">Organization / Ministry</label>
+                        {{ form.organization }}
+                        {% if form.organization.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.organization.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">Phone Contact</label>
+                        {{ form.phone_number }}
+                        {% if form.phone_number.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.phone_number.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Role & Institutional Authorization -->
+            <div style="margin-bottom: 28px;">
+                <h3 style="font-size: 0.95rem; font-weight: 800; color: #001F3B; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
+                    2. Institutional Role &amp; Clearances
+                </h3>
+
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">
+                        Assigned Role <span style="color: #DC2626;">*</span>
+                    </label>
+                    {{ form.role }}
+                    {% if form.role.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.role.errors.0 }}</div>{% endif %}
+                    <div style="font-size: 0.76rem; color: #64748B; margin-top: 6px; line-height: 1.4;">
+                        Institutional Clearances: <strong>Administrator</strong> (Full Governance &amp; Users), <strong>NISR Data Manager</strong> (ETL &amp; Validation), <strong>Agricultural Analyst</strong> (Analytics &amp; Data Views), <strong>District Officer</strong> (District-Restricted Submissions &amp; Reports), <strong>Data Entry Officer</strong> (Manual Observation Drafting), <strong>Reviewer</strong> (Manual Record Approval).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Geographic Jurisdiction -->
+            <div style="margin-bottom: 28px;">
+                <h3 style="font-size: 0.95rem; font-weight: 800; color: #001F3B; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
+                    3. Geographic Jurisdiction (Scope)
+                </h3>
+
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">
+                        Assigned Province (Optional Filter)
+                    </label>
+                    {{ form.assigned_province }}
+                    {% if form.assigned_province.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.assigned_province.errors.0 }}</div>{% endif %}
+                    <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">Optional grouping province for organizational clarity.</div>
+                </div>
+
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">
+                        Assigned Districts (Mandatory for District Officers)
+                    </label>
+                    {{ form.assigned_districts }}
+                    {% if form.assigned_districts.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.assigned_districts.errors.0 }}</div>{% endif %}
+                    <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">
+                        Hold Ctrl (or Cmd on Mac) to select multiple districts. For District Officers, this strictly defines their query and submission boundaries.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Security & Activation (Edit Mode Only) -->
+            {% if form.is_active %}
+            <div style="margin-bottom: 28px;">
+                <h3 style="font-size: 0.95rem; font-weight: 800; color: #001F3B; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
+                    4. Account Status &amp; Self-Lockout Guard
+                </h3>
+
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    {{ form.is_active }}
+                    <label for="{{ form.is_active.id_for_label }}" style="font-size: 0.88rem; font-weight: 600; color: #0F172A; cursor: pointer;">
+                        Account is Active (Authorizes login and API token requests)
+                    </label>
+                </div>
+                {% if form.is_active.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.is_active.errors.0 }}</div>{% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Form Action Buttons -->
+            <div style="display: flex; justify-content: flex-end; gap: 14px; border-top: 1px solid #E2E8F0; padding-top: 20px;">
+                <a href="{% url 'accounts:user_list' %}" style="padding: 10px 20px; background: #F1F5F9; color: #475569; border-radius: 8px; font-weight: 600; font-size: 0.88rem; text-decoration: none;">
+                    Cancel
+                </a>
+                <button type="submit" style="padding: 10px 26px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0, 92, 171, 0.25);">
+                    {% if officer %}Save Officer Changes{% else %}Register Officer &amp; Generate Setup Link{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

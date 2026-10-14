@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | AgriLens Rwanda{% endblock %}
+{% block section_title %}District Performance Dossier{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="padding: 24px 32px; max-width: 1200px; margin: 0 auto;">
+    <!-- Header Strip -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">
+                <span>District Agricultural Intelligence Dossier</span>
+                <span>&bull;</span>
+                <span>{{ district.province.name }} Province</span>
+            </div>
+            <h1 style="margin: 0; font-size: 1.6rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+                {{ district.name }} District Performance Bulletin
+            </h1>
+            <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #64748B;">
+                Season {{ selected_year }} {{ selected_season }} &bull; Localized agricultural microdata and comparative national benchmarks
+            </p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <a href="{% url 'dashboard:reports_national' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
+                <span>&larr; National Report</span>
+            </a>
+            <button onclick="window.print()" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 8px; font-size: 0.86rem; font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(0, 92, 171, 0.25);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                <span>Print Dossier</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Scoped District Selector & Parameters Strip -->
+    <div style="background: #FFFFFF; border-radius: 10px; border: 1px solid #E2E8F0; padding: 16px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+        <form method="GET" style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <label style="font-size: 0.82rem; font-weight: 700; color: #475569;">Target District:</label>
+                <select name="district" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; background: #FFFFFF; font-weight: 600; color: #001F3B;" onchange="this.form.submit()">
+                    {% for d in authorized_districts %}
+                        <option value="{{ d.id }}" {% if d.id == district.id %}selected{% endif %}>
+                            {{ d.name }} ({{ d.province.name }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <label style="font-size: 0.82rem; font-weight: 700; color: #475569;">Survey Year:</label>
+                <select name="year" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; background: #FFFFFF;" onchange="this.form.submit()">
+                    <option value="2025" {% if selected_year == 2025 %}selected{% endif %}>SAS 2025</option>
+                    <option value="2024" {% if selected_year == 2024 %}selected{% endif %}>SAS 2024</option>
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <label style="font-size: 0.82rem; font-weight: 700; color: #475569;">Season:</label>
+                <select name="season" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; background: #FFFFFF;" onchange="this.form.submit()">
+                    <option value="A" {% if selected_season == 'A' %}selected{% endif %}>Season A (Main)</option>
+                    <option value="B" {% if selected_season == 'B' %}selected{% endif %}>Season B</option>
+                    <option value="C" {% if selected_season == 'C' %}selected{% endif %}>Season C</option>
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <label style="font-size: 0.82rem; font-weight: 700; color: #475569;">Crop Filter:</label>
+                <select name="crop" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; background: #FFFFFF;" onchange="this.form.submit()">
+                    {% for c in priority_crops %}
+                        <option value="{{ c.name }}" {% if selected_crop == c.name %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+        {% if user.is_authenticated and user.role == 'DISTRICT_OFFICER' %}
+        <div style="font-size: 0.78rem; font-weight: 700; color: #B45309; background: #FFFBEB; padding: 4px 10px; border-radius: 6px; border: 1px solid #FDE68A;">
+            Geographically Scoped (District Officer Clearance)
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- District Key Performance Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #005CAB;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                {{ district.name }} {{ selected_crop }} Yield
+            </div>
+            <div style="font-size: 1.55rem; font-weight: 800; color: #005CAB;">
+                {{ district_metrics.weighted_yield_kg_per_ha|floatformat:0 }} <span style="font-size: 0.9rem; font-weight: 600; color: #64748B;">kg/ha</span>
+            </div>
+            <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">
+                National Benchmark: {{ national_summary.weighted_yield_kg_per_ha|floatformat:0 }} kg/ha
+            </div>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #00AEEF;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                Cultivated Area
+            </div>
+            <div style="font-size: 1.55rem; font-weight: 800; color: #001F3B;">
+                {{ district_metrics.total_area_ha|floatformat:1 }} <span style="font-size: 0.9rem; font-weight: 600; color: #64748B;">ha</span>
+            </div>
+            <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">District plot expansion</div>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #46962B;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                Estimated Production
+            </div>
+            <div style="font-size: 1.55rem; font-weight: 800; color: #46962B;">
+                {{ district_metrics.total_production_mt|floatformat:1 }} <span style="font-size: 0.9rem; font-weight: 600; color: #64748B;">MT</span>
+            </div>
+            <div style="font-size: 0.74rem; color: #166534; margin-top: 4px;">Weighted harvest output</div>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #B28200;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                Microdata Sample
+            </div>
+            <div style="font-size: 1.55rem; font-weight: 800; color: #001F3B;">
+                {{ district_metrics.plot_count }}
+            </div>
+            <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">Observations surveyed</div>
+        </div>
+    </div>
+
+    <!-- Comparative Practice Adoption: District vs National -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+        <h2 style="margin: 0 0 16px 0; font-size: 1.15rem; font-weight: 800; color: #001F3B;">
+            Technology Adoption: {{ district.name }} vs National Benchmark
+        </h2>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+                <thead>
+                    <tr style="background: #F8FAFC; border-bottom: 2px solid #E2E8F0; text-align: left; color: #475569; font-weight: 700;">
+                        <th style="padding: 12px 16px;">Agricultural Practice</th>
+                        <th style="padding: 12px 16px; text-align: right;">{{ district.name }} Adoption</th>
+                        <th style="padding: 12px 16px; text-align: right;">National Benchmark</th>
+                        <th style="padding: 12px 16px; text-align: right;">Variance / Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding: 12px 16px; font-weight: 600; color: #001F3B;">Improved Seed Usage</td>
+                        <td style="padding: 12px 16px; text-align: right; font-weight: 700; color: #005CAB;">
+                            {{ district_metrics.improved_seed_rate|floatformat:1 }}%
+                        </td>
+                        <td style="padding: 12px 16px; text-align: right; color: #64748B;">
+                            {{ national_summary.adoption_rates.improved_seed|floatformat:1 }}%
+                        </td>
+                        <td style="padding: 12px 16px; text-align: right; font-weight: 700;">
+                            {% if district_metrics.improved_seed_rate >= national_summary.adoption_rates.improved_seed %}
+                                <span style="color: #166534;">&uarr; Above National Average</span>
+                            {% else %}
+                                <span style="color: #DC2626;">&darr; Below National Average</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding: 12px 16px; font-weight: 600; color: #001F3B;">Inorganic Fertilizer Application</td>
+                        <td style="padding: 12px 16px; text-align: right; font-weight: 700; color: #00AEEF;">
+                            {{ district_metrics.fertilizer_rate|floatformat:1 }}%
+                        </td>
+                        <td style="padding: 12px 16px; text-align: right; color: #64748B;">
+                            {{ national_summary.adoption_rates.inorganic_fertilizer|floatformat:1 }}%
+                        </td>
+                        <td style="padding: 12px 16px; text-align: right; font-weight: 700;">
+                            {% if district_metrics.fertilizer_rate >= national_summary.adoption_rates.inorganic_fertilizer %}
+                                <span style="color: #166534;">&uarr; Above National Average</span>
+                            {% else %}
+                                <span style="color: #DC2626;">&darr; Below National Average</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding: 12px 16px; font-weight: 600; color: #001F3B;">Irrigation Infrastructure Access</td>
+                        <td style="padding: 12px 16px; text-align: right; font-weight: 700; color: #B28200;">
+                            {{ district_metrics.irrigation_rate|floatformat:1 }}%
+                        </td>
+                        <td style="padding: 12px 16px; text-align: right; color: #64748B;">
+                            {{ national_summary.adoption_rates.irrigation|floatformat:1 }}%
+                        </td>
+                        <td style="padding: 12px 16px; text-align: right; font-weight: 700;">
+                            {% if district_metrics.irrigation_rate >= national_summary.adoption_rates.irrigation %}
+                                <span style="color: #166534;">&uarr; Above National Average</span>
+                            {% else %}
+                                <span style="color: #DC2626;">&darr; Below National Average</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Administrative Sectors Coverage -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+        <h2 style="margin: 0 0 14px 0; font-size: 1.15rem; font-weight: 800; color: #001F3B;">
+            Administrative Sectors in {{ district.name }} ({{ sectors.count }})
+        </h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            {% for s in sectors %}
+                <span style="padding: 6px 12px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.82rem; color: #0F172A; font-weight: 600;">
+                    {{ s.name }}
+                </span>
+            {% empty %}
+                <div style="color: #64748B; font-size: 0.84rem;">No sectors cataloged for this district.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

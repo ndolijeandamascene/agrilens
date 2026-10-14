@@ -4,5 +4,6 @@ from . import views
 app_name = 'surveys'
 
 urlpatterns = [
-    # Survey intake and validation endpoints
+    path('', views.survey_list, name='survey_list'),
 ]
+

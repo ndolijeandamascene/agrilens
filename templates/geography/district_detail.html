@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}{{ district.name }} District | AgriLens Rwanda{% endblock %}
+{% block section_title %}{{ district.name }} District &bull; Geographic Intelligence{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div style="margin-bottom: 16px;">
+        <a href="{% url 'geography:district_list' %}" style="color: #005CAB; font-weight: 600; text-decoration: none; font-size: 0.875rem;">
+            &larr; Back to Districts Registry
+        </a>
+    </div>
+
+    <div class="panel-card" style="margin-bottom: 24px;">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <h3>{{ district.name }} District</h3>
+                <p class="panel-subtitle">Province: <strong>{{ district.province.name }}</strong> &bull; Administrative Code: <code>{{ district.code }}</code></p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <a href="{% url 'indicators:productivity' %}?district={{ district.name }}" class="btn-action primary" style="padding: 8px 16px; background: #005CAB; color: white; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 0.85rem;">
+                    Productivity Analytics &rarr;
+                </a>
+            </div>
+        </div>
+        <div class="panel-body" style="padding: 24px;">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;">
+                <div style="padding: 16px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
+                    <div style="font-size: 0.8rem; color: #64748B;">Total Sectors</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: #001F3B; margin-top: 4px;">{{ sectors|length }}</div>
+                </div>
+                <div style="padding: 16px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
+                    <div style="font-size: 0.8rem; color: #64748B;">Verified Microdata Plots</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: #005CAB; margin-top: 4px;">{{ total_obs }}</div>
+                </div>
+                <div style="padding: 16px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
+                    <div style="font-size: 0.8rem; color: #64748B;">Province Jurisdiction</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: #001F3B; margin-top: 8px;">{{ district.province.name }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Administrative Sectors List -->
+    <div class="panel-card" style="margin-bottom: 24px;">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <h3>Administrative Sectors ({{ sectors|length }})</h3>
+                <p class="panel-subtitle">Official administrative sub-divisions for {{ district.name }}</p>
+            </div>
+        </div>
+        <div class="panel-body" style="padding: 24px;">
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                {% for sector in sectors %}
+                <div style="padding: 8px 14px; background: #F1F5F9; border-radius: 6px; font-size: 0.85rem; color: #1E293B; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-weight: 600;">{{ sector.name }}</span>
+                    <code style="font-size: 0.75rem; color: #64748B;">{{ sector.code }}</code>
+                </div>
+                {% empty %}
+                <p style="color: #64748B;">No sectors cataloged for this district.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -17,6 +17,7 @@ urlpatterns = [
     path('inputs/', include('apps.inputs.urls', namespace='inputs')),
     path('markets/', include('apps.markets.urls', namespace='markets')),
     path('indicators/', include('apps.indicators.urls', namespace='indicators')),
+    path('data-management/', include('apps.data_management.urls', namespace='data_management')),
     path('api/', include('apps.api.urls', namespace='api')),
 ]
 

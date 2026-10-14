@@ -1490,3 +1490,47 @@ The final product should demonstrate that official agricultural data can be tran
 **Tagline:** See Agriculture Through Data.
 
 **Repository:** `agrilens`
+
+---
+
+# 35. Verified Data Architecture & Pipeline Execution Guide
+
+### 35.1 Environment Configuration & Database Setup
+AgriLens operates on a single unified configuration (`config/settings.py`) driven by `.env`:
+```bash
+# 1. Activate virtual environment
+.\venv\Scripts\activate
+
+# 2. Configure .env with remote or local PostgreSQL
+DATABASE_URL=postgres://user:password@hostname:5439/agrilens?sslmode=disable
+
+# 3. Apply all database migrations
+python manage.py migrate
+
+# 4. Seed authoritative administrative geography (30 Districts, 416 Sectors, Crops, Seasons)
+python scripts/seed_geography.py
+```
+
+### 35.2 Official NISR Microdata ETL Ingestion
+The ETL pipeline ingests official SAS microdata into the 3-Tier storage architecture:
+```bash
+# Ingest SAS 2025 Season A (Pilot or Full)
+python manage.py import_sas_production --file "Datasets/SAS 2025 catalog and data dictionary/Season A/Rwa_raw_SeasonA2025_Production.sav" --year 2025 --season A --limit 5000
+
+# Ingest SAS 2024 Season A (Multi-year comparison)
+python manage.py import_sas_production --file "Datasets/SAS 2024 catalog and data dictionary/Season A/Rwa_raw_SeasonA2024_Production.sav" --year 2024 --season A --limit 5000
+```
+
+### 35.3 Key Endpoints & Capabilities
+- **Public Intelligence Portal:** `/` (Interactive map, Track 1 context, productivity gap simulator)
+- **National Agricultural Dashboard:** `/dashboard/` (Survey-weighted KPIs, practice meters, live audited lineage log)
+- **Productivity Intelligence (Track 1):** `/indicators/productivity/` (Yield comparisons, district rankings, YoY growth)
+- **Data Governance Hub:** `/data-management/` (Ingestion batch registry, QA flags, review queues)
+- **Manual Data Entry Form:** `/data-management/entries/create/` (Dependent dropdowns `Province ➔ District ➔ Sector`, draft & approval workflow)
+
+### 35.4 Automated Test Suite
+Run the full test suite covering data validation, weighting formulas, review workflow, and geographic constraints:
+```bash
+python manage.py test tests
+```
+

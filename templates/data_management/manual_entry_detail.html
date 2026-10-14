@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Observation #{{ entry.id }} Detail | AgriLens{% endblock %}
+{% block section_title %}Observation Review &amp; Audit Trail{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="max-width: 900px; margin: 0 auto;">
+    <!-- Top Action Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div>
+            <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 4px;">
+                <a href="{% url 'data_management:hub' %}" style="color: #005CAB; text-decoration: none;">Data Management</a> &bull; 
+                <a href="{% url 'data_management:manual_entry_list' %}" style="color: #005CAB; text-decoration: none;">Manual Registry</a> &bull; 
+                <span>Record #{{ entry.id }}</span>
+            </div>
+            <h2 style="margin: 0; font-size: 1.5rem; color: #0F172A; font-weight: 800;">
+                {{ entry.crop.name }} &bull; {{ entry.district.name }}, {{ entry.sector.name }}
+            </h2>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <a href="{% url 'data_management:manual_entry_list' %}" class="btn-portal-return">
+                <span>&larr; Registry</span>
+            </a>
+            {% if entry.review_status != 'APPROVED' %}
+                <a href="{% url 'data_management:manual_entry_edit' pk=entry.pk %}" class="btn-portal-return" style="background: #005CAB; color: white;">
+                    <span>Edit Record</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Status Banner -->
+    <div style="background: white; border-radius: 12px; border: 1px solid #E2E8F0; padding: 20px 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <span style="font-size: 0.8rem; color: #64748B; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Current Review Status</span>
+            <div style="margin-top: 4px;">
+                {% if entry.review_status == 'APPROVED' %}
+                    <span style="background: #DCFCE7; color: #166534; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 800;">APPROVED BY AUTHORITY</span>
+                {% elif entry.review_status == 'SUBMITTED' %}
+                    <span style="background: #FEF3C7; color: #92400E; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 800;">PENDING ADMINISTRATIVE REVIEW</span>
+                {% elif entry.review_status == 'REJECTED' %}
+                    <span style="background: #FEE2E2; color: #991B1B; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 800;">RETURNED FOR CORRECTION</span>
+                {% else %}
+                    <span style="background: #F1F5F9; color: #475569; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 800;">UNSUBMITTED DRAFT</span>
+                {% endif %}
+            </div>
+        </div>
+        <div style="text-align: right;">
+            <span style="font-size: 0.8rem; color: #64748B;">Data Provenance &amp; Source</span>
+            <div style="font-family: monospace; font-weight: 700; color: #005CAB; font-size: 0.9rem; margin-top: 2px;">
+                {% if entry.data_source %}{{ entry.data_source.source_type }}{% else %}MANUAL_ENTRY{% endif %}
+            </div>
+            <div style="font-size: 0.75rem; color: #0284C7; font-weight: 600;">{{ entry.get_data_kind_display }}</div>
+        </div>
+    </div>
+
+    <!-- Core Metrics Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div style="background: white; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px;">
+            <div style="font-size: 0.8rem; color: #64748B;">Calculated Yield</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #16A34A; margin-top: 4px;">{{ entry.calculated_yield_kg_per_ha|floatformat:2 }}</div>
+            <div style="font-size: 0.75rem; color: #64748B;">kg per hectare</div>
+        </div>
+        <div style="background: white; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px;">
+            <div style="font-size: 0.8rem; color: #64748B;">Harvested Area</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #005CAB; margin-top: 4px;">{{ entry.plot_area_ha }}</div>
+            <div style="font-size: 0.75rem; color: #64748B;">hectares ({{ entry.plot_area_ha|floatformat:2 }} ha)</div>
+        </div>
+        <div style="background: white; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px;">
+            <div style="font-size: 0.8rem; color: #64748B;">Total Production</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #0F172A; margin-top: 4px;">{{ entry.total_production_kg }}</div>
+            <div style="font-size: 0.75rem; color: #64748B;">kilograms</div>
+        </div>
+        <div style="background: white; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px;">
+            <div style="font-size: 0.8rem; color: #64748B;">Post-Harvest Loss</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #DC2626; margin-top: 4px;">{{ entry.loss_quantity_kg }}</div>
+            <div style="font-size: 0.75rem; color: #64748B;">kilograms lost</div>
+        </div>
+    </div>
+
+    <!-- Observation Field Breakdown -->
+    <div style="background: white; border-radius: 12px; border: 1px solid #E2E8F0; padding: 24px; margin-bottom: 24px;">
+        <h4 style="margin: 0 0 16px 0; font-size: 1rem; color: #0F172A; font-weight: 700; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
+            Observation Specifications
+        </h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 0.875rem;">
+            <div>
+                <span style="color: #64748B;">Data Kind:</span>
+                <span style="font-weight: 700; color: #0369A1; margin-left: 8px; background: #E0F2FE; padding: 2px 8px; border-radius: 4px;">{{ entry.get_data_kind_display }}</span>
+            </div>
+            <div>
+                <span style="color: #64748B;">Linked Data Source:</span>
+                <span style="font-weight: 600; color: #0F172A; margin-left: 8px;">{{ entry.data_source.name|default:"Dynamic Manual Registry" }}</span>
+            </div>
+            <div>
+                <span style="color: #64748B;">Province:</span>
+                <span style="font-weight: 600; color: #0F172A; margin-left: 8px;">{{ entry.district.province.name }}</span>
+            </div>
+            <div>
+                <span style="color: #64748B;">District &amp; Sector:</span>
+                <span style="font-weight: 600; color: #0F172A; margin-left: 8px;">{{ entry.district.name }}, {{ entry.sector.name }}</span>
+            </div>
+            <div>
+                <span style="color: #64748B;">Survey Season:</span>
+                <span style="font-weight: 600; color: #0F172A; margin-left: 8px;">{{ entry.season }} (Year: {{ entry.season.year }}, Season: {{ entry.season.season }})</span>
+            </div>
+            <div>
+                <span style="color: #64748B;">Observation Date:</span>
+                <span style="font-weight: 600; color: #0F172A; margin-left: 8px;">{{ entry.observation_date }}</span>
+            </div>
+            <div>
+                <span style="color: #64748B;">Reporting Organization:</span>
+                <span style="font-weight: 600; color: #0F172A; margin-left: 8px;">{{ entry.reporting_organization|default:"Not specified" }}</span>
+            </div>
+            <div>
+                <span style="color: #64748B;">Reference Identifier:</span>
+                <span style="font-weight: 600; color: #0F172A; margin-left: 8px;">{{ entry.observation_reference|default:"None" }}</span>
+            </div>
+            <div>
+                <span style="color: #64748B;">Quantity Sold:</span>
+                <span style="font-weight: 600; color: #0F172A; margin-left: 8px;">{{ entry.quantity_sold_kg }} kg</span>
+            </div>
+            <div>
+                <span style="color: #64748B;">Farmgate Price:</span>
+                <span style="font-weight: 600; color: #0F172A; margin-left: 8px;">{% if entry.farmgate_price_rwf %}{{ entry.farmgate_price_rwf }} RWF/kg{% else %}N/A{% endif %}</span>
+            </div>
+        </div>
+
+        <h4 style="margin: 24px 0 12px 0; font-size: 0.95rem; color: #0F172A; font-weight: 700;">
+            Observed Farming Practices
+        </h4>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <span style="padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; {% if entry.is_irrigated %}background:#E0F2FE; color:#0369A1;{% else %}background:#F1F5F9; color:#94A3B8;{% endif %}">
+                Irrigation: {% if entry.is_irrigated %}YES{% else %}NO{% endif %}
+            </span>
+            <span style="padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; {% if entry.is_improved_seed %}background:#DCFCE7; color:#15803D;{% else %}background:#F1F5F9; color:#94A3B8;{% endif %}">
+                Improved Seed: {% if entry.is_improved_seed %}YES{% else %}NO{% endif %}
+            </span>
+            <span style="padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; {% if entry.uses_inorganic_fertilizer %}background:#FEF9C3; color:#A16207;{% else %}background:#F1F5F9; color:#94A3B8;{% endif %}">
+                Mineral Fertilizer: {% if entry.uses_inorganic_fertilizer %}YES{% else %}NO{% endif %}
+            </span>
+            <span style="padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; {% if entry.uses_organic_fertilizer %}background:#FEF9C3; color:#A16207;{% else %}background:#F1F5F9; color:#94A3B8;{% endif %}">
+                Organic Fertilizer: {% if entry.uses_organic_fertilizer %}YES{% else %}NO{% endif %}
+            </span>
+            <span style="padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; {% if entry.has_soil_conservation %}background:#DCFCE7; color:#15803D;{% else %}background:#F1F5F9; color:#94A3B8;{% endif %}">
+                Soil Conservation: {% if entry.has_soil_conservation %}YES{% else %}NO{% endif %}
+            </span>
+            <span style="padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; {% if entry.uses_mechanization %}background:#F3E8FF; color:#6B21A8;{% else %}background:#F1F5F9; color:#94A3B8;{% endif %}">
+                Mechanization: {% if entry.uses_mechanization %}YES{% else %}NO{% endif %}
+            </span>
+        </div>
+
+        {% if entry.remarks %}
+        <div style="margin-top: 20px; padding: 12px 16px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0; font-size: 0.85rem; color: #475569;">
+            <strong>Field Notes:</strong> {{ entry.remarks }}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Review & Authority Action Card -->
+    <div style="background: white; border-radius: 12px; border: 1px solid #E2E8F0; padding: 24px; margin-bottom: 24px;">
+        <h4 style="margin: 0 0 16px 0; font-size: 1rem; color: #0F172A; font-weight: 700;">
+            Administrative Review &amp; Quality Audit
+        </h4>
+        
+        {% if entry.review_comments %}
+        <div style="margin-bottom: 20px; padding: 14px 18px; background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 8px; font-size: 0.875rem; color: #92400E;">
+            <strong>Reviewer Feedback ({{ entry.reviewed_at|date:"Y-m-d H:i" }}):</strong><br>
+            {{ entry.review_comments }}
+        </div>
+        {% endif %}
+
+        {% if entry.review_status != 'APPROVED' %}
+            {% if is_reviewer %}
+            <form method="POST" action="{% url 'data_management:manual_entry_review' pk=entry.pk %}">
+                {% csrf_token %}
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                        Review Comments / Audit Justification:
+                    </label>
+                    <textarea name="review_comments" rows="3" class="form-textarea" style="width: 100%; box-sizing: border-box;" placeholder="Enter audit verification remarks before approving or returning this record..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="submit" name="decision" value="reject" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #DC2626; background: #FEF2F2; color: #DC2626; font-weight: 700; cursor: pointer;">
+                        Return for Correction
+                    </button>
+                    <button type="submit" name="decision" value="approve" style="padding: 10px 24px; border-radius: 8px; border: none; background: #16A34A; color: white; font-weight: 700; cursor: pointer;">
+                        Approve Record &check;
+                    </button>
+                </div>
+            </form>
+            {% else %}
+            <div style="padding: 14px 18px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.85rem; color: #64748B;">
+                <span style="font-weight: 600; color: #334155;">Review Authorization Notice:</span>
+                This record is currently <strong>{{ entry.get_review_status_display }}</strong>. Official review and approval actions are restricted to verified Administrators, Agricultural Analysts, and MINAGRI Policy Makers.
+                {% if not user.is_authenticated %}
+                <a href="{% url 'accounts:login' %}?next={{ request.path }}" style="color: #005CAB; font-weight: 600; margin-left: 6px;">Sign in with authorized officer credentials &rarr;</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        {% else %}
+        <div style="color: #16A34A; font-weight: 600; font-size: 0.875rem;">
+            &check; Record verified and approved on {{ entry.reviewed_at|date:"Y-m-d H:i" }} by {{ entry.reviewed_by.get_full_name|default:entry.reviewed_by.username }}.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Audit Traceability Footer -->
+    <div style="font-size: 0.8rem; color: #64748B; text-align: center; margin-bottom: 32px;">
+        Submitted by {{ entry.created_by.username }} on {{ entry.created_at|date:"Y-m-d H:i:s" }} &bull; Last updated {{ entry.updated_at|date:"Y-m-d H:i:s" }}
+    </div>
+</div>
+{% endblock %}

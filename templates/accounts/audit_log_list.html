@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}System Audit Trail &amp; Compliance | AgriLens Rwanda{% endblock %}
+{% block section_title %}Security Audit Trail &amp; Compliance Logs{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="padding: 24px 32px;">
+    <!-- Header Strip -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <h1 style="margin: 0; font-size: 1.5rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+                System &amp; Security Audit Trail
+            </h1>
+            <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #64748B;">
+                Immutable, append-only operational log recording logins, role modifications, geographic assignments, and data governance actions.
+            </p>
+        </div>
+        <div>
+            <a href="{% url 'accounts:user_list' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-weight: 600; font-size: 0.86rem; text-decoration: none;">
+                &larr; Officers Registry
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter and Search Strip -->
+    <div style="background: #FFFFFF; border-radius: 10px; border: 1px solid #E2E8F0; padding: 16px 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+        <form method="GET" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label for="action-filter" style="font-size: 0.84rem; font-weight: 600; color: #475569;">Action:</label>
+                <select id="action-filter" name="action" style="padding: 7px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: #FFFFFF; color: #0F172A;" onchange="this.form.submit()">
+                    <option value="">All Actions</option>
+                    {% for code, label in actions %}
+                        <option value="{{ code }}" {% if action_filter == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search actor, target, or details..." style="min-width: 280px; padding: 7px 14px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: #FFFFFF;">
+                <button type="submit" style="padding: 7px 16px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                    Search
+                </button>
+                {% if query or action_filter %}
+                    <a href="{% url 'accounts:audit_log_list' %}" style="font-size: 0.84rem; color: #DC2626; text-decoration: none; font-weight: 500; margin-left: 6px;">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+        <span style="font-size: 0.84rem; color: #64748B; font-weight: 500;">
+            Showing <strong>{{ page_obj.paginator.count }}</strong> of <strong>{{ total_logs }}</strong> log event(s)
+        </span>
+    </div>
+
+    <!-- Audit Logs Table -->
+    <div style="background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; padding: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden;">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                <thead>
+                    <tr style="background: #F8FAFC; border-bottom: 2px solid #E2E8F0; text-align: left; color: #475569; font-weight: 700;">
+                        <th style="padding: 12px 16px;">Timestamp (UTC)</th>
+                        <th style="padding: 12px 16px;">Action</th>
+                        <th style="padding: 12px 16px;">Actor</th>
+                        <th style="padding: 12px 16px;">Target Object</th>
+                        <th style="padding: 12px 16px;">IP Address</th>
+                        <th style="padding: 12px 16px;">Audit Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in page_obj %}
+                    <tr style="border-bottom: 1px solid #F1F5F9; transition: background 0.15s ease;">
+                        <td style="padding: 12px 16px; color: #64748B; font-family: monospace; font-size: 0.8rem; white-space: nowrap;">
+                            {{ log.timestamp|date:"Y-m-d H:i:s" }}
+                        </td>
+                        <td style="padding: 12px 16px;">
+                            <span style="display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;
+                                {% if 'LOGIN' in log.action %}background: #DCFCE7; color: #166534;
+                                {% elif 'LOGOUT' in log.action %}background: #F1F5F9; color: #475569;
+                                {% elif 'FAILED' in log.action or 'DEACT' in log.action %}background: #FEE2E2; color: #991B1B;
+                                {% elif 'ROLE' in log.action or 'PERM' in log.action or 'PASSWORD' in log.action %}background: #FEF3C7; color: #92400E;
+                                {% elif 'APPROVED' in log.action %}background: #DCFCE7; color: #166534;
+                                {% elif 'REJECTED' in log.action %}background: #FEE2E2; color: #991B1B;
+                                {% else %}background: #EFF6FF; color: #1D4ED8;{% endif %}">
+                                {{ log.get_action_display }}
+                            </span>
+                        </td>
+                        <td style="padding: 12px 16px; font-weight: 600; color: #0F172A;">
+                            {% if log.actor %}
+                                <a href="{% url 'accounts:user_detail' pk=log.actor.pk %}" style="color: #005CAB; text-decoration: none;">
+                                    {{ log.actor.username }}
+                                </a>
+                                <span style="font-size: 0.72rem; color: #64748B; font-weight: 400;">({{ log.actor.get_role_display }})</span>
+                            {% else %}
+                                <span style="color: #64748B;">System / Anonymous</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px 16px; color: #0F172A; font-weight: 500;">
+                            {% if log.target_model %}
+                                <span style="font-size: 0.76rem; background: #F1F5F9; color: #475569; padding: 2px 6px; border-radius: 4px; margin-right: 4px;">
+                                    {{ log.target_model }}
+                                </span>
+                            {% endif %}
+                            <span>{{ log.target_repr|default:log.target_id|default:"-" }}</span>
+                        </td>
+                        <td style="padding: 12px 16px; font-family: monospace; font-size: 0.78rem; color: #64748B;">
+                            {{ log.ip_address|default:"-" }}
+                        </td>
+                        <td style="padding: 12px 16px; color: #334155;">
+                            {% if log.details %}
+                                <code style="font-size: 0.75rem; background: #F8FAFC; border: 1px solid #E2E8F0; padding: 3px 6px; border-radius: 4px; word-break: break-all; color: #0F172A;">
+                                    {{ log.details }}
+                                </code>
+                            {% else %}
+                                <span style="color: #94A3B8;">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="padding: 40px; text-align: center; color: #64748B;">
+                            No audit log records match the search filter.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div style="padding: 16px 20px; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.84rem; color: #64748B;">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </div>
+            <div style="display: flex; gap: 8px;">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}&amp;q={{ query }}&amp;action={{ action_filter }}" style="padding: 6px 12px; background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; text-decoration: none; color: #0F172A;">&larr; Previous</a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&amp;q={{ query }}&amp;action={{ action_filter }}" style="padding: 6px 12px; background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; text-decoration: none; color: #0F172A;">Next &rarr;</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}403 Forbidden | Access Restricted | AgriLens{% endblock %}
+{% block section_title %}Access Restricted (HTTP 403){% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="max-width: 680px; margin: 40px auto; text-align: center;">
+    <div style="background: white; border-radius: 16px; border: 1px solid #E2E8F0; padding: 48px 36px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 20px;">
+            🛡️
+        </div>
+        <h2 style="font-size: 1.6rem; font-weight: 800; color: #0F172A; margin: 0 0 12px;">
+            Institutional Access Restricted
+        </h2>
+        <p style="font-size: 0.95rem; color: #64748B; line-height: 1.6; margin: 0 0 24px;">
+            Your account role (<strong>{{ user_role|default:user.get_role_display }}</strong>) does not hold the necessary security clearance to view or execute actions on this resource.
+        </p>
+
+        {% if required_roles %}
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 18px; margin-bottom: 28px; text-align: left; font-size: 0.85rem;">
+            <div style="color: #475569; font-weight: 600; margin-bottom: 6px;">Authorized Role Clearance Required:</div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                {% for r in required_roles %}
+                    <span style="background: #E0F2FE; color: #0369A1; padding: 3px 8px; border-radius: 4px; font-weight: 600; font-family: monospace;">{{ r }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div style="display: flex; justify-content: center; gap: 12px;">
+            <a href="javascript:history.back()" class="btn-portal-return">
+                <span>&larr; Return to Previous Page</span>
+            </a>
+            <a href="{% url 'dashboard:overview' %}" class="btn-portal-return" style="background: #005CAB; color: white;">
+                <span>National Dashboard &rarr;</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

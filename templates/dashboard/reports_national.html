@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | AgriLens Rwanda{% endblock %}
+{% block section_title %}National Agricultural Analytics Bulletin{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="padding: 24px 32px; max-width: 1200px; margin: 0 auto;">
+    <!-- Print / Export Header Strip -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">
+                <span>Official Agricultural Intelligence Report</span>
+                <span>&bull;</span>
+                <span>NISR Track 1 Validated Microdata</span>
+            </div>
+            <h1 style="margin: 0; font-size: 1.6rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+                National Agricultural Productivity &amp; Survey Bulletin
+            </h1>
+            <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #64748B;">
+                Season {{ selected_year }} {{ selected_season }} &bull; Comprehensive indicators across all 30 districts of Rwanda
+            </p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <a href="{% url 'dashboard:reports_district' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
+                <span>District Dossier &rarr;</span>
+            </a>
+            <button onclick="window.print()" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 8px; font-size: 0.86rem; font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(0, 92, 171, 0.25);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                <span>Print Official Bulletin</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Parameter Filter Toolbar -->
+    <div style="background: #FFFFFF; border-radius: 10px; border: 1px solid #E2E8F0; padding: 16px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+        <form method="GET" style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <label style="font-size: 0.82rem; font-weight: 700; color: #475569;">Survey Year:</label>
+                <select name="year" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; background: #FFFFFF;" onchange="this.form.submit()">
+                    <option value="2025" {% if selected_year == 2025 %}selected{% endif %}>SAS 2025</option>
+                    <option value="2024" {% if selected_year == 2024 %}selected{% endif %}>SAS 2024</option>
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <label style="font-size: 0.82rem; font-weight: 700; color: #475569;">Season:</label>
+                <select name="season" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; background: #FFFFFF;" onchange="this.form.submit()">
+                    <option value="A" {% if selected_season == 'A' %}selected{% endif %}>Season A (Main)</option>
+                    <option value="B" {% if selected_season == 'B' %}selected{% endif %}>Season B</option>
+                    <option value="C" {% if selected_season == 'C' %}selected{% endif %}>Season C</option>
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <label style="font-size: 0.82rem; font-weight: 700; color: #475569;">Primary Crop:</label>
+                <select name="crop" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; background: #FFFFFF;" onchange="this.form.submit()">
+                    {% for c in priority_crops %}
+                        <option value="{{ c.name }}" {% if selected_crop == c.name %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <label style="font-size: 0.82rem; font-weight: 700; color: #475569;">Provenance:</label>
+                <select name="source" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; background: #FFFFFF;" onchange="this.form.submit()">
+                    <option value="official" {% if selected_source == 'official' %}selected{% endif %}>Official NISR Microdata (Weighted)</option>
+                    <option value="manual" {% if selected_source == 'manual' %}selected{% endif %}>Approved Manual Submissions</option>
+                    <option value="combined" {% if selected_source == 'combined' %}selected{% endif %}>Combined Provenance</option>
+                </select>
+            </div>
+        </form>
+
+        <div style="font-size: 0.8rem; color: #64748B;">
+            Provenance: <strong>{{ summary.provenance_label }}</strong>
+        </div>
+    </div>
+
+    <!-- Executive KPI Summary Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #005CAB;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                {{ selected_crop }} Production
+            </div>
+            <div style="font-size: 1.55rem; font-weight: 800; color: #001F3B;">
+                {{ summary.total_production_mt|floatformat:1 }} <span style="font-size: 0.9rem; font-weight: 600; color: #64748B;">MT</span>
+            </div>
+            <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">Weighted National Estimate</div>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #00AEEF;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                Cultivated Area
+            </div>
+            <div style="font-size: 1.55rem; font-weight: 800; color: #001F3B;">
+                {{ summary.total_area_ha|floatformat:1 }} <span style="font-size: 0.9rem; font-weight: 600; color: #64748B;">ha</span>
+            </div>
+            <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">Survey-weighted expansion</div>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #46962B;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                Weighted Yield
+            </div>
+            <div style="font-size: 1.55rem; font-weight: 800; color: #46962B;">
+                {{ summary.weighted_yield_kg_per_ha|floatformat:0 }} <span style="font-size: 0.9rem; font-weight: 600; color: #64748B;">kg/ha</span>
+            </div>
+            <div style="font-size: 0.74rem; color: #166534; margin-top: 4px;">Ratio: &sum;(W&middot;P) / &sum;(W&middot;A)</div>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #B28200;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                Plots Sampled
+            </div>
+            <div style="font-size: 1.55rem; font-weight: 800; color: #001F3B;">
+                {{ summary.total_plots }}
+            </div>
+            <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">Microdata observation plots</div>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #DC2626;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                Harvest Loss Rate
+            </div>
+            <div style="font-size: 1.55rem; font-weight: 800; color: #DC2626;">
+                {{ summary.loss_rate_percentage|floatformat:1 }}%
+            </div>
+            <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">Post-harvest loss proportion</div>
+        </div>
+    </div>
+
+    <!-- Priority Crops Performance Matrix -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid #F1F5F9; padding-bottom: 12px;">
+            <div>
+                <h2 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #001F3B;">
+                    Priority Strategic Crops Matrix &bull; Rwanda SAS {{ selected_year }}{{ selected_season }}
+                </h2>
+                <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: #64748B;">
+                    Comparative production and survey-weighted yields across MINAGRI/NISR designated priority food crops.
+                </p>
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.86rem;">
+                <thead>
+                    <tr style="background: #F8FAFC; border-bottom: 2px solid #E2E8F0; text-align: left; color: #475569; font-weight: 700;">
+                        <th style="padding: 12px 14px;">Crop</th>
+                        <th style="padding: 12px 14px;">Category</th>
+                        <th style="padding: 12px 14px; text-align: right;">Sampled Plots</th>
+                        <th style="padding: 12px 14px; text-align: right;">Total Production (MT)</th>
+                        <th style="padding: 12px 14px; text-align: right;">Cultivated Area (ha)</th>
+                        <th style="padding: 12px 14px; text-align: right;">Weighted Yield (kg/ha)</th>
+                        <th style="padding: 12px 14px; text-align: right;">Post-Harvest Loss (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in crop_summaries %}
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding: 12px 14px; font-weight: 700; color: #001F3B;">
+                            <a href="?year={{ selected_year }}&amp;season={{ selected_season }}&amp;crop={{ item.crop.name }}&amp;source={{ selected_source }}" style="color: #005CAB; text-decoration: none;">
+                                {{ item.crop.name }}
+                            </a>
+                        </td>
+                        <td style="padding: 12px 14px; color: #64748B;">
+                            {{ item.crop.category.name|default:"Staple" }}
+                        </td>
+                        <td style="padding: 12px 14px; text-align: right; font-family: monospace;">
+                            {{ item.summary.total_plots }}
+                        </td>
+                        <td style="padding: 12px 14px; text-align: right; font-weight: 600;">
+                            {{ item.summary.total_production_mt|floatformat:1 }}
+                        </td>
+                        <td style="padding: 12px 14px; text-align: right;">
+                            {{ item.summary.total_area_ha|floatformat:1 }}
+                        </td>
+                        <td style="padding: 12px 14px; text-align: right; font-weight: 700; color: #46962B;">
+                            {{ item.summary.weighted_yield_kg_per_ha|floatformat:0 }}
+                        </td>
+                        <td style="padding: 12px 14px; text-align: right; color: #DC2626;">
+                            {{ item.summary.loss_rate_percentage|floatformat:1 }}%
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" style="padding: 30px; text-align: center; color: #64748B;">
+                            No priority crop records found for the selected season.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modern Agricultural Practices Adoption Strip -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+        <h2 style="margin: 0 0 16px 0; font-size: 1.15rem; font-weight: 800; color: #001F3B;">
+            National Practice &amp; Technology Adoption ({{ selected_crop }})
+        </h2>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px;">
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #0F172A;">Improved Seed</span>
+                    <span style="font-size: 0.85rem; font-weight: 800; color: #005CAB;">{{ summary.adoption_rates.improved_seed|floatformat:1 }}%</span>
+                </div>
+                <div style="height: 8px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
+                    <div style="width: {{ summary.adoption_rates.improved_seed }}%; height: 100%; background: #005CAB;"></div>
+                </div>
+            </div>
+
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #0F172A;">Inorganic Fertilizer</span>
+                    <span style="font-size: 0.85rem; font-weight: 800; color: #00AEEF;">{{ summary.adoption_rates.inorganic_fertilizer|floatformat:1 }}%</span>
+                </div>
+                <div style="height: 8px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
+                    <div style="width: {{ summary.adoption_rates.inorganic_fertilizer }}%; height: 100%; background: #00AEEF;"></div>
+                </div>
+            </div>
+
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #0F172A;">Organic Fertilizer</span>
+                    <span style="font-size: 0.85rem; font-weight: 800; color: #46962B;">{{ summary.adoption_rates.organic_fertilizer|floatformat:1 }}%</span>
+                </div>
+                <div style="height: 8px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
+                    <div style="width: {{ summary.adoption_rates.organic_fertilizer }}%; height: 100%; background: #46962B;"></div>
+                </div>
+            </div>
+
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #0F172A;">Irrigation Access</span>
+                    <span style="font-size: 0.85rem; font-weight: 800; color: #B28200;">{{ summary.adoption_rates.irrigation|floatformat:1 }}%</span>
+                </div>
+                <div style="height: 8px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
+                    <div style="width: {{ summary.adoption_rates.irrigation }}%; height: 100%; background: #B28200;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Official Provenance Disclosure -->
+    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px 22px; font-size: 0.8rem; color: #64748B; line-height: 1.5;">
+        <strong style="color: #0F172A;">Statistical Methodology &amp; Provenance Disclosure:</strong>
+        {{ summary.methodological_note }} Validated under Track 1: Agricultural Productivity of the 2026 NISR Big Data Hackathon.
+        Survey weight ratio estimator formula: <code>&sum;(W &times; Production) / &sum;(W &times; Area)</code>.
+    </div>
+</div>
+{% endblock %}

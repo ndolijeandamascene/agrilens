@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}User Management &amp; Institutional Access | AgriLens Rwanda{% endblock %}
+{% block section_title %}User Management &amp; Institutional Governance{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="padding: 24px 32px;">
+    <!-- Header & Action Strip -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <h1 style="margin: 0; font-size: 1.5rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+                Institutional Officers &amp; Access Control
+            </h1>
+            <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #64748B;">
+                Manage administrative accounts, role-based clearances, and geographic jurisdictions across Rwanda.
+            </p>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <a href="{% url 'accounts:audit_log_list' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-weight: 600; font-size: 0.86rem; text-decoration: none;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <span>Audit Trail</span>
+            </a>
+            <a href="{% url 'accounts:user_create' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; background: #005CAB; color: #FFFFFF; border-radius: 8px; font-weight: 700; font-size: 0.86rem; text-decoration: none; box-shadow: 0 2px 6px rgba(0, 92, 171, 0.25);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Register New Officer</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert / Messages -->
+    {% if messages %}
+        {% for message in messages %}
+        <div style="padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; font-weight: 500; {% if message.tags == 'error' %}background: #FEF2F2; color: #991B1B; border: 1px solid #FCA5A5;{% else %}background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0;{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Filter and Search Strip -->
+    <div style="background: #FFFFFF; border-radius: 10px; border: 1px solid #E2E8F0; padding: 16px 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+        <form method="GET" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label for="role-filter" style="font-size: 0.84rem; font-weight: 600; color: #475569;">Role:</label>
+                <select id="role-filter" name="role" style="padding: 7px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: #FFFFFF; color: #0F172A;" onchange="this.form.submit()">
+                    <option value="">All Roles</option>
+                    {% for code, label in roles %}
+                        <option value="{{ code }}" {% if role_filter == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label for="status-filter" style="font-size: 0.84rem; font-weight: 600; color: #475569;">Status:</label>
+                <select id="status-filter" name="status" style="padding: 7px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: #FFFFFF; color: #0F172A;" onchange="this.form.submit()">
+                    <option value="">All Statuses</option>
+                    <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive / Suspended</option>
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search username, email, organization..." style="min-width: 260px; padding: 7px 14px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: #FFFFFF;">
+                <button type="submit" style="padding: 7px 16px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                    Search
+                </button>
+                {% if query or role_filter or status_filter %}
+                    <a href="{% url 'accounts:user_list' %}" style="font-size: 0.84rem; color: #DC2626; text-decoration: none; font-weight: 500; margin-left: 6px;">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+        <span style="font-size: 0.84rem; color: #64748B; font-weight: 500;">
+            Showing <strong>{{ page_obj.paginator.count }}</strong> officer(s)
+        </span>
+    </div>
+
+    <!-- Users Table -->
+    <div style="background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; padding: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden;">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                <thead>
+                    <tr style="background: #F8FAFC; border-bottom: 2px solid #E2E8F0; text-align: left; color: #475569; font-weight: 700;">
+                        <th style="padding: 14px 18px;">Officer Account</th>
+                        <th style="padding: 14px 18px;">Institutional Role</th>
+                        <th style="padding: 14px 18px;">Geographic Clearance</th>
+                        <th style="padding: 14px 18px;">Organization</th>
+                        <th style="padding: 14px 18px;">Status</th>
+                        <th style="padding: 14px 18px;">Date Joined</th>
+                        <th style="padding: 14px 18px; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for officer in page_obj %}
+                    <tr style="border-bottom: 1px solid #F1F5F9; transition: background 0.15s ease;">
+                        <td style="padding: 14px 18px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 36px; height: 36px; border-radius: 8px; background: #E8F7FE; color: #005CAB; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem; flex-shrink: 0; border: 1px solid #BAE0FB;">
+                                    {{ officer.username|slice:":2"|upper }}
+                                </div>
+                                <div>
+                                    <a href="{% url 'accounts:user_detail' pk=officer.pk %}" style="font-weight: 700; color: #001F3B; text-decoration: none; font-size: 0.92rem;">
+                                        {{ officer.get_full_name|default:officer.username }}
+                                    </a>
+                                    <div style="font-size: 0.76rem; color: #64748B;">@{{ officer.username }} &bull; {{ officer.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 14px 18px;">
+                            <span style="display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.76rem; font-weight: 700;
+                                {% if officer.role == 'ADMIN' %}background: #FEF2F2; color: #991B1B; border: 1px solid #FCA5A5;
+                                {% elif officer.role == 'NISR_DATA_MANAGER' %}background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE;
+                                {% elif officer.role == 'ANALYST' %}background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0;
+                                {% elif officer.role == 'DISTRICT_OFFICER' %}background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A;
+                                {% elif officer.role == 'DATA_ENTRY_OFFICER' %}background: #FAF5FF; color: #7E22CE; border: 1px solid #E9D5FF;
+                                {% else %}background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0;{% endif %}">
+                                {{ officer.get_role_display }}
+                            </span>
+                        </td>
+                        <td style="padding: 14px 18px;">
+                            {% if officer.is_national_scope %}
+                                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; font-weight: 600; color: #005CAB; background: #E8F7FE; padding: 3px 8px; border-radius: 4px;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+                                    National Scope (All 30 Districts)
+                                </span>
+                            {% else %}
+                                <div>
+                                    <div style="font-size: 0.8rem; font-weight: 600; color: #0F172A;">
+                                        {{ officer.assigned_province.name|default:"Unassigned Province" }}
+                                    </div>
+                                    <div style="font-size: 0.74rem; color: #64748B;">
+                                        {% with d_count=officer.assigned_districts.count %}
+                                            {% if d_count > 0 %}
+                                                {{ d_count }} District(s): 
+                                                {% for d in officer.assigned_districts.all|slice:":3" %}
+                                                    {{ d.name }}{% if not forloop.last %}, {% endif %}
+                                                {% endfor %}
+                                                {% if d_count > 3 %}+{{ d_count|add:"-3" }} more{% endif %}
+                                            {% else %}
+                                                <span style="color: #DC2626;">No districts assigned</span>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 14px 18px; color: #475569; font-size: 0.84rem;">
+                            {{ officer.organization|default:"NISR / MINAGRI" }}
+                        </td>
+                        <td style="padding: 14px 18px;">
+                            {% if officer.is_active %}
+                                <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.76rem; font-weight: 700; color: #166534; background: #DCFCE7; padding: 3px 8px; border-radius: 12px;">
+                                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #16A34A;"></span>
+                                    Active
+                                </span>
+                            {% else %}
+                                <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.76rem; font-weight: 700; color: #991B1B; background: #FEE2E2; padding: 3px 8px; border-radius: 12px;">
+                                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #DC2626;"></span>
+                                    Inactive
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 14px 18px; font-size: 0.8rem; color: #64748B;">
+                            {{ officer.date_joined|date:"M d, Y" }}
+                        </td>
+                        <td style="padding: 14px 18px; text-align: right;">
+                            <div style="display: inline-flex; gap: 8px; align-items: center;">
+                                <a href="{% url 'accounts:user_detail' pk=officer.pk %}" style="padding: 5px 10px; background: #F1F5F9; color: #001F3B; text-decoration: none; border-radius: 6px; font-size: 0.78rem; font-weight: 600;">
+                                    Dossier
+                                </a>
+                                <a href="{% url 'accounts:user_edit' pk=officer.pk %}" style="padding: 5px 10px; background: #E8F7FE; color: #005CAB; text-decoration: none; border-radius: 6px; font-size: 0.78rem; font-weight: 600;">
+                                    Edit
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" style="padding: 40px; text-align: center; color: #64748B;">
+                            No institutional officer accounts match the selected criteria.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div style="padding: 16px 20px; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.84rem; color: #64748B;">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </div>
+            <div style="display: flex; gap: 8px;">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}&amp;q={{ query }}&amp;role={{ role_filter }}&amp;status={{ status_filter }}" style="padding: 6px 12px; background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; text-decoration: none; color: #0F172A;">&larr; Previous</a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&amp;q={{ query }}&amp;role={{ role_filter }}&amp;status={{ status_filter }}" style="padding: 6px 12px; background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; text-decoration: none; color: #0F172A;">Next &rarr;</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

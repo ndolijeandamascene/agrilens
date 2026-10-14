@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Seasonal Surveys | AgriLens Rwanda{% endblock %}
+{% block section_title %}Seasonal Agricultural Survey (SAS) Campaigns{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="panel-card" style="margin-bottom: 24px;">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <h3>NISR Survey Methodology &amp; Framework</h3>
+                <p class="panel-subtitle">National Institute of Statistics of Rwanda &bull; Two-stage stratified area sampling</p>
+            </div>
+            <span class="panel-badge blue">Track 1 Framework</span>
+        </div>
+        <div class="panel-body" style="padding: 24px;">
+            <p style="font-size: 0.9rem; color: #334155; line-height: 1.6; margin-bottom: 16px;">
+                The Seasonal Agricultural Survey (SAS) covers all 30 districts of Rwanda across three distinct seasons (A, B, and C). The sample utilizes aerial orthophotos, segment sampling units, and objective GPS plot boundary measurements to deliver statistically defensible estimates of cultivated area, production, and practice adoption.
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                <div style="padding: 14px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
+                    <strong style="color: #005CAB; font-size: 0.85rem;">Sampling Design:</strong>
+                    <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: #64748B;">Stratified Area Sampling Frame with probability proportional to size.</p>
+                </div>
+                <div style="padding: 14px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
+                    <strong style="color: #46962B; font-size: 0.85rem;">Harmonized Series:</strong>
+                    <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: #64748B;">SAS 2024 (Season A) and SAS 2025 (Season A) validated microdata.</p>
+                </div>
+                <div style="padding: 14px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
+                    <strong style="color: #00AEEF; font-size: 0.85rem;">Lineage Integration:</strong>
+                    <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: #64748B;">10,800 validated plot observations ingested via PostgreSQL ETL.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Campaigns Table -->
+    <div class="panel-card">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <h3>Registered Survey Rounds</h3>
+                <p class="panel-subtitle">Survey campaigns active within the AgriLens database</p>
+            </div>
+        </div>
+        <div class="panel-body no-padding">
+            <div class="table-responsive">
+                <table class="lineage-table">
+                    <thead>
+                        <tr>
+                            <th>Campaign Title</th>
+                            <th>Survey Season</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                            <th>Submissions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in campaigns %}
+                        <tr>
+                            <td><strong style="color: #001F3B;">{{ c.title }}</strong></td>
+                            <td>{{ c.season }}</td>
+                            <td>
+                                {% if c.is_active %}
+                                <span class="status-pill verified">Active</span>
+                                {% else %}
+                                <span style="color: #64748B;">Closed / Published</span>
+                                {% endif %}
+                            </td>
+                            <td><small style="color: #64748B;">{{ c.description|default:"Official NISR annual survey round" }}</small></td>
+                            <td><strong>{{ c.submissions_count }}</strong> records</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 36px 24px;">
+                                <div style="color: #64748B;">
+                                    <h4 style="color: #001F3B; margin-bottom: 6px;">Harmonized Survey Microdata Ingested Directly</h4>
+                                    <p style="font-size: 0.85rem; max-width: 500px; margin: 0 auto; line-height: 1.5;">
+                                        Official NISR survey rounds are ingested as bulk SPSS microdata directly into the <strong>Data Lineage Hub</strong>. Field intake forms remain ready for upcoming survey cycles.
+                                    </p>
+                                    <a href="{% url 'data_management:hub' %}" class="btn-action primary" style="display: inline-block; margin-top: 14px; padding: 8px 18px; background: #005CAB; color: white; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 0.85rem;">
+                                        Inspect Ingestion Batches &rarr;
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

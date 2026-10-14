@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Districts &amp; Administrative Geography | AgriLens Rwanda{% endblock %}
+{% block section_title %}Administrative Geography &bull; 30 Districts of Rwanda{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <!-- Top Stats Row -->
+    <section class="metrics-grid" style="margin-bottom: 24px;">
+        <div class="metric-card card-nisr-blue">
+            <div class="metric-card-header">
+                <span class="metric-label">Administrative Districts</span>
+            </div>
+            <div class="metric-value">{{ total_districts }}</div>
+            <div class="metric-sub">Full National Geographic Coverage</div>
+        </div>
+
+        <div class="metric-card card-nisr-cyan">
+            <div class="metric-card-header">
+                <span class="metric-label">Sectors Covered</span>
+            </div>
+            <div class="metric-value">{{ total_sectors }}</div>
+            <div class="metric-sub">Local Administrative Entities</div>
+        </div>
+
+        <div class="metric-card card-nisr-green">
+            <div class="metric-card-header">
+                <span class="metric-label">Provinces + Kigali City</span>
+            </div>
+            <div class="metric-value">{{ provinces|length }}</div>
+            <div class="metric-sub">Kigali, Northern, Southern, Eastern, Western</div>
+        </div>
+    </section>
+
+    <!-- Filter by Province -->
+    <div class="panel-card" style="margin-bottom: 24px;">
+        <div class="panel-body" style="padding: 16px 24px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            <span style="font-size: 0.85rem; font-weight: 700; color: #001F3B;">Filter by Province:</span>
+            <a href="{% url 'geography:district_list' %}" style="padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-decoration: none; {% if not selected_province %}background: #005CAB; color: white;{% else %}background: #F1F5F9; color: #475569;{% endif %}">
+                All ({{ total_districts }})
+            </a>
+            {% for prov in provinces %}
+            <a href="{% url 'geography:district_list' %}?province={{ prov.id }}" style="padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-decoration: none; {% if selected_province == prov.id|stringformat:'s' %}background: #005CAB; color: white;{% else %}background: #F1F5F9; color: #475569;{% endif %}">
+                {{ prov.name }} ({{ prov.districts.count }})
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Districts Grid Table -->
+    <div class="panel-card">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <h3>Official District Registry</h3>
+                <p class="panel-subtitle">National Institute of Statistics of Rwanda spatial sampling units</p>
+            </div>
+            <span class="panel-badge blue">30 Official Polygons</span>
+        </div>
+        <div class="panel-body no-padding">
+            <div class="table-responsive">
+                <table class="lineage-table">
+                    <thead>
+                        <tr>
+                            <th>District Name</th>
+                            <th>Code</th>
+                            <th>Province</th>
+                            <th>Sectors</th>
+                            <th>Verified Microdata Plots</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dist in districts %}
+                        <tr>
+                            <td><strong style="color: #001F3B;">{{ dist.name }}</strong></td>
+                            <td><code>{{ dist.code }}</code></td>
+                            <td>{{ dist.province.name }}</td>
+                            <td>{{ dist.sectors_count }} sectors</td>
+                            <td><strong>{{ dist.observations_count }}</strong> plots</td>
+                            <td>
+                                <a href="{% url 'geography:district_detail' pk=dist.pk %}" style="color: #005CAB; font-weight: 600; text-decoration: none; font-size: 0.85rem;">
+                                    View Sectors &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 32px; color: #64748B;">No districts found for this province.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

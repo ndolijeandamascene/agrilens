@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Crops &amp; Agricultural Seasons | AgriLens Rwanda{% endblock %}
+{% block section_title %}National Crop Taxonomy &amp; Seasonal Calendars{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <!-- Top Filter & Search Bar -->
+    <div class="panel-card" style="margin-bottom: 24px;">
+        <div class="panel-body" style="padding: 18px 24px;">
+            <form method="GET" action="{% url 'agriculture:crop_list' %}" style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+                <div style="display: flex; gap: 12px; flex: 1; min-width: 280px;">
+                    <input type="text" name="q" value="{{ query }}" placeholder="Search crops by English, Kinyarwanda or scientific name..." class="form-input" style="flex: 1; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 8px;">
+                    <select name="category" class="dash-compact-select" style="min-width: 160px; height: 42px;">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <a href="{% url 'agriculture:crop_list' %}?priority=1" class="btn-action {% if selected_priority == '1' %}primary{% endif %}" style="padding: 10px 16px; border: 1px solid #005CAB; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600; color: {% if selected_priority == '1' %}#FFFFFF{% else %}#005CAB{% endif %}; background: {% if selected_priority == '1' %}#005CAB{% else %}transparent{% endif %};">
+                        Priority Crops ({{ priority_count }})
+                    </a>
+                    <button type="submit" class="btn-action primary" style="padding: 10px 20px; background: #005CAB; color: #FFFFFF; font-weight: 700; border: none; border-radius: 8px; cursor: pointer;">
+                        Filter
+                    </button>
+                    {% if query or selected_category or selected_priority %}
+                    <a href="{% url 'agriculture:crop_list' %}" class="btn-action" style="padding: 10px 16px; background: #F1F5F9; color: #475569; text-decoration: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">
+                        Clear
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2 Column Layout: Crop Grid + Seasonal Calendar Reference -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start;">
+        <!-- Left Column: Crops Table -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <h3>Agricultural Crops Registry</h3>
+                    <p class="panel-subtitle">{{ total_crops_count }} crops classified under MINAGRI / NISR framework</p>
+                </div>
+                <span class="panel-badge blue">{{ page_obj.paginator.count }} Found</span>
+            </div>
+            <div class="panel-body no-padding">
+                <div class="table-responsive">
+                    <table class="lineage-table">
+                        <thead>
+                            <tr>
+                                <th>Crop Name</th>
+                                <th>Category</th>
+                                <th>Kinyarwanda</th>
+                                <th>Status</th>
+                                <th>Microdata Plots</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for crop in page_obj %}
+                            <tr>
+                                <td>
+                                    <strong style="color: #001F3B;">{{ crop.name }}</strong>
+                                    {% if crop.scientific_name %}
+                                    <br><small style="color: #64748B; font-style: italic;">{{ crop.scientific_name }}</small>
+                                    {% endif %}
+                                </td>
+                                <td><span style="background: #EEF2F6; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 500;">{{ crop.category.name }}</span></td>
+                                <td>{{ crop.kinyarwanda_name|default:"—" }}</td>
+                                <td>
+                                    {% if crop.is_priority_crop %}
+                                    <span class="status-pill verified" style="background: #E8F7FE; color: #005CAB; font-weight: 700;">NST2 Priority</span>
+                                    {% else %}
+                                    <span style="color: #64748B; font-size: 0.8rem;">Secondary</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>{{ crop.observations_count }}</strong> plots
+                                </td>
+                                <td>
+                                    <a href="{% url 'agriculture:crop_detail' pk=crop.pk %}" style="color: #005CAB; font-weight: 600; text-decoration: none; font-size: 0.85rem;">
+                                        View &rarr;
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 32px; color: #64748B;">
+                                    No crops match the specified filter criteria.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-top: 1px solid #E2E8F0; font-size: 0.875rem;">
+                    <span style="color: #64748B;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    <div style="display: flex; gap: 8px;">
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_priority %}&priority={{ selected_priority }}{% endif %}" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #0F172A;">Previous</a>
+                        {% endif %}
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_priority %}&priority={{ selected_priority }}{% endif %}" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #0F172A;">Next</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Column: Official Agricultural Seasons in Rwanda -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <h3>Agricultural Seasons Calendar</h3>
+                    <p class="panel-subtitle">National Institute of Statistics of Rwanda survey cycle</p>
+                </div>
+            </div>
+            <div class="panel-body" style="padding: 20px;">
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div style="padding: 14px; border-left: 4px solid #005CAB; background: #F0F7FD; border-radius: 0 8px 8px 0;">
+                        <h4 style="margin: 0 0 4px 0; color: #001F3B; font-size: 0.95rem;">Season A (September – February)</h4>
+                        <p style="margin: 0; font-size: 0.82rem; color: #475569; line-height: 1.5;">
+                            Main rainy season (Itumba). Critical planting window for maize, climbing beans, Irish potato, and soybean across all 30 districts.
+                        </p>
+                    </div>
+
+                    <div style="padding: 14px; border-left: 4px solid #46962B; background: #F0F8EE; border-radius: 0 8px 8px 0;">
+                        <h4 style="margin: 0 0 4px 0; color: #166534; font-size: 0.95rem;">Season B (March – June)</h4>
+                        <p style="margin: 0; font-size: 0.82rem; color: #475569; line-height: 1.5;">
+                            Secondary rainy season (Urugaryi). Major harvest season for bush beans, sorghum, cassava, and hillside horticulture.
+                        </p>
+                    </div>
+
+                    <div style="padding: 14px; border-left: 4px solid #00AEEF; background: #E8F7FE; border-radius: 0 8px 8px 0;">
+                        <h4 style="margin: 0 0 4px 0; color: #0088BC; font-size: 0.95rem;">Season C (July – September)</h4>
+                        <p style="margin: 0; font-size: 0.82rem; color: #475569; line-height: 1.5;">
+                            Dry season (Icyi). Cultivation confined to developed marshlands, irrigated perimeters, and valley bottoms (e.g. rice, market vegetables).
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #E2E8F0; font-size: 0.82rem; color: #64748B;">
+                    <strong style="color: #0F172A;">Harmonized SAS Cycles in Database:</strong>
+                    <ul style="margin: 8px 0 0 16px; padding: 0;">
+                        {% for s in seasons %}
+                        <li>{{ s.year }} {{ s.get_season_display }} ({{ s.start_date|date:"M" }} – {{ s.end_date|date:"M Y" }})</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

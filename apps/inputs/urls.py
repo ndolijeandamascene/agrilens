@@ -4,5 +4,6 @@ from . import views
 app_name = 'inputs'
 
 urlpatterns = [
-    # Input distribution endpoints
+    path('', views.input_list, name='input_list'),
 ]
+

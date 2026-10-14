@@ -28,7 +28,7 @@ jobs:
 
     - name: Django Configuration Check
       run: |
-        python manage.py check --settings=config.settings.dev
+        python manage.py check --settings=config.settings
 
     - name: Run Test Suite
       run: |

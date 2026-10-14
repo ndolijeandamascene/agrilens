@@ -10,19 +10,17 @@
         <div class="header-left-meta">
             <span class="live-stream-badge">
                 <span class="pulse-dot"></span>
-                <span>SAS 2026 Season A &bull; Live Stream</span>
+                <span>SAS {{ selected_year }} Season {{ selected_season }} &bull; Audited Microdata</span>
             </span>
-            <span class="header-coverage-tag">30/30 Districts Connected &bull; 416 Sectors</span>
+            <span class="header-coverage-tag">{{ districts_count }}/30 Districts &bull; {{ sectors_count }} Sectors</span>
         </div>
 
         <div class="header-right-tools">
             <div class="header-filter-group">
                 <label for="dash-season-select" class="dash-tool-label">Survey Framework:</label>
                 <select id="dash-season-select" class="dash-compact-select">
-                    <option value="2026A" selected>Season 2026 A (Current)</option>
-                    <option value="2025C">Season 2025 C (Marshland)</option>
-                    <option value="2025B">Season 2025 B (Harvest)</option>
-                    <option value="2025A">Season 2025 A (Baseline)</option>
+                    <option value="2025A" {% if selected_year == 2025 and selected_season == 'A' %}selected{% endif %}>NISR SAS 2025 Season A (Validated)</option>
+                    <option value="2024A" {% if selected_year == 2024 and selected_season == 'A' %}selected{% endif %}>NISR SAS 2024 Season A (Validated)</option>
                 </select>
             </div>
             <a href="/" class="btn-portal-return" id="btn-view-public-map">
@@ -49,10 +47,10 @@
                     </svg>
                 </div>
             </div>
-            <div class="metric-value">12</div>
+            <div class="metric-value">{{ priority_crops_count }}</div>
             <div class="metric-sub">Maize, Potato, Beans, Rice, Cassava...</div>
             <div class="metric-footer">
-                <span class="metric-delta positive">+2 vs previous season</span>
+                <span class="metric-delta positive">Authoritative NISR Classification</span>
             </div>
         </div>
 
@@ -67,16 +65,16 @@
                     </svg>
                 </div>
             </div>
-            <div class="metric-value">30 / 30</div>
-            <div class="metric-sub">416 Sectors &bull; 5 Administrative Provinces</div>
+            <div class="metric-value">{{ summary.districts_covered }} / 30</div>
+            <div class="metric-sub">Districts Sampled in Season {{ selected_season }} &bull; {{ sectors_count }} Sectors in National Grid</div>
             <div class="metric-footer">
-                <span class="metric-status cyan">100% Geographic Reach</span>
+                <span class="metric-status cyan">{% widthratio summary.districts_covered 30 100 %}% Survey Representation</span>
             </div>
         </div>
 
         <div class="metric-card card-nisr-green">
             <div class="metric-card-header">
-                <span class="metric-label">Active Seasonal Surveys</span>
+                <span class="metric-label">Verified Survey Microdata</span>
                 <div class="metric-icon-mini green">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -86,16 +84,16 @@
                     </svg>
                 </div>
             </div>
-            <div class="metric-value">4,820</div>
-            <div class="metric-sub">Sampled Segments &amp; Large Agricultural Farms</div>
+            <div class="metric-value">{{ total_observations_count }}</div>
+            <div class="metric-sub">Audited Crop-Plot Survey Records in PostgreSQL</div>
             <div class="metric-footer">
-                <span class="metric-delta positive">98.4% QA Validated</span>
+                <span class="metric-delta positive">QA Verified &bull; {{ import_batches_count }} Import Batches</span>
             </div>
         </div>
 
         <div class="metric-card card-nisr-yellow">
             <div class="metric-card-header">
-                <span class="metric-label">Estimated Yield Index</span>
+                <span class="metric-label">National Weighted Yield</span>
                 <div class="metric-icon-mini yellow">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
@@ -103,10 +101,17 @@
                     </svg>
                 </div>
             </div>
-            <div class="metric-value">114.2</div>
-            <div class="metric-sub">Base Year 2023 = 100.0 &bull; NST2 Target</div>
+            <div class="metric-value">
+                {% if summary.total_plots > 0 %}
+                    {{ summary.weighted_yield_kg_per_ha|floatformat:1 }}
+                {% else %}
+                    <span style="font-size: 1.2rem; color: #94A3B8;">No Data</span>
+                {% endif %}
+                <small style="font-size: 0.85rem; font-weight: normal; color: #64748B;">kg/ha</small>
+            </div>
+            <div class="metric-sub">Season {{ selected_season }} ({{ selected_year }}) &bull; Weighted Ratio Estimator</div>
             <div class="metric-footer">
-                <span class="metric-delta positive">+4.8% YoY Expansion</span>
+                <span class="metric-delta positive">&sum;(W &times; P) / &sum;(W &times; A)</span>
             </div>
         </div>
     </section>
@@ -191,10 +196,10 @@
                     <div class="practice-item">
                         <div class="practice-row-meta">
                             <span class="practice-name">Mineral Fertilizer (DAP / Urea / NPK)</span>
-                            <span class="practice-rate"><strong>58%</strong> <small>/ 75% target</small></span>
+                            <span class="practice-rate"><strong>{{ summary.adoption_rates.inorganic_fertilizer|floatformat:1 }}%</strong> <small>/ 75% NST2 target</small></span>
                         </div>
                         <div class="progress-bar-track">
-                            <div class="progress-bar-fill green" style="width: 58%;"></div>
+                            <div class="progress-bar-fill green" style="width: {{ summary.adoption_rates.inorganic_fertilizer|floatformat:0 }}%;"></div>
                             <div class="target-marker" style="left: 75%;" title="NST2 2029 Target: 75%"></div>
                         </div>
                     </div>
@@ -202,10 +207,10 @@
                     <div class="practice-item">
                         <div class="practice-row-meta">
                             <span class="practice-name">Improved &amp; Certified Seeds Usage</span>
-                            <span class="practice-rate"><strong>54%</strong> <small>/ 70% target</small></span>
+                            <span class="practice-rate"><strong>{{ summary.adoption_rates.improved_seed|floatformat:1 }}%</strong> <small>/ 70% NST2 target</small></span>
                         </div>
                         <div class="progress-bar-track">
-                            <div class="progress-bar-fill blue" style="width: 54%;"></div>
+                            <div class="progress-bar-fill blue" style="width: {{ summary.adoption_rates.improved_seed|floatformat:0 }}%;"></div>
                             <div class="target-marker" style="left: 70%;" title="NST2 2029 Target: 70%"></div>
                         </div>
                     </div>
@@ -213,10 +218,17 @@
                     <div class="practice-item">
                         <div class="practice-row-meta">
                             <span class="practice-name">Small-Scale &amp; Hillside Irrigation</span>
-                            <span class="practice-rate"><strong>26%</strong> <small>/ 38% target</small></span>
+                            <span class="practice-rate">
+                                {% if summary.practice_availability.irrigation == 'AVAILABLE' %}
+                                    <strong>{{ summary.adoption_rates.irrigation|floatformat:1 }}%</strong>
+                                    <small>/ 38% NST2 target</small>
+                                {% else %}
+                                    <span class="badge badge-warning" style="font-size: 0.72rem; padding: 2px 6px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-radius: 4px;" title="Source variable s4q14 verified in SAS catalog; unmapped in legacy pilot batch (pending full survey re-import)">Pending Re-import</span>
+                                {% endif %}
+                            </span>
                         </div>
                         <div class="progress-bar-track">
-                            <div class="progress-bar-fill cyan" style="width: 26%;"></div>
+                            <div class="progress-bar-fill cyan" style="width: {% if summary.practice_availability.irrigation == 'AVAILABLE' %}{{ summary.adoption_rates.irrigation|floatformat:0 }}{% else %}0{% endif %}%;"></div>
                             <div class="target-marker" style="left: 38%;" title="NST2 2029 Target: 38%"></div>
                         </div>
                     </div>
@@ -224,10 +236,17 @@
                     <div class="practice-item">
                         <div class="practice-row-meta">
                             <span class="practice-name">Mechanized Tillage (Power Tillers &amp; Tractors)</span>
-                            <span class="practice-rate"><strong>16%</strong> <small>/ 30% target</small></span>
+                            <span class="practice-rate">
+                                {% if summary.practice_availability.mechanization == 'AVAILABLE' %}
+                                    <strong>{{ summary.adoption_rates.mechanization|floatformat:1 }}%</strong>
+                                    <small>/ 30% NST2 target</small>
+                                {% else %}
+                                    <span class="badge badge-warning" style="font-size: 0.72rem; padding: 2px 6px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-radius: 4px;" title="Source variable s4q9 verified in SAS catalog; unmapped in legacy pilot batch (pending full survey re-import)">Pending Re-import</span>
+                                {% endif %}
+                            </span>
                         </div>
                         <div class="progress-bar-track">
-                            <div class="progress-bar-fill yellow" style="width: 16%;"></div>
+                            <div class="progress-bar-fill yellow" style="width: {% if summary.practice_availability.mechanization == 'AVAILABLE' %}{{ summary.adoption_rates.mechanization|floatformat:0 }}{% else %}0{% endif %}%;"></div>
                             <div class="target-marker" style="left: 30%;" title="NST2 2029 Target: 30%"></div>
                         </div>
                     </div>
@@ -240,7 +259,7 @@
             <div class="panel-header">
                 <div class="panel-title-group">
                     <h3>Post-Harvest Loss Assessment by Stage</h3>
-                    <p class="panel-subtitle">Total National Average Loss: <strong>11.8%</strong> of seasonal production</p>
+                    <p class="panel-subtitle">Total National Observed Loss: <strong>{{ summary.loss_rate_percentage|floatformat:1 }}%</strong> of seasonal production</p>
                 </div>
                 <span class="panel-badge yellow">Deficit Analysis</span>
             </div>
@@ -251,7 +270,7 @@
                 <div class="loss-alert-box">
                     <span class="alert-icon-dot"></span>
                     <span class="alert-text">
-                        <strong>Storage &amp; Aeration (4.8% loss)</strong> represents the highest return opportunity for post-harvest hermetic storage and collective dryers.
+                        <strong>Storage &amp; Aeration (Observed Loss: {{ summary.loss_rate_percentage|floatformat:1 }}%)</strong> represents the primary opportunity for hermetic bags and collective solar dryers.
                     </span>
                 </div>
             </div>
@@ -262,7 +281,7 @@
     <section class="panel-card">
         <div class="panel-header">
             <div class="panel-title-group">
-                <h3>Seasonal Agricultural Survey (SAS 2026 A) &bull; Verified Sampling Log</h3>
+                <h3>Seasonal Agricultural Survey (SAS {{ selected_year }} {{ selected_season }}) &bull; Verified Sampling Log</h3>
                 <p class="panel-subtitle">Audited plot records demonstrating end-to-end data provenance and variable traceability</p>
             </div>
             <span class="panel-badge blue">Zero Synthetic Data</span>
@@ -272,57 +291,35 @@
                 <table class="lineage-table">
                     <thead>
                         <tr>
+                            <th>Provenance</th>
                             <th>Sample ID</th>
                             <th>District</th>
-                            <th>Sector</th>
+                            <th>Plot Area</th>
                             <th>Crop Monitored</th>
                             <th>Observed Yield</th>
-                            <th>Irrigation Type</th>
+                            <th>Irrigation</th>
                             <th>Fertilizer</th>
                             <th>Verification Status</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {% for obs in recent_observations %}
                         <tr>
-                            <td><code>SAS26A-04102</code></td>
-                            <td><strong>Musanze</strong></td>
-                            <td>Kinigi</td>
-                            <td><span class="crop-tag potato">Irish Potato</span></td>
-                            <td><strong>18,400 kg/ha</strong></td>
-                            <td>Hillside Gravity</td>
-                            <td>DAP + Organic</td>
+                            <td><span style="font-family: monospace; font-size: 0.75rem; background: #EEF2F6; padding: 2px 6px; border-radius: 4px;">{{ obs.provenance }}</span></td>
+                            <td><code>{{ obs.source_record_id|slice:":22" }}</code></td>
+                            <td><strong>{{ obs.district.name }}</strong></td>
+                            <td>{{ obs.plot_area_ha }} ha</td>
+                            <td><span class="crop-tag maize">{{ obs.crop.name }}</span></td>
+                            <td><strong>{{ obs.calculated_yield_kg_per_ha|floatformat:1 }} kg/ha</strong></td>
+                            <td>{{ obs.is_irrigated|yesno:"Irrigated,Rainfed" }}</td>
+                            <td>{{ obs.uses_inorganic_fertilizer|yesno:"Mineral,Organic/None" }}</td>
                             <td><span class="status-pill verified">QA Verified</span></td>
                         </tr>
+                        {% empty %}
                         <tr>
-                            <td><code>SAS26A-01920</code></td>
-                            <td><strong>Bugesera</strong></td>
-                            <td>Nyamata</td>
-                            <td><span class="crop-tag maize">Maize</span></td>
-                            <td><strong>2,700 kg/ha</strong></td>
-                            <td>Rainfed Deficit</td>
-                            <td>Compost Only</td>
-                            <td><span class="status-pill warning">Lagging Alert</span></td>
+                            <td colspan="9" style="text-align: center; padding: 24px; color: #64748B;">No recent observations available.</td>
                         </tr>
-                        <tr>
-                            <td><code>SAS26A-05512</code></td>
-                            <td><strong>Rwamagana</strong></td>
-                            <td>Mwulire</td>
-                            <td><span class="crop-tag rice">Marshland Rice</span></td>
-                            <td><strong>5,100 kg/ha</strong></td>
-                            <td>Canal Marshland</td>
-                            <td>Urea + DAP</td>
-                            <td><span class="status-pill verified">QA Verified</span></td>
-                        </tr>
-                        <tr>
-                            <td><code>SAS26A-03301</code></td>
-                            <td><strong>Burera</strong></td>
-                            <td>Rugarama</td>
-                            <td><span class="crop-tag beans">Climbing Beans</span></td>
-                            <td><strong>1,950 kg/ha</strong></td>
-                            <td>Stream Sprinkler</td>
-                            <td>NPK 17-17-17</td>
-                            <td><span class="status-pill verified">QA Verified</span></td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>

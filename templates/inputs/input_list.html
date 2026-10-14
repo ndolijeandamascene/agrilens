@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Inputs &amp; Subsidies | AgriLens Rwanda{% endblock %}
+{% block section_title %}Agricultural Inputs &amp; Smart Nkunganire Subsidies{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <!-- Context Banner -->
+    <div class="panel-card" style="margin-bottom: 24px;">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <h3>Smart Nkunganire System (SNS) Price Framework</h3>
+                <p class="panel-subtitle">Government-subsidized fertilizer and certified seeds program (MINAGRI / BK TecHouse)</p>
+            </div>
+            <span class="panel-badge green">NST2 Priority</span>
+        </div>
+        <div class="panel-body" style="padding: 24px;">
+            <p style="font-size: 0.9rem; color: #334155; line-height: 1.6; margin: 0;">
+                To accelerate productivity toward the <strong>NST2 (2024–2029)</strong> target of 75% mineral fertilizer adoption and 70% improved seed usage, Rwanda’s government provides direct price subsidies on priority fertilizers (Urea, DAP, NPK 17-17-17) and certified hybrid crop seeds.
+            </p>
+        </div>
+    </div>
+
+    <!-- Inputs Table -->
+    <div class="panel-card">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <h3>Input Catalog &amp; Benchmark Pricing</h3>
+                <p class="panel-subtitle">Official price scales in Rwandan Francs (RWF)</p>
+            </div>
+            <span class="panel-badge blue">{{ total_inputs }} Cataloged</span>
+        </div>
+        <div class="panel-body no-padding">
+            <div class="table-responsive">
+                <table class="lineage-table">
+                    <thead>
+                        <tr>
+                            <th>Input Name</th>
+                            <th>Category</th>
+                            <th>Unit</th>
+                            <th>Commercial Unit Price</th>
+                            <th>Subsidized Price (SNS)</th>
+                            <th>Subsidy Support</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in inputs %}
+                        <tr>
+                            <td><strong style="color: #001F3B;">{{ item.name }}</strong></td>
+                            <td><span style="background: #EEF2F6; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">{{ item.category.name }}</span></td>
+                            <td>per {{ item.unit }}</td>
+                            <td>{{ item.unit_price_rwf }} RWF</td>
+                            <td>
+                                {% if item.subsidized_price_rwf %}
+                                <strong style="color: #46962B;">{{ item.subsidized_price_rwf }} RWF</strong>
+                                {% else %}
+                                <span style="color: #64748B;">Commercial Only</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item.subsidized_price_rwf %}
+                                <span class="status-pill verified">Subsidized</span>
+                                {% else %}
+                                <span style="color: #64748B;">Market Rate</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 36px 24px; color: #64748B;">
+                                <div style="font-size: 0.85rem; max-width: 500px; margin: 0 auto; line-height: 1.5;">
+                                    Input catalog benchmarks are updated seasonally according to MINAGRI ministerial pricing orders.
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

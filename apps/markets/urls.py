@@ -4,5 +4,6 @@ from . import views
 app_name = 'markets'
 
 urlpatterns = [
-    # Market price monitoring endpoints
+    path('', views.market_list, name='market_list'),
 ]
+

@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Data Management & Lineage Hub | AgriLens{% endblock %}
+{% block section_title %}Data Governance & Batch Management{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Header Strip -->
+    <div class="dashboard-header-strip">
+        <div class="header-left-meta">
+            <span class="live-stream-badge">
+                <span class="pulse-dot"></span>
+                <span>PostgreSQL Lineage Active</span>
+            </span>
+            <span class="header-coverage-tag">{{ total_validated_obs|default:0 }} Verified Observations</span>
+        </div>
+        <div class="header-right-tools">
+            <a href="{% url 'data_management:data_source_create' %}" class="btn-portal-return" style="background: #0284C7; color: white;">
+                <span>+ Register Data Source</span>
+            </a>
+            <a href="{% url 'data_management:manual_entry_create' %}" class="btn-portal-return" style="background: #005CAB; color: white;">
+                <span>+ New Manual Record</span>
+            </a>
+            <a href="{% url 'data_management:manual_entry_list' %}" class="btn-portal-return">
+                <span>View Manual Registry &rarr;</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI Grid -->
+    <section class="metrics-grid">
+        <div class="metric-card card-nisr-blue">
+            <div class="metric-card-header">
+                <span class="metric-label">Verified Microdata</span>
+                <span class="badge-dot" style="background:#005CAB;"></span>
+            </div>
+            <div class="metric-value">{{ total_validated_obs|default:0 }}</div>
+            <div class="metric-sub">Strictly isolated official survey observations</div>
+            <div class="metric-footer">
+                <span class="metric-status blue">100% Traceable</span>
+            </div>
+        </div>
+
+        <div class="metric-card card-nisr-yellow">
+            <div class="metric-card-header">
+                <span class="metric-label">Review Queue</span>
+                <span class="badge-dot" style="background:#F3EA00;"></span>
+            </div>
+            <div class="metric-value">{{ manual_counts.pending|default:0 }}</div>
+            <div class="metric-sub">Manual observations awaiting authority sign-off</div>
+            <div class="metric-footer">
+                <span class="metric-status yellow">Vetting Lifecycle</span>
+            </div>
+        </div>
+
+        <div class="metric-card card-nisr-green">
+            <div class="metric-card-header">
+                <span class="metric-label">Approved Manual Entries</span>
+                <span class="badge-dot" style="background:#46962B;"></span>
+            </div>
+            <div class="metric-value">{{ manual_counts.approved|default:0 }}</div>
+            <div class="metric-sub">Vetted agricultural field reports</div>
+            <div class="metric-footer">
+                <span class="metric-status green">Isolated from Survey Stats</span>
+            </div>
+        </div>
+
+        <div class="metric-card card-nisr-cyan">
+            <div class="metric-card-header">
+                <span class="metric-label">Draft Submissions</span>
+                <span class="badge-dot" style="background:#00AEEF;"></span>
+            </div>
+            <div class="metric-value">{{ manual_counts.draft|default:0 }}</div>
+            <div class="metric-sub">Unsubmitted field entries in progress</div>
+            <div class="metric-footer">
+                <span class="metric-status cyan">Draft State</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dynamic Data Sources Registry -->
+    <div style="background: white; border-radius: 12px; border: 1px solid #E2E8F0; padding: 24px; margin-top: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+                <h3 style="margin: 0; font-size: 1.1rem; color: #0F172A; font-weight: 700;">Active Data Sources &amp; Provenance Registry</h3>
+                <span style="font-size: 0.85rem; color: #64748B;">Dynamic registration of statistical surveys, administrative records, cooperative reports, and manual submissions</span>
+            </div>
+            <a href="{% url 'data_management:data_source_create' %}" class="btn-portal-return" style="background: #0284C7; color: white;">
+                <span>+ Register New Source</span>
+            </a>
+        </div>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #E2E8F0; text-align: left; color: #64748B;">
+                        <th style="padding: 10px 12px;">ID</th>
+                        <th style="padding: 10px 12px;">Source Name</th>
+                        <th style="padding: 10px 12px;">Identifier Slug</th>
+                        <th style="padding: 10px 12px;">Kind of Data</th>
+                        <th style="padding: 10px 12px;">Year</th>
+                        <th style="padding: 10px 12px;">Season</th>
+                        <th style="padding: 10px 12px;">Organization</th>
+                        <th style="padding: 10px 12px;">Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ds in data_sources %}
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding: 12px; font-weight: 700; color: #005CAB;">#{{ ds.id }}</td>
+                        <td style="padding: 12px; font-weight: 600; color: #0F172A;">{{ ds.name }}</td>
+                        <td style="padding: 12px; font-family: monospace; font-size: 0.8rem; color: #0284C7;">{{ ds.source_type }}</td>
+                        <td style="padding: 12px;"><span style="background: #E0F2FE; color: #0369A1; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">{{ ds.get_data_kind_display }}</span></td>
+                        <td style="padding: 12px; font-weight: 600;">{{ ds.year|default:"All / N/A" }}</td>
+                        <td style="padding: 12px;">{{ ds.season|default:"All" }}</td>
+                        <td style="padding: 12px; color: #64748B;">{{ ds.organization|default:"Official NISR" }}</td>
+                        <td style="padding: 12px;">
+                            {% if ds.is_official_survey %}
+                                <span style="background: #DCFCE7; color: #15803D; padding: 3px 10px; border-radius: 12px; font-weight: 600; font-size: 0.75rem;">Official NISR</span>
+                            {% else %}
+                                <span style="background: #FEF9C3; color: #A16207; padding: 3px 10px; border-radius: 12px; font-weight: 600; font-size: 0.75rem;">Manual / Extension</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" style="padding: 24px; text-align: center; color: #94A3B8;">No data sources registered yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Recent Import Batches -->
+    <div style="background: white; border-radius: 12px; border: 1px solid #E2E8F0; padding: 24px; margin-top: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 1.1rem; color: #0F172A; font-weight: 700;">Recent Ingestion Batches</h3>
+            <span style="font-size: 0.85rem; color: #64748B;">Audit Log</span>
+        </div>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #E2E8F0; text-align: left; color: #64748B;">
+                        <th style="padding: 10px 12px;">Batch ID</th>
+                        <th style="padding: 10px 12px;">Source</th>
+                        <th style="padding: 10px 12px;">Filename</th>
+                        <th style="padding: 10px 12px;">Total Rows</th>
+                        <th style="padding: 10px 12px;">Accepted</th>
+                        <th style="padding: 10px 12px;">Rejected</th>
+                        <th style="padding: 10px 12px;">Started At</th>
+                        <th style="padding: 10px 12px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in batches %}
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding: 12px; font-weight: 600;">#{{ b.id }}</td>
+                        <td style="padding: 12px;"><span style="background: #E0F2FE; color: #0369A1; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">{{ b.source.source_type }}</span></td>
+                        <td style="padding: 12px; font-family: monospace;">{{ b.filename }}</td>
+                        <td style="padding: 12px;">{{ b.total_rows }}</td>
+                        <td style="padding: 12px; color: #16A34A; font-weight: 600;">{{ b.rows_accepted }}</td>
+                        <td style="padding: 12px; color: #DC2626; font-weight: 600;">{{ b.rows_rejected }}</td>
+                        <td style="padding: 12px; color: #64748B;">{{ b.started_at|date:"M d, H:i" }}</td>
+                        <td style="padding: 12px;">
+                            {% if b.status == 'SUCCESS' %}
+                                <span style="background: #DCFCE7; color: #15803D; padding: 3px 10px; border-radius: 12px; font-weight: 600; font-size: 0.75rem;">Completed</span>
+                            {% elif b.status == 'PARTIAL' %}
+                                <span style="background: #FEF9C3; color: #A16207; padding: 3px 10px; border-radius: 12px; font-weight: 600; font-size: 0.75rem;">With Warnings</span>
+                            {% else %}
+                                <span style="background: #FEE2E2; color: #B91C1C; padding: 3px 10px; border-radius: 12px; font-weight: 600; font-size: 0.75rem;">{{ b.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" style="padding: 24px; text-align: center; color: #94A3B8;">No import batches recorded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Data Quality Outliers Log -->
+    <div style="background: white; border-radius: 12px; border: 1px solid #E2E8F0; padding: 24px; margin-top: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 1.1rem; color: #0F172A; font-weight: 700;">Data Quality &amp; Plausibility Flags</h3>
+            <span style="font-size: 0.85rem; color: #64748B;">Automated QA Audit</span>
+        </div>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #E2E8F0; text-align: left; color: #64748B;">
+                        <th style="padding: 10px 12px;">Severity</th>
+                        <th style="padding: 10px 12px;">Dataset</th>
+                        <th style="padding: 10px 12px;">Variable</th>
+                        <th style="padding: 10px 12px;">Reference</th>
+                        <th style="padding: 10px 12px;">Issue Description</th>
+                        <th style="padding: 10px 12px;">Action Recommended</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for q in qa_issues %}
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding: 12px;">
+                            {% if q.severity == 'CRITICAL' %}
+                                <span style="background: #FEE2E2; color: #991B1B; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">CRITICAL</span>
+                            {% elif q.severity == 'HIGH' %}
+                                <span style="background: #FFEDD5; color: #9A3412; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">HIGH</span>
+                            {% else %}
+                                <span style="background: #FEF3C7; color: #92400E; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">MEDIUM</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px; font-family: monospace;">{{ q.dataset_name }}</td>
+                        <td style="padding: 12px; font-weight: 600;">{{ q.variable_name }}</td>
+                        <td style="padding: 12px; color: #64748B;">{{ q.record_reference }}</td>
+                        <td style="padding: 12px;">{{ q.description }}</td>
+                        <td style="padding: 12px; color: #0369A1; font-weight: 500;">{{ q.recommended_action }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="padding: 24px; text-align: center; color: #94A3B8;">Zero unhandled data quality issues.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,137 +1,144 @@
-<aside class="sidebar">
-    <a href="/dashboard/" class="sidebar-brand">
-        <div class="brand-logo-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
-                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+{% load menu_tags %}
+
+<!-- Mobile Backdrop Overlay for Off-Canvas Drawer -->
+<div class="mobile-sidebar-backdrop" 
+     x-show="sidebarOpen" 
+     @click="sidebarOpen = false" 
+     x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-150"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     style="position: fixed; inset: 0; background: rgba(0, 15, 30, 0.7); z-index: 999; backdrop-filter: blur(2px);">
+</div>
+
+<aside class="sidebar" :class="{ 'mobile-active': sidebarOpen }">
+
+    <!-- Brand Header -->
+    <div class="sidebar-brand-wrapper" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--sidebar-border);">
+        <a href="/dashboard/" class="sidebar-brand" style="display: flex; align-items: center; gap: 12px; text-decoration: none; padding: 0; border: none;">
+            <div class="brand-logo-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+                    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+                </svg>
+            </div>
+            <div class="brand-info">
+                <span class="brand-name">AgriLens</span>
+                <span class="brand-tagline">Rwanda AgData Hub</span>
+            </div>
+        </a>
+
+        <!-- Mobile Drawer Close Button -->
+        <button type="button" 
+                @click="sidebarOpen = false" 
+                class="mobile-sidebar-close" 
+                aria-label="Close navigation drawer" 
+                style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 6px; border-radius: 6px; display: none;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
-        </div>
-        <div class="brand-info">
-            <span class="brand-name">AgriLens</span>
-            <span class="brand-tagline">Rwanda AgData Hub</span>
-        </div>
-    </a>
+        </button>
+    </div>
 
-    <nav class="sidebar-nav">
-        <div class="nav-section-label">Core Analytics</div>
+    <!-- Navigation Scroll Container (Config-Driven via apps.accounts.menu_config) -->
+    <nav class="sidebar-nav" style="overflow-y: auto; flex: 1; padding: 10px 0;">
 
-        <a href="/dashboard/" class="nav-item active">
-            <span class="nav-svg">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="20" x2="18" y2="10"></line>
-                    <line x1="12" y1="20" x2="12" y2="4"></line>
-                    <line x1="6" y1="20" x2="6" y2="14"></line>
-                </svg>
-            </span>
-            <span>National Dashboard</span>
-        </a>
+        {% for group in sidebar_menu %}
+            {% if group.submenu %}
+                {% is_group_active request group as group_active %}
+                <div class="nav-accordion-group" x-data="{ open: {% if group_active %}true{% else %}{% if group.id in 'core,reports' %}true{% else %}false{% endif %}{% endif %} }">
+                    <button type="button" 
+                            @click="open = !open" 
+                            class="nav-section-header" 
+                            style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; cursor: pointer; text-align: left; padding: 10px 14px 6px 14px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="nav-section-label" style="padding: 0; {% if group.id == 'admin' %}color: #38BDF8; font-weight: 700;{% endif %}">
+                                {{ group.name }}
+                            </span>
+                            {% if group.badge %}
+                                <span style="font-size: 0.6rem; background: #0284C7; color: #FFFFFF; padding: 1px 5px; border-radius: 4px; font-weight: 800; letter-spacing: 0.04em;">
+                                    {{ group.badge }}
+                                </span>
+                            {% endif %}
+                        </div>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{% if group.id == 'admin' %}#38BDF8{% else %}#64748B{% endif %}" stroke-width="2.2" :style="open ? 'transform: rotate(180deg); transition: transform 0.2s;' : 'transition: transform 0.2s;'">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
 
-        <a href="/" class="nav-item">
-            <span class="nav-svg">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-                    <line x1="8" y1="2" x2="8" y2="18"></line>
-                    <line x1="16" y1="6" x2="16" y2="22"></line>
-                </svg>
-            </span>
-            <span>Public Portal &amp; Map</span>
-        </a>
+                    <div x-show="open" 
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 -translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         style="padding: 2px 0;">
+                        {% for subitem in group.submenu %}
+                            {% resolve_menu_url subitem.url as sub_url %}
+                            {% is_menu_active request subitem.url as sub_active %}
+                            <a href="{{ sub_url }}" class="nav-item {% if sub_active %}active{% endif %}">
+                                <span class="nav-svg">
+                                    {% render_menu_icon subitem.icon %}
+                                </span>
+                                <span>{{ subitem.name }}</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                {% resolve_menu_url group.url as group_url %}
+                {% is_menu_active request group.url as group_active %}
+                <a href="{{ group_url }}" class="nav-item {% if group_active %}active{% endif %}" style="margin: 4px 10px;">
+                    <span class="nav-svg">
+                        {% render_menu_icon group.icon %}
+                    </span>
+                    <span>{{ group.name }}</span>
+                </a>
+            {% endif %}
+        {% endfor %}
 
-        <div class="nav-section-label">Modules</div>
-
-        <a href="/agriculture/" class="nav-item">
-            <span class="nav-svg">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2a10 10 0 0 1 10 10c0 5.5-4.5 10-10 10S2 17.5 2 12A10 10 0 0 1 12 2z"></path>
-                    <path d="M12 6v6l4 2"></path>
-                </svg>
-            </span>
-            <span>Crops &amp; Seasons</span>
-        </a>
-
-        <a href="/geography/" class="nav-item">
-            <span class="nav-svg">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="2" y1="12" x2="22" y2="12"></line>
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                </svg>
-            </span>
-            <span>Districts &amp; Mapping</span>
-        </a>
-
-        <a href="/surveys/" class="nav-item">
-            <span class="nav-svg">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                </svg>
-            </span>
-            <span>Seasonal Surveys</span>
-        </a>
-
-        <a href="/farmers/" class="nav-item">
-            <span class="nav-svg">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                </svg>
-            </span>
-            <span>Farmers &amp; Cooperatives</span>
-        </a>
-
-        <a href="/inputs/" class="nav-item">
-            <span class="nav-svg">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M10 2v7.31"></path>
-                    <path d="M14 9.3V2"></path>
-                    <path d="M8.5 2h7"></path>
-                    <path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path>
-                </svg>
-            </span>
-            <span>Inputs &amp; Subsidies</span>
-        </a>
-
-        <a href="/markets/" class="nav-item">
-            <span class="nav-svg">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="1" x2="12" y2="23"></line>
-                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                </svg>
-            </span>
-            <span>Commodity Markets</span>
-        </a>
-
-        <a href="/indicators/" class="nav-item">
-            <span class="nav-svg">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <circle cx="12" cy="12" r="6"></circle>
-                    <circle cx="12" cy="12" r="2"></circle>
-                </svg>
-            </span>
-            <span>Policy Indicators</span>
-        </a>
-
-        <a href="/api/" class="nav-item">
-            <span class="nav-svg">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="16 18 22 12 16 6"></polyline>
-                    <polyline points="8 6 2 12 8 18"></polyline>
-                </svg>
-            </span>
-            <span>Data API</span>
-        </a>
     </nav>
 
-    <div class="sidebar-footer">
-        <div class="sidebar-nisr-tag">
-            <span class="swatch-dot swatch-blue"></span>
-            <span class="swatch-dot swatch-cyan"></span>
-            <span class="swatch-dot swatch-green"></span>
-            <span class="swatch-dot swatch-yellow"></span>
-            <span style="margin-left: 4px;">NISR Hackathon 2026</span>
+    <!-- User Profile & Institutional Footer -->
+    <div class="sidebar-footer" style="padding: 14px 16px; border-top: 1px solid var(--sidebar-border); background: rgba(0, 0, 0, 0.15);">
+        {% if user.is_authenticated %}
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: #005CAB; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; flex-shrink: 0; border: 1px solid #BAE0FB;">
+                    {{ user.username|slice:":2"|upper }}
+                </div>
+                <div style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <a href="{% url 'accounts:profile' %}" style="color: #FFFFFF; font-weight: 700; font-size: 0.82rem; text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis;">
+                        {{ user.get_full_name|default:user.username }}
+                    </a>
+                    <div style="font-size: 0.68rem; color: #38BDF8; font-weight: 600;">
+                        {{ user.get_role_display }}
+                    </div>
+                    {% if user_geo_badge %}
+                    <div style="font-size: 0.64rem; color: #94A3B8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ user_geo_badge }}">
+                        {{ user_geo_badge }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <a href="{% url 'accounts:logout' %}" title="Sign out" style="color: #94A3B8; display: flex; align-items: center; padding: 4px; transition: color 0.15s;" onmouseover="this.style.color='#FFFFFF'" onmouseout="this.style.color='#94A3B8'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </a>
         </div>
-        <div>Track 1: Agricultural Productivity</div>
+        {% else %}
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 0.72rem; color: #94A3B8;">Public Visitor Clearance</div>
+            <a href="{% url 'accounts:login' %}" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; background: #005CAB; color: #FFFFFF; border-radius: 6px; font-weight: 700; font-size: 0.78rem; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#004987'" onmouseout="this.style.background='#005CAB'">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <span>Officer Sign In</span>
+            </a>
+        </div>
+        {% endif %}
+
+        <div style="margin-top: 10px; font-size: 0.68rem; color: #64748B; display: flex; align-items: center; justify-content: space-between;">
+            <span>NISR Hackathon 2026</span>
+            <span style="color: #00AEEF; font-weight: 700;">Track 1</span>
+        </div>
     </div>
 </aside>

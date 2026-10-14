@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Farmers &amp; Cooperatives | AgriLens Rwanda{% endblock %}
+{% block section_title %}Farmers &amp; Agricultural Cooperatives Registry{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <!-- Context Banner -->
+    <div class="panel-card" style="margin-bottom: 24px;">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <h3>Smallholder Farmer Profiles &amp; Cooperatives</h3>
+                <p class="panel-subtitle">Aggregation units supporting collective input procurement and harvest marketing</p>
+            </div>
+            <span class="panel-badge blue">Producer Registry</span>
+        </div>
+        <div class="panel-body" style="padding: 24px;">
+            <p style="font-size: 0.9rem; color: #334155; line-height: 1.6; margin: 0;">
+                Rwanda’s agricultural policy strongly leverages producer cooperatives for the distribution of subsidized fertilizers (DAP/Urea) and certified seeds under the <strong>Smart Nkunganire System (SNS)</strong>. Farmer records listed here link individual household plots to sector-level agronomic reporting.
+            </p>
+        </div>
+    </div>
+
+    <!-- 2 Column Layout: Cooperatives + Farmers -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+        <!-- Registered Cooperatives -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <h3>Agricultural Cooperatives</h3>
+                    <p class="panel-subtitle">RCA Registered Farmer Cooperatives</p>
+                </div>
+                <span class="panel-badge green">{{ total_cooperatives }} Listed</span>
+            </div>
+            <div class="panel-body no-padding">
+                <div class="table-responsive">
+                    <table class="lineage-table">
+                        <thead>
+                            <tr>
+                                <th>Cooperative Name</th>
+                                <th>Sector / District</th>
+                                <th>Members</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for coop in cooperatives %}
+                            <tr>
+                                <td><strong style="color: #001F3B;">{{ coop.name }}</strong></td>
+                                <td>{{ coop.sector.name }}, {{ coop.sector.district.name }}</td>
+                                <td>{{ coop.members_count }} members</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" style="text-align: center; padding: 32px 16px; color: #64748B;">
+                                    <div style="font-size: 0.85rem;">
+                                        Cooperative records are synchronized periodically from the RCA (Rwanda Cooperative Agency) registry.
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registered Smallholder Farmers -->
+        <div class="panel-card">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <h3>Farmer Directory</h3>
+                    <p class="panel-subtitle">Individual Household Plot Operators</p>
+                </div>
+                <span class="panel-badge blue">{{ total_farmers }} Registered</span>
+            </div>
+            <div class="panel-body no-padding">
+                <div class="table-responsive">
+                    <table class="lineage-table">
+                        <thead>
+                            <tr>
+                                <th>Farmer Name</th>
+                                <th>Gender</th>
+                                <th>Land Size</th>
+                                <th>Cooperative</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in page_obj %}
+                            <tr>
+                                <td><strong style="color: #001F3B;">{{ f.first_name }} {{ f.last_name }}</strong></td>
+                                <td>{{ f.get_gender_display }}</td>
+                                <td>{{ f.land_size_ha }} ha</td>
+                                <td>{{ f.cooperative.name|default:"Independent" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 32px 16px; color: #64748B;">
+                                    <div style="font-size: 0.85rem;">
+                                        Household survey microdata (NISR AHS 2024) is analyzed at plot aggregate level. Individual farmer onboarding occurs through local sector extension offices.
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
