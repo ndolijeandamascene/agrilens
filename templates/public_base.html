@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AgriLens &bull; See Agriculture Through Data | Rwanda{% endblock %}</title>
-    <meta name="description" content="AgriLens transforms official NISR agricultural datasets into productivity gap analysis, practice insights, and policy decision support for Rwanda.">
+    <title>{% block title %}AgriLens Enterprise &bull; National Agricultural Intelligence &amp; Decision Engine | Rwanda{% endblock %}</title>
+    <meta name="description" content="AgriLens Enterprise transforms official NISR agricultural microdata into precision yield gap benchmarks, parametric risk scoring, and evidence-based decision support for ministries, banks, and agribusinesses in Rwanda.">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,25 +21,25 @@
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/static/css/main.css?v=20261003_v6">
-    <link rel="stylesheet" href="/static/css/public.css?v=20261014_v2">
+    <link rel="stylesheet" href="/static/css/public.css?v=20261014_v3">
     {% block extra_css %}{% endblock %}
 </head>
 <body class="public-body">
-    <!-- Slim Top Announcement Bar with Official NISR Brand Colors Indicator -->
+    <!-- Slim Top Announcement Bar: Enterprise Decision Support Indicator -->
     <div class="top-announcement-bar">
         <div class="announcement-content">
-            <span class="nisr-palette-indicator" title="Official NISR Brand Colors: Pantone 2728 C, Pantone Cyan, Pantone 362 C, Pantone 3965 C">
+            <span class="nisr-palette-indicator" title="Official National Brand Palette: Pantone 2728 C, Pantone Cyan, Pantone 362 C, Pantone 3965 C">
                 <span class="swatch-dot swatch-blue" title="Pantone 2728 C (Royal Blue)"></span>
                 <span class="swatch-dot swatch-cyan" title="Pantone Cyan (Cyan)"></span>
                 <span class="swatch-dot swatch-green" title="Pantone 362 C (Green)"></span>
                 <span class="swatch-dot swatch-yellow" title="Pantone 3965 C (Yellow)"></span>
             </span>
-            <span class="announcement-pill">NISR Hackathon 2026</span>
+            <span class="announcement-pill">Enterprise Intelligence</span>
             <span class="announcement-text">
-                Track 1: Agricultural Productivity &bull; Aligned with <strong>NST2 &amp; Vision 2050</strong>
+                Rwanda Sovereign Agricultural Decision Engine &bull; Powering Evidence-Based Policy, Food Security &amp; Agribusiness Growth
             </span>
-            <a href="https://statistics.gov.rw/about/hackathon/2026-hackathon-competition" target="_blank" rel="noopener noreferrer" class="announcement-link">
-                Official Portal &rarr;
+            <a href="#executive-demo-modal" onclick="openExecutiveDemoModal(event)" class="announcement-link">
+                Schedule Executive Demo &rarr;
             </a>
         </div>
     </div>
@@ -57,7 +57,7 @@
                 <div class="brand-text">
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span class="brand-title">AgriLens</span>
-                        <span class="public-role-pill">Public</span>
+                        <span class="public-role-pill enterprise-role-pill">Public &bull; Enterprise</span>
                     </div>
                     <span class="brand-subtitle">See Agriculture Through Data.</span>
                 </div>
@@ -72,8 +72,9 @@
                 </svg>
             </button>
 
-            <!-- Streamlined Public Navigation Menu (Logo acts as Home) -->
+            <!-- Streamlined Commercial Navigation Menu -->
             <nav class="public-nav-menu" id="public-nav-menu">
+                <a href="/#solutions" class="public-nav-link">Solutions</a>
                 <a href="/indicators/productivity/" class="public-nav-link {% if '/indicators/productivity/' in request.path %}active{% endif %}">Productivity &amp; Yield Gaps</a>
                 <a href="/agriculture/" class="public-nav-link {% if '/agriculture/' in request.path %}active{% endif %}">Crops &amp; Seasons</a>
                 <a href="/surveys/" class="public-nav-link {% if '/surveys/' in request.path %}active{% endif %}">Seasonal Surveys</a>
@@ -81,18 +82,18 @@
 
                 <!-- Mobile-only login button inside drawer -->
                 <div class="mobile-login-drawer-item">
-                    <a href="/accounts/login/" class="btn-primary-action btn-mobile-login" title="Officer Sign In">
+                    <a href="/accounts/login/" class="btn-primary-action btn-mobile-login" title="Officer / Client Sign In">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
-                        <span>Officer Sign In</span>
+                        <span>Client Sign In</span>
                     </a>
                 </div>
             </nav>
 
             <div class="header-action-group">
-                <a href="/accounts/login/" class="btn-primary-action" id="btn-officer-login" title="Officer Sign In (Primary Action)">
+                <a href="/accounts/login/" class="btn-primary-action" id="btn-officer-login" title="Officer / Client Sign In">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -108,9 +109,10 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Clean Public Footer -->
+    <!-- Clean Enterprise Public Footer -->
     <footer class="public-footer">
         <div class="footer-top-container">
+            <!-- Brand & Mission Column -->
             <div class="footer-col brand-col">
                 <div class="brand-container">
                     <div class="brand-icon-box">
@@ -121,70 +123,230 @@
                     </div>
                     <div class="brand-text">
                         <span class="brand-title">AgriLens</span>
-                        <span class="brand-subtitle">See Agriculture Through Data</span>
+                        <span class="brand-subtitle">Enterprise Decision Engine</span>
                     </div>
                 </div>
                 <p class="footer-description">
-                    Agricultural intelligence and decision-support platform developed for the 
-                    <strong>2026 NISR Big Data Hackathon (Track 1)</strong>. Converting official Seasonal 
-                    Agricultural Surveys into practical evidence for Rwanda.
+                    The sovereign agricultural intelligence engine for Rwanda. Powering evidence-based policy formulation, commercial agribusiness value chains, and parametric agrifinance underwriting through verified NISR seasonal microdata.
                 </p>
                 <div class="footer-tagline-badge">
-                    Data &bull; Knowledge &bull; Insight &bull; Decision Support
+                    Evidence &bull; Insight &bull; Risk Underwriting &bull; Decision Engine
                 </div>
             </div>
 
+            <!-- Commercial Solutions -->
+            <div class="footer-col">
+                <h4 class="footer-heading">Enterprise Solutions</h4>
+                <ul class="footer-links">
+                    <li><a href="/#solutions">Ministry &amp; Policy Planning (MINAGRI)</a></li>
+                    <li><a href="/#solutions">Commercial Banks &amp; Agrifinance</a></li>
+                    <li><a href="/#solutions">Parametric Crop Insurance Underwriting</a></li>
+                    <li><a href="/#solutions">Agribusiness Supply Chain Forecasting</a></li>
+                    <li><a href="/#licensing">Institutional Licensing Models</a></li>
+                </ul>
+            </div>
+
+            <!-- Platform Modules -->
             <div class="footer-col">
                 <h4 class="footer-heading">Platform Modules</h4>
                 <ul class="footer-links">
-                    <li><a href="/indicators/productivity/">Productivity &amp; Yield Gaps</a></li>
-                    <li><a href="#rwanda-map">Interactive Rwanda Map (Leaflet)</a></li>
-                    <li><a href="/agriculture/">Crops &amp; Seasons</a></li>
-                    <li><a href="/surveys/">Seasonal Surveys</a></li>
-                    <li><a href="/markets/">Commodity Markets</a></li>
-                    <li><a href="/dashboard/">National Dashboard</a></li>
+                    <li><a href="/#rwanda-map">Interactive Rwanda GIS Engine (30 Districts)</a></li>
+                    <li><a href="/indicators/productivity/">Productivity &amp; Yield Gap AI Simulator</a></li>
+                    <li><a href="/agriculture/">National Crop Taxonomy &amp; Cycles</a></li>
+                    <li><a href="/surveys/">Seasonal Agricultural Survey Pipeline (SAS)</a></li>
+                    <li><a href="/markets/">Commodity Market Surveillance</a></li>
+                    <li><a href="/api/">Enterprise REST API &amp; Webhooks</a></li>
                 </ul>
             </div>
 
+            <!-- Standards, Compliance & Contact -->
             <div class="footer-col">
-                <h4 class="footer-heading">Data Foundations</h4>
-                <ul class="footer-links">
-                    <li><a href="https://statistics.gov.rw" target="_blank" rel="noopener noreferrer">National Institute of Statistics of Rwanda</a></li>
-                    <li><a href="/surveys/">Seasonal Agricultural Survey (SAS 2023–2025)</a></li>
-                    <li><a href="/surveys/">Agriculture Household Survey (AHS 2024)</a></li>
-                    <li><a href="https://www.minagri.gov.rw" target="_blank" rel="noopener noreferrer">Ministry of Agriculture (MINAGRI)</a></li>
-                    <li><a href="/api/">REST API Endpoints</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h4 class="footer-heading">Methodology &amp; Standards</h4>
+                <h4 class="footer-heading">Data Standards &amp; SLA</h4>
                 <p class="footer-methodology-note">
-                    Strict adherence to NISR survey weights (<code>weighted_sum</code>, <code>weighted_mean</code>), 
-                    zero synthetic data fabrication, and verified variable lineage.
+                    Strict mathematical compliance with NISR sample weights (<code>weighted_sum</code>, <code>weighted_mean</code>). Guaranteed <strong>Zero Synthetic Fabrication</strong> and audited end-to-end data provenance.
                 </p>
-                <div class="hackathon-footer-card">
-                    <span class="hackathon-badge-mini">Track 1 Entry</span>
-                    <p>Agricultural Productivity Challenge</p>
+                <div class="enterprise-footer-card" style="background: rgba(0, 174, 239, 0.08); border: 1px solid rgba(0, 174, 239, 0.3); border-radius: 8px; padding: 10px 12px;">
+                    <span class="enterprise-badge-mini" style="background: var(--nisr-blue); color: #FFFFFF; font-size: 0.7rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 3px;">Enterprise SLA</span>
+                    <p style="color: #F1F5F9; font-weight: 600;">99.9% Uptime &bull; GovCloud / On-Premise Ready</p>
+                </div>
+                <div style="margin-top: 14px; margin-bottom: 12px;">
+                    <button type="button" class="btn-book-demo" onclick="openExecutiveDemoModal(event)" id="btn-footer-demo" style="width: 100%; justify-content: center; padding: 11px 16px; font-size: 0.88rem;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        <span>Book Executive Demo</span>
+                    </button>
+                </div>
+                <div style="margin-top: 12px; font-size: 0.8rem; color: #94A3B8;">
+                    Sales Inquiries: <a href="mailto:enterprise@agrilens.rw" style="color: #00AEEF; text-decoration: none; font-weight: 600;">enterprise@agrilens.rw</a>
                 </div>
             </div>
         </div>
 
         <div class="footer-bottom-container">
-            <p>&copy; 2026 AgriLens &bull; NISR Big Data Hackathon &bull; Kigali, Rwanda</p>
+            <p>&copy; 2026 AgriLens Enterprise Intelligence System &bull; Republic of Rwanda</p>
             <div class="footer-bottom-links">
-                <a href="/indicators/productivity/">Productivity Gaps</a>
+                <a href="#executive-demo-modal" onclick="openExecutiveDemoModal(event)" style="color: #00AEEF; font-weight: 700;">Book Demo</a>
                 <span>&bull;</span>
-                <a href="/dashboard/">Dashboard</a>
+                <a href="/#solutions">Solutions</a>
                 <span>&bull;</span>
-                <a href="/api/">API Specs</a>
+                <a href="/indicators/productivity/">Productivity AI</a>
+                <span>&bull;</span>
+                <a href="/#licensing">Licensing Options</a>
+                <span>&bull;</span>
+                <a href="/api/">REST API Specs</a>
+                <span>&bull;</span>
+                <a href="/dashboard/">Institutional Dashboard</a>
             </div>
         </div>
     </footer>
 
-    <!-- Leaflet JS & Client Script -->
+    <!-- =========================================================================
+         EXECUTIVE DEMO REQUEST MODAL (SALES LEAD GENERATION)
+         ========================================================================= -->
+    <div class="executive-demo-modal-backdrop" id="executive-demo-modal" onclick="if(event.target === this) closeExecutiveDemoModal();">
+        <div class="executive-demo-modal">
+            <!-- 4-Color Brand Stripe -->
+            <div class="auth-brand-stripe">
+                <span class="stripe-blue"></span>
+                <span class="stripe-cyan"></span>
+                <span class="stripe-green"></span>
+                <span class="stripe-yellow"></span>
+            </div>
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <h3>Schedule an Executive Demonstration</h3>
+                    <p>Experience custom agricultural intelligence tailored for your institution.</p>
+                </div>
+                <button type="button" class="modal-close-btn" onclick="closeExecutiveDemoModal();" aria-label="Close modal">&times;</button>
+            </div>
+
+            <!-- Modal Form View -->
+            <form id="executive-demo-form" onsubmit="handleDemoFormSubmit(event);">
+                <div class="modal-body">
+                    <div class="modal-form-grid">
+                        <div class="modal-form-group">
+                            <label class="modal-form-label" for="demo-name">Full Name <span style="color: #DC2626;">*</span></label>
+                            <input type="text" id="demo-name" class="modal-form-input" placeholder="e.g. Dr. Jean Bosco" required>
+                        </div>
+
+                        <div class="modal-form-group">
+                            <label class="modal-form-label" for="demo-role">Title / Position <span style="color: #DC2626;">*</span></label>
+                            <input type="text" id="demo-role" class="modal-form-input" placeholder="e.g. Director of Ag Planning / Chief Risk Officer" required>
+                        </div>
+
+                        <div class="modal-form-group">
+                            <label class="modal-form-label" for="demo-org">Organization / Institution <span style="color: #DC2626;">*</span></label>
+                            <input type="text" id="demo-org" class="modal-form-input" placeholder="e.g. MINAGRI, Bank of Kigali, Agribusiness" required>
+                        </div>
+
+                        <div class="modal-form-group">
+                            <label class="modal-form-label" for="demo-email">Institutional Email <span style="color: #DC2626;">*</span></label>
+                            <input type="email" id="demo-email" class="modal-form-input" placeholder="name@institution.gov.rw" required>
+                        </div>
+
+                        <div class="modal-form-group full-width">
+                            <label class="modal-form-label" for="demo-interest">Primary Area of Interest</label>
+                            <select id="demo-interest" class="modal-form-select">
+                                <option value="policy">Government Policy Formulation &amp; Input Subsidy Optimization (Smart Nkunganire)</option>
+                                <option value="finance">Commercial Banking &amp; Agricultural Credit Risk Scoring</option>
+                                <option value="insurance">Parametric Crop Insurance &amp; Loss Underwriting</option>
+                                <option value="supply_chain">Agribusiness Raw Material Sourcing &amp; Grain Reserves</option>
+                                <option value="api">Enterprise REST API &amp; GIS Integration for Corporate ERP</option>
+                            </select>
+                        </div>
+
+                        <div class="modal-form-group full-width">
+                            <label class="modal-form-label" for="demo-notes">Brief Project Scope or Inquiries</label>
+                            <textarea id="demo-notes" class="modal-form-input" rows="2" placeholder="Tell us about your seasonal intelligence goals or desired deployment model..." style="resize: vertical;"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-primary-action" style="background: #F1F5F9; color: #475569; border: 1px solid #CBD5E1;" onclick="closeExecutiveDemoModal();">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn-primary-action" style="background: #005CAB; color: #FFFFFF; font-weight: 700;">
+                        Submit Briefing Request &rarr;
+                    </button>
+                </div>
+            </form>
+
+            <!-- Modal Success Confirmation View -->
+            <div class="modal-success-state" id="demo-success-state">
+                <div class="modal-success-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <h3 style="color: #001F3B; font-size: 1.25rem; font-weight: 800; margin: 0 0 8px 0;">Executive Briefing Requested</h3>
+                <p style="color: #475569; font-size: 0.88rem; line-height: 1.5; margin: 0 0 16px 0;">
+                    Thank you, <strong id="success-client-name">Executive</strong>. Your consultation request for <strong id="success-client-org">your organization</strong> has been logged.
+                </p>
+                <div style="background: #F0F7FD; border: 1px solid #BAE0FB; border-radius: 8px; padding: 12px; margin-bottom: 20px; font-size: 0.82rem; color: #003E73;">
+                    Briefing Reference Code: <strong id="demo-ref-code">AL-2026-8942</strong> &bull; Priority Response SLA: <strong>&lt; 24 Hours</strong>
+                </div>
+                <button type="button" class="btn-primary-action" style="background: #005CAB; color: #FFFFFF; width: 100%; justify-content: center;" onclick="closeExecutiveDemoModal();">
+                    Return to Platform
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS & Client Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="/static/js/public_home.js"></script>
+
+    <!-- Executive Modal Controller -->
+    <script>
+        function openExecutiveDemoModal(e, preselectedTier) {
+            if (e && e.preventDefault) e.preventDefault();
+            const modal = document.getElementById('executive-demo-modal');
+            const form = document.getElementById('executive-demo-form');
+            const success = document.getElementById('demo-success-state');
+            if (form) form.style.display = 'block';
+            if (success) success.style.display = 'none';
+            if (preselectedTier && document.getElementById('demo-interest')) {
+                const select = document.getElementById('demo-interest');
+                if (preselectedTier === 'Commercial') select.value = 'finance';
+                if (preselectedTier === 'Sovereign') select.value = 'policy';
+            }
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeExecutiveDemoModal() {
+            const modal = document.getElementById('executive-demo-modal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function handleDemoFormSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('demo-name').value || 'Executive Leader';
+            const org = document.getElementById('demo-org').value || 'Institution';
+            const refCode = 'AL-2026-' + Math.floor(1000 + Math.random() * 9000);
+
+            document.getElementById('success-client-name').textContent = name;
+            document.getElementById('success-client-org').textContent = org;
+            document.getElementById('demo-ref-code').textContent = refCode;
+
+            document.getElementById('executive-demo-form').style.display = 'none';
+            document.getElementById('demo-success-state').style.display = 'block';
+        }
+
+        // Close on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeExecutiveDemoModal();
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

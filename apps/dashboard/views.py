@@ -1,6 +1,6 @@
 """
-AgriLens Dashboard & Public Presentation Views.
-2026 NISR Big Data Hackathon – Track 1: Agricultural Productivity.
+AgriLens Enterprise Dashboard & Decision Engine Views.
+Sovereign Agricultural Decision Support & Market Intelligence Platform for Rwanda.
 """
 from django.shortcuts import render
 from apps.agriculture.models import Crop, AgriculturalSeason
@@ -15,16 +15,16 @@ VALID_SOURCES = ['official', 'manual', 'combined']
 
 def public_home(request):
     """
-    Public-facing landing page for AgriLens.
-    Showcases Hackathon Track 1 context, national overview metrics,
-    interactive Productivity Gap Intelligence simulator, interactive Rwanda map,
+    Public-facing commercial enterprise landing page for AgriLens.
+    Showcases Sovereign GovTech context, national overview metrics,
+    commercial stakeholder solutions, interactive Yield Gap simulator, interactive Rwanda map,
     and official NISR data lineage principles.
     """
     summary = IndicatorService.get_national_summary(year=2025, season_code='A', source_policy='official')
     priority_crops = Crop.objects.filter(is_priority_crop=True).order_by('name')
 
     context = {
-        'page_title': 'AgriLens • See Agriculture Through Data | Rwanda',
+        'page_title': 'AgriLens Enterprise • National Agricultural Intelligence & Decision Engine | Rwanda',
         'is_public_page': True,
         'summary': summary,
         'districts_count': District.objects.count(),
