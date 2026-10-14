@@ -20,6 +20,9 @@ staticfiles/
 # Environment variables
 .env
 .env.local
+.env.example
+.env.prod
+.env.dev    
 
 # Data folders (keep structures, ignore data dumps)
 Datasets/
