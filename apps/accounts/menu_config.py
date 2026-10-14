@@ -98,6 +98,37 @@ REPORTS_MENU_DISTRICT_ONLY = {
     ],
 }
 
+DECISION_SUPPORT_MENU = {
+    "id": "decision_support",
+    "name": "Decision & Impact",
+    "icon": "decision",
+    "description": "Evidence-driven recommendations, institutional action plans, and impact tracking",
+    "roles": ["ADMIN", "NISR_DATA_MANAGER", "ANALYST", "NATIONAL_OFFICER", "DISTRICT_OFFICER", "REVIEWER", "POLICY_MAKER", "RESEARCHER"],
+    "submenu": [
+        {
+            "id": "decision_hub",
+            "name": "Decision Hub",
+            "url": "decision_support:hub",
+            "icon": "hub",
+            "description": "Stakeholder intelligence across Government, Banks, Insurers, and Agribusiness",
+        },
+        {
+            "id": "decision_recommendations",
+            "name": "Recommendations",
+            "url": "decision_support:recommendation_list",
+            "icon": "recommendations",
+            "description": "Verified evidence-backed recommendations and review queue",
+        },
+        {
+            "id": "decision_impact",
+            "name": "Impact Tracking",
+            "url": "decision_support:impact_dashboard",
+            "icon": "impact",
+            "description": "Track 1: Institutional action plans and seasonal yield monitoring",
+        },
+    ],
+}
+
 AGRICULTURAL_DOMAINS_MENU = {
     "id": "domains",
     "name": "Agricultural Domains",
@@ -410,6 +441,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
             PRODUCTIVITY_MENU,
+            DECISION_SUPPORT_MENU,
             REPORTS_MENU_FULL,
             AGRICULTURAL_DOMAINS_MENU,
             DATA_GOVERNANCE_MENU_FULL,
@@ -422,6 +454,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
             PRODUCTIVITY_MENU,
+            DECISION_SUPPORT_MENU,
             REPORTS_MENU_FULL,
             AGRICULTURAL_DOMAINS_MENU,
             DATA_GOVERNANCE_MENU_FULL,
@@ -433,6 +466,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
             PRODUCTIVITY_MENU,
+            DECISION_SUPPORT_MENU,
             REPORTS_MENU_FULL,
             AGRICULTURAL_DOMAINS_MENU,
             DATA_GOVERNANCE_MENU_ANALYST,
@@ -444,6 +478,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
             PRODUCTIVITY_MENU,
+            DECISION_SUPPORT_MENU,
             REPORTS_MENU_FULL,
             AGRICULTURAL_DOMAINS_MENU,
         ]
@@ -454,6 +489,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
             PRODUCTIVITY_MENU,
+            DECISION_SUPPORT_MENU,
             REPORTS_MENU_DISTRICT_ONLY,
             AGRICULTURAL_DOMAINS_MENU,
             DATA_GOVERNANCE_MENU_ENTRY,
@@ -473,6 +509,7 @@ MENU_CONFIG = {
     "REVIEWER": {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
+            DECISION_SUPPORT_MENU,
             REPORTS_MENU_FULL,
             DATA_GOVERNANCE_MENU_REVIEWER,
             AGRICULTURAL_DOMAINS_MENU,
@@ -484,6 +521,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
             PRODUCTIVITY_MENU,
+            DECISION_SUPPORT_MENU,
             REPORTS_MENU_FULL,
             AGRICULTURAL_DOMAINS_MENU,
         ]
@@ -501,6 +539,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
             PRODUCTIVITY_MENU,
+            DECISION_SUPPORT_MENU,
             REPORTS_MENU_FULL,
             AGRICULTURAL_DOMAINS_MENU,
             DATA_GOVERNANCE_MENU_ANALYST,

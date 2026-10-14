@@ -9,7 +9,9 @@ urlpatterns = [
     path('manual/new/', views.manual_entry_create, name='manual_entry_create'),
     path('manual/<int:pk>/', views.manual_entry_detail, name='manual_entry_detail'),
     path('manual/<int:pk>/edit/', views.manual_entry_edit, name='manual_entry_edit'),
+    path('manual/<int:pk>/submit/', views.manual_entry_submit, name='manual_entry_submit'),
     path('manual/<int:pk>/review/', views.manual_entry_review, name='manual_entry_review'),
+    path('manual/<int:pk>/correct/', views.manual_entry_correction, name='manual_entry_correction'),
     
     # Dynamic Data Source Registration
     path('sources/new/', views.data_source_create, name='data_source_create'),

@@ -123,6 +123,11 @@ def manual_entry_list(request):
     return render(request, 'data_management/manual_entry_list.html', context)
 
 
+from apps.data_management.validation import apply_validation, INVALID
+from apps.data_management.workflow import ObservationWorkflowService, WorkflowError
+from django.core.exceptions import PermissionDenied
+
+
 @login_required(login_url='accounts:login')
 @role_required(
     User.Role.ADMIN, User.Role.DATA_ENTRY_OFFICER, User.Role.DISTRICT_OFFICER,
@@ -142,17 +147,31 @@ def manual_entry_create(request):
                 return render(request, 'data_management/manual_entry_form.html', context)
 
             entry.created_by = request.user
-            
-            # Action button determines initial status
+            entry.review_status = ManualObservation.ReviewStatus.DRAFT
+            entry.save()
+
+            apply_validation(entry)
+            entry.save(update_fields=['validation_status', 'validation_messages'])
+
+            AuditService.log(
+                action=AuditLog.Action.RECORD_CREATED,
+                actor=request.user,
+                target=entry,
+                details={'crop': entry.crop.name, 'district': entry.district.name, 'area_ha': str(entry.plot_area_ha)},
+                request=request
+            )
+
+            # Action button determines initial transition
             action = request.POST.get('action', 'draft')
             if action == 'submit':
-                entry.review_status = ManualObservation.ReviewStatus.SUBMITTED
-                messages.success(request, "Record submitted successfully for authoritative review!")
+                try:
+                    ObservationWorkflowService.submit(entry.id, request.user, request=request)
+                    messages.success(request, "Record submitted successfully for authoritative review!")
+                except WorkflowError as e:
+                    messages.warning(request, f"Saved as draft: {e}")
             else:
-                entry.review_status = ManualObservation.ReviewStatus.DRAFT
                 messages.info(request, "Draft record saved successfully. You may edit and submit later.")
 
-            entry.save()
             return redirect('data_management:manual_entry_detail', pk=entry.pk)
         else:
             messages.error(request, "Please correct the highlighted validation errors below.")
@@ -170,7 +189,7 @@ def manual_entry_create(request):
 def manual_entry_detail(request, pk):
     """Display comprehensive details and review workflow for a manual record."""
     entry = get_object_or_404(
-        ManualObservation.objects.select_related('district__province', 'sector', 'crop', 'season', 'created_by', 'reviewed_by', 'data_source'),
+        ManualObservation.objects.select_related('district__province', 'sector', 'crop', 'season', 'created_by', 'reviewed_by', 'data_source', 'supersedes'),
         pk=pk
     )
 
@@ -187,10 +206,17 @@ def manual_entry_detail(request, pk):
         and (entry.created_by != request.user or request.user.is_superuser)
     )
 
+    can_correct = (
+        entry.review_status == ManualObservation.ReviewStatus.APPROVED
+        and not entry.is_superseded
+        and (entry.created_by == request.user or request.user.is_superuser or request.user.role in [User.Role.ADMIN, User.Role.ANALYST, User.Role.REVIEWER])
+    )
+
     context = {
         'page_title': f"Observation #{entry.id} - {entry.crop.name}",
         'entry': entry,
         'is_reviewer': is_reviewer,
+        'can_correct': can_correct,
     }
     return render(request, 'data_management/manual_entry_detail.html', context)
 
@@ -206,7 +232,7 @@ def manual_entry_edit(request, pk):
         }, status=403)
     
     if entry.review_status == ManualObservation.ReviewStatus.APPROVED:
-        messages.warning(request, "Approved records are locked and cannot be directly modified without an audit amendment.")
+        messages.warning(request, "Approved records cannot be edited in place. Use the 'Create Correction Revision' action to propose an auditable correction.")
         return redirect('data_management:manual_entry_detail', pk=entry.pk)
 
     # Permission check: creator or elevated analyst/admin
@@ -229,14 +255,27 @@ def manual_entry_edit(request, pk):
                 context = {'page_title': f"Edit Observation #{entry.id}", 'form': form, 'entry': entry}
                 return render(request, 'data_management/manual_entry_form.html', context)
 
+            updated.save()
+            apply_validation(updated)
+            updated.save(update_fields=['validation_status', 'validation_messages'])
+
+            AuditService.log(
+                action=AuditLog.Action.RECORD_UPDATED,
+                actor=request.user,
+                target=updated,
+                details={'status': updated.review_status},
+                request=request
+            )
+
             action = request.POST.get('action', 'draft')
             if action == 'submit':
-                updated.review_status = ManualObservation.ReviewStatus.SUBMITTED
-                messages.success(request, "Record updated and submitted for review!")
+                try:
+                    ObservationWorkflowService.submit(updated.id, request.user, request=request)
+                    messages.success(request, "Record updated and submitted for review!")
+                except WorkflowError as e:
+                    messages.warning(request, f"Saved as draft: {e}")
             else:
-                updated.review_status = ManualObservation.ReviewStatus.DRAFT
                 messages.info(request, "Draft record updated successfully.")
-            updated.save()
             return redirect('data_management:manual_entry_detail', pk=updated.pk)
     else:
         form = ManualObservationForm(instance=entry)
@@ -250,66 +289,57 @@ def manual_entry_edit(request, pk):
 
 
 @login_required(login_url='accounts:login')
+def manual_entry_submit(request, pk):
+    """Explicit action to transition a draft or returned record to submitted."""
+    if request.method != 'POST':
+        return redirect('data_management:manual_entry_detail', pk=pk)
+
+    try:
+        ObservationWorkflowService.submit(pk, request.user, request=request)
+        messages.success(request, f"Observation #{pk} submitted successfully for review!")
+    except (WorkflowError, PermissionDenied) as e:
+        messages.error(request, str(e))
+
+    return redirect('data_management:manual_entry_detail', pk=pk)
+
+
+@login_required(login_url='accounts:login')
 def manual_entry_review(request, pk):
     """Authoritative action to approve or reject a submitted observation."""
-    entry = get_object_or_404(ManualObservation, pk=pk)
+    if request.method != 'POST':
+        return redirect('data_management:manual_entry_detail', pk=pk)
 
-    AUTHORIZED_ROLES = [
-        User.Role.ADMIN, User.Role.REVIEWER, User.Role.NISR_DATA_MANAGER,
-        User.Role.ANALYST, User.Role.POLICY_MAKER
-    ]
-    if request.user.role not in AUTHORIZED_ROLES and not request.user.is_superuser:
-        messages.error(request, "Permission Denied: Your account role is not authorized to review or approve entries.")
-        return redirect('data_management:manual_entry_detail', pk=entry.pk)
+    decision = request.POST.get('decision')
+    comments = request.POST.get('review_comments', '')
 
-    # Self-Approval Conflict of Interest Guard (Milestone 4 Condition 5)
-    if entry.created_by == request.user and not request.user.is_superuser:
-        messages.error(request, "Conflict of Interest Guard: You cannot review or approve your own manual submissions.")
-        return redirect('data_management:manual_entry_detail', pk=entry.pk)
-
-    # Geographic boundary check
-    if not can_access_district(request.user, entry.district_id):
-        messages.error(request, "Geographic Access Restricted: You cannot review records outside your assigned districts.")
-        return redirect('data_management:manual_entry_detail', pk=entry.pk)
-
-    reviewer = request.user
-
-    if request.method == 'POST':
-        decision = request.POST.get('decision')
-        comments = request.POST.get('review_comments', '')
-
+    try:
         if decision == 'approve':
-            entry.review_status = ManualObservation.ReviewStatus.APPROVED
-            entry.reviewed_by = reviewer
-            entry.review_comments = comments
-            entry.reviewed_at = timezone.now()
-            entry.save()
-
-            AuditService.log(
-                action=AuditLog.Action.SUBMISSION_APPROVED,
-                actor=request.user,
-                target=entry,
-                details={'decision': 'approve', 'district': entry.district.name, 'comments': comments},
-                request=request
-            )
-            messages.success(request, f"Observation #{entry.id} has been APPROVED and added to authorized manual records.")
+            ObservationWorkflowService.approve(pk, request.user, comments=comments, request=request)
+            messages.success(request, f"Observation #{pk} has been APPROVED and added to authorized manual records.")
         elif decision == 'reject':
-            entry.review_status = ManualObservation.ReviewStatus.REJECTED
-            entry.reviewed_by = reviewer
-            entry.review_comments = comments
-            entry.reviewed_at = timezone.now()
-            entry.save()
+            ObservationWorkflowService.reject(pk, request.user, reason=comments, request=request)
+            messages.warning(request, f"Observation #{pk} returned for correction with reviewer notes.")
+        else:
+            messages.error(request, f"Invalid decision: '{decision}'")
+    except (WorkflowError, PermissionDenied) as e:
+        messages.error(request, str(e))
 
-            AuditService.log(
-                action=AuditLog.Action.SUBMISSION_RETURNED,
-                actor=request.user,
-                target=entry,
-                details={'decision': 'reject', 'district': entry.district.name, 'comments': comments},
-                request=request
-            )
-            messages.warning(request, f"Observation #{entry.id} returned for correction with reviewer notes.")
+    return redirect('data_management:manual_entry_detail', pk=pk)
 
-    return redirect('data_management:manual_entry_detail', pk=entry.pk)
+
+@login_required(login_url='accounts:login')
+def manual_entry_correction(request, pk):
+    """Creates a new editable revision of an approved record."""
+    if request.method != 'POST':
+        return redirect('data_management:manual_entry_detail', pk=pk)
+
+    try:
+        revision = ObservationWorkflowService.create_correction(pk, request.user, request=request)
+        messages.info(request, f"Correction revision #{revision.id} created for approved record #{pk}. Please adjust the fields and submit for review.")
+        return redirect('data_management:manual_entry_edit', pk=revision.pk)
+    except (WorkflowError, PermissionDenied) as e:
+        messages.error(request, str(e))
+        return redirect('data_management:manual_entry_detail', pk=pk)
 
 
 

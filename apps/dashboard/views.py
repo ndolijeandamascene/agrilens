@@ -165,6 +165,8 @@ def reports_national(request):
         'crop_summaries': crop_summaries,
         'total_districts': District.objects.count(),
         'total_observations': ValidatedObservation.objects.count(),
+        'market_data_available': False,
+        'market_note': "Market price monitoring data is currently unavailable for the selected period. National and district agricultural intelligence reflects seasonal production survey microdata.",
     }
     return render(request, 'dashboard/reports_national.html', context)
 
@@ -176,7 +178,6 @@ def reports_district(request, district_id=None):
     and strict server-side geographic scoping for District Officers.
     """
     from apps.accounts.permissions import can_access_district, scope_queryset_by_geography
-    from django.db.models import Sum, Count, Avg, F, ExpressionWrapper, DecimalField, Q
     from django.shortcuts import get_object_or_404
 
     # 1. Determine Accessible Districts for the Requesting User
@@ -217,58 +218,40 @@ def reports_district(request, district_id=None):
     if season_filter not in VALID_SEASONS:
         season_filter = 'A'
 
+    source_filter = request.GET.get('source', 'official').strip().lower()
+    if source_filter == 'all':
+        source_filter = 'combined'
+    elif source_filter not in VALID_SOURCES:
+        source_filter = 'official'
+
     crop_filter = request.GET.get('crop', 'Maize').strip()
     if not crop_filter:
         crop_filter = 'Maize'
 
-    # 5. Extract District Microdata Metrics
-    district_obs = ValidatedObservation.objects.filter(
-        district=target_district,
-        season__year=year_filter,
-        season__season=season_filter,
-        crop__name__iexact=crop_filter
+    # 5. Extract District Microdata Metrics via IndicatorService
+    district_summary = IndicatorService.get_district_summary(
+        district_id=target_district.id,
+        year=year_filter,
+        season_code=season_filter,
+        crop_name=crop_filter,
+        source_policy=source_filter
     )
 
-    plot_count = district_obs.count()
-    if plot_count > 0:
-        prod_w = ExpressionWrapper(F('total_production_kg') * F('sampling_weight'), output_field=DecimalField(max_digits=18, decimal_places=4))
-        area_w = ExpressionWrapper(F('plot_area_ha') * F('sampling_weight'), output_field=DecimalField(max_digits=18, decimal_places=4))
-        
-        aggs = district_obs.annotate(p_w=prod_w, a_w=area_w).aggregate(
-            sum_prod=Sum('p_w'),
-            sum_area=Sum('a_w'),
-            irrig=Count('id', filter=Q(is_irrigated=True)),
-            seed=Count('id', filter=Q(is_improved_seed=True)),
-            fert=Count('id', filter=Q(uses_inorganic_fertilizer=True)),
-            loss=Sum('total_loss_kg'),
-        )
-        total_p = float(aggs['sum_prod'] or 0.0)
-        total_a = float(aggs['sum_area'] or 0.0)
-        weighted_yield = round(total_p / total_a, 1) if total_a > 0 else 0.0
-        
-        district_metrics = {
-            'plot_count': plot_count,
-            'total_production_mt': round(total_p / 1000.0, 2),
-            'total_area_ha': round(total_a, 2),
-            'weighted_yield_kg_per_ha': weighted_yield,
-            'irrigation_rate': round((aggs['irrig'] / plot_count) * 100.0, 1),
-            'improved_seed_rate': round((aggs['seed'] / plot_count) * 100.0, 1),
-            'fertilizer_rate': round((aggs['fert'] / plot_count) * 100.0, 1),
-        }
-    else:
-        district_metrics = {
-            'plot_count': 0,
-            'total_production_mt': 0.0,
-            'total_area_ha': 0.0,
-            'weighted_yield_kg_per_ha': 0.0,
-            'irrigation_rate': 0.0,
-            'improved_seed_rate': 0.0,
-            'fertilizer_rate': 0.0,
-        }
+    # Maintain backward-compatible district_metrics structure
+    district_metrics = {
+        'plot_count': district_summary.get('total_plots', 0),
+        'total_production_mt': district_summary.get('total_production_mt', 0.0),
+        'total_area_ha': district_summary.get('total_area_ha', 0.0),
+        'weighted_yield_kg_per_ha': district_summary.get('weighted_yield_kg_per_ha', 0.0),
+        'irrigation_rate': district_summary.get('adoption_rates', {}).get('irrigation', 0.0),
+        'improved_seed_rate': district_summary.get('adoption_rates', {}).get('improved_seed', 0.0),
+        'fertilizer_rate': district_summary.get('adoption_rates', {}).get('inorganic_fertilizer', 0.0),
+        'anti_erosion_rate': district_summary.get('adoption_rates', {}).get('anti_erosion', 0.0),
+    }
 
     # National Benchmark Comparison
     national_summary = IndicatorService.get_national_summary(
-        year=year_filter, season_code=season_filter, crop_name=crop_filter, source_policy='official'
+        year=year_filter, season_code=season_filter, crop_name=crop_filter, source_policy=source_filter
     )
 
     # Sectors in this district
@@ -282,10 +265,131 @@ def reports_district(request, district_id=None):
         'selected_year': year_filter,
         'selected_season': season_filter,
         'selected_crop': crop_filter,
+        'selected_source': source_filter,
         'district_metrics': district_metrics,
+        'district_summary': district_summary,
         'national_summary': national_summary,
         'sectors': sectors,
         'priority_crops': priority_crops,
+        'market_data_available': False,
     }
     return render(request, 'dashboard/reports_district.html', context)
+
+
+# ------------------------------------------------------------------------------
+# Export Endpoints (CSV & Excel with Formula Injection Mitigation)
+# ------------------------------------------------------------------------------
+def reports_national_export_csv(request):
+    """Exports National Agricultural Bulletin in CSV format."""
+    from apps.dashboard.exports import generate_national_csv
+
+    year_filter = int(request.GET.get('year', 2025)) if request.GET.get('year', '').isdigit() else 2025
+    season_filter = request.GET.get('season', 'A').strip().upper()
+    source_filter = request.GET.get('source', 'official').strip().lower()
+    crop_filter = request.GET.get('crop', 'Maize').strip() or 'Maize'
+
+    summary = IndicatorService.get_national_summary(
+        year=year_filter, season_code=season_filter, crop_name=crop_filter, source_policy=source_filter
+    )
+    rankings = IndicatorService.get_district_rankings(
+        crop_name=crop_filter, year=year_filter, season_code=season_filter, source_policy=source_filter
+    )
+    priority_crops = Crop.objects.filter(is_priority_crop=True).order_by('name')
+    crop_summaries = []
+    for c in priority_crops:
+        c_sum = IndicatorService.get_national_summary(
+            year=year_filter, season_code=season_filter, crop_name=c.name, source_policy=source_filter
+        )
+        if c_sum['total_plots'] > 0:
+            crop_summaries.append({'crop': c, 'summary': c_sum})
+
+    return generate_national_csv(year_filter, season_filter, source_filter, crop_filter, summary, crop_summaries, rankings)
+
+
+def reports_national_export_excel(request):
+    """Exports National Agricultural Bulletin in Excel (.xlsx) format."""
+    from apps.dashboard.exports import generate_national_excel
+
+    year_filter = int(request.GET.get('year', 2025)) if request.GET.get('year', '').isdigit() else 2025
+    season_filter = request.GET.get('season', 'A').strip().upper()
+    source_filter = request.GET.get('source', 'official').strip().lower()
+    crop_filter = request.GET.get('crop', 'Maize').strip() or 'Maize'
+
+    summary = IndicatorService.get_national_summary(
+        year=year_filter, season_code=season_filter, crop_name=crop_filter, source_policy=source_filter
+    )
+    rankings = IndicatorService.get_district_rankings(
+        crop_name=crop_filter, year=year_filter, season_code=season_filter, source_policy=source_filter
+    )
+    priority_crops = Crop.objects.filter(is_priority_crop=True).order_by('name')
+    crop_summaries = []
+    for c in priority_crops:
+        c_sum = IndicatorService.get_national_summary(
+            year=year_filter, season_code=season_filter, crop_name=c.name, source_policy=source_filter
+        )
+        if c_sum['total_plots'] > 0:
+            crop_summaries.append({'crop': c, 'summary': c_sum})
+
+    return generate_national_excel(year_filter, season_filter, source_filter, crop_filter, summary, crop_summaries, rankings)
+
+
+def reports_district_export_csv(request, district_id=None):
+    """Exports District Dossier in CSV format with geographic permission verification."""
+    from apps.accounts.permissions import can_access_district, scope_queryset_by_geography
+    from apps.dashboard.exports import generate_district_csv
+    from django.shortcuts import get_object_or_404
+
+    all_districts = District.objects.select_related('province').all().order_by('province__name', 'name')
+    authorized_districts = scope_queryset_by_geography(all_districts, request.user, district_field='id')
+
+    if district_id is None:
+        raw_did = request.GET.get('district')
+        district_id = int(raw_did) if raw_did and raw_did.isdigit() else (authorized_districts.first().id if authorized_districts.exists() else None)
+
+    if not district_id or not can_access_district(request.user, district_id):
+        return render(request, '403.html', {'reason': 'Geographic clearance required to export this district dossier.'}, status=403)
+
+    target_district = get_object_or_404(District.objects.select_related('province'), pk=district_id)
+    year_filter = int(request.GET.get('year', 2025)) if request.GET.get('year', '').isdigit() else 2025
+    season_filter = request.GET.get('season', 'A').strip().upper()
+    source_filter = request.GET.get('source', 'official').strip().lower()
+    crop_filter = request.GET.get('crop', 'Maize').strip() or 'Maize'
+
+    district_summary = IndicatorService.get_district_summary(
+        district_id=target_district.id, year=year_filter, season_code=season_filter, crop_name=crop_filter, source_policy=source_filter
+    )
+    sectors = Sector.objects.filter(district=target_district).order_by('name')
+
+    return generate_district_csv(target_district, year_filter, season_filter, source_filter, crop_filter, district_summary, sectors)
+
+
+def reports_district_export_excel(request, district_id=None):
+    """Exports District Dossier in Excel (.xlsx) format with geographic permission verification."""
+    from apps.accounts.permissions import can_access_district, scope_queryset_by_geography
+    from apps.dashboard.exports import generate_district_excel
+    from django.shortcuts import get_object_or_404
+
+    all_districts = District.objects.select_related('province').all().order_by('province__name', 'name')
+    authorized_districts = scope_queryset_by_geography(all_districts, request.user, district_field='id')
+
+    if district_id is None:
+        raw_did = request.GET.get('district')
+        district_id = int(raw_did) if raw_did and raw_did.isdigit() else (authorized_districts.first().id if authorized_districts.exists() else None)
+
+    if not district_id or not can_access_district(request.user, district_id):
+        return render(request, '403.html', {'reason': 'Geographic clearance required to export this district dossier.'}, status=403)
+
+    target_district = get_object_or_404(District.objects.select_related('province'), pk=district_id)
+    year_filter = int(request.GET.get('year', 2025)) if request.GET.get('year', '').isdigit() else 2025
+    season_filter = request.GET.get('season', 'A').strip().upper()
+    source_filter = request.GET.get('source', 'official').strip().lower()
+    crop_filter = request.GET.get('crop', 'Maize').strip() or 'Maize'
+
+    district_summary = IndicatorService.get_district_summary(
+        district_id=target_district.id, year=year_filter, season_code=season_filter, crop_name=crop_filter, source_policy=source_filter
+    )
+    sectors = Sector.objects.filter(district=target_district).order_by('name')
+
+    return generate_district_excel(target_district, year_filter, season_filter, source_filter, crop_filter, district_summary, sectors)
+
 

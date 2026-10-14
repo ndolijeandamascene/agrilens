@@ -150,3 +150,94 @@ class IndicatorServiceUnitTests(TestCase):
         rankings_min5 = IndicatorService.get_district_rankings(crop_name='Maize', year=2025, season_code='A', min_plots=5)
         self.assertEqual(len(rankings_min5), 0) # Musanze excluded because it has < 5 plots
 
+    def test_district_summary_and_benchmarks(self):
+        """get_district_summary returns accurate localized metrics and rank against provincial/national benchmarks."""
+        # Musanze: 4,000 kg/ha
+        ValidatedObservation.objects.create(
+            batch=self.batch2025, provenance='NISR_SAS_2025', season=self.season2025a,
+            district=self.dist1, crop=self.crop_maize, source_record_id='DS1',
+            plot_area_ha=Decimal('1.0'), total_production_kg=Decimal('4000.0'),
+            calculated_yield_kg_per_ha=Decimal('4000.0'), sampling_weight=Decimal('1.0'),
+            is_improved_seed=True
+        )
+        # Burera: 2,000 kg/ha
+        ValidatedObservation.objects.create(
+            batch=self.batch2025, provenance='NISR_SAS_2025', season=self.season2025a,
+            district=self.dist2, crop=self.crop_maize, source_record_id='DS2',
+            plot_area_ha=Decimal('1.0'), total_production_kg=Decimal('2000.0'),
+            calculated_yield_kg_per_ha=Decimal('2000.0'), sampling_weight=Decimal('1.0'),
+            is_improved_seed=False
+        )
+
+        d_sum = IndicatorService.get_district_summary(district_id=self.dist1.id, year=2025, season_code='A', crop_name='Maize')
+        self.assertIsNotNone(d_sum)
+        self.assertEqual(d_sum['district_name'], 'Musanze')
+        self.assertEqual(d_sum['weighted_yield_kg_per_ha'], 4000.0)
+        self.assertEqual(d_sum['national_rank'], 1)
+        self.assertEqual(d_sum['provincial_rank'], 1)
+        self.assertEqual(d_sum['adoption_rates']['improved_seed'], 100.0)
+        self.assertEqual(d_sum['weighted_adoption_rates']['improved_seed'], 100.0)
+
+    def test_practice_yield_association_methodological_disclaimer(self):
+        """get_practice_yield_association computes descriptive correlation and enforces strict disclaimer."""
+        # Create 5 adopters and 5 non-adopters for valid sample
+        for i in range(5):
+            ValidatedObservation.objects.create(
+                batch=self.batch2025, provenance='NISR_SAS_2025', season=self.season2025a,
+                district=self.dist1, crop=self.crop_maize, source_record_id=f'ADP_{i}',
+                plot_area_ha=Decimal('1.0'), total_production_kg=Decimal('3500.0'),
+                calculated_yield_kg_per_ha=Decimal('3500.0'), sampling_weight=Decimal('1.0'),
+                is_improved_seed=True
+            )
+            ValidatedObservation.objects.create(
+                batch=self.batch2025, provenance='NISR_SAS_2025', season=self.season2025a,
+                district=self.dist1, crop=self.crop_maize, source_record_id=f'NON_{i}',
+                plot_area_ha=Decimal('1.0'), total_production_kg=Decimal('2000.0'),
+                calculated_yield_kg_per_ha=Decimal('2000.0'), sampling_weight=Decimal('1.0'),
+                is_improved_seed=False
+            )
+
+        assoc = IndicatorService.get_practice_yield_association(
+            crop_name='Maize', practice_field='is_improved_seed', year=2025, season_code='A', min_sample_each=5
+        )
+        self.assertTrue(assoc['is_sufficient_sample'])
+        self.assertEqual(assoc['status'], 'CALCULATED')
+        self.assertEqual(assoc['adopters_yield_kg_per_ha'], 3500.0)
+        self.assertEqual(assoc['non_adopters_yield_kg_per_ha'], 2000.0)
+        self.assertEqual(assoc['yield_difference_kg_per_ha'], 1500.0)
+        self.assertEqual(assoc['yield_difference_percentage'], 75.0)
+        # Critical disclaimer check
+        self.assertIn('NOT be interpreted as a causal effect', assoc['disclaimer'])
+
+    def test_productivity_gap_multi_benchmark_and_target_district(self):
+        """get_productivity_gap supports national and p90 benchmarks and target district evaluation."""
+        ValidatedObservation.objects.create(
+            batch=self.batch2025, provenance='NISR_SAS_2025', season=self.season2025a,
+            district=self.dist1, crop=self.crop_maize, source_record_id='G1',
+            plot_area_ha=Decimal('1.0'), total_production_kg=Decimal('4000.0'),
+            calculated_yield_kg_per_ha=Decimal('4000.0'), sampling_weight=Decimal('1.0')
+        )
+        ValidatedObservation.objects.create(
+            batch=self.batch2025, provenance='NISR_SAS_2025', season=self.season2025a,
+            district=self.dist2, crop=self.crop_maize, source_record_id='G2',
+            plot_area_ha=Decimal('1.0'), total_production_kg=Decimal('2000.0'),
+            calculated_yield_kg_per_ha=Decimal('2000.0'), sampling_weight=Decimal('1.0')
+        )
+
+        # Target district Burera (dist2) vs Top District (Musanze)
+        gap_target = IndicatorService.get_productivity_gap(
+            crop_name='Maize', year=2025, season_code='A', target_district_id=self.dist2.id
+        )
+        self.assertTrue(gap_target['is_sufficient_data'])
+        self.assertEqual(gap_target['target_district']['district_name'], 'Burera')
+        self.assertEqual(gap_target['gap_percentage'], -50.0)
+        self.assertEqual(gap_target['yield_difference_kg_per_ha'], 2000.0)
+
+        # Gap against national benchmark
+        gap_nat = IndicatorService.get_productivity_gap(
+            crop_name='Maize', year=2025, season_code='A', benchmark_type='national', target_district_id=self.dist2.id
+        )
+        self.assertTrue(gap_nat['is_sufficient_data'])
+        self.assertEqual(gap_nat['benchmark_type'], 'national')
+
+

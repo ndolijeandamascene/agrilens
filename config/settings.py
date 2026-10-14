@@ -62,6 +62,7 @@ LOCAL_APPS = [
     'apps.dashboard.apps.DashboardConfig',
     'apps.api.apps.ApiConfig',
     'apps.data_management.apps.DataManagementConfig',
+    'apps.decision_support.apps.DecisionSupportConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

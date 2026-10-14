@@ -55,7 +55,9 @@ class ManualObservationForm(forms.ModelForm):
             'plot_area_ha', 'total_production_kg',
             'is_irrigated', 'is_improved_seed', 'uses_inorganic_fertilizer',
             'uses_organic_fertilizer', 'has_soil_conservation', 'uses_mechanization',
-            'loss_quantity_kg', 'quantity_sold_kg', 'farmgate_price_rwf',
+            'inorganic_fertilizer_kg',
+            'loss_quantity_kg', 'primary_loss_cause', 'quantity_sold_kg', 'farmgate_price_rwf',
+            'latitude', 'longitude', 'gps_accuracy_m',
             'remarks'
         ]
         widgets = {
@@ -70,9 +72,14 @@ class ManualObservationForm(forms.ModelForm):
             'observation_reference': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'e.g. OBS-2026-MUS-042'}),
             'plot_area_ha': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.0001', 'placeholder': '0.0000'}),
             'total_production_kg': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.01', 'placeholder': '0.00'}),
+            'inorganic_fertilizer_kg': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.01', 'placeholder': '0.00 kg'}),
             'loss_quantity_kg': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.01', 'placeholder': '0.00'}),
+            'primary_loss_cause': forms.Select(attrs={'class': 'form-select'}),
             'quantity_sold_kg': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.01', 'placeholder': '0.00'}),
             'farmgate_price_rwf': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.01', 'placeholder': '0.00'}),
+            'latitude': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.000001', 'placeholder': 'e.g. -1.498300'}),
+            'longitude': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.000001', 'placeholder': 'e.g. 29.634100'}),
+            'gps_accuracy_m': forms.NumberInput(attrs={'class': 'form-input', 'step': '0.1', 'placeholder': 'e.g. 4.5'}),
             'remarks': forms.Textarea(attrs={'class': 'form-textarea', 'rows': 3, 'placeholder': 'Contextual observations, field notes, or anomalies'}),
         }
 
@@ -87,7 +94,12 @@ class ManualObservationForm(forms.ModelForm):
             self.fields['data_source'].empty_label = "-- Dynamic Auto-Generation (Based on Data Kind & Season) --"
 
         # Configure optional fields
-        for opt_field in ['data_kind', 'data_source', 'loss_quantity_kg', 'quantity_sold_kg', 'farmgate_price_rwf', 'reporting_organization', 'observation_reference', 'remarks']:
+        for opt_field in [
+            'data_kind', 'data_source', 'inorganic_fertilizer_kg', 'loss_quantity_kg', 
+            'primary_loss_cause', 'quantity_sold_kg', 'farmgate_price_rwf', 
+            'latitude', 'longitude', 'gps_accuracy_m',
+            'reporting_organization', 'observation_reference', 'remarks'
+        ]:
             if opt_field in self.fields:
                 self.fields[opt_field].required = False
 
@@ -113,33 +125,26 @@ class ManualObservationForm(forms.ModelForm):
         prov = cleaned_data.get('province')
         dist = cleaned_data.get('district')
         sec = cleaned_data.get('sector')
-        area = cleaned_data.get('plot_area_ha')
-        prod = cleaned_data.get('total_production_kg')
-        loss = cleaned_data.get('loss_quantity_kg')
-        sold = cleaned_data.get('quantity_sold_kg')
 
-        # 1. Server-side Geographic Hierarchical Integrity Validation
+        # 1. Geographic Hierarchical Integrity Validation
         if prov and dist and dist.province != prov:
-            raise ValidationError({'district': f"District '{dist.name}' does not belong to {prov.name}."})
+            self.add_error('district', f"District '{dist.name}' does not belong to {prov.name}.")
 
         if dist and sec and sec.district != dist:
-            raise ValidationError({'sector': f"Sector '{sec.name}' does not belong to {dist.name}."})
+            self.add_error('sector', f"Sector '{sec.name}' does not belong to {dist.name}.")
 
-        # 2. Area & Production Range Validation
-        if area is not None and area <= 0:
-            raise ValidationError({'plot_area_ha': "Plot area must be strictly positive (> 0 ha)."})
+        # 2. Authoritative Server-side Validation Layer
+        from apps.data_management.validation import validate_observation
+        val_result = validate_observation(cleaned_data, instance_pk=self.instance.pk)
+        self.validation_warnings = val_result.warnings
+        self.validation_messages = val_result.messages
 
-        if prod is not None and prod < 0:
-            raise ValidationError({'total_production_kg': "Production quantity cannot be negative."})
-
-        if loss is None:
-            cleaned_data['loss_quantity_kg'] = 0.0
-        elif loss < 0:
-            raise ValidationError({'loss_quantity_kg': "Post-harvest loss quantity cannot be negative."})
-
-        if sold is None:
-            cleaned_data['quantity_sold_kg'] = 0.0
-        elif prod is not None and sold > (prod + 100):
-            raise ValidationError({'quantity_sold_kg': f"Sold quantity ({sold} kg) cannot significantly exceed total harvest ({prod} kg)."})
+        for err in val_result.errors:
+            field_name = err.get('field')
+            msg = err['message']
+            if field_name and field_name in self.fields:
+                self.add_error(field_name, msg)
+            else:
+                self.add_error(None, msg)
 
         return cleaned_data

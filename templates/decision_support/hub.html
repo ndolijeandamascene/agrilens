@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}Decision Support & Stakeholder Intelligence Hub | AgriLens Rwanda{% endblock %}
+{% block section_title %}Decision Support Hub{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="padding: 24px 32px; max-width: 1400px; margin: 0 auto;">
+    <!-- Header Strip -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">
+                <span>Institutional Decision Engine</span>
+                <span>&bull;</span>
+                <span>Track 1: Agricultural Productivity & Evidence-Driven Decisions</span>
+            </div>
+            <h1 style="margin: 0; font-size: 1.6rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+                Agricultural Decision Support & Stakeholder Intelligence Hub
+            </h1>
+            <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #64748B;">
+                Automated multi-stakeholder advisory recommendations, operational action tracking, and observational seasonal impact monitoring.
+            </p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a href="{% url 'decision_support:recommendation_list' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
+                <span>View Recommendations Queue &rarr;</span>
+            </a>
+            <a href="{% url 'decision_support:impact_dashboard' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #166534; border: 1px solid #BBF7D0; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                <span>Impact Tracking Dashboard</span>
+            </a>
+            {% if request.user.is_superuser or request.user.role in "ADMIN NISR_DATA_MANAGER NATIONAL_OFFICER POLICY_MAKER" %}
+            <form method="POST" action="{% url 'decision_support:generate' %}" style="display: inline-flex; margin: 0;">
+                {% csrf_token %}
+                <input type="hidden" name="year" value="2025">
+                <input type="hidden" name="season" value="A">
+                <input type="hidden" name="source" value="official">
+                <button type="submit" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 8px; font-size: 0.86rem; font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(0, 92, 171, 0.25);">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <span>Run Decision Engine (SAS 2025A)</span>
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Stakeholder Domain Summary Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <!-- Card 1: MINAGRI / Government -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-top: 4px solid #46962B; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 0.04em;">MINAGRI & Extension</span>
+                <span style="background: #DCFCE7; color: #15803D; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 12px;">Policy & Inputs</span>
+            </div>
+            <div style="font-size: 2rem; font-weight: 800; color: #001F3B; line-height: 1.1;">{{ gov_count }}</div>
+            <p style="margin: 6px 0 0 0; font-size: 0.82rem; color: #64748B;">Yield gap interventions, input subsidy targeting, and extension deployment advisories.</p>
+            <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid #F1F5F9;">
+                <a href="{% url 'decision_support:recommendation_list' %}?stakeholder=GOVERNMENT" style="font-size: 0.82rem; font-weight: 700; color: #46962B; text-decoration: none;">View Government Queue &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Card 2: Financial Sector / Banks -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-top: 4px solid #005CAB; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: #005CAB; text-transform: uppercase; letter-spacing: 0.04em;">Agricultural Lenders</span>
+                <span style="background: #E0F2FE; color: #0369A1; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 12px;">Credit Risk</span>
+            </div>
+            <div style="font-size: 2rem; font-weight: 800; color: #001F3B; line-height: 1.1;">{{ bank_count }}</div>
+            <p style="margin: 6px 0 0 0; font-size: 0.82rem; color: #64748B;">Low-adoption exposure warnings, collateral risk factors, and seasonal cash flow buffers.</p>
+            <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid #F1F5F9;">
+                <a href="{% url 'decision_support:recommendation_list' %}?stakeholder=BANK" style="font-size: 0.82rem; font-weight: 700; color: #005CAB; text-decoration: none;">View Lender Advisories &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Card 3: Crop Insurers -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-top: 4px solid #7C3AED; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: #6D28D9; text-transform: uppercase; letter-spacing: 0.04em;">Crop Insurers</span>
+                <span style="background: #F3E8FF; color: #7E22CE; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 12px;">Yield Volatility</span>
+            </div>
+            <div style="font-size: 2rem; font-weight: 800; color: #001F3B; line-height: 1.1;">{{ insurer_count }}</div>
+            <p style="margin: 6px 0 0 0; font-size: 0.82rem; color: #64748B;">High yield variability clusters (CV &gt; 40%), underwriting risk zones, and monitoring triggers.</p>
+            <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid #F1F5F9;">
+                <a href="{% url 'decision_support:recommendation_list' %}?stakeholder=INSURER" style="font-size: 0.82rem; font-weight: 700; color: #7C3AED; text-decoration: none;">View Insurance Flags &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Card 4: Agribusiness & Sourcing -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-top: 4px solid #D97706; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: #B45309; text-transform: uppercase; letter-spacing: 0.04em;">Agribusiness &amp; Offtakers</span>
+                <span style="background: #FEF3C7; color: #92400E; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 12px;">Supply Sourcing</span>
+            </div>
+            <div style="font-size: 2rem; font-weight: 800; color: #001F3B; line-height: 1.1;">{{ agribus_count }}</div>
+            <p style="margin: 6px 0 0 0; font-size: 0.82rem; color: #64748B;">Supply deficit alerts, low-productivity aggregation zones, and contract farming mitigation.</p>
+            <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid #F1F5F9;">
+                <a href="{% url 'decision_support:recommendation_list' %}?stakeholder=AGRIBUSINESS" style="font-size: 0.82rem; font-weight: 700; color: #D97706; text-decoration: none;">View Sourcing Alerts &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Secondary Status Metrics -->
+    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap;">
+            <div>
+                <span style="font-size: 0.78rem; color: #64748B; font-weight: 600;">Total Active Recommendations:</span>
+                <span style="font-size: 1.1rem; font-weight: 800; color: #001F3B; margin-left: 6px;">{{ total_recommendations }}</span>
+            </div>
+            <div>
+                <span style="font-size: 0.78rem; color: #DC2626; font-weight: 700;">Critical Priority:</span>
+                <span style="font-size: 1.1rem; font-weight: 800; color: #DC2626; margin-left: 6px;">{{ critical_count }}</span>
+            </div>
+            <div>
+                <span style="font-size: 0.78rem; color: #D97706; font-weight: 700;">High Priority:</span>
+                <span style="font-size: 1.1rem; font-weight: 800; color: #D97706; margin-left: 6px;">{{ high_count }}</span>
+            </div>
+            <div>
+                <span style="font-size: 0.78rem; color: #166534; font-weight: 700;">Approved by Authority:</span>
+                <span style="font-size: 1.1rem; font-weight: 800; color: #166534; margin-left: 6px;">{{ approved_count }}</span>
+            </div>
+            <div>
+                <span style="font-size: 0.78rem; color: #005CAB; font-weight: 700;">Attached Action Plans:</span>
+                <span style="font-size: 1.1rem; font-weight: 800; color: #005CAB; margin-left: 6px;">{{ action_plans_count }}</span>
+            </div>
+        </div>
+        <div style="font-size: 0.76rem; color: #64748B; background: #FFFFFF; padding: 4px 10px; border-radius: 6px; border: 1px solid #E2E8F0;">
+            Strict Deterministic Rules &bull; Zero Black-Box Generation
+        </div>
+    </div>
+
+    <!-- 2-Column Split: Recent Recommendations & Active Action Plans -->
+    <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; margin-bottom: 24px;">
+        <!-- Left Column: Priority Recommendation Feed -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 12px;">
+                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #001F3B;">
+                    Recent Evidence-Backed Recommendations
+                </h3>
+                <a href="{% url 'decision_support:recommendation_list' %}" style="font-size: 0.82rem; font-weight: 600; color: #005CAB; text-decoration: none;">
+                    View All &rarr;
+                </a>
+            </div>
+
+            {% if recent_recs %}
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for r in recent_recs %}
+                <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 16px; transition: border-color 0.15s; background: {% if r.priority == 'CRITICAL' %}#FEF2F2{% else %}#FFFFFF{% endif %};">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px;">
+                        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                            <!-- Priority Pill -->
+                            {% if r.priority == 'CRITICAL' %}
+                                <span style="background: #DC2626; color: #FFFFFF; font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 4px;">CRITICAL</span>
+                            {% elif r.priority == 'HIGH' %}
+                                <span style="background: #F59E0B; color: #FFFFFF; font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 4px;">HIGH</span>
+                            {% elif r.priority == 'MEDIUM' %}
+                                <span style="background: #0284C7; color: #FFFFFF; font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 4px;">MEDIUM</span>
+                            {% else %}
+                                <span style="background: #64748B; color: #FFFFFF; font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 4px;">LOW</span>
+                            {% endif %}
+
+                            <!-- Stakeholder Pill -->
+                            <span style="font-size: 0.7rem; font-weight: 700; color: #334155; background: #F1F5F9; padding: 2px 6px; border-radius: 4px;">
+                                {{ r.get_target_stakeholder_display }}
+                            </span>
+
+                            <!-- Geography -->
+                            {% if r.district %}
+                            <span style="font-size: 0.72rem; font-weight: 600; color: #005CAB;">
+                                {{ r.district.name }} District ({{ r.crop.name }})
+                            </span>
+                            {% else %}
+                            <span style="font-size: 0.72rem; font-weight: 600; color: #005CAB;">
+                                National &bull; {{ r.crop.name }}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Status Pill -->
+                        <span style="font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; border: 1px solid #CBD5E1; color: #475569; background: #F8FAFC;">
+                            {{ r.get_status_display }}
+                        </span>
+                    </div>
+
+                    <a href="{% url 'decision_support:recommendation_detail' r.id %}" style="text-decoration: none; color: #001F3B; font-weight: 700; font-size: 0.92rem; display: block; margin-bottom: 4px;">
+                        {{ r.title }}
+                    </a>
+                    <p style="margin: 0; font-size: 0.8rem; color: #64748B; line-height: 1.4;">
+                        {{ r.recommended_action|truncatewords:24 }}
+                    </p>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.74rem; color: #94A3B8;">
+                        <span>SAS {{ r.season.year }} {{ r.season.season_code }} &bull; {{ r.created_at|date:"M d, Y" }}</span>
+                        <a href="{% url 'decision_support:recommendation_detail' r.id %}" style="font-weight: 700; color: #005CAB; text-decoration: none;">
+                            Inspect Dossier &rarr;
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 36px 20px; color: #64748B;">
+                <p style="margin: 0 0 12px 0; font-size: 0.9rem;">No recommendations generated yet for the current scope.</p>
+                {% if request.user.is_superuser or request.user.role in "ADMIN NISR_DATA_MANAGER NATIONAL_OFFICER" %}
+                <form method="POST" action="{% url 'decision_support:generate' %}" style="display: inline-block;">
+                    {% csrf_token %}
+                    <button type="submit" style="padding: 8px 16px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.84rem; font-weight: 600; cursor: pointer;">
+                        Execute Decision Engine Now
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Column: Active Action Plans & Impact Links -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Active Action Plans Card -->
+            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid #F1F5F9; padding-bottom: 10px;">
+                    <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #001F3B;">
+                        Track 1: Operational Action Plans
+                    </h3>
+                    <a href="{% url 'decision_support:impact_dashboard' %}" style="font-size: 0.82rem; font-weight: 600; color: #166534; text-decoration: none;">
+                        All Plans &rarr;
+                    </a>
+                </div>
+
+                {% if active_actions %}
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    {% for a in active_actions %}
+                    <div style="border: 1px solid #E2E8F0; border-radius: 6px; padding: 12px; background: #F8FAFC;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 4px;">
+                            <span style="font-weight: 700; font-size: 0.86rem; color: #001F3B;">{{ a.title }}</span>
+                            <span style="font-size: 0.68rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: #FEF3C7; color: #92400E;">
+                                {{ a.get_status_display }}
+                            </span>
+                        </div>
+                        <div style="font-size: 0.78rem; color: #64748B; margin-bottom: 6px;">
+                            <strong>Lead:</strong> {{ a.assigned_organization|default:a.assigned_to.get_full_name|default:"Unassigned" }}
+                            {% if a.target_date %} &bull; <strong>Target:</strong> {{ a.target_date|date:"M Y" }}{% endif %}
+                        </div>
+                        <div style="font-size: 0.74rem; color: #005CAB; display: flex; justify-content: space-between; align-items: center;">
+                            <span>Attached to: {{ a.recommendation.title|truncatechars:32 }}</span>
+                            <a href="{% url 'decision_support:recommendation_detail' a.recommendation.id %}" style="color: #005CAB; font-weight: 700; text-decoration: none;">
+                                View &rarr;
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 24px 16px; color: #64748B; font-size: 0.84rem;">
+                    No operational action plans pending. Attach plans from verified recommendations.
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Empirical Transparency Notice -->
+            <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 10px; padding: 16px 18px;">
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <div style="color: #166534; font-size: 1.1rem; line-height: 1;">🛡️</div>
+                    <div>
+                        <div style="font-size: 0.84rem; font-weight: 700; color: #166534; margin-bottom: 4px;">
+                            Scientific Governance &amp; Anti-Hallucination Standard
+                        </div>
+                        <p style="margin: 0; font-size: 0.76rem; color: #14532D; line-height: 1.45;">
+                            All AgriLens decision advisories are triggered strictly by verified statistical microdata from official NISR Seasonal Agricultural Surveys (SAS). No synthetic credit ratings or black-box predictions are permitted. Recommendations serve as decision aids and do not constitute automatic credit denials or underwriting determinations.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

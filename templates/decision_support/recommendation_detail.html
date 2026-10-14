@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block title %}Decision Dossier: {{ rec.title }} | AgriLens Rwanda{% endblock %}
+{% block section_title %}Decision Support Dossier{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="padding: 24px 32px; max-width: 1200px; margin: 0 auto;">
+    <!-- Header Strip -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">
+                <span>Decision Dossier #{{ rec.id }}</span>
+                <span>&bull;</span>
+                <span>{{ rec.get_target_stakeholder_display }}</span>
+                {% if rec.district %}
+                <span>&bull;</span>
+                <span>{{ rec.district.name }} District ({{ rec.district.province.name }} Province)</span>
+                {% endif %}
+            </div>
+            <h1 style="margin: 0; font-size: 1.5rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+                {{ rec.title }}
+            </h1>
+            <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #64748B;">
+                Generated from SAS {{ rec.season.year }} Season {{ rec.season.season_code }} microdata for {{ rec.crop.name }} &bull; Rule: {{ rec.rule.code }}
+            </p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a href="{% url 'decision_support:recommendation_list' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
+                <span>&larr; All Recommendations</span>
+            </a>
+            {% if rec.district %}
+            <a href="{% url 'dashboard:reports_district' %}?district={{ rec.district.id }}&amp;year={{ rec.season.year }}&amp;season={{ rec.season.season_code }}&amp;crop={{ rec.crop.name }}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; background: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
+                <span>District Dossier &rarr;</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Status & Priority Banner -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <!-- Priority Badge -->
+            {% if rec.priority == 'CRITICAL' %}
+                <span style="background: #DC2626; color: #FFFFFF; font-size: 0.76rem; font-weight: 800; padding: 4px 10px; border-radius: 4px;">CRITICAL PRIORITY</span>
+            {% elif rec.priority == 'HIGH' %}
+                <span style="background: #F59E0B; color: #FFFFFF; font-size: 0.76rem; font-weight: 800; padding: 4px 10px; border-radius: 4px;">HIGH PRIORITY</span>
+            {% elif rec.priority == 'MEDIUM' %}
+                <span style="background: #0284C7; color: #FFFFFF; font-size: 0.76rem; font-weight: 800; padding: 4px 10px; border-radius: 4px;">MEDIUM PRIORITY</span>
+            {% else %}
+                <span style="background: #64748B; color: #FFFFFF; font-size: 0.76rem; font-weight: 800; padding: 4px 10px; border-radius: 4px;">LOW PRIORITY</span>
+            {% endif %}
+
+            <!-- Stakeholder Badge -->
+            <span style="background: #F1F5F9; color: #1E293B; font-size: 0.76rem; font-weight: 700; padding: 4px 10px; border-radius: 4px;">
+                Stakeholder: {{ rec.get_target_stakeholder_display }}
+            </span>
+
+            <!-- Status Badge -->
+            <span style="border: 1px solid #CBD5E1; color: #0F172A; font-size: 0.76rem; font-weight: 700; padding: 4px 10px; border-radius: 4px; background: #F8FAFC;">
+                Workflow Status: <strong>{{ rec.get_status_display }}</strong>
+            </span>
+        </div>
+
+        <div style="font-size: 0.78rem; color: #64748B;">
+            Generated on {{ rec.created_at|date:"M d, Y H:i" }} &bull; Reviewer: {{ rec.reviewer.get_full_name|default:"Pending Review" }}
+        </div>
+    </div>
+
+    <!-- Core Intelligence Cards: Problem Statement & Recommended Action -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+        <!-- Problem Statement -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-top: 4px solid #DC2626; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                <span style="font-size: 1.1rem;">⚠️</span>
+                <h3 style="margin: 0; font-size: 1rem; font-weight: 800; color: #001F3B;">
+                    Empirical Problem Statement
+                </h3>
+            </div>
+            <p style="margin: 0; font-size: 0.88rem; color: #334155; line-height: 1.6;">
+                {{ rec.problem_statement }}
+            </p>
+        </div>
+
+        <!-- Recommended Action -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-top: 4px solid #166534; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                <span style="font-size: 1.1rem;">🎯</span>
+                <h3 style="margin: 0; font-size: 1rem; font-weight: 800; color: #001F3B;">
+                    Targeted Advisory Action
+                </h3>
+            </div>
+            <p style="margin: 0; font-size: 0.88rem; color: #166534; line-height: 1.6;">
+                {{ rec.recommended_action }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Statistical Evidence & Provenance Audit Grid -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 12px;">
+            <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #001F3B;">
+                Structured Statistical Evidence &amp; Survey Provenance
+            </h3>
+            <span style="font-size: 0.74rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 3px 8px; border-radius: 4px;">
+                NISR Microdata Lineage
+            </span>
+        </div>
+
+        {% if rec.evidence_json %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 16px;">
+            {% if rec.evidence_json.actual_yield_kg_ha %}
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 14px;">
+                <div style="font-size: 0.74rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Observed Yield</div>
+                <div style="font-size: 1.3rem; font-weight: 800; color: #001F3B; margin-top: 4px;">
+                    {{ rec.evidence_json.actual_yield_kg_ha|floatformat:1 }} <span style="font-size: 0.76rem; font-weight: 600; color: #64748B;">kg/ha</span>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if rec.evidence_json.potential_yield_kg_ha %}
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 14px;">
+                <div style="font-size: 0.74rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Benchmark Potential</div>
+                <div style="font-size: 1.3rem; font-weight: 800; color: #166534; margin-top: 4px;">
+                    {{ rec.evidence_json.potential_yield_kg_ha|floatformat:1 }} <span style="font-size: 0.76rem; font-weight: 600; color: #64748B;">kg/ha</span>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if rec.evidence_json.yield_gap_pct %}
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 14px;">
+                <div style="font-size: 0.74rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Productivity Gap</div>
+                <div style="font-size: 1.3rem; font-weight: 800; color: #DC2626; margin-top: 4px;">
+                    {{ rec.evidence_json.yield_gap_pct }}%
+                </div>
+            </div>
+            {% endif %}
+
+            {% if rec.evidence_json.cv_pct %}
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 14px;">
+                <div style="font-size: 0.74rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Yield Volatility (CV)</div>
+                <div style="font-size: 1.3rem; font-weight: 800; color: #7C3AED; margin-top: 4px;">
+                    {{ rec.evidence_json.cv_pct }}%
+                </div>
+            </div>
+            {% endif %}
+
+            {% if rec.evidence_json.sample_size %}
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 14px;">
+                <div style="font-size: 0.74rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Sample Size</div>
+                <div style="font-size: 1.3rem; font-weight: 800; color: #0284C7; margin-top: 4px;">
+                    {{ rec.evidence_json.sample_size }} <span style="font-size: 0.76rem; font-weight: 600; color: #64748B;">plots</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Full Evidence Payload Accordion -->
+        <details style="font-size: 0.8rem; color: #64748B; border-top: 1px solid #F1F5F9; padding-top: 10px;">
+            <summary style="cursor: pointer; font-weight: 700; color: #005CAB; margin-bottom: 8px;">
+                View Raw JSON Evidence Payload &amp; Parameter Keys
+            </summary>
+            <pre style="background: #F1F5F9; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 0.76rem; color: #001F3B;">{{ rec.evidence_json|pprint }}</pre>
+        </details>
+        {% endif %}
+
+        <!-- Observational Disclosure -->
+        <div style="margin-top: 14px; padding: 10px 14px; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 6px; font-size: 0.74rem; color: #92400E; line-height: 1.4;">
+            <strong>Observational Disclaimer:</strong> {{ rec.evidence_json.disclaimer|default:"Descriptive observational metric from official survey records; does not imply proven counterfactual causality or automated credit determination." }}
+        </div>
+    </div>
+
+    <!-- Review Workflow Transition Box (Visible to Reviewers / Authority) -->
+    {% if can_review %}
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+        <h3 style="margin: 0 0 12px 0; font-size: 1.05rem; font-weight: 800; color: #001F3B;">
+            Institutional Review &amp; Approval Action
+        </h3>
+        <form method="POST" action="{% url 'decision_support:recommendation_transition' rec.id %}">
+            {% csrf_token %}
+            <div style="display: grid; grid-template-columns: 200px 1fr auto; gap: 14px; align-items: flex-end;">
+                <div>
+                    <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 4px;">Transition Status:</label>
+                    <select name="status" style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; background: #FFFFFF; font-weight: 600;">
+                        {% for code, label in status_choices %}
+                            <option value="{{ code }}" {% if rec.status == code %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 4px;">Review Notes &amp; Institutional Justification:</label>
+                    <input type="text" name="review_notes" value="{{ rec.review_notes }}" placeholder="Enter operational notes or verification comments..." style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem;">
+                </div>
+                <div>
+                    <button type="submit" style="padding: 9px 20px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.84rem; font-weight: 700; cursor: pointer;">
+                        Save Transition
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Action Plans Section -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 12px;">
+            <div>
+                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #001F3B;">
+                    Attached Operational Action Plans ({{ action_plans|length }})
+                </h3>
+                <span style="font-size: 0.78rem; color: #64748B;">Track 1 implementation commitments linked to this advisory</span>
+            </div>
+            <a href="{% url 'decision_support:action_plan_create' rec.id %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #166534; color: #FFFFFF; border-radius: 6px; font-size: 0.82rem; font-weight: 700; text-decoration: none;">
+                <span>+ Attach Operational Action Plan</span>
+            </a>
+        </div>
+
+        {% if action_plans %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
+                <thead>
+                    <tr style="background: #F8FAFC; border-bottom: 1px solid #E2E8F0; text-align: left;">
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Action Plan Title</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Assigned Org / Lead</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Target Date</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Status</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569; text-align: right;">Update Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in action_plans %}
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding: 12px 14px; font-weight: 700; color: #001F3B;">
+                            <div>{{ a.title }}</div>
+                            <div style="font-weight: 400; font-size: 0.78rem; color: #64748B; margin-top: 2px;">{{ a.action_details }}</div>
+                        </td>
+                        <td style="padding: 12px 14px; color: #334155;">
+                            {{ a.assigned_organization|default:a.assigned_to.get_full_name|default:"Unassigned" }}
+                        </td>
+                        <td style="padding: 12px 14px; color: #64748B;">
+                            {{ a.target_date|date:"M d, Y"|default:"Not specified" }}
+                        </td>
+                        <td style="padding: 12px 14px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: {% if a.status == 'COMPLETED' %}#DCFCE7; color: #166534;{% elif a.status == 'ONGOING' %}#E0F2FE; color: #0369A1;{% else %}#FEF3C7; color: #92400E;{% endif %}">
+                                {{ a.get_status_display }}
+                            </span>
+                        </td>
+                        <td style="padding: 12px 14px; text-align: right;">
+                            <form method="POST" action="{% url 'decision_support:action_plan_update' a.id %}" style="display: inline-flex; gap: 6px; align-items: center;">
+                                {% csrf_token %}
+                                <select name="status" style="padding: 4px 8px; border: 1px solid #CBD5E1; border-radius: 4px; font-size: 0.78rem;" onchange="this.form.submit()">
+                                    <option value="PLANNED" {% if a.status == 'PLANNED' %}selected{% endif %}>Planned</option>
+                                    <option value="ONGOING" {% if a.status == 'ONGOING' %}selected{% endif %}>Ongoing</option>
+                                    <option value="COMPLETED" {% if a.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                                    <option value="CANCELLED" {% if a.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 28px 20px; color: #64748B; font-size: 0.86rem;">
+            No operational action plans attached yet. Click "+ Attach Operational Action Plan" to assign responsibility and Track 1 milestones.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

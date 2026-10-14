@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Create Operational Action Plan | AgriLens Rwanda{% endblock %}
+{% block section_title %}Create Action Plan{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="padding: 24px 32px; max-width: 900px; margin: 0 auto;">
+    <!-- Header Strip -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">
+                <span>Track 1 Operationalization</span>
+                <span>&bull;</span>
+                <span>Action Plan Commitment</span>
+            </div>
+            <h1 style="margin: 0; font-size: 1.5rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+                Attach Operational Action Plan
+            </h1>
+            <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #64748B;">
+                Translate evidence-backed advisory into accountable institutional actions and seasonal impact targets.
+            </p>
+        </div>
+        <div>
+            <a href="{% url 'decision_support:recommendation_detail' rec.id %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #475569; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
+                <span>&larr; Back to Dossier</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Parent Recommendation Summary Card -->
+    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px 20px; margin-bottom: 24px;">
+        <div style="font-size: 0.76rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 4px;">
+            Target Recommendation:
+        </div>
+        <div style="font-size: 1.05rem; font-weight: 800; color: #001F3B; margin-bottom: 6px;">
+            {{ rec.title }}
+        </div>
+        <div style="font-size: 0.82rem; color: #475569; display: flex; gap: 16px; flex-wrap: wrap;">
+            <span><strong>Stakeholder:</strong> {{ rec.get_target_stakeholder_display }}</span>
+            <span><strong>Crop:</strong> {{ rec.crop.name }}</span>
+            <span><strong>Geography:</strong> {% if rec.district %}{{ rec.district.name }} District ({{ rec.district.province.name }}){% else %}National Scope{% endif %}</span>
+            <span><strong>Season:</strong> SAS {{ rec.season.year }} {{ rec.season.season_code }}</span>
+        </div>
+    </div>
+
+    <!-- Action Plan Form -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 0.84rem; font-weight: 700; color: #001F3B; margin-bottom: 6px;">
+                    Action Plan Title <span style="color: #DC2626;">*</span>
+                </label>
+                <input type="text" name="title" required placeholder="e.g. Targeted Lime and DAP Fertilizer Distribution in Burera High-Gap Sectors" style="width: 100%; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.88rem; box-sizing: border-box;">
+                <span style="font-size: 0.76rem; color: #64748B; margin-top: 4px; display: block;">A concise, operational title identifying the intervention.</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div>
+                    <label style="display: block; font-size: 0.84rem; font-weight: 700; color: #001F3B; margin-bottom: 6px;">
+                        Assigned Organization / Implementing Agency
+                    </label>
+                    <input type="text" name="assigned_organization" placeholder="e.g. Rwanda Agriculture Board (RAB) / MINAGRI" style="width: 100%; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.88rem; box-sizing: border-box;">
+                    <span style="font-size: 0.76rem; color: #64748B; margin-top: 4px; display: block;">The responsible ministry, cooperative union, or agency.</span>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 0.84rem; font-weight: 700; color: #001F3B; margin-bottom: 6px;">
+                        Target Completion Date
+                    </label>
+                    <input type="date" name="target_date" style="width: 100%; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.88rem; box-sizing: border-box; background: #FFFFFF;">
+                    <span style="font-size: 0.76rem; color: #64748B; margin-top: 4px; display: block;">Anticipated delivery milestone or evaluation season kickoff.</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; font-size: 0.84rem; font-weight: 700; color: #001F3B; margin-bottom: 6px;">
+                    Operational Action Details &amp; Implementation Strategy <span style="color: #DC2626;">*</span>
+                </label>
+                <textarea name="action_details" rows="5" required placeholder="Describe specific operational steps, target farmer counts, input voucher schemes, extension training sessions, or risk mitigation protocols..." style="width: 100%; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.88rem; box-sizing: border-box; resize: vertical; line-height: 1.5;"></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid #F1F5F9; padding-top: 20px;">
+                <a href="{% url 'decision_support:recommendation_detail' rec.id %}" style="padding: 10px 20px; background: #FFFFFF; color: #475569; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
+                    Cancel
+                </a>
+                <button type="submit" style="padding: 10px 24px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.86rem; font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(0, 92, 171, 0.25);">
+                    Commit Action Plan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -37,5 +37,10 @@ class AgriculturalSeason(models.Model):
     class Meta:
         unique_together = ('year', 'season')
 
+    @property
+    def season_code(self):
+        """Convenience property returning the season letter (e.g. 'A', 'B', 'C')."""
+        return self.season
+
     def __str__(self):
         return f"{self.year} {self.get_season_display()}"

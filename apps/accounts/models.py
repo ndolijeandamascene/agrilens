@@ -130,6 +130,20 @@ class AuditLog(models.Model):
         DATA_SOURCE_CREATED = 'DATA_SOURCE_CREATED', 'Data Source Registered'
         DATA_EXPORTED = 'DATA_EXPORTED', 'Analytical Data Exported'
 
+        # Data lifecycle events
+        RECORD_CREATED = 'RECORD_CREATED', 'Observation Record Created'
+        RECORD_UPDATED = 'RECORD_UPDATED', 'Observation Record Updated'
+        RECORD_SUBMITTED = 'RECORD_SUBMITTED', 'Observation Submitted for Review'
+        CORRECTION_CREATED = 'CORRECTION_CREATED', 'Correction Revision Created'
+        RECORD_SUPERSEDED = 'RECORD_SUPERSEDED', 'Approved Record Superseded by Correction'
+        DATA_IMPORTED = 'DATA_IMPORTED', 'Official Dataset Imported'
+
+        # Decision support & impact events
+        RECOMMENDATIONS_GENERATED = 'RECOMMENDATIONS_GENERATED', 'Recommendation Rules Executed'
+        RECOMMENDATION_TRANSITION = 'RECOMMENDATION_TRANSITION', 'Recommendation Status Changed'
+        ACTION_UPDATED = 'ACTION_UPDATED', 'Action Plan Assigned or Updated'
+        OUTCOME_RECORDED = 'OUTCOME_RECORDED', 'Outcome Measurement Recorded'
+
     actor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

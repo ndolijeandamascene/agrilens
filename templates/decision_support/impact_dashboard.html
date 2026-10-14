@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Track 1: Implementation & Impact Monitoring | AgriLens Rwanda{% endblock %}
+{% block section_title %}Implementation & Impact Tracking{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="padding: 24px 32px; max-width: 1400px; margin: 0 auto;">
+    <!-- Header Strip -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #166534; background: #DCFCE7; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">
+                <span>NISR Big Data Hackathon 2026 &bull; Track 1</span>
+                <span>&bull;</span>
+                <span>Implementation &amp; Impact Monitoring</span>
+            </div>
+            <h1 style="margin: 0; font-size: 1.6rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+                Agricultural Productivity Impact Tracking Dashboard
+            </h1>
+            <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #64748B;">
+                Empirical pre- vs. post-intervention seasonal yield monitoring across Rwandan agricultural districts and prioritized value chains.
+            </p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a href="{% url 'decision_support:hub' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
+                <span>&larr; Decision Hub</span>
+            </a>
+            <a href="{% url 'decision_support:recommendation_list' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
+                <span>Recommendations Queue &rarr;</span>
+            </a>
+            <button onclick="window.print()" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 8px; font-size: 0.86rem; font-weight: 700; cursor: pointer;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                <span>Print Impact Report</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mandatory Methodological & Non-Causal Disclosure Banner -->
+    <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-left: 4px solid #005CAB; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px;">
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div style="color: #005CAB; font-size: 1.2rem; line-height: 1;">ℹ️</div>
+            <div>
+                <div style="font-size: 0.84rem; font-weight: 700; color: #1E3A8A; margin-bottom: 4px;">
+                    Methodological Disclosure &bull; Observational Monitoring Standard
+                </div>
+                <p style="margin: 0; font-size: 0.78rem; color: #1E40AF; line-height: 1.5;">
+                    {{ methodological_disclaimer }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+            <div style="font-size: 0.76rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Total Action Plans</div>
+            <div style="font-size: 1.9rem; font-weight: 800; color: #001F3B; margin-top: 4px;">{{ total_actions }}</div>
+            <div style="font-size: 0.78rem; color: #64748B; margin-top: 4px;">Institutional commitments</div>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+            <div style="font-size: 0.76rem; font-weight: 700; color: #0369A1; text-transform: uppercase;">Ongoing Implementations</div>
+            <div style="font-size: 1.9rem; font-weight: 800; color: #0284C7; margin-top: 4px;">{{ ongoing_actions }}</div>
+            <div style="font-size: 0.78rem; color: #64748B; margin-top: 4px;">Active in field</div>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+            <div style="font-size: 0.76rem; font-weight: 700; color: #15803D; text-transform: uppercase;">Completed Milestones</div>
+            <div style="font-size: 1.9rem; font-weight: 800; color: #166534; margin-top: 4px;">{{ completed_actions }}</div>
+            <div style="font-size: 0.78rem; color: #64748B; margin-top: 4px;">Verified delivery</div>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+            <div style="font-size: 0.76rem; font-weight: 700; color: #005CAB; text-transform: uppercase;">Avg. Observed Yield Trajectory</div>
+            <div style="font-size: 1.9rem; font-weight: 800; color: {% if avg_yield_change >= 0 %}#166534{% else %}#DC2626{% endif %}; margin-top: 4px;">
+                {% if avg_yield_change >= 0 %}+{% endif %}{{ avg_yield_change }}%
+            </div>
+            <div style="font-size: 0.78rem; color: #64748B; margin-top: 4px;">Descriptive seasonal change</div>
+        </div>
+    </div>
+
+    <!-- Section 1: Seasonal Outcome Measurements Table -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 12px;">
+            <div>
+                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: #001F3B;">
+                    Empirical Seasonal Outcome Measurements
+                </h3>
+                <span style="font-size: 0.8rem; color: #64748B;">Observed pre- vs. post-intervention seasonal yield data from SAS waves</span>
+            </div>
+            <span style="font-size: 0.74rem; font-weight: 700; color: #166534; background: #DCFCE7; padding: 3px 8px; border-radius: 4px;">
+                {{ outcomes|length }} Tracked Evaluation(s)
+            </span>
+        </div>
+
+        {% if outcomes %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
+                <thead>
+                    <tr style="background: #F8FAFC; border-bottom: 1px solid #E2E8F0; text-align: left;">
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">District &amp; Crop</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Associated Action Plan</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Survey Trajectory</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Baseline Yield</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Evaluation Yield</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Observed Change</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Target &amp; Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for o in outcomes %}
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding: 12px 14px; font-weight: 700; color: #001F3B;">
+                            <div>{{ o.district.name }} District</div>
+                            <div style="font-weight: 400; font-size: 0.76rem; color: #64748B;">{{ o.crop.name }} &bull; {{ o.district.province.name }}</div>
+                        </td>
+                        <td style="padding: 12px 14px; color: #334155;">
+                            <div>{{ o.action_plan.title }}</div>
+                            <div style="font-size: 0.74rem; color: #64748B;">{{ o.action_plan.assigned_organization|default:"Agency" }}</div>
+                        </td>
+                        <td style="padding: 12px 14px; color: #475569;">
+                            <span style="font-weight: 600;">SAS {{ o.baseline_season.year }}{{ o.baseline_season.season_code }}</span>
+                            <span style="color: #94A3B8; margin: 0 4px;">&rarr;</span>
+                            <span style="font-weight: 600; color: #005CAB;">SAS {{ o.evaluation_season.year }}{{ o.evaluation_season.season_code }}</span>
+                        </td>
+                        <td style="padding: 12px 14px; color: #334155;">
+                            {{ o.baseline_yield_kg_ha|floatformat:1 }} <span style="font-size: 0.72rem; color: #64748B;">kg/ha</span>
+                        </td>
+                        <td style="padding: 12px 14px; font-weight: 700; color: #001F3B;">
+                            {{ o.evaluation_yield_kg_ha|floatformat:1 }} <span style="font-size: 0.72rem; color: #64748B;">kg/ha</span>
+                        </td>
+                        <td style="padding: 12px 14px;">
+                            <span style="font-size: 0.78rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; background: {% if o.observed_yield_change_pct >= 0 %}#DCFCE7; color: #15803D;{% else %}#FEF2F2; color: #DC2626;{% endif %}">
+                                {% if o.observed_yield_change_pct >= 0 %}+{% endif %}{{ o.observed_yield_change_pct|floatformat:1 }}%
+                            </span>
+                        </td>
+                        <td style="padding: 12px 14px;">
+                            {% if o.observed_yield_change_pct >= 0 %}
+                                <span style="font-size: 0.72rem; font-weight: 700; color: #166534; background: #DCFCE7; padding: 2px 6px; border-radius: 4px;">Positive Trajectory</span>
+                            {% else %}
+                                <span style="font-size: 0.72rem; font-weight: 700; color: #DC2626; background: #FEF2F2; padding: 2px 6px; border-radius: 4px;">Declining Trajectory</span>
+                            {% endif %}
+                            {% if o.notes %}
+                            <div style="font-size: 0.72rem; color: #64748B; margin-top: 2px;">{{ o.notes|truncatewords:8 }}</div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 36px 20px; color: #64748B;">
+            <p style="margin: 0 0 6px 0; font-size: 0.9rem; font-weight: 600; color: #001F3B;">No multi-season outcome measurements logged yet.</p>
+            <p style="margin: 0; font-size: 0.82rem; color: #64748B;">
+                Outcome measurements compare sequential survey seasons (e.g. SAS 2024A vs SAS 2025A) after action plans are executed.
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Section 2: All Institutional Action Plans Table -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 12px;">
+            <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: #001F3B;">
+                Institutional Operational Action Plans Registry
+            </h3>
+            <span style="font-size: 0.78rem; color: #64748B;">{{ scoped_actions|length }} Action Plan(s)</span>
+        </div>
+
+        {% if scoped_actions %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
+                <thead>
+                    <tr style="background: #F8FAFC; border-bottom: 1px solid #E2E8F0; text-align: left;">
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Action Plan</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Target District &amp; Crop</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Assigned Organization</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Target Date</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Status</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in scoped_actions %}
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding: 12px 14px; font-weight: 700; color: #001F3B;">
+                            <div>{{ a.title }}</div>
+                            <div style="font-weight: 400; font-size: 0.76rem; color: #64748B; margin-top: 2px;">{{ a.action_details|truncatewords:16 }}</div>
+                        </td>
+                        <td style="padding: 12px 14px; color: #334155;">
+                            {% if a.recommendation.district %}{{ a.recommendation.district.name }} District{% else %}National{% endif %}
+                            &bull; {{ a.recommendation.crop.name }}
+                        </td>
+                        <td style="padding: 12px 14px; color: #334155;">
+                            {{ a.assigned_organization|default:a.assigned_to.get_full_name|default:"Unassigned" }}
+                        </td>
+                        <td style="padding: 12px 14px; color: #64748B;">
+                            {{ a.target_date|date:"M d, Y"|default:"Not specified" }}
+                        </td>
+                        <td style="padding: 12px 14px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: {% if a.status == 'COMPLETED' %}#DCFCE7; color: #166534;{% elif a.status == 'ONGOING' %}#E0F2FE; color: #0369A1;{% else %}#FEF3C7; color: #92400E;{% endif %}">
+                                {{ a.get_status_display }}
+                            </span>
+                        </td>
+                        <td style="padding: 12px 14px; text-align: right;">
+                            <a href="{% url 'decision_support:recommendation_detail' a.recommendation.id %}" style="color: #005CAB; font-weight: 700; text-decoration: none; font-size: 0.8rem;">
+                                Dossier &rarr;
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 28px 20px; color: #64748B; font-size: 0.86rem;">
+            No operational action plans recorded.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

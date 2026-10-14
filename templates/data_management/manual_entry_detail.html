@@ -17,7 +17,7 @@
                 {{ entry.crop.name }} &bull; {{ entry.district.name }}, {{ entry.sector.name }}
             </h2>
         </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
             <a href="{% url 'data_management:manual_entry_list' %}" class="btn-portal-return">
                 <span>&larr; Registry</span>
             </a>
@@ -25,15 +25,40 @@
                 <a href="{% url 'data_management:manual_entry_edit' pk=entry.pk %}" class="btn-portal-return" style="background: #005CAB; color: white;">
                     <span>Edit Record</span>
                 </a>
+                <form method="POST" action="{% url 'data_management:manual_entry_submit' pk=entry.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="padding: 8px 16px; border-radius: 8px; border: none; background: #0284C7; color: white; font-weight: 700; cursor: pointer;">
+                        Submit for Review &rarr;
+                    </button>
+                </form>
+            {% elif can_correct %}
+                <form method="POST" action="{% url 'data_management:manual_entry_correction' pk=entry.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #BAE0FB; background: #E8F7FE; color: #005CAB; font-weight: 700; cursor: pointer;">
+                        + Propose Correction Revision
+                    </button>
+                </form>
             {% endif %}
         </div>
     </div>
 
+    {% if entry.is_superseded %}
+    <div style="background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 10px; padding: 14px 20px; margin-bottom: 20px; color: #991B1B; font-size: 0.88rem;">
+        <strong>Notice: Superseded Record.</strong> This record was approved previously but has been superseded by an authorized correction revision. It is excluded from official analytical indicators.
+    </div>
+    {% endif %}
+
+    {% if entry.supersedes %}
+    <div style="background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 10px; padding: 14px 20px; margin-bottom: 20px; color: #166534; font-size: 0.88rem;">
+        <strong>Audit Lineage:</strong> This record is a correction revision of approved record <a href="{% url 'data_management:manual_entry_detail' pk=entry.supersedes.pk %}" style="color: #166534; text-decoration: underline; font-weight: 700;">#{{ entry.supersedes.id }}</a>.
+    </div>
+    {% endif %}
+
     <!-- Status Banner -->
-    <div style="background: white; border-radius: 12px; border: 1px solid #E2E8F0; padding: 20px 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="background: white; border-radius: 12px; border: 1px solid #E2E8F0; padding: 20px 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
         <div>
             <span style="font-size: 0.8rem; color: #64748B; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Current Review Status</span>
-            <div style="margin-top: 4px;">
+            <div style="margin-top: 4px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                 {% if entry.review_status == 'APPROVED' %}
                     <span style="background: #DCFCE7; color: #166534; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 800;">APPROVED BY AUTHORITY</span>
                 {% elif entry.review_status == 'SUBMITTED' %}
@@ -42,6 +67,14 @@
                     <span style="background: #FEE2E2; color: #991B1B; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 800;">RETURNED FOR CORRECTION</span>
                 {% else %}
                     <span style="background: #F1F5F9; color: #475569; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 800;">UNSUBMITTED DRAFT</span>
+                {% endif %}
+
+                {% if entry.validation_status == 'VALID' %}
+                    <span style="background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; padding: 3px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 700;">Validation: VALID &check;</span>
+                {% elif entry.validation_status == 'WARNING' %}
+                    <span style="background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; padding: 3px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 700;">Validation: WARNING ({{ entry.validation_messages|length }})</span>
+                {% elif entry.validation_status == 'INVALID' %}
+                    <span style="background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; padding: 3px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 700;">Validation: INVALID</span>
                 {% endif %}
             </div>
         </div>
@@ -53,6 +86,17 @@
             <div style="font-size: 0.75rem; color: #0284C7; font-weight: 600;">{{ entry.get_data_kind_display }}</div>
         </div>
     </div>
+
+    {% if entry.validation_messages %}
+    <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; padding: 14px 18px; margin-bottom: 24px; font-size: 0.85rem;">
+        <strong style="color: #92400E;">Validation &amp; Anomaly Detection Notes:</strong>
+        <ul style="margin: 6px 0 0 18px; color: #78350F;">
+            {% for vm in entry.validation_messages %}
+                <li><strong>[{{ vm.level }}]</strong> {{ vm.message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
 
     <!-- Core Metrics Cards -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
@@ -123,6 +167,25 @@
             <div>
                 <span style="color: #64748B;">Farmgate Price:</span>
                 <span style="font-weight: 600; color: #0F172A; margin-left: 8px;">{% if entry.farmgate_price_rwf %}{{ entry.farmgate_price_rwf }} RWF/kg{% else %}N/A{% endif %}</span>
+            </div>
+            <div>
+                <span style="color: #64748B;">Mineral Fertilizer Applied:</span>
+                <span style="font-weight: 600; color: #0F172A; margin-left: 8px;">{% if entry.inorganic_fertilizer_kg %}{{ entry.inorganic_fertilizer_kg }} kg{% else %}Not specified{% endif %}</span>
+            </div>
+            <div>
+                <span style="color: #64748B;">Primary Loss Cause:</span>
+                <span style="font-weight: 600; color: #DC2626; margin-left: 8px;">{{ entry.get_primary_loss_cause_display|default:"None / Not recorded" }}</span>
+            </div>
+            <div>
+                <span style="color: #64748B;">GPS Coordinates:</span>
+                <span style="font-weight: 600; color: #0F172A; margin-left: 8px;">
+                    {% if entry.latitude and entry.longitude %}
+                        {{ entry.latitude }}, {{ entry.longitude }}
+                        {% if entry.gps_accuracy_m %}<span style="color: #64748B; font-size: 0.75rem;">(&plusmn;{{ entry.gps_accuracy_m }}m)</span>{% endif %}
+                    {% else %}
+                        Not captured
+                    {% endif %}
+                </span>
             </div>
         </div>
 

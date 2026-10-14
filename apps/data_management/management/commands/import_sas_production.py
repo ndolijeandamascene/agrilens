@@ -47,6 +47,8 @@ class Command(BaseCommand):
         parser.add_argument('--season', type=str, default='A', help="Agricultural Season (A, B, or C)")
         parser.add_argument('--limit', type=int, default=None, help="Limit number of rows for pilot test")
         parser.add_argument('--chunk-size', type=int, default=2000, help="Bulk chunk size for database inserts")
+        parser.add_argument('--dry-run', action='store_true', default=False, help="Run validation and transformation preview without database writes")
+        parser.add_argument('--force', action='store_true', default=False, help="Force re-import even if file checksum was previously ingested successfully")
 
     def handle(self, *args, **options):
         file_path = Path(options['file'])
@@ -61,9 +63,12 @@ class Command(BaseCommand):
         season_code = options['season'].upper()
         limit = options['limit']
         chunk_size = options['chunk_size']
+        dry_run = options['dry_run']
+        force = options['force']
 
+        mode_str = "DRY-RUN (Preview Mode - No Database Writes)" if dry_run else "LIVE INGESTION"
         self.stdout.write(self.style.NOTICE(
-            f"Starting Ingestion Pipeline for SAS {year} Season {season_code}\n"
+            f"Starting Ingestion Pipeline [{mode_str}] for SAS {year} Season {season_code}\n"
             f"File: {file_path.name} (Limit: {limit or 'Full dataset'})\n"
         ))
 
@@ -84,19 +89,30 @@ class Command(BaseCommand):
             }
         )
 
-        # 2. File Checksum & Batch Registration
+        # 2. File Checksum & Duplicate Ingestion Detection
         hasher = hashlib.sha256()
         with open(file_path, 'rb') as f:
             while chunk := f.read(65536):
                 hasher.update(chunk)
         file_hash = hasher.hexdigest()
 
-        batch = ImportBatch.objects.create(
-            source=data_source,
-            filename=file_path.name,
-            file_checksum=file_hash,
-            status=ImportBatch.Status.PROCESSING,
-        )
+        if not dry_run and not force:
+            prior = ImportBatch.objects.filter(file_checksum=file_hash, status=ImportBatch.Status.SUCCESS).first()
+            if prior:
+                self.stderr.write(self.style.WARNING(
+                    f"Duplicate Ingestion Guard: This exact file (SHA256: {file_hash[:16]}...) was already successfully ingested "
+                    f"in Batch #{prior.id} on {prior.completed_at}. Pass --force to re-import or --dry-run to preview."
+                ))
+                return
+
+        batch = None
+        if not dry_run:
+            batch = ImportBatch.objects.create(
+                source=data_source,
+                filename=file_path.name,
+                file_checksum=file_hash,
+                status=ImportBatch.Status.PROCESSING,
+            )
 
         # 3. Read Source Microdata
         ext = file_path.suffix.lower()
@@ -339,6 +355,23 @@ class Command(BaseCommand):
         if rows_skipped > 0:
             self.stdout.write(self.style.WARNING(f"Skipping {rows_skipped:,} records that already exist in database for this season."))
 
+        if dry_run:
+            self.stdout.write(self.style.SUCCESS(
+                f"\n=======================================================\n"
+                f"DRY-RUN VALIDATION PREVIEW COMPLETED\n"
+                f"=======================================================\n"
+                f"Source File:     {file_path.name}\n"
+                f"Total In File:   {total_rows:,}\n"
+                f"Eligible:        {rows_accepted:,} ({(rows_accepted/total_rows)*100:.1f}%)\n"
+                f"New Unique:      {len(unique_validated_records):,}\n"
+                f"Existing Skips:  {rows_skipped:,}\n"
+                f"Rejected:        {rows_rejected:,} ({(rows_rejected/total_rows)*100:.1f}%)\n"
+                f"QA Flags:        {len(qa_issues)}\n"
+                f"DB Writes:       NONE (Dry-run mode)\n"
+                f"=======================================================\n"
+            ))
+            return
+
         # 5. Atomic Bulk Ingestion into PostgreSQL
         self.stdout.write("Inserting staging and validated records in chunks...")
         with transaction.atomic():
@@ -350,22 +383,37 @@ class Command(BaseCommand):
             for i in range(0, len(unique_validated_records), chunk_size):
                 ValidatedObservation.objects.bulk_create(unique_validated_records[i:i + chunk_size])
 
-            # Ingest Quality Issues
+            # Ingest Quality Issues (single bulk_create call)
             if qa_issues:
-                DataQualityIssue.objects.bulk_create(qa_issues)
                 DataQualityIssue.objects.bulk_create(qa_issues)
 
         # 6. Update Batch Summary
         batch.rows_accepted = rows_accepted
         batch.rows_rejected = rows_rejected
+        batch.rows_skipped = rows_skipped
         batch.completed_at = timezone.now()
         batch.status = ImportBatch.Status.SUCCESS if rows_rejected == 0 else ImportBatch.Status.PARTIAL
         batch.summary_notes = (
-            f"Successfully imported {rows_accepted:,} verified observations. "
+            f"Successfully imported {len(unique_validated_records):,} new verified observations "
+            f"({rows_skipped:,} skipped as already existing). "
             f"Rejected {rows_rejected:,} rows (zero area or unmapped keys). "
             f"Flagged {len(qa_issues)} QA outliers."
         )
         batch.save()
+
+        from apps.accounts.permissions import AuditService
+        from apps.accounts.models import AuditLog
+        AuditService.log(
+            action=AuditLog.Action.DATA_IMPORTED,
+            target=batch,
+            details={
+                'filename': file_path.name,
+                'source': source_type,
+                'accepted': rows_accepted,
+                'new_unique': len(unique_validated_records),
+                'rejected': rows_rejected,
+            }
+        )
 
         self.stdout.write(self.style.SUCCESS(
             f"\n=======================================================\n"
@@ -375,6 +423,8 @@ class Command(BaseCommand):
             f"Source File:     {file_path.name}\n"
             f"Total Processed: {total_rows:,}\n"
             f"Accepted:        {rows_accepted:,} ({(rows_accepted/total_rows)*100:.1f}%)\n"
+            f"New Written:     {len(unique_validated_records):,}\n"
+            f"Skipped Dupes:   {rows_skipped:,}\n"
             f"Rejected:        {rows_rejected:,} ({(rows_rejected/total_rows)*100:.1f}%)\n"
             f"QA Flags:        {len(qa_issues)}\n"
             f"Batch Status:    {batch.get_status_display()}\n"

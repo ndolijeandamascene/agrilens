@@ -243,6 +243,18 @@ class ValidatedObservation(models.Model):
         return f"{self.crop.name} in {self.district.name} ({self.season}) - {self.calculated_yield_kg_per_ha} kg/ha"
 
 
+class ManualObservationQuerySet(models.QuerySet):
+    def eligible_for_indicators(self):
+        """
+        Records allowed to enter analytical indicators: approved by an authorised
+        reviewer and not superseded by an approved correction revision.
+        """
+        return self.filter(
+            review_status=ManualObservation.ReviewStatus.APPROVED,
+            is_superseded=False,
+        )
+
+
 class ManualObservation(models.Model):
     """
     Authorized Manual Agricultural Data Entry.
@@ -254,11 +266,52 @@ class ManualObservation(models.Model):
         APPROVED = 'APPROVED', 'Approved by Authority'
         REJECTED = 'REJECTED', 'Returned for Correction'
 
+    class ValidationStatus(models.TextChoices):
+        VALID = 'VALID', 'Valid'
+        WARNING = 'WARNING', 'Warning - requires reviewer attention'
+        INVALID = 'INVALID', 'Invalid - blocked from approval'
+
+    class LossCause(models.TextChoices):
+        PESTS_DISEASE = 'PESTS_DISEASE', 'Pests or disease'
+        MOISTURE_ROT = 'MOISTURE_ROT', 'Moisture / rot / mould'
+        HANDLING_TRANSPORT = 'HANDLING_TRANSPORT', 'Handling or transport'
+        STORAGE = 'STORAGE', 'Storage conditions'
+        THEFT = 'THEFT', 'Theft'
+        WEATHER = 'WEATHER', 'Weather event at harvest'
+        OTHER = 'OTHER', 'Other / not determined'
+
+    objects = ManualObservationQuerySet.as_manager()
+
     review_status = models.CharField(
         max_length=20, 
         choices=ReviewStatus.choices, 
         default=ReviewStatus.DRAFT, 
         db_index=True
+    )
+    submitted_at = models.DateTimeField(null=True, blank=True)
+
+    # Server-side validation outcome (recomputed on every save through the workflow service)
+    validation_status = models.CharField(
+        max_length=10,
+        choices=ValidationStatus.choices,
+        default=ValidationStatus.VALID,
+        db_index=True,
+    )
+    validation_messages = models.JSONField(default=list, blank=True)
+
+    # Correction revisions: approved records are never edited in place
+    supersedes = models.ForeignKey(
+        'self',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='corrections',
+        help_text="Approved record that this revision corrects",
+    )
+    is_superseded = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="True once an approved correction replaces this record in indicators",
     )
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='manual_entries')
     reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_entries')
@@ -306,10 +359,24 @@ class ManualObservation(models.Model):
     has_soil_conservation = models.BooleanField(default=False)
     uses_mechanization = models.BooleanField(default=False)
     
+    inorganic_fertilizer_kg = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        help_text="Quantity of inorganic fertilizer applied on the plot (kg), if recorded",
+    )
+
     # Post Harvest Loss & Sales
     loss_quantity_kg = models.DecimalField(max_digits=12, decimal_places=2, default=0.0, blank=True)
+    primary_loss_cause = models.CharField(max_length=30, choices=LossCause.choices, blank=True)
     quantity_sold_kg = models.DecimalField(max_digits=12, decimal_places=2, default=0.0, blank=True)
     farmgate_price_rwf = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    # Optional geolocation (WGS84 / EPSG:4326)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    gps_accuracy_m = models.DecimalField(
+        max_digits=8, decimal_places=2, null=True, blank=True,
+        help_text="Reported horizontal accuracy of the GPS fix in metres",
+    )
     
     remarks = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

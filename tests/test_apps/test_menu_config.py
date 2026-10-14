@@ -60,38 +60,45 @@ class MenuConfigModuleTestCase(TestCase):
         self.assertIn("admin", admin_ids)
         self.assertIn("governance", admin_ids)
         self.assertIn("reports", admin_ids)
+        self.assertIn("decision_support", admin_ids)
 
         # 2. NISR_DATA_MANAGER
         nisr_ids = [g["id"] for g in get_user_menu("NISR_DATA_MANAGER")["sidebar"]]
         self.assertNotIn("admin", nisr_ids)
         self.assertIn("governance", nisr_ids)
         self.assertIn("reports", nisr_ids)
+        self.assertIn("decision_support", nisr_ids)
 
         # 3. ANALYST
         analyst_ids = [g["id"] for g in get_user_menu("ANALYST")["sidebar"]]
         self.assertNotIn("admin", analyst_ids)
         self.assertIn("governance", analyst_ids)
+        self.assertIn("decision_support", analyst_ids)
 
         # 4. NATIONAL_OFFICER
         nat_ids = [g["id"] for g in get_user_menu("NATIONAL_OFFICER")["sidebar"]]
         self.assertNotIn("admin", nat_ids)
         self.assertNotIn("governance", nat_ids)
         self.assertIn("reports", nat_ids)
+        self.assertIn("decision_support", nat_ids)
 
         # 5. DISTRICT_OFFICER
         dist_ids = [g["id"] for g in get_user_menu("DISTRICT_OFFICER")["sidebar"]]
         self.assertIn("governance", dist_ids)
         self.assertIn("reports", dist_ids)
+        self.assertIn("decision_support", dist_ids)
 
         # 6. DATA_ENTRY_OFFICER
         entry_ids = [g["id"] for g in get_user_menu("DATA_ENTRY_OFFICER")["sidebar"]]
         self.assertIn("governance", entry_ids)
         self.assertNotIn("reports", entry_ids)
+        self.assertNotIn("decision_support", entry_ids)
 
         # 7. REVIEWER
         reviewer_ids = [g["id"] for g in get_user_menu("REVIEWER")["sidebar"]]
         self.assertIn("governance", reviewer_ids)
         self.assertIn("reports", reviewer_ids)
+        self.assertIn("decision_support", reviewer_ids)
 
     def test_legacy_roles_backward_compatibility(self):
         """Legacy roles map cleanly with 100% backward compatibility."""
