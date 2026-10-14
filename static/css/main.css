@@ -93,6 +93,7 @@ body.agrilens-body {
     flex-direction: column;
     flex-shrink: 0;
     border-right: 1px solid var(--sidebar-border);
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar-brand {
@@ -204,6 +205,57 @@ body.agrilens-body {
     color: var(--nisr-cyan);
     font-weight: 700;
     margin-bottom: 2px;
+}
+
+/* Accessible focus outlines */
+.nav-item:focus-visible,
+.nav-section-header:focus-visible,
+.btn-sidebar-toggle:focus-visible,
+.btn-desktop-collapse:focus-visible {
+    outline: 2px solid var(--nisr-cyan);
+    outline-offset: 2px;
+}
+
+/* Collapsed Desktop Sidebar (Icon-Only Mode with Tooltips) */
+@media (min-width: 993px) {
+    .sidebar.collapsed {
+        width: 72px;
+    }
+    .sidebar.collapsed .sidebar-brand-wrapper {
+        padding: 16px 0;
+        justify-content: center;
+    }
+    .sidebar.collapsed .brand-info,
+    .sidebar.collapsed .nav-section-label,
+    .sidebar.collapsed .nav-item-label,
+    .sidebar.collapsed .nav-accordion-group svg,
+    .sidebar.collapsed .menu-badge,
+    .sidebar.collapsed .sidebar-user-details,
+    .sidebar.collapsed .sidebar-nisr-tag,
+    .sidebar.collapsed .sidebar-footer-text {
+        display: none !important;
+    }
+    .sidebar.collapsed .nav-section-header {
+        justify-content: center !important;
+        padding: 8px 0 !important;
+    }
+    .sidebar.collapsed .nav-item {
+        justify-content: center !important;
+        padding: 10px 0 !important;
+        margin: 4px 10px !important;
+        border-left: none !important;
+        position: relative;
+    }
+    .sidebar.collapsed .nav-item.active {
+        box-shadow: 0 0 0 2px var(--nisr-cyan);
+    }
+    .sidebar.collapsed .sidebar-footer {
+        padding: 14px 6px;
+        justify-content: center;
+    }
+    .sidebar.collapsed .sidebar-footer-content {
+        justify-content: center !important;
+    }
 }
 
 /* ==========================================================================

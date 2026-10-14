@@ -2,48 +2,53 @@
 
 **Platform:** AgriLens &bull; National Agricultural Intelligence Platform  
 **Event:** 2026 NISR Big Data Hackathon &bull; Track 1: Agricultural Productivity  
-**Milestone:** Milestone 4: Dashboard Navigation, User Management &amp; Role-Based Access Control  
-**Document Version:** 1.0 &bull; October 2026  
+**Document Version:** 2.0 &bull; Modular Menu Modernization & Role-Aware Navigation  
+**Architecture Source:** [`apps/accounts/menu_config.py`](file:///c:/Users/ndoli/Documents/WEBAPP/agrilens/apps/accounts/menu_config.py)
 
 ---
 
 ## 1. Overview & Architectural Principles
 
-The AgriLens navigation system provides an intuitive, responsive, institutional-grade decision-support interface for the National Institute of Statistics of Rwanda (NISR), the Ministry of Agriculture and Animal Resources (MINAGRI), agricultural researchers, district agronomists, and the general public.
+The AgriLens navigation system provides a decoupled, role-aware, accessible, and responsive decision-support interface for the National Institute of Statistics of Rwanda (NISR), the Ministry of Agriculture and Animal Resources (MINAGRI), agricultural researchers, district agronomists, and the general public.
 
 ### Core Architectural Principles
-1. **Official NISR Brand Identity:** Designed with official NISR brand colors (Pantone 2728 C `#005CAB` Royal Blue, Pantone Cyan `#00AEEF`, Pantone 362 C `#46962B` Green, and Pantone 3965 C `#F3EA00` Yellow) on a deep institutional navy (`#001F3B`) foundation.
-2. **Alpine.js Reactive Accordions:** Sidebar sections collapse and expand smoothly without page flickering, automatically defaulting to expanded state when the user is within that module.
-3. **Role-Based Dynamic Visibility:** Sensitive administrative and data management sections dynamically render only when the authenticated user possesses the appropriate institutional clearance.
-4. **Active Route Highlighting:** Current section is highlighted with royal blue background, cyan indicator border, and subtle glow.
-5. **Mobile Responsiveness:** Collapsible off-canvas drawer on tablet and mobile viewports (`<= 992px`) driven by lightweight Alpine.js state.
+1. **Single Source of Truth (`menu_config.py`):** Navigation structure is completely decoupled from template markup. All menu sections, submenus, icon identifiers, and permissions are declaratively defined in Python.
+2. **Deep Copy Immutability:** `get_user_menu(role)` returns an isolated, deep copy of the menu data structure to guarantee request-level immutability across users and concurrent requests.
+3. **Official NISR Brand Identity:** Built with official NISR brand colors (Pantone 2728 C `#005CAB` Royal Blue, Pantone Cyan `#00AEEF`, Pantone 362 C `#46962B` Green, and Pantone 3965 C `#F3EA00` Yellow) on a deep institutional navy (`#001F3B`) background.
+4. **Dual-State Desktop Navigation (Expanded vs. Collapsed):** Supports both an expanded sidebar (260px) and an icon-only collapsed view (72px) with accessible tooltips and persistence via `localStorage`.
+5. **Mobile Responsive Off-Canvas Drawer:** On screens $\le 992\text{px}$, the sidebar transforms into a touch-friendly off-canvas drawer with backdrop overlay blur and explicit close button.
+6. **Dynamic Top Navbar Utilities:**
+   - **Breadcrumbs:** Auto-generated hierarchical navigation trail from URL path segments.
+   - **Quick Command Palette (<kbd>Ctrl</kbd> + <kbd>K</kbd>):** Instant search across Rwanda's 30 districts and core reports.
+   - **Review Queue Notification Badge:** Real-time indicator showing count of pending field observations awaiting verification.
+   - **Geographic Jurisdiction Indicator:** Displays active district or provincial assignment for extension officers.
 
 ---
 
-## 2. Navigation Hierarchy & Route Structure
+## 2. Navigation Hierarchy & Target Structure
 
 ```mermaid
 graph TD
-    A[AgriLens Portal] --> B[Core Intelligence]
+    A[AgriLens Navigation] --> B[Core Intelligence]
     A --> C[Productivity & Yield Gap]
     A --> D[Reports & Bulletins]
     A --> E[Agricultural Domains]
     A --> F[Data Governance]
-    A --> G[Institutional Administration]
+    A --> G[Administration]
+    A --> H[Account Actions]
 
     B --> B1["National Dashboard (/dashboard/)"]
     B --> B2["Public Portal & Map (/)"]
 
     C --> C1["Yield Gap Intelligence (/indicators/productivity/)"]
-    C --> C2["District Rankings (/indicators/productivity/#rankings)"]
 
-    D --> D1["National Agricultural Report (/dashboard/reports/national/)"]
-    D --> D2["District Performance Dossier (/dashboard/reports/district/)"]
+    D --> D1["National Report (/dashboard/reports/national/)"]
+    D --> D2["District Dossier (/dashboard/reports/district/)"]
 
     E --> E1["Crops & Seasons (/agriculture/crops/)"]
     E --> E2["Districts & Mapping (/geography/districts/)"]
     E --> E3["Seasonal Surveys (/surveys/)"]
-    E --> E4["Farmers & Coops (/farmers/)"]
+    E --> E4["Farmers & Cooperatives (/farmers/)"]
     E --> E5["Inputs & Subsidies (/inputs/)"]
     E --> E6["Commodity Markets (/markets/)"]
     E --> E7["Developer Data API (/api/)"]
@@ -51,64 +56,62 @@ graph TD
     F --> F1["Data Lineage Hub (/data-management/)"]
     F --> F2["Manual Registry (/data-management/manual/)"]
     F --> F3["Submit Observation (/data-management/manual/new/)"]
+    F --> F4["Review Queue (/data-management/manual/?status=SUBMITTED)"]
 
     G --> G1["Officers & Roles (/accounts/users/)"]
     G --> G2["Register Officer (/accounts/users/new/)"]
     G --> G3["Security Audit Trail (/accounts/audit-log/)"]
+
+    H --> H1["My Profile (/accounts/profile/)"]
+    H --> H2["Sign In / Sign Out (/accounts/login/ / /accounts/logout/)"]
 ```
 
 ---
 
-## 3. Section Catalog & Access Restrictions
+## 3. Role-Aware Menu Visibility Policy
 
-| Accordion Section | URL Pattern | View Function | Required Clearance |
-| :--- | :--- | :--- | :--- |
-| **Core Intelligence** | | | |
-| &bull; National Dashboard | `/dashboard/` | `dashboard:overview` | Public &amp; Authenticated |
-| &bull; Public Portal &amp; Map | `/` | `dashboard:public_home` | Public &amp; Authenticated |
-| **Productivity &amp; Gap** | | | |
-| &bull; Yield Gap Intelligence | `/indicators/productivity/` | `indicators:productivity` | Public &amp; Authenticated |
-| **Reports &amp; Bulletins** | | | |
-| &bull; National Report | `/dashboard/reports/national/` | `dashboard:reports_national` | Public &amp; Authenticated |
-| &bull; District Dossier | `/dashboard/reports/district/` | `dashboard:reports_district` | Public / Scoped for District Officers |
-| **Agricultural Domains** | | | |
-| &bull; Crops &amp; Seasons | `/agriculture/crops/` | `agriculture:crop_list` | Public &amp; Authenticated |
-| &bull; Districts &amp; Mapping | `/geography/districts/` | `geography:district_list` | Public / Scoped for District Officers |
-| &bull; Seasonal Surveys | `/surveys/` | `surveys:survey_list` | Public &amp; Authenticated |
-| &bull; Farmers &amp; Coops | `/farmers/` | `farmers:farmer_list` | Public &amp; Authenticated |
-| &bull; Inputs &amp; Subsidies | `/inputs/` | `inputs:input_list` | Public &amp; Authenticated |
-| &bull; Commodity Markets | `/markets/` | `markets:market_list` | Public &amp; Authenticated |
-| &bull; Developer Data API | `/api/` | `api:api-root` | Public &amp; Authenticated |
-| **Data Governance** | | | |
-| &bull; Data Lineage Hub | `/data-management/` | `data_management:hub` | `ADMIN`, `NISR_DATA_MANAGER`, `ANALYST` |
-| &bull; Manual Registry | `/data-management/manual/` | `data_management:manual_entry_list` | Authenticated Internal Officers |
-| &bull; Submit Observation | `/data-management/manual/new/` | `data_management:manual_entry_create` | `ADMIN`, `DATA_ENTRY_OFFICER`, `DISTRICT_OFFICER` |
-| **Administration** | | | |
-| &bull; Officers &amp; Roles | `/accounts/users/` | `accounts:user_list` | `ADMIN` or Superuser |
-| &bull; Register Officer | `/accounts/users/new/` | `accounts:user_create` | `ADMIN` or Superuser |
-| &bull; Security Audit Trail | `/accounts/audit-log/` | `accounts:audit_log_list` | `ADMIN` or Superuser |
+Every role in AgriLens receives a strictly tailored menu configuration:
+
+| Role Code | Institutional Clearance | Visible Navigation Sections |
+| :--- | :--- | :--- |
+| **`ADMIN`** | System Administrator | Core, Productivity, Reports (Full), Domains, Data Governance (Full), Administration |
+| **`NISR_DATA_MANAGER`** | NISR Ingestion Lead | Core, Productivity, Reports (Full), Domains, Data Governance (Lineage Hub, Registry, Submit) |
+| **`ANALYST`** | Agricultural Data Analyst | Core, Productivity, Reports (Full), Domains, Data Governance (Lineage Hub, Registry read-only) |
+| **`NATIONAL_OFFICER`** | MINAGRI National Officer | Core, Productivity, Reports (Full), Agricultural Domains |
+| **`DISTRICT_OFFICER`** | District Agriculture Officer | Core, Productivity, Reports (District Dossier), Domains, Data Governance (Registry, Submit) |
+| **`DATA_ENTRY_OFFICER`** | Field Data Enumerator | Core, Domains, Data Governance (Registry, Submit) |
+| **`REVIEWER`** | Observation Validator | Core, Reports (Full), Data Governance (Review Queue, Registry), Domains |
+| **`POLICY_MAKER`** | *Legacy Role* | Core, Productivity, Reports (Full), Domains |
+| **`EXTENSION_OFFICER`**| *Legacy Role* | Core, Productivity, Reports (District Dossier), Domains, Data Governance (Registry, Submit) |
+| **`RESEARCHER`** | *Legacy Role* | Core, Productivity, Reports (Full), Domains, Data Governance (Lineage Hub, Registry) |
+| **`PUBLIC`** | Unauthenticated Visitor | Core, Productivity, Reports (Full), Agricultural Domains *(Read-Only)* |
 
 ---
 
-## 4. Alpine.js Client-Side State Management
+## 4. Technical Implementation Architecture
 
-The sidebar incorporates declarative Alpine.js directives (`x-data`, `x-show`, `x-transition`, `@click`) that bind menu state directly to the active URL:
+### A. Modular Python Configuration (`apps/accounts/menu_config.py`)
+- Reusable menu block dictionaries (`CORE_INTELLIGENCE_MENU`, `PRODUCTIVITY_MENU`, `REPORTS_MENU_FULL`, etc.).
+- Central mapping `MENU_CONFIG` for all 7 institutional roles + 3 legacy roles + public visitors.
+- Immutability guarantee function `get_user_menu(role, is_superuser=False)` utilizing `copy.deepcopy()`.
 
-```html
-<aside class="sidebar" 
-       x-data="{
-           openCore: {% if request.path == '/' or '/dashboard' in request.path and '/reports' not in request.path %}true{% else %}true{% endif %},
-           openAnalytics: {% if '/indicators' in request.path %}true{% else %}true{% endif %},
-           openReports: {% if '/reports' in request.path %}true{% else %}true{% endif %},
-           openDomains: {% if '/agriculture' in request.path or '/geography' in request.path or ... %}true{% else %}false{% endif %},
-           openDataGov: {% if '/data-management' in request.path %}true{% else %}false{% endif %},
-           openSecurity: {% if '/accounts/users' in request.path or '/accounts/audit-log' in request.path %}true{% else %}false{% endif %},
-       }"
-       :class="{ 'mobile-active': sidebarOpen }">
-```
+### B. Global Context Processor (`apps/accounts/context_processors.py`)
+Registered in Django `TEMPLATES` configuration to inject:
+- `sidebar_menu`: Role-specific menu group list.
+- `user_geo_badge`: Assigned districts string or national jurisdiction status.
+- `pending_reviews_count`: Real-time count of pending field observations awaiting review.
+- `breadcrumbs`: Auto-generated hierarchical navigation crumb list.
+- `command_palette_districts`: Searchable catalog of Rwanda's 30 districts.
 
-### Key Interactive Features
-- **Auto-Expansion:** Accordion sections matching the current request path open automatically on page load.
-- **Independent Toggles:** Users can expand or collapse sections on demand without losing context.
-- **Chevron Rotation:** SVG indicator icons animate smoothly 180 degrees using CSS transform transitions.
-- **Mobile Drawer:** On viewports under `992px`, the sidebar slides in smoothly over the viewport upon clicking the hamburger toggle (`#mobile-sidebar-toggle`).
+### C. Safe Template Tags (`apps/accounts/templatetags/menu_tags.py`)
+- `{% resolve_menu_url item.url %}`: Safely reverses named Django routes and preserves query parameters (e.g. `?status=SUBMITTED`).
+- `{% is_menu_active request item.url %}`: Path matching and resolver view matching for active navigation states.
+- `{% is_group_active request group %}`: Checks if any sub-item in an accordion is active.
+- `{% render_menu_icon group.icon %}`: Renders inline SVG icons with scalable CSS classes.
+
+### D. Accessibility & Keyboard Navigation
+- Standard semantic `<nav role="navigation" aria-label="Main Application Navigation">`.
+- `aria-expanded` and `aria-controls` bindings on collapsible accordion buttons.
+- Tooltip labels via `title="..."` and `aria-label="..."` on collapsed icons.
+- Keyboard shortcut: <kbd>Ctrl</kbd> + <kbd>K</kbd> (or <kbd>Cmd</kbd> + <kbd>K</kbd>) to open the command palette from anywhere.
+- Focus-visible cyan outlines (`outline: 2px solid var(--nisr-cyan)`) for full keyboard navigation accessibility.

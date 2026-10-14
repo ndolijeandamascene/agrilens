@@ -27,7 +27,7 @@
 </head>
 <body class="agrilens-body">
     <div class="app-layout" 
-         x-data="{ sidebarOpen: false, paletteOpen: false }"
+         x-data="{ sidebarOpen: false, sidebarCollapsed: localStorage.getItem('agrilens_sidebar_collapsed') === 'true', paletteOpen: false }"
          @keydown.window.prevent.cmd.k="paletteOpen = true"
          @keydown.window.prevent.ctrl.k="paletteOpen = true">
         {% include "includes/sidebar.html" %}

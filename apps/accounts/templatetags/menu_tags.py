@@ -107,9 +107,11 @@ def is_group_active(request, group):
 
 
 @register.simple_tag
-def render_menu_icon(icon_name):
+def render_menu_icon(icon_name, extra_class=""):
     """
-    Renders SVG markup for the given icon name.
+    Renders SVG markup for the given icon name, optionally injecting CSS classes.
     """
     svg = ICONS.get(icon_name, ICONS["core"])
+    if extra_class:
+        svg = svg.replace("<svg ", f'<svg class="{extra_class}" ')
     return mark_safe(svg)

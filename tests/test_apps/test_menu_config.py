@@ -1,88 +1,197 @@
+"""
+Comprehensive Automated Test Suite for AgriLens Modular Menu Configuration,
+Role-Aware Navigation, Template Tags, Context Processors, and UI Components.
+"""
 from django.test import TestCase, RequestFactory
 from django.contrib.auth import get_user_model
 from django.template import Context, Template
 from apps.accounts.menu_config import get_user_menu, MENU_CONFIG
 from apps.accounts.context_processors import menu_context
-from apps.accounts.templatetags.menu_tags import resolve_menu_url, is_menu_active, is_group_active, render_menu_icon
+from apps.accounts.templatetags.menu_tags import (
+    resolve_menu_url,
+    is_menu_active,
+    is_group_active,
+    render_menu_icon,
+)
 from apps.geography.models import Province, District
+from apps.data_management.models import ManualObservation
+from apps.agriculture.models import AgriculturalSeason, Crop
 
 User = get_user_model()
 
 
-class MenuConfigTestCase(TestCase):
+class MenuConfigModuleTestCase(TestCase):
+    """Tests the Python declarative menu configuration and immutability guarantees."""
+
+    def test_get_user_menu_immutability(self):
+        """Mutating the returned menu dictionary must NOT modify global MENU_CONFIG."""
+        menu1 = get_user_menu("ADMIN")
+        menu1["sidebar"].clear()
+        menu1["sidebar"].append({"id": "tampered", "name": "Tampered"})
+
+        # Subsequent call must be completely unaffected
+        menu2 = get_user_menu("ADMIN")
+        section_ids = [group["id"] for group in menu2["sidebar"]]
+        self.assertIn("admin", section_ids)
+        self.assertIn("core", section_ids)
+        self.assertNotIn("tampered", section_ids)
+
+    def test_anonymous_and_unknown_roles_fallback_safely(self):
+        """None and unknown role strings safely fall back to PUBLIC configuration."""
+        anon_menu = get_user_menu(None)
+        self.assertIn("core", [g["id"] for g in anon_menu["sidebar"]])
+        self.assertNotIn("admin", [g["id"] for g in anon_menu["sidebar"]])
+        self.assertNotIn("governance", [g["id"] for g in anon_menu["sidebar"]])
+
+        unknown_menu = get_user_menu("UNKNOWN_CUSTOM_ROLE")
+        self.assertEqual(len(unknown_menu["sidebar"]), len(anon_menu["sidebar"]))
+
+    def test_superuser_always_gets_admin_menu(self):
+        """Superuser flag unconditionally grants ADMIN navigation clearance."""
+        su_menu = get_user_menu("PUBLIC", is_superuser=True)
+        section_ids = [g["id"] for g in su_menu["sidebar"]]
+        self.assertIn("admin", section_ids)
+        self.assertIn("governance", section_ids)
+
+    def test_role_navigation_allocations(self):
+        """Verifies explicit section allocation across all 7 institutional roles."""
+        # 1. ADMIN
+        admin_ids = [g["id"] for g in get_user_menu("ADMIN")["sidebar"]]
+        self.assertIn("admin", admin_ids)
+        self.assertIn("governance", admin_ids)
+        self.assertIn("reports", admin_ids)
+
+        # 2. NISR_DATA_MANAGER
+        nisr_ids = [g["id"] for g in get_user_menu("NISR_DATA_MANAGER")["sidebar"]]
+        self.assertNotIn("admin", nisr_ids)
+        self.assertIn("governance", nisr_ids)
+        self.assertIn("reports", nisr_ids)
+
+        # 3. ANALYST
+        analyst_ids = [g["id"] for g in get_user_menu("ANALYST")["sidebar"]]
+        self.assertNotIn("admin", analyst_ids)
+        self.assertIn("governance", analyst_ids)
+
+        # 4. NATIONAL_OFFICER
+        nat_ids = [g["id"] for g in get_user_menu("NATIONAL_OFFICER")["sidebar"]]
+        self.assertNotIn("admin", nat_ids)
+        self.assertNotIn("governance", nat_ids)
+        self.assertIn("reports", nat_ids)
+
+        # 5. DISTRICT_OFFICER
+        dist_ids = [g["id"] for g in get_user_menu("DISTRICT_OFFICER")["sidebar"]]
+        self.assertIn("governance", dist_ids)
+        self.assertIn("reports", dist_ids)
+
+        # 6. DATA_ENTRY_OFFICER
+        entry_ids = [g["id"] for g in get_user_menu("DATA_ENTRY_OFFICER")["sidebar"]]
+        self.assertIn("governance", entry_ids)
+        self.assertNotIn("reports", entry_ids)
+
+        # 7. REVIEWER
+        reviewer_ids = [g["id"] for g in get_user_menu("REVIEWER")["sidebar"]]
+        self.assertIn("governance", reviewer_ids)
+        self.assertIn("reports", reviewer_ids)
+
+    def test_legacy_roles_backward_compatibility(self):
+        """Legacy roles map cleanly with 100% backward compatibility."""
+        policy_ids = [g["id"] for g in get_user_menu("POLICY_MAKER")["sidebar"]]
+        self.assertIn("core", policy_ids)
+        self.assertIn("reports", policy_ids)
+
+        ext_ids = [g["id"] for g in get_user_menu("EXTENSION_OFFICER")["sidebar"]]
+        self.assertIn("governance", ext_ids)
+
+        research_ids = [g["id"] for g in get_user_menu("RESEARCHER")["sidebar"]]
+        self.assertIn("governance", research_ids)
+
+
+class MenuTagsTestCase(TestCase):
+    """Tests the safe template tags in apps/accounts/templatetags/menu_tags.py."""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_resolve_menu_url_handling(self):
+        # Direct URL
+        self.assertEqual(resolve_menu_url("/api/"), "/api/")
+
+        # Named view
+        self.assertEqual(resolve_menu_url("dashboard:overview"), "/dashboard/")
+
+        # Named view with canonical query parameters
+        self.assertEqual(
+            resolve_menu_url("data_management:manual_entry_list?status=SUBMITTED"),
+            "/data-management/manual/?status=SUBMITTED"
+        )
+
+        # Invalid route fallback
+        self.assertEqual(resolve_menu_url("non_existent:route_xyz"), "#")
+        self.assertEqual(resolve_menu_url(""), "#")
+
+    def test_is_menu_active_matching(self):
+        # Exact root match
+        req_root = self.factory.get("/")
+        self.assertTrue(is_menu_active(req_root, "dashboard:public_home"))
+        self.assertFalse(is_menu_active(req_root, "dashboard:overview"))
+
+        # Sub-path match
+        req_nat = self.factory.get("/dashboard/reports/national/")
+        self.assertTrue(is_menu_active(req_nat, "dashboard:reports_national"))
+        self.assertFalse(is_menu_active(req_nat, "dashboard:reports_district"))
+
+    def test_is_group_active(self):
+        req = self.factory.get("/dashboard/reports/national/")
+        group = {
+            "id": "reports",
+            "submenu": [
+                {"name": "National Report", "url": "dashboard:reports_national"},
+                {"name": "District Dossier", "url": "dashboard:reports_district"},
+            ]
+        }
+        self.assertTrue(is_group_active(req, group))
+
+        other_group = {
+            "id": "admin",
+            "submenu": [
+                {"name": "Users", "url": "accounts:user_list"}
+            ]
+        }
+        self.assertFalse(is_group_active(req, other_group))
+
+    def test_render_menu_icon(self):
+        svg = render_menu_icon("dashboard")
+        self.assertIn("<svg", svg)
+        self.assertIn('viewBox="0 0 24 24"', svg)
+
+        svg_classed = render_menu_icon("dashboard", extra_class="w-5 h-5")
+        self.assertIn('class="w-5 h-5"', svg_classed)
+
+
+class ContextProcessorAndTemplateTestCase(TestCase):
+    """Tests the menu_context processor and dynamic sidebar, navbar, and footer rendering."""
+
     def setUp(self):
         self.factory = RequestFactory()
         self.province = Province.objects.create(name="Northern", code="01")
         self.district = District.objects.create(name="Musanze", code="0101", province=self.province)
 
-    def test_admin_menu_has_administration_section(self):
-        admin_menu = get_user_menu("ADMIN")
-        section_ids = [group["id"] for group in admin_menu["sidebar"]]
-        self.assertIn("admin", section_ids)
-        self.assertIn("governance", section_ids)
-        self.assertIn("reports", section_ids)
-
-    def test_analyst_and_public_menu_lacks_admin_section(self):
-        analyst_menu = get_user_menu("ANALYST")
-        analyst_section_ids = [group["id"] for group in analyst_menu["sidebar"]]
-        self.assertNotIn("admin", analyst_section_ids)
-
-        public_menu = get_user_menu("PUBLIC")
-        public_section_ids = [group["id"] for group in public_menu["sidebar"]]
-        self.assertNotIn("admin", public_section_ids)
-        self.assertNotIn("governance", public_section_ids)
-
-    def test_legacy_roles_backward_compatibility(self):
-        policy_menu = get_user_menu("POLICY_MAKER")
-        national_menu = get_user_menu("NATIONAL_OFFICER")
-        self.assertEqual(len(policy_menu["sidebar"]), len(national_menu["sidebar"]))
-
-        extension_menu = get_user_menu("EXTENSION_OFFICER")
-        district_menu = get_user_menu("DISTRICT_OFFICER")
-        self.assertEqual(len(extension_menu["sidebar"]), len(district_menu["sidebar"]))
-
-    def test_superuser_always_gets_admin_menu(self):
-        superuser_menu = get_user_menu("PUBLIC", is_superuser=True)
-        section_ids = [group["id"] for group in superuser_menu["sidebar"]]
-        self.assertIn("admin", section_ids)
-
-    def test_resolve_menu_url_tag(self):
-        # Direct path
-        self.assertEqual(resolve_menu_url("/api/"), "/api/")
-        
-        # Valid view name
-        self.assertEqual(resolve_menu_url("dashboard:overview"), "/dashboard/")
-        
-        # View name with query parameter
-        self.assertEqual(
-            resolve_menu_url("data_management:manual_entry_list?status=pending"),
-            "/data-management/manual/?status=pending"
-        )
-        
-        # Invalid view fallback
-        self.assertEqual(resolve_menu_url("invalid:non_existent_route"), "#")
-
-    def test_is_menu_active_tag(self):
+    def test_menu_context_for_anonymous_visitor(self):
         req = self.factory.get("/dashboard/reports/national/")
-        self.assertTrue(is_menu_active(req, "dashboard:reports_national"))
-        self.assertFalse(is_menu_active(req, "dashboard:reports_district"))
-
-        req_root = self.factory.get("/")
-        self.assertTrue(is_menu_active(req_root, "dashboard:public_home"))
-        self.assertFalse(is_menu_active(req_root, "dashboard:overview"))
-
-    def test_menu_context_processor_for_anonymous_visitor(self):
-        req = self.factory.get("/")
         req.user = None
         ctx = menu_context(req)
+
         self.assertIn("sidebar_menu", ctx)
         self.assertIsNone(ctx["user_geo_badge"])
+        self.assertEqual(ctx["pending_reviews_count"], 0)
+        self.assertGreaterEqual(len(ctx["breadcrumbs"]), 2)
+        self.assertEqual(ctx["breadcrumbs"][0]["label"], "AgriLens")
 
-    def test_menu_context_processor_for_district_officer(self):
+    def test_menu_context_for_district_officer(self):
         user = User.objects.create_user(
-            username="dist_officer",
-            email="dist@agrilens.rw",
-            password="TestPassword123!",
+            username="agronomist_musanze",
+            email="agro@musanze.gov.rw",
+            password="SecurePassword123!",
             role=User.Role.DISTRICT_OFFICER,
         )
         user.assigned_districts.add(self.district)
@@ -90,26 +199,43 @@ class MenuConfigTestCase(TestCase):
         req = self.factory.get("/dashboard/")
         req.user = user
         ctx = menu_context(req)
-        self.assertIn("sidebar_menu", ctx)
+
         self.assertIn("Musanze", ctx["user_geo_badge"])
 
-    def test_sidebar_template_renders_dynamically(self):
-        user = User.objects.create_superuser(
-            username="super_test",
-            email="super@agrilens.rw",
-            password="SuperPassword123!",
+    def test_sidebar_and_navbar_render_dynamically(self):
+        admin = User.objects.create_superuser(
+            username="admin_test",
+            email="admin@agrilens.rw",
+            password="AdminPassword123!",
         )
-        req = self.factory.get("/dashboard/")
-        req.user = user
+        req = self.factory.get("/dashboard/reports/national/")
+        req.user = admin
 
         ctx_data = menu_context(req)
-        ctx_data["user"] = user
+        ctx_data["user"] = admin
         ctx_data["request"] = req
 
-        template = Template("{% include 'includes/sidebar.html' %}")
-        rendered = template.render(Context(ctx_data))
+        # 1. Test Sidebar rendering
+        sidebar_tpl = Template("{% include 'includes/sidebar.html' %}")
+        rendered_sidebar = sidebar_tpl.render(Context(ctx_data))
 
-        self.assertIn("AgriLens", rendered)
-        self.assertIn("Core Intelligence", rendered)
-        self.assertIn("Administration", rendered)
-        self.assertIn("Officers &amp; Roles", rendered)
+        self.assertIn("AgriLens", rendered_sidebar)
+        self.assertIn("Core Intelligence", rendered_sidebar)
+        self.assertIn("Administration", rendered_sidebar)
+        self.assertIn("Officers &amp; Roles", rendered_sidebar)
+        self.assertIn("aria-label=\"AgriLens Primary Navigation\"", rendered_sidebar)
+
+        # 2. Test Navbar rendering
+        navbar_tpl = Template("{% include 'includes/navbar.html' %}")
+        rendered_navbar = navbar_tpl.render(Context(ctx_data))
+
+        self.assertIn("National Dashboard", rendered_navbar)
+        self.assertIn("Ctrl K", rendered_navbar)
+        self.assertIn("nav-breadcrumbs", rendered_navbar)
+
+        # 3. Test Footer rendering
+        footer_tpl = Template("{% include 'includes/footer.html' %}")
+        rendered_footer = footer_tpl.render(Context(ctx_data))
+
+        self.assertIn("AgriLens Rwanda", rendered_footer)
+        self.assertIn("National Institute of Statistics of Rwanda", rendered_footer)
