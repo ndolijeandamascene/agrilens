@@ -157,6 +157,113 @@ AGRICULTURAL_DOMAINS_MENU = {
     ],
 }
 
+# ------------------------------------------------------------------------------
+# PUBLIC SPECIFIC MODULAR MENU BLOCKS (Recommended Public Architecture)
+# ------------------------------------------------------------------------------
+
+CORE_INTELLIGENCE_MENU_PUBLIC = {
+    "id": "core",
+    "name": "Core Intelligence",
+    "icon": "core",
+    "description": "Macro-level agricultural productivity and public portal",
+    "roles": ["PUBLIC"],
+    "submenu": [
+        {
+            "id": "core_home",
+            "name": "Home",
+            "url": "dashboard:public_home",
+            "icon": "public",
+            "description": "AgriLens public landing portal and national overview",
+        },
+        {
+            "id": "core_dashboard",
+            "name": "National Dashboard",
+            "url": "dashboard:overview",
+            "icon": "dashboard",
+            "description": "Macro KPIs, seasonal trends, and national aggregations",
+        },
+        {
+            "id": "core_public_map",
+            "name": "Agricultural Map",
+            "url": "geography:district_list",
+            "icon": "districts",
+            "description": "Geospatial Rwanda agricultural map and district boundaries",
+        },
+    ],
+}
+
+PRODUCTIVITY_MENU_PUBLIC = {
+    "id": "productivity",
+    "name": "Productivity & Yield Gaps",
+    "icon": "productivity",
+    "description": "Actual vs. potential yield gap analytics and district rankings",
+    "roles": ["PUBLIC"],
+    "submenu": [
+        {
+            "id": "yield_gap",
+            "name": "Productivity & Yield Gaps",
+            "url": "indicators:productivity",
+            "icon": "trending",
+            "description": "Crop yield gap indexes, potential yields, and district comparisons",
+        },
+    ],
+}
+
+REPORTS_MENU_PUBLIC = {
+    "id": "reports",
+    "name": "Reports & Bulletins",
+    "icon": "reports",
+    "description": "Published reports only",
+    "roles": ["PUBLIC"],
+    "submenu": [
+        {
+            "id": "reports_national",
+            "name": "National Report",
+            "url": "dashboard:reports_national",
+            "icon": "report_national",
+            "description": "Published national bulletins and seasonal survey summaries",
+        },
+    ],
+}
+
+AGRICULTURAL_DOMAINS_MENU_PUBLIC = {
+    "id": "domains",
+    "name": "Agricultural Domains",
+    "icon": "domains",
+    "description": "Public agricultural datasets, open APIs, and published market data",
+    "roles": ["PUBLIC"],
+    "submenu": [
+        {
+            "id": "domain_crops",
+            "name": "Crops & Seasons",
+            "url": "agriculture:crop_list",
+            "icon": "crops",
+            "description": "Public crop information, varieties, and seasonal cycles",
+        },
+        {
+            "id": "domain_surveys",
+            "name": "Seasonal Surveys",
+            "url": "surveys:survey_list",
+            "icon": "surveys",
+            "description": "Published survey information and SAS methodology",
+        },
+        {
+            "id": "domain_markets",
+            "name": "Commodity Markets",
+            "url": "markets:market_list",
+            "icon": "markets",
+            "description": "Published market data and wholesale/retail prices",
+        },
+        {
+            "id": "domain_api",
+            "name": "Developer API",
+            "url": "/api/",
+            "icon": "api",
+            "description": "REST API root and OpenAPI schema documentation",
+        },
+    ],
+}
+
 DATA_GOVERNANCE_MENU_FULL = {
     "id": "governance",
     "name": "Data Governance",
@@ -400,13 +507,13 @@ MENU_CONFIG = {
         ]
     },
 
-    # Public / Anonymous Visitor (Published dashboards, reports, and public catalogs)
+    # Public / Anonymous Visitor (Published dashboards, maps, reports, and public datasets only)
     "PUBLIC": {
         "sidebar": [
-            CORE_INTELLIGENCE_MENU,
-            PRODUCTIVITY_MENU,
-            REPORTS_MENU_FULL,
-            AGRICULTURAL_DOMAINS_MENU,
+            CORE_INTELLIGENCE_MENU_PUBLIC,
+            PRODUCTIVITY_MENU_PUBLIC,
+            REPORTS_MENU_PUBLIC,
+            AGRICULTURAL_DOMAINS_MENU_PUBLIC,
         ]
     },
 }

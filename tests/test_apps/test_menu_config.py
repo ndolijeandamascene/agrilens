@@ -239,3 +239,59 @@ class ContextProcessorAndTemplateTestCase(TestCase):
 
         self.assertIn("AgriLens Rwanda", rendered_footer)
         self.assertIn("National Institute of Statistics of Rwanda", rendered_footer)
+
+    def test_recommended_public_menu_architecture(self):
+        """Validates the exact recommended public menu hierarchy and privacy exclusions."""
+        pub_menu = get_user_menu("PUBLIC")
+        sidebar = pub_menu["sidebar"]
+        
+        # Verify sections present
+        section_ids = [g["id"] for g in sidebar]
+        self.assertIn("core", section_ids)
+        self.assertIn("productivity", section_ids)
+        self.assertIn("reports", section_ids)
+        self.assertIn("domains", section_ids)
+        self.assertNotIn("governance", section_ids)
+        self.assertNotIn("admin", section_ids)
+
+        # Collect all submenu items for public
+        all_subitems = []
+        for g in sidebar:
+            all_subitems.extend(g.get("submenu", []))
+        
+        sub_names = [item["name"] for item in all_subitems]
+        self.assertIn("Home", sub_names)
+        self.assertIn("National Dashboard", sub_names)
+        self.assertIn("Agricultural Map", sub_names)
+        self.assertIn("Productivity & Yield Gaps", sub_names)
+        self.assertIn("National Report", sub_names)
+        self.assertIn("Crops & Seasons", sub_names)
+        self.assertIn("Seasonal Surveys", sub_names)
+        self.assertIn("Commodity Markets", sub_names)
+        self.assertIn("Developer API", sub_names)
+
+        # Verify privacy exclusions: farmer registries, subsidies, district dossiers are NOT in public
+        self.assertNotIn("Farmers & Cooperatives", sub_names)
+        self.assertNotIn("Inputs & Subsidies", sub_names)
+        self.assertNotIn("District Dossier", sub_names)
+
+    def test_public_landing_navbar_rendering(self):
+        """Tests that the public landing header displays the recommended public menu and officer sign in."""
+        resp = self.client.get("/")
+        self.assertEqual(resp.status_code, 200)
+        content = resp.content.decode("utf-8")
+
+        self.assertIn("AgriLens", content)
+        self.assertIn("See Agriculture Through Data.", content)
+        self.assertIn("public-role-pill", content)
+        self.assertIn("Public", content)
+        self.assertIn("National Dashboard", content)
+        self.assertIn("Agricultural Map", content)
+        self.assertIn("Productivity &amp; Yield Gaps", content)
+        self.assertIn("Reports &amp; Bulletins", content)
+        self.assertIn("Crops &amp; Seasons", content)
+        self.assertIn("Seasonal Surveys", content)
+        self.assertIn("Commodity Markets", content)
+        self.assertIn("Developer API", content)
+        self.assertIn("Officer Sign In", content)
+        self.assertIn("/accounts/login/", content)

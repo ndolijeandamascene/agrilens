@@ -83,8 +83,26 @@ Every role in AgriLens receives a strictly tailored menu configuration:
 | **`REVIEWER`** | Observation Validator | Core, Reports (Full), Data Governance (Review Queue, Registry), Domains |
 | **`POLICY_MAKER`** | *Legacy Role* | Core, Productivity, Reports (Full), Domains |
 | **`EXTENSION_OFFICER`**| *Legacy Role* | Core, Productivity, Reports (District Dossier), Domains, Data Governance (Registry, Submit) |
-| **`RESEARCHER`** | *Legacy Role* | Core, Productivity, Reports (Full), Domains, Data Governance (Lineage Hub, Registry) |
-| **`PUBLIC`** | Unauthenticated Visitor | Core, Productivity, Reports (Full), Agricultural Domains *(Read-Only)* |
+| **`PUBLIC`** | Unauthenticated Visitor | Recommended Public Navigation: Home, National Dashboard, Agricultural Map, Productivity & Yield Gaps, Published Reports only, Crops & Seasons, Seasonal Surveys, Commodity Markets, Developer API. *(Privacy Exclusions: Farmers & Cooperatives, Inputs & Subsidies, District Dossiers)* |
+
+---
+
+### Public Portal Navigation & Header Architecture
+For unauthenticated citizens, researchers, and public visitors, AgriLens delivers a streamlined public navigation system:
+- **Brand Tagline:** `"See Agriculture Through Data."`
+- **Role Indicator:** Distinct `Public` pill badge.
+- **Top Public Header & Navigation Links:**
+  1. `Home` (`/`)
+  2. `National Dashboard` (`/dashboard/`)
+  3. `Agricultural Map` (`/geography/`)
+  4. `Productivity & Yield Gaps` (`/indicators/productivity/`)
+  5. `Reports & Bulletins` (`/dashboard/reports/national/` &bull; *Published reports only*)
+  6. `Crops & Seasons` (`/agriculture/` &bull; *Public crop information*)
+  7. `Seasonal Surveys` (`/surveys/` &bull; *Published survey information*)
+  8. `Commodity Markets` (`/markets/` &bull; *Published market data*)
+  9. `Developer API` (`/api/`)
+- **Primary Header Action:** Prominent **Officer Sign In** (`/accounts/login/`) button for institutional users.
+- **Privacy Protections:** Smallholder farmer personal data, subsidy allocations, and localized internal dossiers remain strictly inaccessible to unauthenticated traffic.
 
 ---
 

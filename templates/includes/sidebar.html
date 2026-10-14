@@ -28,7 +28,10 @@
             </div>
             <div class="brand-info">
                 <span class="brand-name">AgriLens</span>
-                <span class="brand-tagline">Rwanda AgData Hub</span>
+                <span class="brand-tagline">See Agriculture Through Data.</span>
+                {% if not user.is_authenticated %}
+                <span class="brand-role-badge" style="font-size: 0.62rem; color: #38BDF8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-top: 2px;">Public</span>
+                {% endif %}
             </div>
         </a>
 
