@@ -240,17 +240,17 @@ body.public-body {
 .public-nav-menu {
     display: flex;
     align-items: center;
-    gap: 4px;
-    flex-wrap: wrap;
+    gap: 12px;
+    flex-wrap: nowrap;
 }
 
 .public-nav-link {
     color: var(--text-muted);
     text-decoration: none;
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     font-weight: 600;
     white-space: nowrap;
-    padding: 6px 9px;
+    padding: 7px 12px;
     border-radius: 6px;
     transition: all 0.15s ease;
     position: relative;
@@ -428,6 +428,8 @@ body.public-body {
 .hero-container {
     position: relative;
     z-index: 2;
+    max-width: 1360px;
+    margin: 0 auto;
 }
 
 .hero-badge-container {

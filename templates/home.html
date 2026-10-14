@@ -25,7 +25,7 @@
             Seasonal Agricultural Surveys to quantify yield gaps, assess farming practice adoption, and support targeted policy planning across Rwanda.
         </p>
 
-        <div class="hero-cta-group">
+        <div class="hero-cta-group" style="margin-bottom: 28px;">
             <a href="#productivity-gap" class="btn-hero-primary" id="hero-btn-gap">
                 <span>View Productivity Gap Analysis</span>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -33,18 +33,13 @@
                     <polyline points="19 12 12 19 5 12"></polyline>
                 </svg>
             </a>
-            <a href="#rwanda-map" class="btn-hero-secondary" id="hero-btn-map">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-                    <line x1="8" y1="2" x2="8" y2="18"></line>
-                    <line x1="16" y1="6" x2="16" y2="22"></line>
-                </svg>
-                <span>Administrative Map</span>
+            <a href="/dashboard/" class="btn-hero-secondary" id="hero-btn-dash">
+                <span>Open National Dashboard &rarr;</span>
             </a>
         </div>
 
         <!-- Metric Highlights Grid -->
-        <div class="hero-stats-grid">
+        <div class="hero-stats-grid" style="margin-bottom: 36px;">
             <div class="stat-card">
                 <div class="stat-number">30 / 30</div>
                 <div class="stat-label">Administrative Districts</div>
@@ -64,6 +59,137 @@
                 <div class="stat-number">100%</div>
                 <div class="stat-label">Verifiable Lineage</div>
                 <div class="stat-sub">Raw variable traceability with zero synthetic data</div>
+            </div>
+        </div>
+
+        <!-- =========================================================================
+             HERO CENTERPIECE: INTERACTIVE RWANDA GEOGRAPHIC MAP
+             ========================================================================= -->
+        <div class="hero-map-wrapper" id="rwanda-map" style="text-align: left;">
+            <div class="map-controls-panel">
+                <!-- Cascading Filters: Province -> District -> Sector -->
+                <div class="geo-filter-toolbar">
+                    <div class="filter-col">
+                        <label for="filter-province" class="filter-label">Province</label>
+                        <div class="select-wrapper">
+                            <select id="filter-province" class="geo-select">
+                                <option value="">All Provinces (Rwanda)</option>
+                                <option value="Kigali">City of Kigali</option>
+                                <option value="North">Northern Province</option>
+                                <option value="South">Southern Province</option>
+                                <option value="East">Eastern Province</option>
+                                <option value="West">Western Province</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-col">
+                        <label for="filter-district" class="filter-label">District</label>
+                        <div class="select-wrapper">
+                            <select id="filter-district" class="geo-select">
+                                <option value="">All Districts (30)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-col">
+                        <label for="filter-sector" class="filter-label">Sector</label>
+                        <div class="select-wrapper">
+                            <select id="filter-sector" class="geo-select" disabled>
+                                <option value="">Select District first</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-col filter-action-col">
+                        <button id="btn-reset-filters" class="btn-reset-geo" title="Reset filters to all Rwanda">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                <path d="M3 3v5h5"></path>
+                            </svg>
+                            <span>Reset</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Indicator Layer Switcher -->
+                <div class="map-layer-toggles">
+                    <span class="layer-toggle-label">Choropleth Layer:</span>
+                    <button class="map-pill-btn active" data-layer="province" id="map-btn-prov">Administrative Provinces</button>
+                    <button class="map-pill-btn" data-layer="yield" id="map-btn-yield">Crop Yield</button>
+                    <button class="map-pill-btn" data-layer="irrigation" id="map-btn-irrig">Irrigation %</button>
+                    <button class="map-pill-btn" data-layer="fertilizer" id="map-btn-fert">Fertilizer %</button>
+                    <button class="map-pill-btn" data-layer="loss" id="map-btn-loss">Loss Rate %</button>
+                </div>
+            </div>
+
+            <div class="map-layout-grid">
+                <!-- Real Leaflet Container -->
+                <div class="map-wrapper-card">
+                    <div id="rwanda-leaflet-map" class="leaflet-map-element" style="height: 520px; width: 100%;"></div>
+                    <!-- Interactive Map Legend -->
+                    <div class="map-legend-bar" id="map-legend-bar">
+                        <span class="legend-title" id="legend-title">5 Provinces of Rwanda (NISR Palette):</span>
+                        <div class="legend-items" id="legend-items">
+                            <span class="legend-chip"><span class="legend-color-box" style="background: #D4A000;"></span> Eastern</span>
+                            <span class="legend-chip"><span class="legend-color-box" style="background: #46962B;"></span> Northern</span>
+                            <span class="legend-chip"><span class="legend-color-box" style="background: #00AEEF;"></span> Western</span>
+                            <span class="legend-chip"><span class="legend-color-box" style="background: #005CAB;"></span> Southern</span>
+                            <span class="legend-chip"><span class="legend-color-box" style="background: #002B54;"></span> Kigali</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- District / Sector Detail Panel -->
+                <div class="district-inspect-card" id="district-inspector">
+                    <div class="inspect-header">
+                        <div class="inspect-level-badge" id="inspect-level">National Overview</div>
+                        <span class="inspect-badge" id="inspect-province">Republic of Rwanda</span>
+                        <h3 class="inspect-title" id="inspect-title">National Agricultural Grid</h3>
+                        <p class="inspect-desc" id="inspect-desc">Official NISR Seasonal Agricultural Survey microdata covering monitored districts across Rwanda.</p>
+                    </div>
+
+                    <div class="inspect-body">
+                        <div class="inspect-stat-row">
+                            <span class="label">Priority Crops</span>
+                            <strong class="value" id="inspect-crops">Maize, Irish Potato, Bush Beans, Rice, Cassava</strong>
+                        </div>
+                        <div class="inspect-stat-row">
+                            <span class="label">Average Yield</span>
+                            <strong class="value highlight-val" id="inspect-yield">1,959.9 kg/ha (Weighted Mean)</strong>
+                        </div>
+                        <div class="inspect-stat-row">
+                            <span class="label">Irrigation Adoption</span>
+                            <strong class="value" id="inspect-irrig">0.0% (Pilot batch unmapped)</strong>
+                        </div>
+                        <div class="inspect-stat-row">
+                            <span class="label">Fertilizer (Mineral)</span>
+                            <strong class="value" id="inspect-fert">36.6% (Inorganic Adoption)</strong>
+                        </div>
+                        <div class="inspect-stat-row">
+                            <span class="label">Mechanization</span>
+                            <strong class="value" id="inspect-mech">0.0% (Pilot batch unmapped)</strong>
+                        </div>
+                        <div class="inspect-stat-row">
+                            <span class="label">Post-Harvest Loss</span>
+                            <strong class="value" id="inspect-loss">2.2% (Seasonal Loss)</strong>
+                        </div>
+                        <div class="inspect-stat-row">
+                            <span class="label">Market Hub</span>
+                            <strong class="value" id="inspect-market">National &amp; Regional Trade Hubs</strong>
+                        </div>
+                        <div class="inspect-stat-row" id="inspect-sector-count-row">
+                            <span class="label">Survey Coverage</span>
+                            <strong class="value" id="inspect-sectors">27 Districts Sampled</strong>
+                        </div>
+                    </div>
+
+                    <div class="inspect-footer">
+                        <a href="/dashboard/" class="btn-inspect-action">
+                            <span>Open Detailed District Analytics &rarr;</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -220,146 +346,7 @@
     </div>
 </section>
 
-<!-- =========================================================================
-     3. INTERACTIVE RWANDA GEOGRAPHIC MAP (LEAFLET + REAL GEOJSON)
-     ========================================================================= -->
-<section class="section-wrapper" id="rwanda-map">
-    <div class="section-container">
-        <div class="section-header">
-            <span class="section-kicker">Geospatial Distribution</span>
-            <h2 class="section-heading">Spatial Distribution of Agricultural Indicators</h2>
-            <p class="section-subheading">
-                Interactive spatial visualization of 30 administrative districts and 416 sectors. Filter by administrative tier or examine choropleth indicator layers.
-            </p>
-        </div>
 
-        <div class="map-controls-panel">
-            <!-- Cascading Filters: Province -> District -> Sector -->
-            <div class="geo-filter-toolbar">
-                <div class="filter-col">
-                    <label for="filter-province" class="filter-label">Province</label>
-                    <div class="select-wrapper">
-                        <select id="filter-province" class="geo-select">
-                            <option value="">All Provinces (Rwanda)</option>
-                            <option value="Kigali">City of Kigali</option>
-                            <option value="North">Northern Province</option>
-                            <option value="South">Southern Province</option>
-                            <option value="East">Eastern Province</option>
-                            <option value="West">Western Province</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="filter-col">
-                    <label for="filter-district" class="filter-label">District</label>
-                    <div class="select-wrapper">
-                        <select id="filter-district" class="geo-select">
-                            <option value="">All Districts (30)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="filter-col">
-                    <label for="filter-sector" class="filter-label">Sector</label>
-                    <div class="select-wrapper">
-                        <select id="filter-sector" class="geo-select" disabled>
-                            <option value="">Select District first</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="filter-col filter-action-col">
-                    <button id="btn-reset-filters" class="btn-reset-geo" title="Reset filters to all Rwanda">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                            <path d="M3 3v5h5"></path>
-                        </svg>
-                        <span>Reset</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Indicator Layer Switcher -->
-            <div class="map-layer-toggles">
-                <span class="layer-toggle-label">Choropleth Layer:</span>
-                <button class="map-pill-btn active" data-layer="province" id="map-btn-prov">Administrative Provinces</button>
-                <button class="map-pill-btn" data-layer="yield" id="map-btn-yield">Crop Yield</button>
-                <button class="map-pill-btn" data-layer="irrigation" id="map-btn-irrig">Irrigation %</button>
-                <button class="map-pill-btn" data-layer="fertilizer" id="map-btn-fert">Fertilizer %</button>
-                <button class="map-pill-btn" data-layer="loss" id="map-btn-loss">Loss Rate %</button>
-            </div>
-        </div>
-
-        <div class="map-layout-grid">
-            <!-- Real Leaflet Container -->
-            <div class="map-wrapper-card">
-                <div id="rwanda-leaflet-map" class="leaflet-map-element" style="height: 540px; width: 100%;"></div>
-                <!-- Interactive Map Legend -->
-                <div class="map-legend-bar" id="map-legend-bar">
-                    <span class="legend-title" id="legend-title">5 Provinces of Rwanda (NISR Palette):</span>
-                    <div class="legend-items" id="legend-items">
-                        <span class="legend-chip"><span class="legend-color-box" style="background: #D4A000;"></span> Eastern</span>
-                        <span class="legend-chip"><span class="legend-color-box" style="background: #46962B;"></span> Northern</span>
-                        <span class="legend-chip"><span class="legend-color-box" style="background: #00AEEF;"></span> Western</span>
-                        <span class="legend-chip"><span class="legend-color-box" style="background: #005CAB;"></span> Southern</span>
-                        <span class="legend-chip"><span class="legend-color-box" style="background: #002B54;"></span> Kigali</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- District / Sector Detail Panel -->
-            <div class="district-inspect-card" id="district-inspector">
-                <div class="inspect-header">
-                    <div class="inspect-level-badge" id="inspect-level">National Overview</div>
-                    <span class="inspect-badge" id="inspect-province">Republic of Rwanda</span>
-                    <h3 class="inspect-title" id="inspect-title">National Agricultural Grid</h3>
-                    <p class="inspect-desc" id="inspect-desc">Official NISR Seasonal Agricultural Survey microdata covering monitored districts across Rwanda.</p>
-                </div>
-
-                <div class="inspect-body">
-                    <div class="inspect-stat-row">
-                        <span class="label">Priority Crops</span>
-                        <strong class="value" id="inspect-crops">Maize, Irish Potato, Bush Beans, Rice, Cassava</strong>
-                    </div>
-                    <div class="inspect-stat-row">
-                        <span class="label">Average Yield</span>
-                        <strong class="value highlight-val" id="inspect-yield">1,959.9 kg/ha (Weighted Mean)</strong>
-                    </div>
-                    <div class="inspect-stat-row">
-                        <span class="label">Irrigation Adoption</span>
-                        <strong class="value" id="inspect-irrig">0.0% (Pilot batch unmapped)</strong>
-                    </div>
-                    <div class="inspect-stat-row">
-                        <span class="label">Fertilizer (Mineral)</span>
-                        <strong class="value" id="inspect-fert">36.6% (Inorganic Adoption)</strong>
-                    </div>
-                    <div class="inspect-stat-row">
-                        <span class="label">Mechanization</span>
-                        <strong class="value" id="inspect-mech">0.0% (Pilot batch unmapped)</strong>
-                    </div>
-                    <div class="inspect-stat-row">
-                        <span class="label">Post-Harvest Loss</span>
-                        <strong class="value" id="inspect-loss">2.2% (Seasonal Loss)</strong>
-                    </div>
-                    <div class="inspect-stat-row">
-                        <span class="label">Market Hub</span>
-                        <strong class="value" id="inspect-market">National &amp; Regional Trade Hubs</strong>
-                    </div>
-                    <div class="inspect-stat-row" id="inspect-sector-count-row">
-                        <span class="label">Survey Coverage</span>
-                        <strong class="value" id="inspect-sectors">27 Districts Sampled</strong>
-                    </div>
-                </div>
-
-                <div class="inspect-footer">
-                    <a href="/dashboard/" class="btn-inspect-action">
-                        <span>Open Detailed District Analytics &rarr;</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
 <!-- =========================================================================
      4. PLATFORM CORE MODULES (THE 6 PILLARS)

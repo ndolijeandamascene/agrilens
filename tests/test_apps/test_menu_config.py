@@ -276,22 +276,33 @@ class ContextProcessorAndTemplateTestCase(TestCase):
         self.assertNotIn("District Dossier", sub_names)
 
     def test_public_landing_navbar_rendering(self):
-        """Tests that the public landing header displays the recommended public menu and officer sign in."""
+        """Tests that the public landing header displays the streamlined 4-page menu, logo linking to home, and hero map."""
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, 200)
         content = resp.content.decode("utf-8")
 
+        # Brand Logo acts as Home
+        self.assertIn('id="brand-logo-link"', content)
+        self.assertIn('href="/"', content)
         self.assertIn("AgriLens", content)
         self.assertIn("See Agriculture Through Data.", content)
         self.assertIn("public-role-pill", content)
         self.assertIn("Public", content)
-        self.assertIn("National Dashboard", content)
-        self.assertIn("Agricultural Map", content)
+
+        # 4 Streamlined Navbar Links
         self.assertIn("Productivity &amp; Yield Gaps", content)
-        self.assertIn("Reports &amp; Bulletins", content)
+        self.assertIn("/indicators/productivity/", content)
         self.assertIn("Crops &amp; Seasons", content)
+        self.assertIn("/agriculture/", content)
         self.assertIn("Seasonal Surveys", content)
+        self.assertIn("/surveys/", content)
         self.assertIn("Commodity Markets", content)
-        self.assertIn("Developer API", content)
+        self.assertIn("/markets/", content)
+
+        # Primary Action
         self.assertIn("Officer Sign In", content)
         self.assertIn("/accounts/login/", content)
+
+        # Interactive Map featured prominently in the Hero Section
+        self.assertIn('id="rwanda-map"', content)
+        self.assertIn('id="rwanda-leaflet-map"', content)

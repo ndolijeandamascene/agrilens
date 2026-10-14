@@ -66,25 +66,12 @@
                 </svg>
             </button>
 
-            <!-- Recommended Public Navigation Menu -->
+            <!-- Streamlined Public Navigation Menu (Logo acts as Home) -->
             <nav class="public-nav-menu" id="public-nav-menu">
-                <a href="/" class="public-nav-link {% if request.path == '/' %}active{% endif %}">Home</a>
-                <a href="/dashboard/" class="public-nav-link {% if request.path == '/dashboard/' %}active{% endif %}">National Dashboard</a>
-                <a href="/geography/" class="public-nav-link {% if '/geography/' in request.path %}active{% endif %}">Agricultural Map</a>
                 <a href="/indicators/productivity/" class="public-nav-link {% if '/indicators/productivity/' in request.path %}active{% endif %}">Productivity &amp; Yield Gaps</a>
-                <a href="/dashboard/reports/national/" class="public-nav-link {% if '/reports/' in request.path %}active{% endif %}" title="Published reports only">
-                    Reports &amp; Bulletins
-                </a>
-                <a href="/agriculture/" class="public-nav-link {% if '/agriculture/' in request.path %}active{% endif %}" title="Public crop information">
-                    Crops &amp; Seasons
-                </a>
-                <a href="/surveys/" class="public-nav-link {% if '/surveys/' in request.path %}active{% endif %}" title="Published survey information">
-                    Seasonal Surveys
-                </a>
-                <a href="/markets/" class="public-nav-link {% if '/markets/' in request.path %}active{% endif %}" title="Published market data">
-                    Commodity Markets
-                </a>
-                <a href="/api/" class="public-nav-link {% if '/api/' in request.path %}active{% endif %}">Developer API</a>
+                <a href="/agriculture/" class="public-nav-link {% if '/agriculture/' in request.path %}active{% endif %}">Crops &amp; Seasons</a>
+                <a href="/surveys/" class="public-nav-link {% if '/surveys/' in request.path %}active{% endif %}">Seasonal Surveys</a>
+                <a href="/markets/" class="public-nav-link {% if '/markets/' in request.path %}active{% endif %}">Commodity Markets</a>
 
                 <!-- Mobile-only login button inside drawer -->
                 <div class="mobile-login-drawer-item">
