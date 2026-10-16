@@ -147,8 +147,12 @@ if 'test' in sys.argv or any('pytest' in arg for arg in sys.argv):
         }
     }
 elif env.str('DATABASE_URL', default=''):
+    db_config = env.db('DATABASE_URL')
+    db_config['CONN_MAX_AGE'] = env.int('DATABASE_CONN_MAX_AGE', default=60)
+    db_config.setdefault('OPTIONS', {})
+    db_config['OPTIONS'].setdefault('connect_timeout', 10)
     DATABASES = {
-        'default': env.db('DATABASE_URL')
+        'default': db_config
     }
 else:
     DATABASES = {
