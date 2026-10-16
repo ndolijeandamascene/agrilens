@@ -5,6 +5,7 @@ Strict parameter validation protects against invalid requests and ensures statis
 """
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.views.decorators.cache import cache_page
 from apps.agriculture.models import Crop, AgriculturalSeason
 from apps.geography.models import District, Province
 from .services import IndicatorService
@@ -86,6 +87,7 @@ def productivity_intelligence_view(request):
     return render(request, 'indicators/productivity_intelligence.html', context)
 
 
+@cache_page(60 * 30)
 def api_national_summary(request):
     """
     REST endpoint returning national summary KPIs.
@@ -100,6 +102,7 @@ def api_national_summary(request):
     return JsonResponse({'status': 'success', 'data': data})
 
 
+@cache_page(60 * 30)
 def api_district_rankings(request):
     """
     REST endpoint returning district rankings for Leaflet maps or charts.
@@ -125,6 +128,7 @@ def api_district_rankings(request):
     })
 
 
+@cache_page(60 * 30)
 def api_productivity_gap(request):
     """
     REST endpoint returning crop yield gap benchmark vs lagging with strict sample policy.

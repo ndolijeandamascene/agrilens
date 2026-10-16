@@ -6,16 +6,18 @@
     <title>{% block title %}AgriLens Enterprise &bull; National Agricultural Intelligence &amp; Decision Engine | Rwanda{% endblock %}</title>
     <meta name="description" content="AgriLens Enterprise transforms official NISR agricultural microdata into precision yield gap benchmarks, parametric risk scoring, and evidence-based decision support for ministries, banks, and agribusinesses in Rwanda.">
     
-    <!-- Fonts -->
+    <!-- Fonts & CDN Preconnections -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Leaflet CSS for Rwanda Mapping -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     
-    <!-- Chart.js & Alpine.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <!-- Chart.js & Alpine.js (Non-blocking Deferred Loading) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
     <style>[x-cloak] { display: none !important; }</style>
 
@@ -296,9 +298,9 @@
         </div>
     </div>
 
-    <!-- Leaflet JS & Client Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="/static/js/public_home.js"></script>
+    <!-- Leaflet JS & Client Scripts (Deferred) -->
+    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script defer src="/static/js/public_home.js"></script>
 
     <!-- Executive Modal Controller -->
     <script>

@@ -41,9 +41,65 @@ function initProductivitySimulator() {
     }
 }
 
+const simulatorClientCache = {};
+
+function renderSimulatorData(data, subtextEl) {
+    if (data.is_sufficient_data && data.benchmark && data.lagging) {
+        const b = data.benchmark;
+        const l = data.lagging;
+
+        // District A (Benchmark)
+        const distAName = document.getElementById('dist-a-name');
+        if (distAName) distAName.textContent = `${b.district_name} District`;
+        const distAProv = document.getElementById('dist-a-prov');
+        if (distAProv) distAProv.textContent = b.province_name;
+        const distAYield = document.getElementById('dist-a-yield');
+        if (distAYield) distAYield.textContent = b.yield_kg_per_ha.toLocaleString();
+
+        setBarAndValue('dist-a-irrig-val', 'dist-a-irrig-bar', b.irrigation_rate);
+        setBarAndValue('dist-a-seed-val', 'dist-a-seed-bar', b.improved_seed_rate);
+        setBarAndValue('dist-a-fert-val', 'dist-a-fert-bar', b.fertilizer_rate);
+        setBarAndValue('dist-a-loss-val', 'dist-a-loss-bar', b.loss_rate);
+
+        // Center Gap
+        const gapPercent = document.getElementById('gap-percent-val');
+        if (gapPercent) gapPercent.textContent = `${data.gap_percentage}%`;
+        if (subtextEl) {
+            subtextEl.textContent = `Observed empirical gap: ${b.district_name} vs ${l.district_name} (${data.yield_difference_kg_per_ha.toLocaleString()} kg/ha spread)`;
+        }
+
+        // District B (Lagging)
+        const distBName = document.getElementById('dist-b-name');
+        if (distBName) distBName.textContent = `${l.district_name} District`;
+        const distBProv = document.getElementById('dist-b-prov');
+        if (distBProv) distBProv.textContent = l.province_name;
+        const distBYield = document.getElementById('dist-b-yield');
+        if (distBYield) distBYield.textContent = l.yield_kg_per_ha.toLocaleString();
+
+        setBarAndValue('dist-b-irrig-val', 'dist-b-irrig-bar', l.irrigation_rate);
+        setBarAndValue('dist-b-seed-val', 'dist-b-seed-bar', l.improved_seed_rate);
+        setBarAndValue('dist-b-fert-val', 'dist-b-fert-bar', l.fertilizer_rate);
+        setBarAndValue('dist-b-loss-val', 'dist-b-loss-bar', l.loss_rate);
+    } else {
+        // Insufficient data state (Strict statistical policy)
+        const gapPercent = document.getElementById('gap-percent-val');
+        if (gapPercent) gapPercent.textContent = 'N/A';
+        if (subtextEl) {
+            subtextEl.textContent = data.reason || 'Insufficient observations for a reliable benchmark comparison.';
+        }
+    }
+}
+
 async function updateSimulatorView(cropKey) {
     const cropName = CROP_NAME_MAP[cropKey] || 'Maize';
     const subtextEl = document.getElementById('gap-subtext-val');
+
+    // 1. Instant Cache Hit: 0ms UI switch
+    if (simulatorClientCache[cropKey]) {
+        renderSimulatorData(simulatorClientCache[cropKey], subtextEl);
+        return;
+    }
+
     if (subtextEl) {
         subtextEl.textContent = `Fetching verified microdata for ${cropName}...`;
     }
@@ -54,52 +110,8 @@ async function updateSimulatorView(cropKey) {
         const result = await resp.json();
 
         if (result.status === 'success' && result.data) {
-            const data = result.data;
-
-            if (data.is_sufficient_data && data.benchmark && data.lagging) {
-                const b = data.benchmark;
-                const l = data.lagging;
-
-                // District A (Benchmark)
-                const distAName = document.getElementById('dist-a-name');
-                if (distAName) distAName.textContent = `${b.district_name} District`;
-                const distAProv = document.getElementById('dist-a-prov');
-                if (distAProv) distAProv.textContent = b.province_name;
-                const distAYield = document.getElementById('dist-a-yield');
-                if (distAYield) distAYield.textContent = b.yield_kg_per_ha.toLocaleString();
-
-                setBarAndValue('dist-a-irrig-val', 'dist-a-irrig-bar', b.irrigation_rate);
-                setBarAndValue('dist-a-seed-val', 'dist-a-seed-bar', b.improved_seed_rate);
-                setBarAndValue('dist-a-fert-val', 'dist-a-fert-bar', b.fertilizer_rate);
-                setBarAndValue('dist-a-loss-val', 'dist-a-loss-bar', b.loss_rate);
-
-                // Center Gap
-                const gapPercent = document.getElementById('gap-percent-val');
-                if (gapPercent) gapPercent.textContent = `${data.gap_percentage}%`;
-                if (subtextEl) {
-                    subtextEl.textContent = `Observed empirical gap: ${b.district_name} vs ${l.district_name} (${data.yield_difference_kg_per_ha.toLocaleString()} kg/ha spread)`;
-                }
-
-                // District B (Lagging)
-                const distBName = document.getElementById('dist-b-name');
-                if (distBName) distBName.textContent = `${l.district_name} District`;
-                const distBProv = document.getElementById('dist-b-prov');
-                if (distBProv) distBProv.textContent = l.province_name;
-                const distBYield = document.getElementById('dist-b-yield');
-                if (distBYield) distBYield.textContent = l.yield_kg_per_ha.toLocaleString();
-
-                setBarAndValue('dist-b-irrig-val', 'dist-b-irrig-bar', l.irrigation_rate);
-                setBarAndValue('dist-b-seed-val', 'dist-b-seed-bar', l.improved_seed_rate);
-                setBarAndValue('dist-b-fert-val', 'dist-b-fert-bar', l.fertilizer_rate);
-                setBarAndValue('dist-b-loss-val', 'dist-b-loss-bar', l.loss_rate);
-            } else {
-                // Insufficient data state (Strict statistical policy)
-                const gapPercent = document.getElementById('gap-percent-val');
-                if (gapPercent) gapPercent.textContent = 'N/A';
-                if (subtextEl) {
-                    subtextEl.textContent = data.reason || 'Insufficient observations for a reliable benchmark comparison.';
-                }
-            }
+            simulatorClientCache[cropKey] = result.data;
+            renderSimulatorData(result.data, subtextEl);
         }
     } catch (err) {
         console.warn('Could not fetch productivity gap from API:', err);

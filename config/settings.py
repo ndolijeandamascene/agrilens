@@ -203,6 +203,23 @@ STORAGES = {
     },
 }
 
+# ------------------------------------------------------------------------------
+# Cache Configuration
+# ------------------------------------------------------------------------------
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'agrilens-core-cache',
+        'TIMEOUT': 900,  # 15 minutes default TTL
+        'OPTIONS': {
+            'MAX_ENTRIES': 2000,
+        }
+    }
+}
+
+# 1-year browser cache header for hashed static assets
+WHITENOISE_MAX_AGE = env.int('WHITENOISE_MAX_AGE', default=31536000)
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ------------------------------------------------------------------------------
