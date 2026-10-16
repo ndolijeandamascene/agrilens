@@ -283,21 +283,17 @@ class ContextProcessorAndTemplateTestCase(TestCase):
         self.assertNotIn("District Dossier", sub_names)
 
     def test_public_landing_navbar_rendering(self):
-        """Tests that the public landing header displays the streamlined 4-page menu, logo linking to home, and hero map."""
+        """Tests that the public landing header displays the streamlined menu, logo linking to home, and hero map."""
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, 200)
         content = resp.content.decode("utf-8")
 
-        # Brand Logo acts as Home
+        # Brand Logo acts as Home (Simplified Header)
         self.assertIn('id="brand-logo-link"', content)
         self.assertIn('href="/"', content)
         self.assertIn("AgriLens", content)
-        self.assertIn("See Agriculture Through Data.", content)
-        self.assertIn("public-role-pill", content)
-        self.assertIn("Public", content)
 
-        # 4 Streamlined Navbar Links
-        self.assertIn("Productivity &amp; Yield Gaps", content)
+        # Streamlined Navbar Links
         self.assertIn("/indicators/productivity/", content)
         self.assertIn("Crops &amp; Seasons", content)
         self.assertIn("/agriculture/", content)

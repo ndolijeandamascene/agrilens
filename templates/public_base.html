@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Leaflet CSS for Rwanda Mapping -->
@@ -27,21 +28,21 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body class="public-body">
-    <!-- Slim Top Announcement Bar: Enterprise Decision Support Indicator -->
+    <!-- Slim Top Announcement Bar -->
     <div class="top-announcement-bar">
         <div class="announcement-content">
             <span class="nisr-palette-indicator" title="Official National Brand Palette: Pantone 2728 C, Pantone Cyan, Pantone 362 C, Pantone 3965 C">
-                <span class="swatch-dot swatch-blue" title="Pantone 2728 C (Royal Blue)"></span>
-                <span class="swatch-dot swatch-cyan" title="Pantone Cyan (Cyan)"></span>
-                <span class="swatch-dot swatch-green" title="Pantone 362 C (Green)"></span>
-                <span class="swatch-dot swatch-yellow" title="Pantone 3965 C (Yellow)"></span>
+                <span class="swatch-dot swatch-blue"></span>
+                <span class="swatch-dot swatch-cyan"></span>
+                <span class="swatch-dot swatch-green"></span>
+                <span class="swatch-dot swatch-yellow"></span>
             </span>
-            <span class="announcement-pill">Enterprise Intelligence</span>
+            <span class="announcement-pill">NISR Hackathon 2026</span>
             <span class="announcement-text">
-                Rwanda Sovereign Agricultural Decision Engine &bull; Powering Evidence-Based Policy, Food Security &amp; Agribusiness Growth
+                Track 1: Agricultural Productivity &bull; Official Survey-Backed Intelligence Platform for Rwanda
             </span>
             <a href="#executive-demo-modal" onclick="openExecutiveDemoModal(event)" class="announcement-link">
-                Schedule Executive Demo &rarr;
+                Schedule Demo &rarr;
             </a>
         </div>
     </div>
@@ -49,24 +50,21 @@
     <!-- Clean Navigation Header -->
     <header class="public-header" id="public-header">
         <div class="nav-container">
-            <a href="/" class="brand-container" id="brand-logo-link" title="AgriLens &bull; See Agriculture Through Data.">
-                <div class="brand-icon-box">
+            <a href="/" class="brand-container" id="brand-logo-link" title="AgriLens Rwanda">
+                <div class="brand-icon-box" aria-hidden="true">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
                         <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
                     </svg>
                 </div>
                 <div class="brand-text">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span class="brand-title">AgriLens</span>
-                        <span class="public-role-pill enterprise-role-pill">Public &bull; Enterprise</span>
-                    </div>
-                    <span class="brand-subtitle">See Agriculture Through Data.</span>
+                    <span class="brand-title">AgriLens</span>
+                    <span class="brand-subtitle">Rwanda Agricultural Intelligence</span>
                 </div>
             </a>
 
             <!-- Mobile Menu Toggle Button -->
-            <button type="button" class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle navigation menu" onclick="document.getElementById('public-nav-menu').classList.toggle('mobile-open');">
+            <button type="button" class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false" onclick="toggleMobileNav()">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="3" y1="12" x2="21" y2="12"></line>
                     <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -75,28 +73,28 @@
             </button>
 
             <!-- Streamlined Commercial Navigation Menu -->
-            <nav class="public-nav-menu" id="public-nav-menu">
+            <nav class="public-nav-menu" id="public-nav-menu" aria-label="Main Navigation">
                 <a href="/#solutions" class="public-nav-link">Solutions</a>
-                <a href="/indicators/productivity/" class="public-nav-link {% if '/indicators/productivity/' in request.path %}active{% endif %}">Productivity &amp; Yield Gaps</a>
+                <a href="/indicators/productivity/" class="public-nav-link {% if '/indicators/productivity/' in request.path %}active{% endif %}">Yield Gaps</a>
                 <a href="/agriculture/" class="public-nav-link {% if '/agriculture/' in request.path %}active{% endif %}">Crops &amp; Seasons</a>
                 <a href="/surveys/" class="public-nav-link {% if '/surveys/' in request.path %}active{% endif %}">Seasonal Surveys</a>
                 <a href="/markets/" class="public-nav-link {% if '/markets/' in request.path %}active{% endif %}">Commodity Markets</a>
 
                 <!-- Mobile-only login button inside drawer -->
                 <div class="mobile-login-drawer-item">
-                    <a href="/accounts/login/" class="btn-primary-action btn-mobile-login" title="Officer / Client Sign In">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <a href="/accounts/login/" class="btn-primary-action btn-mobile-login" title="Officer Sign In">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
-                        <span>Client Sign In</span>
+                        <span>Officer Sign In</span>
                     </a>
                 </div>
             </nav>
 
             <div class="header-action-group">
-                <a href="/accounts/login/" class="btn-primary-action" id="btn-officer-login" title="Officer / Client Sign In">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <a href="/accounts/login/" class="btn-primary-action" id="btn-officer-login" title="Officer Sign In">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
@@ -344,9 +342,37 @@
             document.getElementById('demo-success-state').style.display = 'block';
         }
 
-        // Close on ESC key
+        // Mobile navigation drawer toggle
+        function toggleMobileNav() {
+            const menu = document.getElementById('public-nav-menu');
+            const btn = document.getElementById('mobile-menu-toggle');
+            if (!menu) return;
+            const isOpen = menu.classList.toggle('mobile-open');
+            if (btn) btn.setAttribute('aria-expanded', isOpen);
+        }
+
+        // Close on ESC key and outside clicks
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeExecutiveDemoModal();
+            if (e.key === 'Escape') {
+                closeExecutiveDemoModal();
+                const menu = document.getElementById('public-nav-menu');
+                const btn = document.getElementById('mobile-menu-toggle');
+                if (menu && menu.classList.contains('mobile-open')) {
+                    menu.classList.remove('mobile-open');
+                    if (btn) btn.setAttribute('aria-expanded', 'false');
+                }
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('public-nav-menu');
+            const btn = document.getElementById('mobile-menu-toggle');
+            if (menu && menu.classList.contains('mobile-open')) {
+                if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                    menu.classList.remove('mobile-open');
+                    btn.setAttribute('aria-expanded', 'false');
+                }
+            }
         });
     </script>
     {% block extra_js %}{% endblock %}
