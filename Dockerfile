@@ -17,17 +17,16 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Working directory
 WORKDIR /app
 
-# Install runtime and build dependencies
+# Install runtime dependencies (curl for healthcheck, libpq5 for PostgreSQL)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
     curl \
+    libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install python dependencies
-COPY requirements.txt /app/
+COPY requirements-prod.txt /app/
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements-prod.txt
 
 # Copy source code
 COPY . /app/
