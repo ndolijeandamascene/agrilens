@@ -13,10 +13,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Initialize environ helper
 env = environ.Env()
 
-# Load .env file from repository root if it exists
-env_file = BASE_DIR / '.env'
-if env_file.exists():
-    environ.Env.read_env(env_file)
+# Load environment file (.env, .env.pro, or file defined by ENV_FILE)
+env_file_name = os.getenv('ENV_FILE')
+if env_file_name and (BASE_DIR / env_file_name).exists():
+    environ.Env.read_env(BASE_DIR / env_file_name)
+elif (BASE_DIR / '.env').exists():
+    environ.Env.read_env(BASE_DIR / '.env')
+elif (BASE_DIR / '.env.pro').exists():
+    environ.Env.read_env(BASE_DIR / '.env.pro')
 
 # ------------------------------------------------------------------------------
 # Core Settings
@@ -30,8 +34,37 @@ SECRET_KEY = env.str(
 
 ALLOWED_HOSTS = env.list(
     'ALLOWED_HOSTS',
-    default=['localhost', '127.0.0.1', '[::1]']
+    default=[
+        'localhost',
+        '127.0.0.1',
+        '[::1]',
+        'agrilens.ndoli.dev',
+        'www.agrilens.ndoli.dev',
+        '62.171.182.99',
+    ]
 )
+
+# CSRF Trusted Origins (Mandatory for Django 4/5 form submissions over HTTPS)
+CSRF_TRUSTED_ORIGINS = env.list(
+    'CSRF_TRUSTED_ORIGINS',
+    default=[
+        'https://agrilens.ndoli.dev',
+        'http://agrilens.ndoli.dev',
+        'https://www.agrilens.ndoli.dev',
+        'http://www.agrilens.ndoli.dev',
+        'http://62.171.182.99',
+    ]
+)
+
+# CORS Origins
+CORS_ALLOWED_ORIGINS = env.list(
+    'CORS_ALLOWED_ORIGINS',
+    default=[
+        'https://agrilens.ndoli.dev',
+        'https://www.agrilens.ndoli.dev',
+    ]
+)
+CORS_ALLOW_ALL_ORIGINS = env.bool('CORS_ALLOW_ALL_ORIGINS', default=False)
 
 # ------------------------------------------------------------------------------
 # Application Definition
@@ -151,9 +184,20 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT.mkdir(parents=True, exist_ok=True)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -169,16 +213,49 @@ REST_FRAMEWORK = {
 }
 
 # ------------------------------------------------------------------------------
-# Email Backend
+# Email Configuration (SMTP / Notifications)
 # ------------------------------------------------------------------------------
-EMAIL_BACKEND = env.str('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+EMAIL_BACKEND = env.str(
+    'EMAIL_BACKEND',
+    default='django.core.mail.backends.smtp.EmailBackend' if not DEBUG else 'django.core.mail.backends.console.EmailBackend'
+)
+EMAIL_HOST = env.str('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = env.int('EMAIL_PORT', default=587)
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
+EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', default=False)
+EMAIL_HOST_USER = env.str('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = env.str('DEFAULT_FROM_EMAIL', default='AgriLens Rwanda <ndolijeandamascene3@gmail.com>')
+SERVER_EMAIL = env.str('SERVER_EMAIL', default='ndolijeandamascene3@gmail.com')
 
 # ------------------------------------------------------------------------------
-# Production Security Hardening
+# Production Security Hardening & Proxy Support
 # ------------------------------------------------------------------------------
+# Trust proxy headers when behind Nginx, Easypanel, Traefik, or Caddy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+
+SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=False)
+
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+# Optional Sentry Monitoring
+SENTRY_DSN = env.str('SENTRY_DSN', default='')
+if SENTRY_DSN and not DEBUG:
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.django import DjangoIntegration
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,
+            integrations=[DjangoIntegration()],
+            traces_sample_rate=0.2,
+            send_default_pii=False,
+        )
+    except Exception:
+        pass

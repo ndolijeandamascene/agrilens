@@ -1,0 +1,53 @@
+# Git & IDEs
+.git/
+.github/
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Python cache & compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Local database and media
+db.sqlite3
+db.sqlite3-journal
+
+# Secrets & environment configurations
+.env
+.env.*
+!.env.example
+.env.pro
+.env.prod
+.env.production
+.env.local
+.env.dev
+
+# Heavy datasets and local dumps
+Datasets/
+backups/*.sql
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/README.md
+data/interim/*
+!data/interim/.gitkeep
+!data/interim/README.md
+data/processed/*
+!data/processed/.gitkeep
+!data/processed/README.md
+
+# Logs & docs
+*.log
+docs/

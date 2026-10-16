@@ -1,0 +1,26 @@
+services:
+  web:
+    image: ndoli/agrilens:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agrilens-web
+    restart: unless-stopped
+    env_file:
+      - .env.pro
+    environment:
+      - AUTO_MIGRATE=1
+    ports:
+      - "8000:8000"
+    volumes:
+      - media_data:/app/media
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  media_data:
+    driver: local

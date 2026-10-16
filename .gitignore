@@ -17,11 +17,14 @@ db.sqlite3-journal
 media/
 staticfiles/
 
-# Environment variables
+# Environment variables & secrets
 .env
-.env.local
-.env.example
+.env.*
+!.env.example
+.env.pro
 .env.prod
+.env.production
+.env.local
 .env.dev    
 
 # Data folders (keep structures, ignore data dumps)
