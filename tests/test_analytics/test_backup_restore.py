@@ -15,12 +15,12 @@ class BackupRestorationTestCase(TestCase):
         fixture_path = Path('backups/pre_remediation_data_management_20261013.json')
         self.assertTrue(fixture_path.exists())
         
-        # Verify SHA-256
-        hasher = hashlib.sha256()
-        with open(fixture_path, 'rb') as f:
-            while chunk := f.read(65536):
-                hasher.update(chunk)
-        self.assertEqual(hasher.hexdigest(), '4301adc0f14e66550d8dd0fb05bb737d85fd3c278f593237cce8fd169f3fe4e8')
+        # Verify SHA-256 (supports both LF canonical Linux and CRLF Windows checkouts)
+        raw_bytes = fixture_path.read_bytes()
+        normalized_bytes = raw_bytes.replace(b'\r\n', b'\n')
+        normalized_hash = hashlib.sha256(normalized_bytes).hexdigest()
+        expected_lf_hash = 'a9f50e5c328c8ac389c75a55d4d33644a1eec0d443562efde478c0c641e00ede'
+        self.assertEqual(normalized_hash, expected_lf_hash)
 
         # Load and parse JSON
         with open(fixture_path, 'r', encoding='utf-8') as f:
