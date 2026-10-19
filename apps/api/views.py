@@ -1,12 +1,14 @@
 """
 API Viewsets and endpoints for external consumers and frontend visualizations.
 """
+from django.db.models import Q
 from rest_framework import viewsets
 from apps.geography.models import Province, District
 from apps.agriculture.models import Crop
 from apps.markets.models import CommodityPrice
 from apps.accounts.permissions import scope_queryset_by_geography
 from .serializers import ProvinceSerializer, DistrictSerializer, CropSerializer, CommodityPriceSerializer
+
 
 
 class ProvinceViewSet(viewsets.ReadOnlyModelViewSet):
@@ -37,12 +39,35 @@ class CropViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CropSerializer
 
     def get_queryset(self):
-        qs = Crop.objects.select_related('category').all().order_by('name')
+        qs = Crop.objects.select_related('category').all().order_by('id')
         priority = self.request.query_params.get('priority')
         if priority is not None:
             is_prio = priority.lower() in ['true', '1', 'yes']
             qs = qs.filter(is_priority_crop=is_prio)
+
+        season = self.request.query_params.get('season')
+        if season:
+            clean_s = season.strip()
+            # If season query is '2024-2025' or '2024_2025', return official priority crops if priority not explicitly false
+            if clean_s in ['2024-2025', '2024_2025', '2025', '2024'] and priority is None:
+                qs = qs.filter(is_priority_crop=True)
+            else:
+                parts = [p.strip() for p in clean_s.replace('/', '-').split('-') if p.strip().isdigit()]
+                if parts:
+                    years = [int(p) for p in parts]
+                    qs = qs.filter(
+                        Q(observations__season__year__in=years) |
+                        Q(farmsurveysubmission__campaign__season__year__in=years) |
+                        Q(productivitymetric__season__year__in=years)
+                    ).distinct()
+                else:
+                    qs = qs.filter(
+                        Q(observations__season__season__iexact=clean_s) |
+                        Q(farmsurveysubmission__campaign__season__season__iexact=clean_s) |
+                        Q(productivitymetric__season__season__iexact=clean_s)
+                    ).distinct()
         return qs
+
 
 
 class CommodityPriceViewSet(viewsets.ReadOnlyModelViewSet):

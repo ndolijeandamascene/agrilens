@@ -5298,3 +5298,973 @@ body.public-body {
         padding: 0 16px;
     }
 }
+
+/* ==========================================================================
+   Data & API Public Portal (Milestone 5 Design)
+   ========================================================================== */
+
+.data-api-page-wrapper {
+    min-height: calc(100vh - 120px);
+    background-color: #f8fafc;
+    padding-bottom: 60px;
+}
+
+/* Hero Banner with Code Texture Background */
+.data-api-hero-banner {
+    background-size: cover;
+    background-position: center right;
+    background-repeat: no-repeat;
+    color: #ffffff;
+    padding: 44px 24px 50px;
+    position: relative;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+}
+
+.data-api-hero-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.data-api-hero-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: #ffffff;
+    margin: 0 0 6px 0;
+    line-height: 1.2;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.data-api-hero-subtitle {
+    font-size: 1.02rem;
+    color: rgba(255, 255, 255, 0.92);
+    margin: 0;
+    font-weight: 400;
+    line-height: 1.45;
+}
+
+.data-api-hero-badge {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, rgba(6, 78, 59, 0.92) 80%);
+    border: 2.5px solid #10b981;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
+    flex-shrink: 0;
+}
+
+.api-code-symbol {
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 27px;
+    font-weight: 700;
+    color: #34d399;
+    letter-spacing: -1px;
+}
+
+/* Main Layout Grid */
+.data-api-main-container {
+    max-width: 1140px;
+    margin: 32px auto 0;
+    padding: 0 20px;
+}
+
+.data-api-layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: stretch;
+}
+
+.data-api-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 32px 32px 36px;
+    box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+    display: flex;
+    flex-direction: column;
+}
+
+.api-card-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 22px 0;
+    letter-spacing: -0.015em;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.api-card-subtitle {
+    font-size: 0.94rem;
+    color: #475569;
+    margin: -12px 0 20px 0;
+    line-height: 1.45;
+}
+
+/* Left Card: Available Data Services */
+.data-services-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.data-service-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.data-service-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.service-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.service-icon-box.icon-green {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.service-icon-box.icon-blue {
+    background-color: #dbeafe;
+    color: #2563eb;
+}
+
+.service-icon-box.icon-orange {
+    background-color: #ffedd5;
+    color: #ea580c;
+}
+
+.service-icon-box.icon-purple {
+    background-color: #f3e8ff;
+    color: #9333ea;
+}
+
+.service-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.service-title {
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.01em;
+}
+
+.service-desc {
+    font-size: 0.88rem;
+    color: #64748b;
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+}
+
+.btn-explore-data {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #059669;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-explore-data:hover {
+    color: #047857;
+    gap: 9px;
+}
+
+/* Right Card: Developer API */
+.api-features-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.93rem;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.check-icon {
+    flex-shrink: 0;
+}
+
+.api-button-wrapper {
+    margin-bottom: 22px;
+}
+
+.btn-api-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #046a4e;
+    color: #ffffff;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 0.94rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 2px 6px rgba(4, 106, 78, 0.22);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.btn-api-primary:hover {
+    background-color: #03543e;
+    box-shadow: 0 4px 12px rgba(4, 106, 78, 0.35);
+    transform: translateY(-1px);
+}
+
+/* API Code Snippet Box matching exact mockup */
+.api-code-snippet-box {
+    background-color: #eef4f8;
+    border: 1px solid #dbe6ef;
+    border-radius: 12px;
+    padding: 16px 18px;
+    font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+    margin-top: auto;
+}
+
+.snippet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.snippet-route-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.http-method-pill {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: #0369a1;
+    background: #e0f2fe;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+}
+
+.http-url-text {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.btn-copy-snippet {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-copy-snippet:hover {
+    background: #f8fafc;
+    color: #0f172a;
+    border-color: #94a3b8;
+}
+
+.snippet-code-pre {
+    margin: 0;
+    font-size: 0.83rem;
+    line-height: 1.58;
+    color: #1e293b;
+    overflow-x: auto;
+    background: transparent;
+    padding: 0;
+}
+
+.snippet-code-pre .json-key {
+    color: #0369a1;
+    font-weight: 600;
+}
+
+.snippet-code-pre .json-str {
+    color: #15803d;
+}
+
+.snippet-code-pre .json-num {
+    color: #7c3aed;
+    font-weight: 600;
+}
+
+.snippet-code-pre .json-bool {
+    color: #d97706;
+    font-weight: 600;
+}
+
+.snippet-code-pre .json-ellipsis {
+    color: #64748b;
+    font-style: italic;
+}
+
+/* ==========================================================================
+   API Documentation Modal Styles
+   ========================================================================== */
+
+.api-docs-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.70);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.api-docs-modal-card {
+    width: 100%;
+    max-width: 980px;
+    max-height: 88vh;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalScaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-docs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.modal-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.modal-badge-tag {
+    font-size: 0.75rem;
+    font-weight: 800;
+    background: #dcfce7;
+    color: #15803d;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+.modal-docs-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-close-modal:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.modal-docs-body {
+    padding: 24px 28px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Specs Grid */
+.docs-specs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.spec-pill-box {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.spec-label {
+    font-size: 0.74rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: 0.05em;
+}
+
+.spec-value {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.spec-value code {
+    font-family: 'Fira Code', monospace;
+    color: #0369a1;
+}
+
+.section-subtitle {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 16px 0;
+}
+
+/* Endpoints List */
+.endpoints-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.endpoint-item-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+    background: #ffffff;
+}
+
+.endpoint-header-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.method-tag {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+}
+
+.method-get {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.endpoint-path-code {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.endpoint-title-tag {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-left: auto;
+}
+
+.btn-try-it-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #059669;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-try-it-live:hover {
+    background: #047857;
+}
+
+.endpoint-desc-text {
+    font-size: 0.86rem;
+    color: #475569;
+    margin: 0 0 12px 0;
+    line-height: 1.45;
+}
+
+/* Params Table */
+.params-table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 12px;
+}
+
+.params-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+.params-table th, .params-table td {
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.params-table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.params-table td code {
+    font-family: 'Fira Code', monospace;
+    color: #0369a1;
+}
+
+.type-pill {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.74rem;
+}
+
+/* Live Response Output */
+.live-response-box {
+    background: #0f172a;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-top: 8px;
+}
+
+.live-response-header {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+}
+
+.live-json-pre {
+    margin: 0;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.80rem;
+    color: #38bdf8;
+    line-height: 1.5;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+/* Code Tabs Section */
+.docs-code-examples-section {
+    margin-top: 24px;
+}
+
+.code-tabs-header {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 12px;
+}
+
+.code-tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 8px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.code-tab-btn.active {
+    color: #059669;
+    border-bottom-color: #059669;
+}
+
+.tab-code-pre {
+    background: #0f172a;
+    border-radius: 8px;
+    padding: 14px;
+    margin: 0;
+    color: #f1f5f9;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    overflow-x: auto;
+}
+
+.modal-docs-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn-open-raw-api {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #059669;
+    text-decoration: none;
+}
+
+.btn-open-raw-api:hover {
+    text-decoration: underline;
+}
+
+.btn-modal-done {
+    background: #0f172a;
+    color: #ffffff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-modal-done:hover {
+    background: #1e293b;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+    .data-api-layout-grid {
+        grid-template-columns: 1fr;
+    }
+    .data-api-hero-banner {
+        padding: 36px 18px 42px;
+    }
+    .data-api-hero-title {
+        font-size: 1.85rem;
+    }
+    .data-api-card {
+        padding: 24px 20px 28px;
+    }
+}
+
+/* ==========================================================================
+   About AgriLens Public Portal (Milestone 6 Design)
+   ========================================================================== */
+
+.about-page-wrapper {
+    min-height: calc(100vh - 120px);
+    background-color: #f8fafc;
+    padding-bottom: 60px;
+}
+
+/* Hero Banner with Rwanda Hills Backdrop */
+.about-hero-banner {
+    background-size: cover;
+    background-position: center 38%;
+    background-repeat: no-repeat;
+    color: #ffffff;
+    padding: 44px 24px 50px;
+    position: relative;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+}
+
+.about-hero-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.about-hero-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: #ffffff;
+    margin: 0 0 6px 0;
+    line-height: 1.2;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.about-hero-subtitle {
+    font-size: 1.02rem;
+    color: rgba(255, 255, 255, 0.92);
+    margin: 0;
+    font-weight: 400;
+    line-height: 1.45;
+}
+
+.about-hero-badge {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, rgba(6, 78, 59, 0.92) 80%);
+    border: 2.5px solid #10b981;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
+    flex-shrink: 0;
+}
+
+/* Main Layout Grid */
+.about-main-container {
+    max-width: 1140px;
+    margin: 32px auto 0;
+    padding: 0 20px;
+}
+
+.about-layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: stretch;
+}
+
+.about-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 32px 32px 36px;
+    box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Left Card: Pillars */
+.pillars-list {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.pillar-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.pillar-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.pillar-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pillar-icon-box.icon-mission {
+    background-color: #064e3b;
+    color: #ffffff;
+}
+
+.pillar-icon-box.icon-vision {
+    background-color: #10b981;
+    color: #ffffff;
+}
+
+.pillar-icon-box.icon-values {
+    background-color: #65a30d;
+    color: #ffffff;
+}
+
+.pillar-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.pillar-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.01em;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.pillar-text {
+    font-size: 0.92rem;
+    color: #475569;
+    margin: 0;
+    line-height: 1.55;
+}
+
+/* Values Items List */
+.values-items-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.value-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.93rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.value-icon {
+    flex-shrink: 0;
+}
+
+/* Right Card: Overview */
+.about-media-box {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 22px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.about-card-hero-img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    display: block;
+}
+
+.about-overview-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 12px 0;
+    letter-spacing: -0.015em;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.about-overview-text {
+    font-size: 0.92rem;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0 0 24px 0;
+}
+
+.about-action-group {
+    margin-top: auto;
+}
+
+.btn-about-explore-map {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #046a4e;
+    color: #ffffff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.94rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 2px 6px rgba(4, 106, 78, 0.22);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.btn-about-explore-map:hover {
+    background-color: #03543e;
+    box-shadow: 0 4px 12px rgba(4, 106, 78, 0.35);
+    transform: translateY(-1px);
+    color: #ffffff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+    .about-layout-grid {
+        grid-template-columns: 1fr;
+    }
+    .about-hero-banner {
+        padding: 36px 18px 42px;
+    }
+    .about-hero-title {
+        font-size: 1.85rem;
+    }
+    .about-card {
+        padding: 24px 20px 28px;
+    }
+    .about-card-hero-img {
+        height: 220px;
+    }
+}
+
+

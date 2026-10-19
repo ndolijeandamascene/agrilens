@@ -15,6 +15,16 @@ urlpatterns = [
     path('reports/<slug:slug>/detail/', views.public_report_detail_api, name='report_detail_api'),
     path('reports/admin/generate-all/', views.admin_generate_all_reports_view, name='admin_generate_all_reports'),
 
+    # Public Data & API Portal (Milestone 5 Design)
+    path('data-api/', views.public_data_api, name='data_api'),
+    path('data-api/docs/', views.public_api_docs, name='data_api_docs'),
+    path('api/docs/', views.public_api_docs, name='api_docs'),
+
+    # Public About Portal (Milestone 6 Design)
+    path('about/', views.public_about, name='about'),
+
+
+
     # Official Intelligence Reports & Bulletins (Milestone 4 Module)
     path('dashboard/reports/national/', views.reports_national, name='reports_national'),
     path('dashboard/reports/national/export/csv/', views.reports_national_export_csv, name='reports_national_export_csv'),

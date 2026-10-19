@@ -1,0 +1,425 @@
+{% extends 'public_base.html' %}
+{% load static %}
+
+{% block title %}Data &amp; API • AgriLens Rwanda{% endblock %}
+
+{% block content %}
+<div class="data-api-page-wrapper">
+    <!-- Hero Banner with Programmer Code Backdrop & Developer Badge -->
+    <section class="data-api-hero-banner" style="background-image: linear-gradient(90deg, rgba(2, 44, 34, 0.96) 0%, rgba(4, 53, 44, 0.92) 40%, rgba(6, 78, 59, 0.70) 75%), url('{% static "images/api_hero_code_bg.jpg" %}');">
+        <div class="data-api-hero-container">
+            <div class="data-api-hero-text">
+                <h1 class="data-api-hero-title">Data &amp; API</h1>
+                <p class="data-api-hero-subtitle">Open data, tools and resources for developers and researchers.</p>
+            </div>
+            <div class="data-api-hero-badge" aria-hidden="true">
+                <span class="api-code-symbol">&lt;/&gt;</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Grid matching Reference Mockup -->
+    <main class="data-api-main-container">
+        <div class="data-api-layout-grid">
+            
+            <!-- Left Card: Available Data -->
+            <section class="data-api-card available-data-card" aria-labelledby="available-data-heading">
+                <h2 id="available-data-heading" class="api-card-title">Available Data</h2>
+                
+                <div class="data-services-list">
+                    <!-- Item 1: Agricultural Statistics -->
+                    <article class="data-service-item">
+                        <div class="service-icon-box icon-green" aria-hidden="true">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 20V10"></path>
+                                <path d="M18 20V4"></path>
+                                <path d="M6 20v-4"></path>
+                            </svg>
+                        </div>
+                        <div class="service-content">
+                            <h3 class="service-title">Agricultural Statistics</h3>
+                            <p class="service-desc">Crop production, area, yield and more.</p>
+                            <a href="/indicators/productivity/" class="btn-explore-data" title="Explore Agricultural Statistics">
+                                <span>Explore Data</span>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Item 2: Geographic Data -->
+                    <article class="data-service-item">
+                        <div class="service-icon-box icon-blue" aria-hidden="true">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                            </svg>
+                        </div>
+                        <div class="service-content">
+                            <h3 class="service-title">Geographic Data</h3>
+                            <p class="service-desc">Districts, provinces and administrative boundaries.</p>
+                            <a href="/geography/" class="btn-explore-data" title="Explore Geographic Boundaries and Maps">
+                                <span>Explore Data</span>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Item 3: Market Data -->
+                    <article class="data-service-item">
+                        <div class="service-icon-box icon-orange" aria-hidden="true">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                <polyline points="17 6 23 6 23 12"></polyline>
+                            </svg>
+                        </div>
+                        <div class="service-content">
+                            <h3 class="service-title">Market Data</h3>
+                            <p class="service-desc">Commodity prices and market information.</p>
+                            <a href="/markets/" class="btn-explore-data" title="Explore Commodity Market Trends">
+                                <span>Explore Data</span>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Item 4: Survey Data -->
+                    <article class="data-service-item">
+                        <div class="service-icon-box icon-purple" aria-hidden="true">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                                <path d="m9 14 2 2 4-4"></path>
+                            </svg>
+                        </div>
+                        <div class="service-content">
+                            <h3 class="service-title">Survey Data</h3>
+                            <p class="service-desc">SAS, AHS and other agricultural surveys.</p>
+                            <a href="/reports/" class="btn-explore-data" title="Explore Agricultural Surveys &amp; Bulletins">
+                                <span>Explore Data</span>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Right Card: Developer API -->
+            <section class="data-api-card developer-api-card" aria-labelledby="developer-api-heading">
+                <h2 id="developer-api-heading" class="api-card-title">Developer API</h2>
+                <p class="api-card-subtitle">Integrate agricultural data into your applications using our RESTful API.</p>
+
+                <!-- Checklist features -->
+                <ul class="api-features-checklist" role="list">
+                    <li class="checklist-item">
+                        <svg class="check-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>Real-time and historical data</span>
+                    </li>
+                    <li class="checklist-item">
+                        <svg class="check-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>Standard JSON format</span>
+                    </li>
+                    <li class="checklist-item">
+                        <svg class="check-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>Authentication required</span>
+                    </li>
+                    <li class="checklist-item">
+                        <svg class="check-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>Rate limits apply</span>
+                    </li>
+                </ul>
+
+                <!-- Primary Action Button -->
+                <div class="api-button-wrapper">
+                    <button type="button" class="btn-api-primary" id="btnOpenApiDocs" onclick="openApiDocsModal()">
+                        <span>View API Documentation</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Live Code Response Snippet Box matching exact mockup -->
+                <div class="api-code-snippet-box">
+                    <div class="snippet-header">
+                        <div class="snippet-route-tag">
+                            <span class="http-method-pill">GET</span>
+                            <span class="http-url-text" id="activeEndpointUrl">/api/v1/crops/?season=2024-2025</span>
+                        </div>
+                        <button type="button" class="btn-copy-snippet" id="btnCopySnippet" onclick="copyActiveCodeSnippet()" title="Copy snippet to clipboard">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            <span id="copySnippetLabel">Copy</span>
+                        </button>
+                    </div>
+
+                    <!-- JSON Body matching mockup layout -->
+                    <pre class="snippet-code-pre" id="snippetPreBlock"><code>{
+  <span class="json-key">"count"</span>: <span class="json-num">10</span>,
+  <span class="json-key">"results"</span>: [
+    {
+      <span class="json-key">"id"</span>: <span class="json-num">1</span>,
+      <span class="json-key">"name"</span>: <span class="json-str">"Maize"</span>,
+      <span class="json-key">"kinyarwanda_name"</span>: <span class="json-str">"Ikigori"</span>,
+      <span class="json-key">"scientific_name"</span>: <span class="json-str">"Zea mays"</span>,
+      <span class="json-key">"is_priority_crop"</span>: <span class="json-bool">true</span>,
+      <span class="json-key">"category_name"</span>: <span class="json-str">"Cereals"</span>
+    },
+    {
+      <span class="json-key">"id"</span>: <span class="json-num">2</span>,
+      <span class="json-key">"name"</span>: <span class="json-str">"Marshland Rice"</span>,
+      <span class="json-key">"kinyarwanda_name"</span>: <span class="json-str">"Umuceri"</span>,
+      <span class="json-key">"scientific_name"</span>: <span class="json-str">"Oryza sativa"</span>,
+      <span class="json-key">"is_priority_crop"</span>: <span class="json-bool">true</span>,
+      <span class="json-key">"category_name"</span>: <span class="json-str">"Cereals"</span>
+    },
+    <span class="json-ellipsis">[...]</span>
+  ]
+}</code></pre>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Interactive API Documentation & Live Console Modal -->
+    <div class="api-docs-modal-overlay" id="apiDocsModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" style="display: none;">
+        <div class="api-docs-modal-card">
+            <header class="modal-docs-header">
+                <div class="modal-title-group">
+                    <span class="modal-badge-tag">REST API v1</span>
+                    <h2 id="modalTitle" class="modal-docs-title">AgriLens Rwanda Developer API Documentation</h2>
+                </div>
+                <button type="button" class="btn-close-modal" onclick="closeApiDocsModal()" aria-label="Close API Documentation">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </header>
+
+            <div class="modal-docs-body">
+                <!-- Overview Specs -->
+                <div class="docs-specs-grid">
+                    <div class="spec-pill-box">
+                        <span class="spec-label">Base URL</span>
+                        <code class="spec-value">/api/v1/</code>
+                    </div>
+                    <div class="spec-pill-box">
+                        <span class="spec-label">Authentication</span>
+                        <span class="spec-value">Session &amp; Token (Bearer)</span>
+                    </div>
+                    <div class="spec-pill-box">
+                        <span class="spec-label">Rate Limit</span>
+                        <span class="spec-value">100 req/min (Auth) &bull; 30 req/min (Anon)</span>
+                    </div>
+                    <div class="spec-pill-box">
+                        <span class="spec-label">Response Format</span>
+                        <span class="spec-value">application/json</span>
+                    </div>
+                </div>
+
+                <!-- Interactive Endpoints Accordion -->
+                <div class="endpoints-accordion-section">
+                    <h3 class="section-subtitle">Official REST Endpoints</h3>
+                    
+                    <div class="endpoints-list">
+                        {% for ep in endpoints %}
+                        <div class="endpoint-item-card">
+                            <div class="endpoint-header-row">
+                                <span class="method-tag method-{{ ep.method|lower }}">{{ ep.method }}</span>
+                                <code class="endpoint-path-code">{{ ep.path }}</code>
+                                <span class="endpoint-title-tag">{{ ep.title }}</span>
+                                <button type="button" class="btn-try-it-live" onclick="executeLiveTest('{{ ep.path }}', 'liveRes_{{ forloop.counter }}')">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                    <span>Try Live</span>
+                                </button>
+                            </div>
+                            <p class="endpoint-desc-text">{{ ep.desc }}</p>
+                            
+                            {% if ep.params %}
+                            <div class="params-table-wrapper">
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Type</th>
+                                            <th>Example</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for p in ep.params %}
+                                        <tr>
+                                            <td><code>{{ p.name }}</code></td>
+                                            <td><span class="type-pill">{{ p.type }}</span></td>
+                                            <td><code>{{ p.example }}</code></td>
+                                            <td>{{ p.desc }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endif %}
+
+                            <!-- Live Output Area -->
+                            <div class="live-response-box" id="liveRes_{{ forloop.counter }}">
+                                <div class="live-response-header">
+                                    <span>Sample Response:</span>
+                                </div>
+                                <pre class="live-json-pre"><code>{{ ep.sample_response }}</code></pre>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Code Example Snippets: cURL, Python -->
+                <div class="docs-code-examples-section">
+                    <h3 class="section-subtitle">Quickstart Integration</h3>
+                    <div class="code-tabs-header">
+                        <button type="button" class="code-tab-btn active" onclick="switchCodeTab('curl')">cURL</button>
+                        <button type="button" class="code-tab-btn" onclick="switchCodeTab('python')">Python (requests)</button>
+                        <button type="button" class="code-tab-btn" onclick="switchCodeTab('js')">JavaScript (fetch)</button>
+                    </div>
+
+                    <div class="code-tab-content" id="tabCurl">
+                        <pre class="tab-code-pre"><code>curl -X GET "https://agrilens.rw/api/v1/crops/?season=2024-2025" \
+     -H "Accept: application/json"</code></pre>
+                    </div>
+                    <div class="code-tab-content" id="tabPython" style="display: none;">
+                        <pre class="tab-code-pre"><code>import requests
+
+url = "https://agrilens.rw/api/v1/crops/?season=2024-2025"
+headers = {"Accept": "application/json"}
+response = requests.get(url, headers=headers)
+data = response.json()
+print(f"Loaded {data['count']} priority crops.")</code></pre>
+                    </div>
+                    <div class="code-tab-content" id="tabJs" style="display: none;">
+                        <pre class="tab-code-pre"><code>const response = await fetch('/api/v1/crops/?season=2024-2025', {
+  headers: { 'Accept': 'application/json' }
+});
+const data = await response.json();
+console.log('Agricultural crops count:', data.count);</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="modal-docs-footer">
+                <a href="/api/" class="btn-open-raw-api" target="_blank" rel="noopener">Open Raw DRF Browsable Root &rarr;</a>
+                <button type="button" class="btn-modal-done" onclick="closeApiDocsModal()">Done</button>
+            </footer>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Copy Snippet Handler
+    function copyActiveCodeSnippet() {
+        const snippetText = `GET /api/v1/crops/?season=2024-2025\n{\n  "count": 10,\n  "results": [...]\n}`;
+        navigator.clipboard.writeText(snippetText).then(() => {
+            const label = document.getElementById('copySnippetLabel');
+            if (label) {
+                const orig = label.textContent;
+                label.textContent = 'Copied!';
+                setTimeout(() => { label.textContent = orig; }, 2000);
+            }
+        }).catch(err => {
+            console.error('Copy failed', err);
+        });
+    }
+
+    // Modal Handlers
+    function openApiDocsModal() {
+        const modal = document.getElementById('apiDocsModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeApiDocsModal() {
+        const modal = document.getElementById('apiDocsModal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    }
+
+    // Close on escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeApiDocsModal();
+        }
+    });
+
+    // Close on overlay click
+    document.getElementById('apiDocsModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeApiDocsModal();
+        }
+    });
+
+    // Quickstart Code Tabs
+    function switchCodeTab(lang) {
+        const tabs = ['curl', 'python', 'js'];
+        tabs.forEach(t => {
+            const el = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+            if (el) el.style.display = (t === lang) ? 'block' : 'none';
+        });
+        document.querySelectorAll('.code-tab-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.textContent.toLowerCase().includes(lang));
+        });
+    }
+
+    // Try Live Execution
+    async function executeLiveTest(endpointUrl, targetContainerId) {
+        const container = document.getElementById(targetContainerId);
+        if (!container) return;
+        
+        const pre = container.querySelector('code');
+        if (!pre) return;
+        
+        pre.textContent = '// Fetching live data from ' + endpointUrl + ' ...';
+        try {
+            const res = await fetch(endpointUrl, {
+                headers: { 'Accept': 'application/json' }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                pre.textContent = JSON.stringify(data, null, 2);
+            } else {
+                pre.textContent = `// HTTP Error: ${res.status} ${res.statusText}`;
+            }
+        } catch (err) {
+            pre.textContent = `// Request failed: ${err.message}`;
+        }
+    }
+</script>
+{% endblock %}

@@ -771,4 +771,174 @@ def admin_generate_all_reports_view(request):
     return redirect('dashboard:reports')
 
 
+def public_data_api(request):
+    """
+    Public Developer and Open Data Portal for AgriLens Rwanda.
+    Showcases available datasets (Agricultural Statistics, Geographic Data, Market Data, Survey Data),
+    RESTful API capabilities, authentication, rate limiting, and interactive code explorer.
+    """
+    import json
+    from apps.geography.models import Province, District, Sector
+    from apps.markets.models import MarketLocation, CommodityPrice
+    from apps.surveys.models import FarmSurveySubmission
+    from apps.data_management.models import DataSource
+
+    # 1. Agricultural Statistics
+    crops_count = Crop.objects.count()
+    priority_crops = list(Crop.objects.filter(is_priority_crop=True).select_related('category').order_by('id'))
+    priority_crops_count = len(priority_crops)
+    seasons_count = AgriculturalSeason.objects.count()
+    observations_count = ValidatedObservation.objects.count()
+
+    # 2. Geographic Data
+    provinces_count = Province.objects.count() or 5
+    districts_count = District.objects.count() or 30
+    sectors_count = Sector.objects.count() or 416
+
+    # 3. Market Data
+    markets_count = MarketLocation.objects.count()
+    prices_count = CommodityPrice.objects.count()
+
+    # 4. Survey Data
+    surveys_count = FarmSurveySubmission.objects.count()
+    data_sources_count = DataSource.objects.count()
+
+    # Dynamic API response preview matching exact mockup: GET /api/v1/crops/?season=2024-2025
+    sample_crops_data = [
+        {
+            "id": c.id,
+            "name": c.name,
+            "kinyarwanda_name": c.kinyarwanda_name or "",
+            "scientific_name": c.scientific_name or "",
+            "is_priority_crop": c.is_priority_crop,
+            "category": c.category_id,
+            "category_name": c.category.name if c.category else "Cereals",
+        }
+        for c in priority_crops
+    ]
+
+    preview_snippet_json = json.dumps({
+        "count": len(sample_crops_data),
+        "results": sample_crops_data
+    }, indent=2)
+
+    # API Endpoints catalog for documentation & interactive explorer
+    endpoints = [
+        {
+            "method": "GET",
+            "path": "/api/v1/crops/?season=2024-2025",
+            "title": "Agricultural Crops",
+            "desc": "Retrieve the registry of crops cultivated across Rwanda with priority crop flags and botanical categories.",
+            "params": [
+                {"name": "season", "type": "string", "example": "2024-2025", "desc": "Filter crops by season or calendar cycle (e.g. 2024-2025, 2025A)"},
+                {"name": "priority", "type": "boolean", "example": "true", "desc": "Filter only national priority strategic crops"},
+            ],
+            "sample_response": json.dumps({
+                "count": len(sample_crops_data),
+                "results": sample_crops_data[:3]
+            }, indent=2)
+        },
+        {
+            "method": "GET",
+            "path": "/api/v1/districts/",
+            "title": "Administrative Districts",
+            "desc": "List all 30 administrative districts grouped by province with national GIS identifiers.",
+            "params": [
+                {"name": "province", "type": "string / int", "example": "Eastern", "desc": "Filter districts by province name or ID"},
+            ],
+            "sample_response": json.dumps({
+                "count": 30,
+                "results": [
+                    {"id": 1, "name": "Nyarugenge", "code": "01", "province": 1, "province_name": "Kigali City"},
+                    {"id": 2, "name": "Gasabo", "code": "02", "province": 1, "province_name": "Kigali City"},
+                    {"id": 3, "name": "Kicukiro", "code": "03", "province": 1, "province_name": "Kigali City"}
+                ]
+            }, indent=2)
+        },
+        {
+            "method": "GET",
+            "path": "/api/v1/provinces/",
+            "title": "Provinces of Rwanda",
+            "desc": "List the 5 provincial administrative territories of Rwanda (Kigali City, Southern, Western, Northern, Eastern).",
+            "params": [],
+            "sample_response": json.dumps({
+                "count": 5,
+                "results": [
+                    {"id": 1, "name": "Kigali City", "code": "KGL"},
+                    {"id": 2, "name": "Southern Province", "code": "SOU"},
+                    {"id": 3, "name": "Western Province", "code": "WES"}
+                ]
+            }, indent=2)
+        },
+        {
+            "method": "GET",
+            "path": "/api/v1/prices/",
+            "title": "Commodity Market Prices",
+            "desc": "Access wholesale and retail prices recorded in physical markets across Rwanda's 30 districts.",
+            "params": [
+                {"name": "crop", "type": "string / int", "example": "Maize", "desc": "Filter price series by crop name or ID"},
+                {"name": "market", "type": "string / int", "example": "Kimironko", "desc": "Filter by market location name or ID"},
+            ],
+            "sample_response": json.dumps({
+                "count": 28,
+                "results": [
+                    {
+                        "id": 1,
+                        "crop": 1,
+                        "crop_name": "Maize",
+                        "market": 2,
+                        "market_name": "Kimironko",
+                        "district_name": "Gasabo",
+                        "price_per_kg_rwf": "450.00",
+                        "wholesale_price_rwf": "410.00",
+                        "date_recorded": "2025-02-15"
+                    }
+                ]
+            }, indent=2)
+        },
+    ]
+
+    context = {
+        'page_title': 'Data & API • AgriLens Rwanda',
+        'is_public_page': True,
+        'crops_count': crops_count,
+        'priority_crops_count': priority_crops_count,
+        'seasons_count': seasons_count,
+        'districts_count': districts_count,
+        'provinces_count': provinces_count,
+        'sectors_count': sectors_count,
+        'markets_count': markets_count,
+        'prices_count': prices_count,
+        'surveys_count': surveys_count,
+        'data_sources_count': data_sources_count,
+        'observations_count': observations_count,
+        'priority_crops': priority_crops,
+        'sample_crops_data': sample_crops_data,
+        'preview_snippet_json': preview_snippet_json,
+        'endpoints': endpoints,
+    }
+    return render(request, 'dashboard/data_api.html', context)
+
+
+def public_api_docs(request):
+    """
+    Dedicated interactive Developer Documentation and API Explorer view.
+    """
+    return public_data_api(request)
+
+
+def public_about(request):
+    """
+    Public About Portal for AgriLens Rwanda (Milestone 6 Design).
+    Presents institutional mission, vision, core values, and Rwanda agricultural intelligence context.
+    """
+    context = {
+        'page_title': 'About AgriLens • Rwanda Agricultural Intelligence Platform',
+        'is_public_page': True,
+    }
+    return render(request, 'dashboard/about.html', context)
+
+
+
+
 

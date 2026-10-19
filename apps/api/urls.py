@@ -11,5 +11,7 @@ router.register(r'crops', views.CropViewSet, basename='crop')
 router.register(r'prices', views.CommodityPriceViewSet, basename='price')
 
 urlpatterns = [
+    path('v1/', include(router.urls)),
     path('', include(router.urls)),
 ]
+
