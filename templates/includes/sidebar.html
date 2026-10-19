@@ -20,7 +20,12 @@
     </div>
 
     <div class="nav-section">
-        <div class="nav-title">Reports & Bulletins</div>
+        <div class="nav-title">Reports &amp; Intelligence</div>
+        <a href="/dashboard/reports/center/" class="nav-item {% if request.path == '/dashboard/reports/center/' %}active{% endif %}"><i class="fa-solid fa-gauge-high"></i> Report Overview</a>
+        <a href="/dashboard/reports/generate/" class="nav-item {% if request.path == '/dashboard/reports/generate/' %}active{% endif %}"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate Report</a>
+        <a href="/dashboard/reports/schedules/" class="nav-item {% if request.path|slice:':29' == '/dashboard/reports/schedules' %}active{% endif %}"><i class="fa-solid fa-clock-rotate-left"></i> Scheduled Reports</a>
+        <a href="/dashboard/reports/history/" class="nav-item {% if request.path|slice:':27' == '/dashboard/reports/history' or request.path|slice:':29' == '/dashboard/reports/generated' %}active{% endif %}"><i class="fa-solid fa-file-invoice"></i> Generated Reports</a>
+        <a href="/dashboard/reports/published/" class="nav-item {% if request.path == '/dashboard/reports/published/' %}active{% endif %}"><i class="fa-solid fa-bullhorn"></i> Published Reports</a>
         <a href="/dashboard/reports/national/" class="nav-item {% if request.path|slice:':27' == '/dashboard/reports/national' %}active{% endif %}"><i class="fa-regular fa-file-lines"></i> National Report</a>
         <a href="/dashboard/reports/district/" class="nav-item {% if request.path|slice:':27' == '/dashboard/reports/district' %}active{% endif %}"><i class="fa-solid fa-folder-open"></i> District Dossier</a>
     </div>

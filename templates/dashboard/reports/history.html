@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="padding: 24px 32px; max-width: 1360px; margin: 0 auto; overflow-y: auto; height: 100vh;">
+    <!-- Messages -->
+    {% if messages %}
+    <div style="margin-bottom: 20px;">
+        {% for message in messages %}
+        <div style="padding: 12px 18px; border-radius: 8px; margin-bottom: 8px; font-size: 0.9rem; font-weight: 500; {% if message.tags == 'error' %}background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5;{% elif message.tags == 'success' %}background: #DCFCE7; color: #166534; border: 1px solid #86EFAC;{% else %}background: #E0F2FE; color: #075985; border: 1px solid #7DD3FC;{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Header Strip -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Internal Report History &amp; Audit Trail</span>
+            </div>
+            <h1 style="margin: 0; font-size: 1.75rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+                Generated Reports History
+            </h1>
+            <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #64748B;">
+                Search, inspect, review, and download generated institutional agricultural dossiers.
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <a href="{% url 'dashboard:internal_report_generate' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; background: #10B981; color: #FFFFFF; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);">
+                <i class="fa-solid fa-plus"></i> Generate Report
+            </a>
+            <a href="{% url 'dashboard:internal_report_center' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
+                <i class="fa-solid fa-house"></i> Overview
+            </a>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div style="display: flex; gap: 8px; border-bottom: 2px solid #E2E8F0; margin-bottom: 24px;">
+        <a href="{% url 'dashboard:internal_report_center' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 600; color: #64748B; text-decoration: none;">
+            <i class="fa-solid fa-gauge-high"></i> Overview
+        </a>
+        <a href="{% url 'dashboard:internal_report_generate' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 600; color: #64748B; text-decoration: none;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Generate
+        </a>
+        <a href="{% url 'dashboard:internal_report_schedules' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 600; color: #64748B; text-decoration: none;">
+            <i class="fa-solid fa-clock-rotate-left"></i> Schedules
+        </a>
+        <a href="{% url 'dashboard:internal_report_history' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 700; color: #047857; border-bottom: 3px solid #10B981; margin-bottom: -2px; text-decoration: none;">
+            <i class="fa-solid fa-file-invoice"></i> Generated History
+        </a>
+        <a href="{% url 'dashboard:internal_report_published' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 600; color: #64748B; text-decoration: none;">
+            <i class="fa-solid fa-bullhorn"></i> Published Bulletins
+        </a>
+    </div>
+
+    <!-- Search & Filter Controls Card -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+        <form method="GET" action="{% url 'dashboard:internal_report_history' %}" style="display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end;">
+            <!-- Search Text -->
+            <div style="flex: 2; min-width: 220px;">
+                <label for="q" style="display: block; font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 4px;">
+                    Search Keywords
+                </label>
+                <div style="position: relative;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 11px; color: #94A3B8; font-size: 0.85rem;"></i>
+                    <input type="text" name="q" id="q" value="{{ query_q }}" placeholder="Search by title, crop, district, period..." style="width: 100%; padding: 8px 12px 8px 34px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.88rem;">
+                </div>
+            </div>
+
+            <!-- Status Filter -->
+            <div style="flex: 1; min-width: 140px;">
+                <label for="status" style="display: block; font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 4px;">
+                    Status
+                </label>
+                <select name="status" id="status" style="width: 100%; padding: 8px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.86rem; background: #FFF;">
+                    <option value="all" {% if selected_status == 'all' or not selected_status %}selected{% endif %}>All Statuses</option>
+                    {% for code, label in status_choices %}
+                    <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Format Filter -->
+            <div style="flex: 1; min-width: 120px;">
+                <label for="format" style="display: block; font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 4px;">
+                    Format
+                </label>
+                <select name="format" id="format" style="width: 100%; padding: 8px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.86rem; background: #FFF;">
+                    <option value="all" {% if selected_format == 'all' or not selected_format %}selected{% endif %}>All Formats</option>
+                    <option value="pdf" {% if selected_format == 'pdf' %}selected{% endif %}>PDF</option>
+                    <option value="xlsx" {% if selected_format == 'xlsx' %}selected{% endif %}>Excel (XLSX)</option>
+                    <option value="csv" {% if selected_format == 'csv' %}selected{% endif %}>CSV</option>
+                </select>
+            </div>
+
+            <!-- Report Type Filter -->
+            <div style="flex: 1.5; min-width: 180px;">
+                <label for="type" style="display: block; font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 4px;">
+                    Report Type
+                </label>
+                <select name="type" id="type" style="width: 100%; padding: 8px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.86rem; background: #FFF;">
+                    <option value="all" {% if selected_type == 'all' or not selected_type %}selected{% endif %}>All Types</option>
+                    {% for code, label in report_types %}
+                    <option value="{{ code }}" {% if selected_type == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 8px;">
+                <button type="submit" style="padding: 8px 16px; background: #005CAB; color: #FFF; border: none; border-radius: 6px; font-size: 0.88rem; font-weight: 600; cursor: pointer;">
+                    Filter
+                </button>
+                <a href="{% url 'dashboard:internal_report_history' %}" style="padding: 8px 14px; background: #F1F5F9; color: #475569; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table Card -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+        {% if page_obj.object_list %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.86rem; text-align: left;">
+                <thead>
+                    <tr style="background: #F8FAFC; border-bottom: 2px solid #E2E8F0; color: #475569;">
+                        <th style="padding: 12px 14px;">Report Title</th>
+                        <th style="padding: 12px 10px;">Format</th>
+                        <th style="padding: 12px 10px;">Period</th>
+                        <th style="padding: 12px 10px;">Scope</th>
+                        <th style="padding: 12px 10px;">Status</th>
+                        <th style="padding: 12px 10px;">Requester</th>
+                        <th style="padding: 12px 10px;">Created</th>
+                        <th style="padding: 12px 14px; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in page_obj.object_list %}
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding: 14px;">
+                            <a href="{% url 'dashboard:internal_report_detail' r.id %}" style="font-weight: 700; color: #005CAB; text-decoration: none; font-size: 0.9rem;">
+                                {{ r.title }}
+                            </a>
+                            <div style="font-size: 0.74rem; color: #94A3B8; font-family: monospace;">UUID: {{ r.uuid }}</div>
+                        </td>
+                        <td style="padding: 14px 10px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; padding: 3px 6px; border-radius: 4px; {% if r.output_format == 'pdf' %}background: #FEE2E2; color: #DC2626;{% elif r.output_format == 'xlsx' %}background: #DCFCE7; color: #16A34A;{% else %}background: #EFF6FF; color: #2563EB;{% endif %}">
+                                {{ r.output_format|upper }}
+                            </span>
+                        </td>
+                        <td style="padding: 14px 10px; color: #334155; font-weight: 500;">
+                            {{ r.reporting_period|default:r.season }}
+                        </td>
+                        <td style="padding: 14px 10px; color: #475569; font-size: 0.8rem;">
+                            {% if r.district %}
+                                {{ r.district.name }}
+                            {% elif r.province %}
+                                {{ r.province.name }}
+                            {% else %}
+                                National
+                            {% endif %}
+                        </td>
+                        <td style="padding: 14px 10px;">
+                            <span style="font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 12px; {% if r.status == 'published' %}background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0;{% elif r.status == 'approved' %}background: #E0E7FF; color: #3730A3; border: 1px solid #C7D2FE;{% elif r.status == 'pending_review' %}background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A;{% elif r.status == 'failed' %}background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA;{% else %}background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0;{% endif %}">
+                                {{ r.get_status_display }}
+                            </span>
+                        </td>
+                        <td style="padding: 14px 10px; color: #64748B;">
+                            {{ r.generated_by.username|default:"Scheduler" }}
+                        </td>
+                        <td style="padding: 14px 10px; color: #64748B; font-size: 0.8rem;">
+                            {{ r.created_at|date:"M d, Y" }}<br/>
+                            <span style="color: #94A3B8;">{{ r.created_at|date:"H:i" }}</span>
+                        </td>
+                        <td style="padding: 14px; text-align: right; white-space: nowrap;">
+                            <a href="{% url 'dashboard:internal_report_detail' r.id %}" style="display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.78rem; font-weight: 600; color: #334155; text-decoration: none; margin-right: 6px;">
+                                View
+                            </a>
+                            {% if r.file_path %}
+                            <a href="{% url 'dashboard:internal_report_download' r.id %}" style="display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; background: #10B981; border-radius: 6px; font-size: 0.78rem; font-weight: 600; color: #FFFFFF; text-decoration: none;">
+                                <i class="fa-solid fa-download"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: #F8FAFC; border-top: 1px solid #E2E8F0;">
+            <div style="font-size: 0.82rem; color: #64748B;">
+                Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} ({{ page_obj.paginator.count }} reports)
+            </div>
+            <div style="display: flex; gap: 6px;">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}&amp;q={{ query_q }}&amp;status={{ selected_status }}&amp;format={{ selected_format }}&amp;type={{ selected_type }}" style="padding: 6px 12px; background: #FFF; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.82rem; color: #334155; text-decoration: none; font-weight: 600;">
+                    &larr; Previous
+                </a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&amp;q={{ query_q }}&amp;status={{ selected_status }}&amp;format={{ selected_format }}&amp;type={{ selected_type }}" style="padding: 6px 12px; background: #FFF; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.82rem; color: #334155; text-decoration: none; font-weight: 600;">
+                    Next &rarr;
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div style="padding: 60px 20px; text-align: center; color: #94A3B8;">
+            <i class="fa-solid fa-folder-open" style="font-size: 2.8rem; margin-bottom: 12px; color: #CBD5E1;"></i>
+            <h3 style="margin: 0; font-size: 1.1rem; color: #475569;">No Matching Reports Found</h3>
+            <p style="margin: 6px 0 16px 0; font-size: 0.88rem;">Try adjusting your search criteria or generate a new report.</p>
+            <a href="{% url 'dashboard:internal_report_generate' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; background: #10B981; color: #FFF; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
+                <i class="fa-solid fa-plus"></i> Generate New Report
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

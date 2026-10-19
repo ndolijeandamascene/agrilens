@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="padding: 24px 32px; max-width: 1360px; margin: 0 auto; overflow-y: auto; height: 100vh;">
+    <!-- Messages Notification Banner -->
+    {% if messages %}
+    <div style="margin-bottom: 20px;">
+        {% for message in messages %}
+        <div style="padding: 12px 18px; border-radius: 8px; margin-bottom: 8px; font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; justify-content: space-between; {% if message.tags == 'error' %}background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5;{% elif message.tags == 'success' %}background: #DCFCE7; color: #166534; border: 1px solid #86EFAC;{% else %}background: #E0F2FE; color: #075985; border: 1px solid #7DD3FC;{% endif %}">
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Header Strip -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Institutional Reporting Workspace</span>
+                <span>&bull;</span>
+                <span>MINAGRI &bull; NISR Verified Data</span>
+            </div>
+            <h1 style="margin: 0; font-size: 1.75rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+                Report Center Overview
+            </h1>
+            <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #64748B;">
+                Automated Institutional Reporting, On-Demand Dossier Generation &amp; Public Publication Gateway
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a href="{% url 'dashboard:internal_report_generate' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; background: #10B981; color: #FFFFFF; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);">
+                <i class="fa-solid fa-plus"></i>
+                <span>Generate Report</span>
+            </a>
+            <a href="{% url 'dashboard:internal_report_schedules' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>Scheduled Jobs</span>
+            </a>
+            <a href="{% url 'dashboard:internal_report_history' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
+                <i class="fa-solid fa-list-check"></i>
+                <span>History</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div style="display: flex; gap: 8px; border-bottom: 2px solid #E2E8F0; margin-bottom: 24px;">
+        <a href="{% url 'dashboard:internal_report_center' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 700; color: #047857; border-bottom: 3px solid #10B981; margin-bottom: -2px; text-decoration: none;">
+            <i class="fa-solid fa-gauge-high"></i> Overview
+        </a>
+        <a href="{% url 'dashboard:internal_report_generate' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 600; color: #64748B; text-decoration: none;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Generate
+        </a>
+        <a href="{% url 'dashboard:internal_report_schedules' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 600; color: #64748B; text-decoration: none;">
+            <i class="fa-solid fa-clock-rotate-left"></i> Schedules
+        </a>
+        <a href="{% url 'dashboard:internal_report_history' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 600; color: #64748B; text-decoration: none;">
+            <i class="fa-solid fa-file-invoice"></i> Generated History
+        </a>
+        <a href="{% url 'dashboard:internal_report_published' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 600; color: #64748B; text-decoration: none;">
+            <i class="fa-solid fa-bullhorn"></i> Published Bulletins
+        </a>
+    </div>
+
+    <!-- KPI Metric Cards Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <!-- Total Generated -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Total Generated</span>
+                <span style="width: 32px; height: 32px; border-radius: 8px; background: #ECFDF5; color: #10B981; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;"><i class="fa-solid fa-file-lines"></i></span>
+            </div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: #0F172A;">{{ total_generated }}</div>
+            <div style="font-size: 0.78rem; color: #10B981; font-weight: 600; margin-top: 4px;">Verified analytical runs</div>
+        </div>
+
+        <!-- Generated This Month -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">This Month</span>
+                <span style="width: 32px; height: 32px; border-radius: 8px; background: #EFF6FF; color: #3B82F6; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;"><i class="fa-solid fa-calendar"></i></span>
+            </div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: #0F172A;">{{ this_month_count }}</div>
+            <div style="font-size: 0.78rem; color: #3B82F6; font-weight: 600; margin-top: 4px;">Active reporting cycle</div>
+        </div>
+
+        <!-- Scheduled Reports -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Scheduled Jobs</span>
+                <span style="width: 32px; height: 32px; border-radius: 8px; background: #F5F3FF; color: #8B5CF6; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;"><i class="fa-solid fa-clock"></i></span>
+            </div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: #0F172A;">{{ active_schedules_count }}</div>
+            <div style="font-size: 0.78rem; color: #8B5CF6; font-weight: 600; margin-top: 4px;">Recurring active schedulers</div>
+        </div>
+
+        <!-- Awaiting Review -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Pending Review</span>
+                <span style="width: 32px; height: 32px; border-radius: 8px; background: #FEF3C7; color: #D97706; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;"><i class="fa-solid fa-hourglass-half"></i></span>
+            </div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: #0F172A;">{{ awaiting_review_count }}</div>
+            <div style="font-size: 0.78rem; color: #D97706; font-weight: 600; margin-top: 4px;">Separation of duties review</div>
+        </div>
+
+        <!-- Awaiting Publication -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Approved</span>
+                <span style="width: 32px; height: 32px; border-radius: 8px; background: #E0E7FF; color: #4F46E5; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;"><i class="fa-solid fa-circle-check"></i></span>
+            </div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: #0F172A;">{{ awaiting_pub_count }}</div>
+            <div style="font-size: 0.78rem; color: #4F46E5; font-weight: 600; margin-top: 4px;">Ready for public launch</div>
+        </div>
+
+        <!-- Failed Jobs -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Failed Jobs</span>
+                <span style="width: 32px; height: 32px; border-radius: 8px; background: #FEE2E2; color: #EF4444; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;"><i class="fa-solid fa-triangle-exclamation"></i></span>
+            </div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: #0F172A;">{{ failed_count }}</div>
+            <div style="font-size: 0.78rem; color: #EF4444; font-weight: 600; margin-top: 4px;">Captured execution errors</div>
+        </div>
+    </div>
+
+    <!-- Latest Execution Highlight Banner -->
+    {% if latest_report %}
+    <div style="background: linear-gradient(135deg, #0F2E24 0%, #164E63 100%); color: #FFFFFF; border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: #34D399; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">
+                <i class="fa-solid fa-circle-check"></i> Most Recent Successful Generation
+            </div>
+            <h2 style="margin: 0; font-size: 1.25rem; font-weight: 700;">{{ latest_report.title }}</h2>
+            <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #CBD5E1;">
+                Generated {{ latest_report.created_at|timesince }} ago &bull; Format: <strong>{{ latest_report.output_format|upper }}</strong> &bull; Period: {{ latest_report.reporting_period }} &bull; Execution: {{ latest_report.execution_duration_sec }}s
+            </p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <a href="{% url 'dashboard:internal_report_detail' latest_report.id %}" style="padding: 8px 16px; background: #FFFFFF; color: #0F2E24; border-radius: 6px; font-size: 0.85rem; font-weight: 700; text-decoration: none;">
+                View Dossier &rarr;
+            </a>
+            {% if latest_report.file_path %}
+            <a href="{% url 'dashboard:internal_report_download' latest_report.id %}" style="padding: 8px 16px; background: #10B981; color: #FFFFFF; border-radius: 6px; font-size: 0.85rem; font-weight: 700; text-decoration: none;">
+                <i class="fa-solid fa-download"></i> Download
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Two Column Main Content -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: flex-start;">
+        <!-- Left: Recent Generated Reports Table -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #0F172A;">Recent Generated Reports</h3>
+                <a href="{% url 'dashboard:internal_report_history' %}" style="font-size: 0.82rem; font-weight: 600; color: #005CAB; text-decoration: none;">
+                    View All History &rarr;
+                </a>
+            </div>
+
+            {% if recent_reports %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #E2E8F0; color: #64748B;">
+                            <th style="padding: 10px 8px;">Report Title</th>
+                            <th style="padding: 10px 8px;">Format</th>
+                            <th style="padding: 10px 8px;">Period</th>
+                            <th style="padding: 10px 8px;">Status</th>
+                            <th style="padding: 10px 8px;">Generated By</th>
+                            <th style="padding: 10px 8px; text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in recent_reports %}
+                        <tr style="border-bottom: 1px solid #F1F5F9;">
+                            <td style="padding: 12px 8px;">
+                                <a href="{% url 'dashboard:internal_report_detail' r.id %}" style="font-weight: 600; color: #005CAB; text-decoration: none;">
+                                    {{ r.title }}
+                                </a>
+                                <div style="font-size: 0.75rem; color: #94A3B8;">{{ r.created_at|date:"M d, Y H:i" }}</div>
+                            </td>
+                            <td style="padding: 12px 8px;">
+                                <span style="font-size: 0.72rem; font-weight: 700; padding: 3px 6px; border-radius: 4px; {% if r.output_format == 'pdf' %}background: #FEE2E2; color: #DC2626;{% elif r.output_format == 'xlsx' %}background: #DCFCE7; color: #16A34A;{% else %}background: #EFF6FF; color: #2563EB;{% endif %}">
+                                    {{ r.output_format|upper }}
+                                </span>
+                            </td>
+                            <td style="padding: 12px 8px; color: #334155;">{{ r.reporting_period|default:r.season }}</td>
+                            <td style="padding: 12px 8px;">
+                                <span style="font-size: 0.75rem; font-weight: 600; padding: 3px 8px; border-radius: 12px; {% if r.status == 'published' %}background: #DCFCE7; color: #166534;{% elif r.status == 'approved' %}background: #E0E7FF; color: #3730A3;{% elif r.status == 'pending_review' %}background: #FEF3C7; color: #92400E;{% elif r.status == 'failed' %}background: #FEE2E2; color: #991B1B;{% else %}background: #F1F5F9; color: #475569;{% endif %}">
+                                    {{ r.get_status_display }}
+                                </span>
+                            </td>
+                            <td style="padding: 12px 8px; color: #64748B;">
+                                {{ r.generated_by.username|default:"Scheduler" }}
+                            </td>
+                            <td style="padding: 12px 8px; text-align: right;">
+                                <a href="{% url 'dashboard:internal_report_detail' r.id %}" style="padding: 4px 8px; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 4px; font-size: 0.75rem; color: #334155; text-decoration: none; margin-right: 4px;">
+                                    View
+                                </a>
+                                {% if r.file_path %}
+                                <a href="{% url 'dashboard:internal_report_download' r.id %}" style="padding: 4px 8px; background: #10B981; border-radius: 4px; font-size: 0.75rem; color: #FFFFFF; text-decoration: none;">
+                                    <i class="fa-solid fa-download"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div style="padding: 40px 20px; text-align: center; color: #94A3B8;">
+                <i class="fa-solid fa-file-circle-question" style="font-size: 2.2rem; margin-bottom: 10px; color: #CBD5E1;"></i>
+                <p style="margin: 0; font-size: 0.95rem;">No reports have been generated yet in this environment.</p>
+                <div style="margin-top: 14px;">
+                    <a href="{% url 'dashboard:internal_report_generate' %}" style="padding: 8px 16px; background: #10B981; color: #FFF; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-decoration: none;">
+                        Generate First Report
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right: Upcoming Automated Schedules -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #0F172A;">Upcoming Automated Runs</h3>
+                <a href="{% url 'dashboard:internal_report_schedules' %}" style="font-size: 0.82rem; font-weight: 600; color: #005CAB; text-decoration: none;">
+                    Manage &rarr;
+                </a>
+            </div>
+
+            {% if upcoming_schedules %}
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for s in upcoming_schedules %}
+                <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 14px; background: #F8FAFC;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                        <span style="font-size: 0.86rem; font-weight: 700; color: #0F172A;">{{ s.title }}</span>
+                        <span style="font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: #EDE9FE; color: #6D28D9;">
+                            {{ s.get_frequency_display }}
+                        </span>
+                    </div>
+                    <div style="font-size: 0.78rem; color: #64748B;">
+                        Next Run: <strong>{{ s.next_run_at|date:"M d, Y H:i" }}</strong> (Kigali Time)
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.75rem;">
+                        <span style="color: #475569;">Format: <strong>{{ s.output_format|upper }}</strong></span>
+                        <form method="POST" action="{% url 'dashboard:internal_report_schedule_run_now' s.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" style="background: none; border: none; color: #005CAB; font-size: 0.75rem; font-weight: 700; cursor: pointer; padding: 0;">
+                                <i class="fa-solid fa-play"></i> Run Now
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="padding: 30px 10px; text-align: center; color: #94A3B8;">
+                <i class="fa-solid fa-clock" style="font-size: 1.8rem; margin-bottom: 8px; color: #CBD5E1;"></i>
+                <p style="margin: 0; font-size: 0.88rem;">No active schedules configured.</p>
+                <div style="margin-top: 10px;">
+                    <a href="{% url 'dashboard:internal_report_schedules' %}" style="font-size: 0.8rem; font-weight: 700; color: #005CAB; text-decoration: none;">
+                        + Configure Schedule
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

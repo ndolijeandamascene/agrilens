@@ -144,6 +144,13 @@ class AuditLog(models.Model):
         ACTION_UPDATED = 'ACTION_UPDATED', 'Action Plan Assigned or Updated'
         OUTCOME_RECORDED = 'OUTCOME_RECORDED', 'Outcome Measurement Recorded'
 
+        # Reporting & Schedule lifecycle events
+        REPORT_GENERATED = 'REPORT_GENERATED', 'Agricultural Report Generated'
+        REPORT_APPROVED = 'REPORT_APPROVED', 'Agricultural Report Approved'
+        REPORT_PUBLISHED = 'REPORT_PUBLISHED', 'Agricultural Report Published'
+        REPORT_WITHDRAWN = 'REPORT_WITHDRAWN', 'Agricultural Report Withdrawn'
+        SCHEDULE_MODIFIED = 'SCHEDULE_MODIFIED', 'Report Schedule Modified'
+
     actor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

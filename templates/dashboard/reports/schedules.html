@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="padding: 24px 32px; max-width: 1360px; margin: 0 auto; overflow-y: auto; height: 100vh;">
+    <!-- Messages -->
+    {% if messages %}
+    <div style="margin-bottom: 20px;">
+        {% for message in messages %}
+        <div style="padding: 12px 18px; border-radius: 8px; margin-bottom: 8px; font-size: 0.9rem; font-weight: 500; {% if message.tags == 'error' %}background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5;{% elif message.tags == 'success' %}background: #DCFCE7; color: #166534; border: 1px solid #86EFAC;{% else %}background: #E0F2FE; color: #075985; border: 1px solid #7DD3FC;{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Header Strip -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>Automated Reporting Infrastructure</span>
+                <span>&bull;</span>
+                <span>Africa/Kigali (RST) Scheduling</span>
+            </div>
+            <h1 style="margin: 0; font-size: 1.75rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+                Scheduled Reports &amp; Recurring Schedulers
+            </h1>
+            <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #64748B;">
+                Configure autonomous reporting jobs based on configured periods, duplicate locks, and reviewer routing.
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <a href="{% url 'dashboard:internal_report_center' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
+                <i class="fa-solid fa-house"></i> Overview
+            </a>
+            <a href="{% url 'dashboard:internal_report_history' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; background: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
+                <i class="fa-solid fa-list-check"></i> History
+            </a>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div style="display: flex; gap: 8px; border-bottom: 2px solid #E2E8F0; margin-bottom: 24px;">
+        <a href="{% url 'dashboard:internal_report_center' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 600; color: #64748B; text-decoration: none;">
+            <i class="fa-solid fa-gauge-high"></i> Overview
+        </a>
+        <a href="{% url 'dashboard:internal_report_generate' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 600; color: #64748B; text-decoration: none;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Generate
+        </a>
+        <a href="{% url 'dashboard:internal_report_schedules' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 700; color: #047857; border-bottom: 3px solid #10B981; margin-bottom: -2px; text-decoration: none;">
+            <i class="fa-solid fa-clock-rotate-left"></i> Schedules
+        </a>
+        <a href="{% url 'dashboard:internal_report_history' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 600; color: #64748B; text-decoration: none;">
+            <i class="fa-solid fa-file-invoice"></i> Generated History
+        </a>
+        <a href="{% url 'dashboard:internal_report_published' %}" style="padding: 10px 18px; font-size: 0.9rem; font-weight: 600; color: #64748B; text-decoration: none;">
+            <i class="fa-solid fa-bullhorn"></i> Published Bulletins
+        </a>
+    </div>
+
+    <!-- Two Columns: Create Schedule on Left / Configured Schedules List on Right -->
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px; align-items: flex-start;">
+        <!-- Left: Create Schedule Form Card -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <h3 style="margin: 0 0 16px 0; font-size: 1.05rem; font-weight: 700; color: #0F172A; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-plus-circle" style="color: #10B981;"></i> New Schedule Configuration
+            </h3>
+
+            <form method="POST" action="{% url 'dashboard:internal_report_schedule_create' %}">
+                {% csrf_token %}
+
+                <!-- Title -->
+                <div style="margin-bottom: 14px;">
+                    <label for="title" style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 4px;">
+                        Schedule Name / Title
+                    </label>
+                    <input type="text" name="title" id="title" placeholder="e.g. Monthly National Production Brief" style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.88rem;">
+                </div>
+
+                <!-- Report Type -->
+                <div style="margin-bottom: 14px;">
+                    <label for="sched_report_type" style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 4px;">
+                        Report Category
+                    </label>
+                    <select name="report_type" id="sched_report_type" required style="width: 100%; padding: 8px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.86rem; background: #FFF;">
+                        {% for code, label in report_types %}
+                        <option value="{{ code }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Frequency -->
+                <div style="margin-bottom: 14px;">
+                    <label for="frequency" style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 4px;">
+                        Reporting Frequency
+                    </label>
+                    <select name="frequency" id="frequency" required style="width: 100%; padding: 8px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.86rem; background: #FFF;">
+                        {% for code, label in frequency_choices %}
+                        <option value="{{ code }}" {% if code == 'monthly' %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <div style="font-size: 0.74rem; color: #64748B; margin-top: 3px;">
+                        Execution occurs at 06:00 AM Africa/Kigali time for the defined period rule.
+                    </div>
+                </div>
+
+                <!-- Output Format -->
+                <div style="margin-bottom: 14px;">
+                    <label for="sched_format" style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 4px;">
+                        Output Artifact Format
+                    </label>
+                    <select name="output_format" id="sched_format" required style="width: 100%; padding: 8px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.86rem; background: #FFF;">
+                        <option value="pdf" selected>PDF Document</option>
+                        <option value="xlsx">Excel (XLSX Workbook)</option>
+                        <option value="csv">CSV (Comma-Separated Values)</option>
+                    </select>
+                </div>
+
+                <!-- District Scope -->
+                <div style="margin-bottom: 14px;">
+                    <label for="sched_district" style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 4px;">
+                        Geographic Scope
+                    </label>
+                    <select name="district" id="sched_district" style="width: 100%; padding: 8px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.86rem; background: #FFF;">
+                        {% if request.user.is_national_scope %}
+                        <option value="" selected>National (All Districts)</option>
+                        {% endif %}
+                        {% for d in districts %}
+                        <option value="{{ d.id }}">{{ d.name }} ({{ d.province.name }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Crop Scope -->
+                <div style="margin-bottom: 16px;">
+                    <label for="sched_crop" style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 4px;">
+                        Target Crop Value Chain
+                    </label>
+                    <select name="crop" id="sched_crop" style="width: 100%; padding: 8px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.86rem; background: #FFF;">
+                        <option value="" selected>All Crops</option>
+                        {% for c in crops %}
+                        <option value="{{ c.id }}">{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Auto Submit for Review -->
+                <div style="margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #334155; cursor: pointer;">
+                        <input type="checkbox" name="auto_submit_for_review" checked style="accent-color: #10B981;">
+                        <span>Auto-submit generated reports for review</span>
+                    </label>
+                </div>
+
+                <button type="submit" style="width: 100%; padding: 10px; background: #10B981; color: #FFF; border: none; border-radius: 6px; font-size: 0.88rem; font-weight: 700; cursor: pointer;">
+                    <i class="fa-solid fa-plus"></i> Configure Automated Schedule
+                </button>
+            </form>
+        </div>
+
+        <!-- Right: Configured Schedules List -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #0F172A;">
+                    Configured Institutional Schedules ({{ schedules|length }})
+                </h3>
+            </div>
+
+            {% if schedules %}
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                {% for s in schedules %}
+                <div style="border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px; background: {% if not s.is_active %}#F8FAFC{% else %}#FFFFFF{% endif %};">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+                        <div>
+                            <span style="font-size: 1rem; font-weight: 700; color: #0F172A;">{{ s.title }}</span>
+                            <div style="font-size: 0.78rem; color: #64748B; margin-top: 2px;">
+                                Type: <strong>{{ s.get_report_type_display }}</strong> &bull; Scope: {% if s.district %}{{ s.district.name }}{% else %}National{% endif %} &bull; Format: <strong>{{ s.output_format|upper }}</strong>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span style="font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: #EDE9FE; color: #6D28D9;">
+                                {{ s.get_frequency_display }}
+                            </span>
+                            <span style="font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; {% if s.is_active %}background: #DCFCE7; color: #166534;{% else %}background: #F1F5F9; color: #64748B;{% endif %}">
+                                {% if s.is_active %}ACTIVE{% else %}PAUSED{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; font-size: 0.8rem; background: #F8FAFC; border-radius: 6px; padding: 10px 12px; margin-bottom: 12px;">
+                        <div>
+                            <span style="color: #64748B;">Next Execution:</span><br/>
+                            <strong style="color: #0F172A;">{{ s.next_run_at|date:"M d, Y H:i" }}</strong>
+                        </div>
+                        <div>
+                            <span style="color: #64748B;">Last Execution:</span><br/>
+                            <strong style="color: #0F172A;">{{ s.last_run_at|date:"M d, Y H:i"|default:"Never run" }}</strong>
+                        </div>
+                        <div>
+                            <span style="color: #64748B;">Last Status:</span><br/>
+                            <span style="font-weight: 700; {% if s.last_status == 'success' %}color: #16A34A;{% elif s.last_status == 'failed' %}color: #DC2626;{% else %}color: #475569;{% endif %}">
+                                {{ s.last_status|default:"Pending"|title }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Actions Bar -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
+                        <span style="color: #64748B;">Configured by <strong>{{ s.owner.username }}</strong></span>
+                        <div style="display: flex; gap: 8px;">
+                            <form method="POST" action="{% url 'dashboard:internal_report_schedule_run_now' s.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" style="padding: 5px 12px; background: #005CAB; color: #FFF; border: none; border-radius: 4px; font-size: 0.76rem; font-weight: 600; cursor: pointer;">
+                                    <i class="fa-solid fa-play"></i> Run Now
+                                </button>
+                            </form>
+                            <form method="POST" action="{% url 'dashboard:internal_report_schedule_toggle' s.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" style="padding: 5px 12px; background: #FFF; border: 1px solid #CBD5E1; color: #334155; border-radius: 4px; font-size: 0.76rem; font-weight: 600; cursor: pointer;">
+                                    {% if s.is_active %}<i class="fa-solid fa-pause"></i> Pause{% else %}<i class="fa-solid fa-play"></i> Resume{% endif %}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="padding: 50px 20px; text-align: center; color: #94A3B8;">
+                <i class="fa-solid fa-calendar-check" style="font-size: 2.5rem; margin-bottom: 12px; color: #CBD5E1;"></i>
+                <h4 style="margin: 0; color: #475569; font-size: 1rem;">No Recurring Schedules Configured</h4>
+                <p style="margin: 6px 0 0 0; font-size: 0.86rem;">Use the form on the left to set up automatic institutional reports.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
