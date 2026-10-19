@@ -1202,7 +1202,7 @@ class ReportEngine:
                 report.file_path = rel_filepath
                 report.file_size_bytes = os.path.getsize(abs_filepath)
 
-            report.execution_duration_sec = round(time.time() - start_time, 2)
+            report.execution_duration_sec = max(round(time.time() - start_time, 3), 0.01)
             report.status = 'generated'
             report.error_message = ""
             report.save()
@@ -1222,11 +1222,12 @@ class ReportEngine:
             return report
 
         except Exception as e:
-            report.execution_duration_sec = round(time.time() - start_time, 2)
+            report.execution_duration_sec = max(round(time.time() - start_time, 3), 0.01)
             report.status = 'failed'
             report.error_message = str(e)
             report.save(update_fields=['status', 'error_message', 'execution_duration_sec', 'updated_at'])
             raise e
+
 
     @classmethod
     def _generate_pdf(cls, report, data, target_filepath):

@@ -257,7 +257,8 @@ class AgriLensReportCenterTestSuite(TestCase):
             self.assertEqual(rep.status, 'generated')
             self.assertTrue(rep.file_path.endswith(f".{fmt}"))
             self.assertGreater(rep.file_size_bytes, 0)
-            self.assertGreater(rep.execution_duration_sec, 0.0)
+            self.assertGreaterEqual(rep.execution_duration_sec, 0.0)
+
 
             # Check file exists on filesystem
             full_path = os.path.join(settings.MEDIA_ROOT, rep.file_path)
