@@ -1,47 +1,251 @@
 <!-- TOPBAR -->
 <header class="topbar">
     <div class="topbar-left">
-        <i class="fa-solid fa-bars"></i>
+        <i class="fa-solid fa-bars" id="topbar-sidebar-toggle" role="button" aria-label="Toggle navigation menu" style="cursor: pointer; padding: 4px; border-radius: 4px;"></i>
         <div class="topbar-title">
-            <h2>National Dashboard</h2>
-            <p>Agricultural performance and seasonal insights for Rwanda</p>
+            {% with last_crumb=breadcrumbs|last %}
+            <h2>{% if page_heading %}{{ page_heading }}{% elif request.path == '/' or request.path == '/dashboard/' %}National Dashboard{% elif breadcrumbs|length > 1 and last_crumb.label %}{{ last_crumb.label }}{% else %}National Dashboard{% endif %}</h2>
+            {% endwith %}
+            <p>{% if page_subheading %}{{ page_subheading }}{% elif request.path == '/' or request.path == '/dashboard/' %}Agricultural performance and seasonal insights for Rwanda{% elif request.path|slice:':12' == '/indicators/' %}National agricultural productivity intelligence and yield gap analytics{% elif request.path|slice:':18' == '/dashboard/reports' %}Official seasonal bulletins, district dossiers, and data exports{% elif request.path|slice:':13' == '/agriculture/' %}Priority crop taxonomy, phenology, and seasonal calendar{% elif request.path|slice:':11' == '/geography/' %}Administrative boundaries, 30 districts, and geographic mapping{% elif request.path|slice:':9' == '/surveys/' %}Seasonal agricultural survey campaigns, sampling, and microdata{% elif request.path|slice:':9' == '/farmers/' %}Smallholder farmers, cooperative registries, and farmer organizations{% elif request.path|slice:':8' == '/inputs/' %}Smart Nkunganire subsidies, seeds, fertilizer, and agrochemicals{% elif request.path|slice:':9' == '/markets/' %}Commodity price surveillance, rural-urban spreads, and markets{% elif request.path|slice:':18' == '/data-management/' %}Data lineage hub, manual registry, and observation governance{% elif request.path|slice:':10' == '/accounts/' %}System administration, officer roles, and security audit log{% else %}Agricultural performance and seasonal insights for Rwanda{% endif %}</p>
         </div>
         <!-- Hidden Breadcrumb element for test suite compatibility -->
         <nav aria-label="Breadcrumbs" class="nav-breadcrumbs" style="display: none !important;">
             <span>AgriLens</span>
             <span>National Dashboard</span>
+            {% for crumb in breadcrumbs %}
+                {% if not forloop.first %}<span>{{ crumb.label }}</span>{% endif %}
+            {% endfor %}
         </nav>
     </div>
     <div class="topbar-right">
-        <div class="badge-dropdown">
+        <!-- Dynamic Season Selector backed by Database -->
+        <div class="badge-dropdown" title="Select Agricultural Season">
             <i class="fa-regular fa-calendar"></i> 
-            <select id="topbar-season-select" onchange="if(this.value){ window.location.href='/dashboard/?year=' + this.value.substring(0,4) + '&season=' + this.value.substring(4); }" style="background: transparent; border: none; font-size: 13px; font-weight: 500; cursor: pointer; outline: none; font-family: inherit; color: inherit;">
-                <option value="2025A" {% if selected_year == 2025 %}selected{% endif %}>SAS 2024 – 2025</option>
-                <option value="2024A" {% if selected_year == 2024 %}selected{% endif %}>SAS 2023 – 2024</option>
+            <select id="topbar-season-select" onchange="if(window.switchSeason){ window.switchSeason(this.value); } else { window.location.href='/dashboard/?year=' + this.value.substring(0,4) + '&season=' + this.value.substring(4); }" style="background: transparent; border: none; font-size: 13px; font-weight: 500; cursor: pointer; outline: none; font-family: inherit; color: inherit; appearance: none; -webkit-appearance: none; -moz-appearance: none; padding-right: 0;">
+                {% for season_opt in db_seasons %}
+                <option value="{{ season_opt.code }}" {% if season_opt.is_selected %}selected{% endif %}>{{ season_opt.label }}</option>
+                {% empty %}
+                <option value="2025A" {% if selected_year == 2025 and selected_season == 'A' %}selected{% endif %}>SAS 2024 – 2025</option>
+                <option value="2024A" {% if selected_year == 2024 and selected_season == 'A' %}selected{% endif %}>SAS 2023 – 2024</option>
+                {% endfor %}
             </select>
-            <i class="fa-solid fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i>
+            <i class="fa-solid fa-chevron-down" style="font-size: 10px; margin-left: 4px; pointer-events: none;"></i>
         </div>
-        <div class="data-verified">
+
+        <!-- Verification status backed by DB timestamp -->
+        <div class="data-verified" title="Official Validation Status">
             <i class="fa-solid fa-circle-check" style="color: var(--primary-green);"></i>
             <div>
                 <div>Data verified</div>
-                <span style="font-weight: normal; font-size: 10px;">Last updated: Apr 24, 2025 10:32</span>
+                <span id="topbar-last-updated" style="font-weight: normal; font-size: 10px;">{{ last_updated_display|default:"Last updated: Apr 24, 2025 10:32" }}</span>
             </div>
         </div>
-        <i class="fa-regular fa-bell" style="position: relative; font-size: 18px; cursor: pointer;">
-            <span style="position: absolute; top: -2px; right: -2px; background: red; width: 6px; height: 6px; border-radius: 50%;"></span>
-        </i>
+
+        <!-- Notification Bell with Interactive Dropdown -->
+        <div class="topbar-dropdown-container" style="position: relative;">
+            <i class="fa-regular fa-bell" id="topbar-notification-toggle" role="button" aria-label="Notifications" style="position: relative; font-size: 18px; cursor: pointer; display: inline-block; vertical-align: middle;">
+                {% if pending_reviews_count and pending_reviews_count > 0 %}
+                <span style="position: absolute; top: -2px; right: -2px; background: #ef4444; width: 7px; height: 7px; border-radius: 50%; box-shadow: 0 0 0 2px #fff;"></span>
+                {% else %}
+                <span style="position: absolute; top: -2px; right: -2px; background: #10b981; width: 6px; height: 6px; border-radius: 50%; box-shadow: 0 0 0 2px #fff;"></span>
+                {% endif %}
+            </i>
+            <div id="topbar-notifications-dropdown" class="topbar-popover" style="display: none; position: absolute; right: -50px; top: 32px; width: 280px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 1000; overflow: hidden;">
+                <div style="padding: 10px 14px; background: #f8fafc; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="font-size: 12px; color: var(--text-main);">Notifications</strong>
+                    <span style="font-size: 10px; color: var(--text-muted);">{% if pending_reviews_count %}{{ pending_reviews_count }} pending{% else %}All verified{% endif %}</span>
+                </div>
+                <div style="max-height: 240px; overflow-y: auto;">
+                    {% if pending_reviews_count and pending_reviews_count > 0 %}
+                    <a href="/data-management/manual/?status=SUBMITTED" style="display: block; padding: 10px 14px; text-decoration: none; border-bottom: 1px solid #f1f5f9; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <div style="display: flex; gap: 8px; align-items: flex-start;">
+                            <i class="fa-solid fa-clipboard-check" style="color: #f59e0b; margin-top: 2px;"></i>
+                            <div>
+                                <div style="font-size: 11px; font-weight: 600; color: #1e293b;">{{ pending_reviews_count }} Field Observation{{ pending_reviews_count|pluralize }}</div>
+                                <div style="font-size: 10px; color: #64748b;">Awaiting QA validation in review queue</div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endif %}
+                    <div style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9;">
+                        <div style="display: flex; gap: 8px; align-items: flex-start;">
+                            <i class="fa-solid fa-database" style="color: var(--primary-green); margin-top: 2px;"></i>
+                            <div>
+                                <div style="font-size: 11px; font-weight: 600; color: #1e293b;">SAS {{ selected_year|default:2025 }} Data Live</div>
+                                <div style="font-size: 10px; color: #64748b;">{{ last_updated_display|default:"Data verified and indexed" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="padding: 10px 14px;">
+                        <div style="display: flex; gap: 8px; align-items: flex-start;">
+                            <i class="fa-solid fa-chart-line" style="color: #0284c7; margin-top: 2px;"></i>
+                            <div>
+                                <div style="font-size: 11px; font-weight: 600; color: #1e293b;">Market Surveillance Active</div>
+                                <div style="font-size: 10px; color: #64748b;">30 districts commodity price monitoring</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Hidden Ctrl K element for test suite compatibility -->
         <div style="display: none !important;">
             <kbd>Ctrl K</kbd>
         </div>
-        <div class="user-profile">
-            <div class="avatar">JD</div>
-            <div class="user-info">
-                <p>Jean Dufatanye</p>
-                <span>ANALYST</span>
+
+        <!-- Interactive Dynamic User Profile Dropdown -->
+        <div class="topbar-dropdown-container" style="position: relative;">
+            <div class="user-profile" id="topbar-user-toggle" role="button" aria-haspopup="true" aria-expanded="false" style="cursor: pointer; user-select: none;">
+                <div class="avatar">
+                    {% if request.user.is_authenticated and request.user.first_name and request.user.last_name %}
+                        {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+                    {% elif request.user.is_authenticated and request.user.username %}
+                        {{ request.user.username|slice:":2"|upper }}
+                    {% else %}
+                        JD
+                    {% endif %}
+                </div>
+                <div class="user-info">
+                    <p>
+                        {% if request.user.is_authenticated and request.user.get_full_name %}
+                            {{ request.user.get_full_name }}
+                        {% elif request.user.is_authenticated and request.user.username %}
+                            {{ request.user.username }}
+                        {% else %}
+                            Jean Dufatanye
+                        {% endif %}
+                    </p>
+                    <span>
+                        {% if request.user.is_authenticated and request.user.role %}
+                            {{ request.user.get_role_display|default:request.user.role }}
+                        {% else %}
+                            ANALYST
+                        {% endif %}
+                    </span>
+                </div>
+                <i class="fa-solid fa-chevron-down" style="font-size: 10px; color: var(--text-muted); cursor: pointer; margin-left: 2px;"></i>
             </div>
-            <i class="fa-solid fa-chevron-down" style="font-size: 10px; color: var(--text-muted); cursor: pointer;"></i>
+
+            <!-- Profile Dropdown Menu -->
+            <div id="topbar-user-dropdown" class="topbar-popover" style="display: none; position: absolute; right: 0; top: 46px; width: 230px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 1000; overflow: hidden; padding: 6px 0;">
+                <div style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; background: #f8fafc;">
+                    <div style="font-size: 12px; font-weight: 600; color: #1e293b;">
+                        {% if request.user.is_authenticated and request.user.get_full_name %}
+                            {{ request.user.get_full_name }}
+                        {% elif request.user.is_authenticated and request.user.username %}
+                            {{ request.user.username }}
+                        {% else %}
+                            Jean Dufatanye
+                        {% endif %}
+                    </div>
+                    <div style="font-size: 10px; color: #64748b;">
+                        {% if request.user.is_authenticated and request.user.email %}
+                            {{ request.user.email }}
+                        {% else %}
+                            analyst@agrilens.rw
+                        {% endif %}
+                    </div>
+                    {% if user_geo_badge %}
+                    <div style="font-size: 9px; margin-top: 4px; padding: 2px 6px; background: #e0f2fe; color: #0369a1; border-radius: 4px; display: inline-block; font-weight: 600;">
+                        {{ user_geo_badge }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div style="padding: 4px 0;">
+                    <a href="/accounts/profile/" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 12px; color: #334155; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                        <i class="fa-regular fa-user" style="width: 14px; color: #64748b;"></i>
+                        <span>My Profile</span>
+                    </a>
+                    
+                    {% if request.user.is_authenticated and request.user.is_superuser or request.user.role == 'ADMIN' %}
+                    <a href="/accounts/users/" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 12px; color: #334155; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                        <i class="fa-solid fa-users-gear" style="width: 14px; color: #64748b;"></i>
+                        <span>Officers &amp; Roles</span>
+                    </a>
+                    <a href="/accounts/audit-log/" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 12px; color: #334155; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                        <i class="fa-solid fa-shield-halved" style="width: 14px; color: #64748b;"></i>
+                        <span>Security Audit Trail</span>
+                    </a>
+                    {% endif %}
+
+                    {% if request.user.role in 'ADMIN,REVIEWER,NISR_DATA_MANAGER' or request.user.is_superuser %}
+                    <a href="/data-management/manual/?status=SUBMITTED" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 12px; color: #334155; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                        <i class="fa-solid fa-clipboard-check" style="width: 14px; color: #64748b;"></i>
+                        <span>Review Queue</span>
+                        {% if pending_reviews_count and pending_reviews_count > 0 %}
+                        <span style="margin-left: auto; background: #ef4444; color: #fff; font-size: 9px; padding: 1px 5px; border-radius: 10px; font-weight: 700;">{{ pending_reviews_count }}</span>
+                        {% endif %}
+                    </a>
+                    {% endif %}
+                    
+                    <a href="/dashboard/" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 12px; color: #334155; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                        <i class="fa-solid fa-house" style="width: 14px; color: #64748b;"></i>
+                        <span>National Dashboard</span>
+                    </a>
+                    <a href="/" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 12px; color: #334155; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                        <i class="fa-solid fa-earth-africa" style="width: 14px; color: #64748b;"></i>
+                        <span>Public Portal</span>
+                    </a>
+                </div>
+
+                <div style="border-top: 1px solid #f1f5f9; padding-top: 4px;">
+                    {% if request.user.is_authenticated %}
+                    <a href="/accounts/logout/" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 12px; color: #ef4444; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
+                        <i class="fa-solid fa-right-from-bracket" style="width: 14px;"></i>
+                        <span>Sign Out</span>
+                    </a>
+                    {% else %}
+                    <a href="/accounts/login/" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 12px; color: var(--primary-green); text-decoration: none; font-weight: 600; transition: background 0.15s;" onmouseover="this.style.background='#ecfdf5'" onmouseout="this.style.background='transparent'">
+                        <i class="fa-solid fa-right-to-bracket" style="width: 14px;"></i>
+                        <span>Sign In</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </header>
+
+<script>
+(function() {
+    function setupDropdown(toggleId, menuId) {
+        const toggle = document.getElementById(toggleId);
+        const menu = document.getElementById(menuId);
+        if (!toggle || !menu) return;
+
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isOpen = menu.style.display === 'block';
+            document.querySelectorAll('.topbar-popover').forEach(function(p) {
+                p.style.display = 'none';
+            });
+            menu.style.display = isOpen ? 'none' : 'block';
+        });
+    }
+
+    setupDropdown('topbar-notification-toggle', 'topbar-notifications-dropdown');
+    setupDropdown('topbar-user-toggle', 'topbar-user-dropdown');
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.topbar-dropdown-container')) {
+            document.querySelectorAll('.topbar-popover').forEach(function(p) {
+                p.style.display = 'none';
+            });
+        }
+    });
+
+    const sbToggle = document.getElementById('topbar-sidebar-toggle');
+    if (sbToggle) {
+        sbToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('active');
+                sidebar.classList.toggle('show-mobile');
+            }
+        });
+    }
+})();
+</script>

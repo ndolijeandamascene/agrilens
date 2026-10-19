@@ -10,49 +10,92 @@
 
     <div class="nav-section">
         <div class="nav-title">Core Intelligence</div>
-        <a href="/dashboard/" class="nav-item active"><i class="fa-solid fa-house"></i> National Dashboard</a>
-        <a href="/" class="nav-item"><i class="fa-solid fa-map-location-dot"></i> Public Portal & Map</a>
+        <a href="/dashboard/" class="nav-item {% if request.path == '/dashboard/' %}active{% endif %}"><i class="fa-solid fa-house"></i> National Dashboard</a>
+        <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}"><i class="fa-solid fa-map-location-dot"></i> Public Portal & Map</a>
     </div>
 
     <div class="nav-section">
         <div class="nav-title">Productivity & Gap</div>
-        <a href="/indicators/productivity/" class="nav-item"><i class="fa-solid fa-chart-line"></i> Yield Gap Intelligence</a>
+        <a href="/indicators/productivity/" class="nav-item {% if request.path|slice:':12' == '/indicators/' %}active{% endif %}"><i class="fa-solid fa-chart-line"></i> Yield Gap Intelligence</a>
     </div>
 
     <div class="nav-section">
         <div class="nav-title">Reports & Bulletins</div>
-        <a href="/dashboard/reports/national/" class="nav-item"><i class="fa-regular fa-file-lines"></i> National Report</a>
-        <a href="/dashboard/reports/district/" class="nav-item"><i class="fa-solid fa-folder-open"></i> District Dossier</a>
+        <a href="/dashboard/reports/national/" class="nav-item {% if request.path|slice:':27' == '/dashboard/reports/national' %}active{% endif %}"><i class="fa-regular fa-file-lines"></i> National Report</a>
+        <a href="/dashboard/reports/district/" class="nav-item {% if request.path|slice:':27' == '/dashboard/reports/district' %}active{% endif %}"><i class="fa-solid fa-folder-open"></i> District Dossier</a>
     </div>
 
     <div class="nav-section">
         <div class="nav-title">Agricultural Domains</div>
-        <a href="/agriculture/" class="nav-item"><i class="fa-solid fa-seedling"></i> Crops & Seasons</a>
-        <a href="/geography/" class="nav-item"><i class="fa-solid fa-map"></i> Districts & Mapping</a>
-        <a href="/surveys/" class="nav-item"><i class="fa-solid fa-calendar-days"></i> Seasonal Surveys</a>
-        <a href="/farmers/" class="nav-item"><i class="fa-solid fa-people-group"></i> Farmers & Cooperatives</a>
-        <a href="/inputs/" class="nav-item"><i class="fa-solid fa-box"></i> Inputs & Subsidies</a>
-        <a href="/markets/" class="nav-item"><i class="fa-solid fa-shop"></i> Commodity Markets</a>
-        <a href="/api/" class="nav-item"><i class="fa-solid fa-code"></i> Developer Data API</a>
+        <a href="/agriculture/" class="nav-item {% if request.path|slice:':13' == '/agriculture/' %}active{% endif %}"><i class="fa-solid fa-seedling"></i> Crops & Seasons</a>
+        <a href="/geography/" class="nav-item {% if request.path|slice:':11' == '/geography/' %}active{% endif %}"><i class="fa-solid fa-map"></i> Districts & Mapping</a>
+        <a href="/surveys/" class="nav-item {% if request.path|slice:':9' == '/surveys/' %}active{% endif %}"><i class="fa-solid fa-calendar-days"></i> Seasonal Surveys</a>
+        <a href="/farmers/" class="nav-item {% if request.path|slice:':9' == '/farmers/' %}active{% endif %}"><i class="fa-solid fa-people-group"></i> Farmers & Cooperatives</a>
+        <a href="/inputs/" class="nav-item {% if request.path|slice:':8' == '/inputs/' %}active{% endif %}"><i class="fa-solid fa-box"></i> Inputs & Subsidies</a>
+        <a href="/markets/" class="nav-item {% if request.path|slice:':9' == '/markets/' %}active{% endif %}"><i class="fa-solid fa-shop"></i> Commodity Markets</a>
+        <a href="/api/" class="nav-item {% if request.path|slice:':5' == '/api/' %}active{% endif %}"><i class="fa-solid fa-code"></i> Developer Data API</a>
     </div>
     
     <div class="nav-section">
         <div class="nav-title">Data Governance</div>
-        <a href="/data-management/" class="nav-item"><i class="fa-solid fa-sitemap"></i> Data Lineage Hub</a>
-        <a href="/data-management/manual/" class="nav-item"><i class="fa-solid fa-book"></i> Manual Registry</a>
-        <a href="/data-management/manual/new/" class="nav-item"><i class="fa-solid fa-cloud-arrow-up"></i> Submit Observation</a>
+        <a href="/data-management/" class="nav-item {% if request.path == '/data-management/' %}active{% endif %}"><i class="fa-solid fa-sitemap"></i> Data Lineage Hub</a>
+        <a href="/data-management/manual/" class="nav-item {% if request.path == '/data-management/manual/' %}active{% endif %}"><i class="fa-solid fa-book"></i> Manual Registry</a>
+        <a href="/data-management/manual/new/" class="nav-item {% if request.path|slice:':21' == '/data-management/manual' and request.path != '/data-management/manual/' %}active{% endif %}"><i class="fa-solid fa-cloud-arrow-up"></i> Submit Observation</a>
     </div>
 
     <div class="nav-section">
         <div class="nav-title">Administration</div>
-        <a href="/accounts/users/" class="nav-item"><i class="fa-solid fa-users-gear"></i> Officers &amp; Roles</a>
-        <a href="/accounts/users/create/" class="nav-item"><i class="fa-solid fa-user-plus"></i> Register Officer</a>
-        <a href="/accounts/audit-log/" class="nav-item"><i class="fa-solid fa-shield-halved"></i> Security Audit Trail</a>
+        <a href="/accounts/users/" class="nav-item {% if request.path == '/accounts/users/' or request.path == '/accounts/users' %}active{% endif %}"><i class="fa-solid fa-users-gear"></i> Officers &amp; Roles</a>
+        <a href="/accounts/users/create/" class="nav-item {% if request.path == '/accounts/users/create/' or request.path == '/accounts/users/new/' %}active{% endif %}"><i class="fa-solid fa-user-plus"></i> Register Officer</a>
+        <a href="/accounts/audit-log/" class="nav-item {% if request.path|slice:':19' == '/accounts/audit-log' %}active{% endif %}"><i class="fa-solid fa-shield-halved"></i> Security Audit Trail</a>
     </div>
 
     <div class="nav-section">
         <div class="nav-title">Account</div>
-        <a href="/accounts/profile/" class="nav-item"><i class="fa-solid fa-user"></i> My Profile</a>
+        <a href="/accounts/profile/" class="nav-item {% if request.path|slice:':17' == '/accounts/profile' %}active{% endif %}"><i class="fa-solid fa-user"></i> My Profile</a>
         <a href="/accounts/logout/" class="nav-item"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
     </div>
 </aside>
+
+<script>
+(function() {
+    function highlightActiveMenu() {
+        var currentPath = window.location.pathname;
+        if (!currentPath) return;
+
+        var navItems = document.querySelectorAll('.sidebar .nav-item');
+        var matchedItem = null;
+        var maxMatchLen = 0;
+
+        navItems.forEach(function(item) {
+            var href = item.getAttribute('href');
+            if (!href) return;
+            var cleanHref = href.split('?')[0];
+
+            if (cleanHref === currentPath) {
+                matchedItem = item;
+                maxMatchLen = 99999;
+            } else if (cleanHref !== '/' && currentPath.indexOf(cleanHref) === 0 && cleanHref.length > maxMatchLen) {
+                matchedItem = item;
+                maxMatchLen = cleanHref.length;
+            }
+        });
+
+        if (matchedItem) {
+            navItems.forEach(function(i) { i.classList.remove('active'); });
+            matchedItem.classList.add('active');
+            var section = matchedItem.closest('.nav-section');
+            if (section) {
+                document.querySelectorAll('.nav-section').forEach(function(s) { s.classList.remove('active'); });
+                section.classList.add('active');
+            }
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', highlightActiveMenu);
+    } else {
+        highlightActiveMenu();
+    }
+})();
+</script>

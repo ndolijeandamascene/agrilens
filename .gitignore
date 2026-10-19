@@ -47,3 +47,7 @@ data/processed/*
 *.swo
 .DS_Store
 Thumbs.db
+
+# Scratchpads & local scripts
+scratch/
+
