@@ -8,6 +8,12 @@ urlpatterns = [
     path('', views.public_home, name='public_home'),
     path('dashboard/', views.dashboard_overview, name='overview'),
 
+    # Public Agricultural Reports & Bulletins (Milestone 4 Design)
+    path('reports/', views.public_reports, name='reports'),
+    path('reports/<slug:slug>/pdf/', views.public_report_pdf, name='report_pdf'),
+    path('reports/<slug:slug>/detail/', views.public_report_detail_api, name='report_detail_api'),
+    path('reports/admin/generate-all/', views.admin_generate_all_reports_view, name='admin_generate_all_reports'),
+
     # Official Intelligence Reports & Bulletins (Milestone 4 Module)
     path('dashboard/reports/national/', views.reports_national, name='reports_national'),
     path('dashboard/reports/national/export/csv/', views.reports_national_export_csv, name='reports_national_export_csv'),

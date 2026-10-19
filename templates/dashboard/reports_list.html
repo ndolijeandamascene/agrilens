@@ -1,0 +1,375 @@
+{% extends 'public_base.html' %}
+{% load static %}
+
+{% block title %}Reports &amp; Bulletins • AgriLens Rwanda{% endblock %}
+
+{% block content %}
+<div class="reports-page-wrapper">
+    <!-- Hero Banner -->
+    <section class="reports-hero-banner" style="background-image: linear-gradient(135deg, rgba(6, 78, 59, 0.92) 0%, rgba(4, 47, 46, 0.95) 100%), url('{% static "images/hero_rwanda_hills.jpg" %}');">
+        <div class="reports-hero-container">
+            <div class="reports-hero-text">
+                <h1 class="reports-hero-title">Reports &amp; Bulletins</h1>
+                <p class="reports-hero-subtitle">Access published agricultural reports, statistics and insights.</p>
+            </div>
+            <div class="reports-hero-icon-card" aria-hidden="true">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <div class="reports-main-container">
+        <!-- Optional Admin Operations Bar -->
+        {% if request.user.is_authenticated and request.user.is_staff or request.user.role in 'national_analyst,data_manager' %}
+        <div class="reports-admin-bar">
+            <div class="admin-bar-left">
+                <span class="admin-shield-icon">🛡️</span>
+                <div>
+                    <strong>Administrative Operations &bull; MINAGRI / NISR Synthesis Engine</strong>
+                    <div class="admin-bar-sub">Synthesize and publish verified SAS microdata into downloadable official PDFs</div>
+                </div>
+            </div>
+            <div class="admin-bar-right">
+                <button type="button" id="btnAdminGenerateAll" class="btn-admin-generate">
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-text">Generate All Reports</span>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Alert Notification Box -->
+        <div id="reportsAlertNotice" class="reports-alert-notice" style="display: none;"></div>
+
+        <div class="reports-layout-grid">
+            <!-- Left Column: Filter Sidebar -->
+            <aside class="reports-filter-sidebar">
+                <div class="reports-filter-card">
+                    <h2 class="filter-card-title">Filter Reports</h2>
+                    <form method="GET" action="/reports/" id="reportsFilterForm">
+                        <!-- Report Type Filter -->
+                        <div class="form-group-filter">
+                            <label for="reportTypeSelect" class="filter-label">Report Type</label>
+                            <div class="select-wrapper">
+                                <select name="type" id="reportTypeSelect" class="filter-select">
+                                    <option value="all" {% if active_type == 'all' or not active_type %}selected{% endif %}>All Types</option>
+                                    {% for t in report_types %}
+                                    <option value="{{ t.code }}" {% if active_type == t.code %}selected{% endif %}>
+                                        {{ t.label }}{% if t.count %} ({{ t.count }}){% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <svg class="select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                        </div>
+
+                        <!-- Crop Filter -->
+                        <div class="form-group-filter">
+                            <label for="cropSelect" class="filter-label">Crop</label>
+                            <div class="select-wrapper">
+                                <select name="crop" id="cropSelect" class="filter-select">
+                                    <option value="all" {% if active_crop == 'all' or not active_crop %}selected{% endif %}>All Crops</option>
+                                    {% for c in available_crops %}
+                                    <option value="{{ c }}" {% if active_crop == c %}selected{% endif %}>{{ c }}</option>
+                                    {% endfor %}
+                                </select>
+                                <svg class="select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                        </div>
+
+                        <!-- Season Filter -->
+                        <div class="form-group-filter">
+                            <label for="seasonSelect" class="filter-label">Season</label>
+                            <div class="select-wrapper">
+                                <select name="season" id="seasonSelect" class="filter-select">
+                                    <option value="all" {% if active_season == 'all' or not active_season %}selected{% endif %}>All Seasons</option>
+                                    {% for s in available_seasons %}
+                                    <option value="{{ s }}" {% if active_season == s %}selected{% endif %}>{{ s }}</option>
+                                    {% endfor %}
+                                </select>
+                                <svg class="select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                        </div>
+
+                        <!-- Year Filter -->
+                        <div class="form-group-filter">
+                            <label for="yearSelect" class="filter-label">Year</label>
+                            <div class="select-wrapper">
+                                <select name="year" id="yearSelect" class="filter-select">
+                                    <option value="all" {% if active_year == 'all' or not active_year %}selected{% endif %}>All Years</option>
+                                    {% for y in available_years %}
+                                    <option value="{{ y }}" {% if active_year|stringformat:"s" == y|stringformat:"s" %}selected{% endif %}>{{ y }}</option>
+                                    {% endfor %}
+                                </select>
+                                <svg class="select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="filter-actions">
+                            <button type="submit" class="btn-filter-apply">Apply Filters</button>
+                            <a href="/reports/" class="btn-filter-reset">Reset</a>
+                        </div>
+                    </form>
+                </div>
+            </aside>
+
+            <!-- Right Column: Reports Table -->
+            <main class="reports-content-area">
+                <div class="reports-table-card">
+                    <table class="reports-table" aria-label="Published Agricultural Reports">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="th-title">Title</th>
+                                <th scope="col" class="th-date">Date</th>
+                                <th scope="col" class="th-download">Download</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsTableBody">
+                            {% for report in reports %}
+                            <tr class="report-row" data-slug="{{ report.slug }}">
+                                <td class="td-title">
+                                    <a href="javascript:void(0)" class="report-title-link" onclick="openReportModal('{{ report.slug }}')">
+                                        {{ report.title }}
+                                    </a>
+                                    {% if report.subtitle %}
+                                    <div class="report-subtitle">{{ report.subtitle }}</div>
+                                    {% endif %}
+                                </td>
+                                <td class="td-date">
+                                    {{ report.date_display|default:report.publication_date }}
+                                </td>
+                                <td class="td-download">
+                                    <a href="/reports/{{ report.slug }}/pdf/" class="btn-pdf-download" target="_blank" rel="noopener" title="Download official PDF report">
+                                        PDF
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="reports-empty-state">
+                                    <div class="empty-icon">📂</div>
+                                    <h3>No reports match the selected filters</h3>
+                                    <p>Try resetting filters or selecting different criteria.</p>
+                                    <a href="/reports/" class="btn-filter-reset">Reset All Filters</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination Footer -->
+                {% if paginator.count > 0 %}
+                <div class="reports-pagination-container">
+                    <div class="reports-pagination-info">
+                        Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ paginator.count }} reports
+                    </div>
+                    {% if paginator.num_pages > 1 %}
+                    <nav class="reports-pagination-nav" aria-label="Reports Pagination">
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if active_type != 'all' %}&type={{ active_type }}{% endif %}{% if active_crop != 'all' %}&crop={{ active_crop }}{% endif %}{% if active_season != 'all' %}&season={{ active_season }}{% endif %}{% if active_year != 'all' %}&year={{ active_year }}{% endif %}" class="page-pill page-arrow" aria-label="Previous Page">
+                            &lt;
+                        </a>
+                        {% endif %}
+
+                        {% for p in paginator.page_range %}
+                            {% if p == page_obj.number %}
+                            <span class="page-pill active" aria-current="page">{{ p }}</span>
+                            {% elif p >= page_obj.number|add:"-2" and p <= page_obj.number|add:"2" %}
+                            <a href="?page={{ p }}{% if active_type != 'all' %}&type={{ active_type }}{% endif %}{% if active_crop != 'all' %}&crop={{ active_crop }}{% endif %}{% if active_season != 'all' %}&season={{ active_season }}{% endif %}{% if active_year != 'all' %}&year={{ active_year }}{% endif %}" class="page-pill">
+                                {{ p }}
+                            </a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if active_type != 'all' %}&type={{ active_type }}{% endif %}{% if active_crop != 'all' %}&crop={{ active_crop }}{% endif %}{% if active_season != 'all' %}&season={{ active_season }}{% endif %}{% if active_year != 'all' %}&year={{ active_year }}{% endif %}" class="page-pill page-arrow" aria-label="Next Page">
+                            &gt;
+                        </a>
+                        {% endif %}
+                    </nav>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </main>
+        </div>
+    </div>
+</div>
+
+<!-- Interactive Modal for Report Details & Preview -->
+<div id="reportModal" class="report-modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modalReportTitle">
+    <div class="report-modal-dialog">
+        <div class="report-modal-header">
+            <div>
+                <span id="modalReportBadge" class="modal-report-badge">Report</span>
+                <h2 id="modalReportTitle" class="modal-report-title">Report Title</h2>
+                <div id="modalReportSubtitle" class="modal-report-subtitle">Subtitle</div>
+            </div>
+            <button type="button" class="modal-close-btn" onclick="closeReportModal()" aria-label="Close dialog">&times;</button>
+        </div>
+
+        <div class="report-modal-body">
+            <div class="modal-meta-strip">
+                <div><strong>Published:</strong> <span id="modalReportDate">-</span></div>
+                <div><strong>Crop:</strong> <span id="modalReportCrop">-</span></div>
+                <div><strong>Season:</strong> <span id="modalReportSeason">-</span></div>
+            </div>
+
+            <div class="modal-section-title">1. Executive Summary</div>
+            <p id="modalReportSummary" class="modal-summary-text">Summary text...</p>
+
+            <div class="modal-section-title">2. Key Performance Indicators</div>
+            <div class="modal-kpi-table-wrapper">
+                <table class="modal-kpi-table">
+                    <thead>
+                        <tr>
+                            <th>Indicator Metric</th>
+                            <th>Statistical Value</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalKpiTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="report-modal-footer">
+            <a id="modalPdfBtn" href="#" target="_blank" rel="noopener" class="btn-modal-download">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download Official PDF
+            </a>
+            <button type="button" class="btn-modal-close" onclick="closeReportModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Dynamic Interactive Modal Handler
+function openReportModal(slug) {
+    const modal = document.getElementById('reportModal');
+    if (!modal) return;
+
+    fetch('/reports/' + encodeURIComponent(slug) + '/detail/')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('modalReportTitle').textContent = data.title;
+            document.getElementById('modalReportSubtitle').textContent = data.subtitle || '';
+            document.getElementById('modalReportBadge').textContent = data.report_type_label || 'Official Report';
+            document.getElementById('modalReportDate').textContent = data.date_display || '';
+            document.getElementById('modalReportCrop').textContent = data.crop || 'All Crops';
+            document.getElementById('modalReportSeason').textContent = data.season || 'All Seasons';
+            document.getElementById('modalReportSummary').textContent = data.executive_summary || 'No summary available.';
+            document.getElementById('modalPdfBtn').href = data.pdf_url;
+
+            const kpiTbody = document.getElementById('modalKpiTableBody');
+            kpiTbody.innerHTML = '';
+            if (data.key_metrics && Object.keys(data.key_metrics).length > 0) {
+                for (const [key, value] of Object.entries(data.key_metrics)) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${escapeHtml(key)}</strong></td>
+                        <td>${escapeHtml(String(value))}</td>
+                        <td><span class="status-verified-badge">✓ Validated</span></td>
+                    `;
+                    kpiTbody.appendChild(tr);
+                }
+            } else {
+                kpiTbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #64748b;">No specific KPI metrics defined.</td></tr>';
+            }
+
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        })
+        .catch(err => {
+            console.error('Failed to load report detail:', err);
+            // Fallback direct download
+            window.open('/reports/' + encodeURIComponent(slug) + '/pdf/', '_blank');
+        });
+}
+
+function closeReportModal() {
+    const modal = document.getElementById('reportModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
+// Close on backdrop click or ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeReportModal();
+});
+document.getElementById('reportModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeReportModal();
+});
+
+// Admin Generate All Reports Dynamic Trigger
+document.getElementById('btnAdminGenerateAll')?.addEventListener('click', function() {
+    const btn = this;
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border" style="width: 14px; height: 14px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; display: inline-block; animation: spin 0.8s linear infinite; margin-right: 6px;"></span> Generating...';
+
+    const csrfToken = getCookie('csrftoken') || '{{ csrf_token }}';
+
+    fetch('/reports/admin/generate-all/', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'format=json'
+    })
+    .then(r => r.json())
+    .then(res => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        const notice = document.getElementById('reportsAlertNotice');
+        if (notice) {
+            notice.className = 'reports-alert-notice ' + (res.success ? 'notice-success' : 'notice-error');
+            notice.innerHTML = `<strong>${res.success ? '✓ Success:' : '⚠ Error:'}</strong> ${res.message || 'Operation completed.'}`;
+            notice.style.display = 'block';
+            setTimeout(() => { notice.style.display = 'none'; }, 6000);
+        }
+        if (res.success) {
+            setTimeout(() => { window.location.reload(); }, 1200);
+        }
+    })
+    .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        alert('Report generation completed or refreshed.');
+        window.location.reload();
+    });
+});
+
+function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

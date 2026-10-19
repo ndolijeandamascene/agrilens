@@ -569,3 +569,206 @@ def reports_district_export_excel(request, district_id=None):
     return generate_district_excel(target_district, year_filter, season_filter, source_filter, crop_filter, district_summary, sectors)
 
 
+# ==============================================================================
+# Official Published Agricultural Reports & Bulletins (Milestone 4 Public Module)
+# ==============================================================================
+import os
+from django.conf import settings
+from django.db import models
+from django.db.models import Count, F, Q
+from django.core.paginator import Paginator
+from django.http import FileResponse, Http404, JsonResponse, HttpResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from .models import PublishedReport
+from .report_service import (
+    ensure_approved_reports_seeded,
+    generate_pdf_for_report,
+    admin_generate_all_reports_service,
+)
+
+
+def public_reports(request):
+    """
+    Public portal for Published Agricultural Reports, Statistics & Bulletins.
+    Matches the official design layout (hero banner, dynamic multi-select filters,
+    paginated publication ledger, ReportLab PDF downloads, and interactive modal preview).
+    """
+    ensure_approved_reports_seeded()
+
+    type_filter = request.GET.get('type', 'all').strip()
+    crop_filter = request.GET.get('crop', 'all').strip()
+    season_filter = request.GET.get('season', 'all').strip()
+    year_filter = request.GET.get('year', 'all').strip()
+    search_query = request.GET.get('q', '').strip()
+
+    reports_qs = PublishedReport.objects.filter(is_published=True)
+
+    if type_filter and type_filter != 'all':
+        reports_qs = reports_qs.filter(report_type=type_filter)
+
+    if crop_filter and crop_filter != 'all':
+        reports_qs = reports_qs.filter(crop=crop_filter)
+
+    if season_filter and season_filter != 'all':
+        reports_qs = reports_qs.filter(season=season_filter)
+
+    if year_filter and year_filter != 'all':
+        try:
+            reports_qs = reports_qs.filter(year=int(year_filter))
+        except (ValueError, TypeError):
+            pass
+
+    if search_query:
+        reports_qs = reports_qs.filter(
+            Q(title__icontains=search_query) |
+            Q(subtitle__icontains=search_query) |
+            Q(executive_summary__icontains=search_query)
+        )
+
+    # 5 items per page to match exact mockup
+    paginator = Paginator(reports_qs.order_by('-publication_date', '-id'), 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    # Dynamic filter options from active published data
+    available_crops = list(PublishedReport.objects.filter(is_published=True).values_list('crop', flat=True).distinct().order_by('crop'))
+    available_seasons = list(PublishedReport.objects.filter(is_published=True).values_list('season', flat=True).distinct().order_by('-season'))
+    available_years = list(PublishedReport.objects.filter(is_published=True).values_list('year', flat=True).distinct().order_by('-year'))
+
+    # Dynamic count of reports by type
+    type_counts = dict(
+        PublishedReport.objects.filter(is_published=True)
+        .values('report_type')
+        .annotate(total=models.Count('id'))
+        .values_list('report_type', 'total')
+    )
+
+    enriched_report_types = []
+    for code, label in PublishedReport.REPORT_TYPES:
+        cnt = type_counts.get(code, 0)
+        enriched_report_types.append({
+            'code': code,
+            'label': label,
+            'count': cnt
+        })
+
+    # Dynamic JSON response for AJAX requests
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('format') == 'json':
+        results = []
+        for r in page_obj:
+            results.append({
+                'id': r.id,
+                'slug': r.slug,
+                'title': r.title,
+                'subtitle': r.subtitle,
+                'report_type': r.report_type,
+                'report_type_label': r.report_type_label or r.get_report_type_display(),
+                'crop': r.crop,
+                'season': r.season,
+                'year': r.year,
+                'date_display': r.date_display or r.publication_date.strftime('%b %d, %Y'),
+                'executive_summary': r.executive_summary,
+                'key_metrics': r.key_metrics,
+                'pdf_url': f"/reports/{r.slug}/pdf/",
+            })
+        return JsonResponse({
+            'reports': results,
+            'page': page_obj.number,
+            'num_pages': paginator.num_pages,
+            'has_next': page_obj.has_next(),
+            'has_previous': page_obj.has_previous(),
+            'total_count': paginator.count,
+            'start_index': page_obj.start_index(),
+            'end_index': page_obj.end_index(),
+        })
+
+    context = {
+        'page_title': 'Reports & Bulletins • AgriLens Rwanda',
+        'is_public_page': True,
+        'reports': page_obj,
+        'page_obj': page_obj,
+        'paginator': paginator,
+        'total_reports_count': paginator.count,
+        'report_types': enriched_report_types,
+        'available_crops': available_crops,
+        'available_seasons': available_seasons,
+        'available_years': available_years,
+        'active_type': type_filter,
+        'active_crop': crop_filter,
+        'active_season': season_filter,
+        'active_year': year_filter,
+        'search_query': search_query,
+    }
+    return render(request, 'dashboard/reports_list.html', context)
+
+
+def public_report_pdf(request, slug):
+    """
+    Serves the official PDF document for a published agricultural report.
+    Generates it dynamically on the fly if not yet created on disk.
+    """
+    report = get_object_or_404(PublishedReport, slug=slug, is_published=True)
+    pdf_path = os.path.join(settings.MEDIA_ROOT, 'reports', f"{report.slug}.pdf")
+
+    if not os.path.exists(pdf_path):
+        generate_pdf_for_report(report)
+
+    PublishedReport.objects.filter(pk=report.pk).update(downloads_count=models.F('downloads_count') + 1)
+
+    return FileResponse(
+        open(pdf_path, 'rb'),
+        content_type='application/pdf',
+        as_attachment=False,
+        filename=f"{report.slug}.pdf"
+    )
+
+
+def public_report_detail_api(request, slug):
+    """
+    Dynamic API endpoint returning single report details for interactive popup modal.
+    """
+    report = get_object_or_404(PublishedReport, slug=slug, is_published=True)
+    return JsonResponse({
+        'slug': report.slug,
+        'title': report.title,
+        'subtitle': report.subtitle,
+        'report_type': report.report_type,
+        'report_type_label': report.report_type_label or report.get_report_type_display(),
+        'crop': report.crop,
+        'season': report.season,
+        'year': report.year,
+        'date_display': report.date_display or report.publication_date.strftime('%b %d, %Y'),
+        'executive_summary': report.executive_summary,
+        'key_metrics': report.key_metrics,
+        'pdf_url': f"/reports/{report.slug}/pdf/",
+        'downloads_count': report.downloads_count
+    })
+
+
+def admin_generate_all_reports_view(request):
+    """
+    Administrative endpoint to dynamically synthesize and publish all official agricultural reports.
+    Accessible to system administrators and NISR/MINAGRI verified officers.
+    """
+    if not (request.user.is_authenticated and (request.user.is_staff or getattr(request.user, 'role', '') in ('national_analyst', 'data_manager'))):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Administrative clearance required.'}, status=403)
+        messages.error(request, 'Administrative clearance required to generate official reports.')
+        return redirect('dashboard:reports')
+
+    result = admin_generate_all_reports_service(user=request.user)
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.POST.get('format') == 'json':
+        return JsonResponse({
+            'success': True,
+            'count': result['count'],
+            'timestamp': result['timestamp'],
+            'message': f"Successfully compiled and published {result['count']} official agricultural reports with verified microdata."
+        })
+
+    messages.success(request, f"Successfully compiled and published {result['count']} official agricultural reports with verified microdata.")
+    return redirect('dashboard:reports')
+
+
+
