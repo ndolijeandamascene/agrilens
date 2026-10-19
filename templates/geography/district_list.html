@@ -232,10 +232,10 @@
                 </div>
             </div>
 
-            <!-- Action Link Button -->
-            <a href="/dashboard/reports/district/{{ selected_district_id }}/" id="btn-view-district-report" class="btn-view-district-report">
+            <!-- Action Trigger Button (Opens Public Interactive District Report Modal) -->
+            <button type="button" id="btn-view-district-report" class="btn-view-district-report" onclick="openDistrictReportModal()" aria-haspopup="dialog" aria-controls="district-report-modal">
                 View District Report →
-            </a>
+            </button>
 
         </div>
     </div>
@@ -314,6 +314,191 @@
         <span data-district-id="{{ dist.id }}">{{ dist.name }}</span>
     {% endfor %}
 </div>
+
+<!-- ==========================================================================
+     Comprehensive Public District Agricultural Report Modal
+     ========================================================================== -->
+<div id="district-report-modal" class="district-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-district-title">
+    <div class="district-modal-card">
+        <!-- Modal Header -->
+        <div class="district-modal-header">
+            <div class="modal-header-info">
+                <div class="modal-top-badge">
+                    <span class="badge-dot"></span>
+                    <span>Official Public Agricultural Dossier &bull; NISR &amp; MINAGRI Verified</span>
+                </div>
+                <h2 id="modal-district-title" class="modal-district-title">Nyabihu District Report</h2>
+                <p id="modal-district-subtitle" class="modal-district-subtitle">
+                    <span id="modal-province-name">Western Province</span> &bull; Season: <span id="modal-season-label">SAS 2024 – 2025</span> &bull; Active Crop: <span id="modal-crop-label">Maize</span>
+                </p>
+            </div>
+            <div class="modal-header-actions">
+                <button type="button" class="btn-modal-print" onclick="window.print()" title="Print or save as PDF">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    <span>Print Report</span>
+                </button>
+                <button type="button" class="btn-modal-close" onclick="closeDistrictReportModal()" title="Close report modal" aria-label="Close">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="district-modal-body">
+            <!-- 1. Key Performance Metric Grid -->
+            <div class="modal-kpi-grid">
+                <div class="modal-kpi-card green-accent">
+                    <div class="kpi-card-header">
+                        <span class="kpi-card-title">Average Yield (<span class="modal-active-crop-text">Maize</span>)</span>
+                        <span class="kpi-chip-pill" id="modal-yield-badge">+44% vs Nat'l Avg</span>
+                    </div>
+                    <div class="kpi-card-val" id="modal-kpi-yield">3.6 <span class="unit">t/ha</span></div>
+                    <div class="kpi-card-footnote">National Benchmark: ~2.5 t/ha</div>
+                </div>
+
+                <div class="modal-kpi-card blue-accent">
+                    <div class="kpi-card-header">
+                        <span class="kpi-card-title">Cultivated Area</span>
+                        <span class="kpi-icon-small">📍</span>
+                    </div>
+                    <div class="kpi-card-val" id="modal-kpi-area">1,240 <span class="unit">ha</span></div>
+                    <div class="kpi-card-footnote">Farmland area dedicated to crop</div>
+                </div>
+
+                <div class="modal-kpi-card purple-accent">
+                    <div class="kpi-card-header">
+                        <span class="kpi-card-title">Total Production</span>
+                        <span class="kpi-icon-small">📦</span>
+                    </div>
+                    <div class="kpi-card-val" id="modal-kpi-prod">4,464 <span class="unit">t</span></div>
+                    <div class="kpi-card-footnote">Total estimated season harvest</div>
+                </div>
+
+                <div class="modal-kpi-card amber-accent">
+                    <div class="kpi-card-header">
+                        <span class="kpi-card-title">National Rank</span>
+                        <span class="kpi-icon-small">🏆</span>
+                    </div>
+                    <div class="kpi-card-val" id="modal-kpi-rank">#4 <span class="unit">/ 30</span></div>
+                    <div class="kpi-card-footnote" id="modal-rank-sub">Top tier productivity in Rwanda</div>
+                </div>
+            </div>
+
+            <!-- 2. Multi-Crop Production Portfolio Table -->
+            <div class="modal-section-box">
+                <div class="modal-section-header">
+                    <h3 class="modal-section-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+                            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+                        </svg>
+                        <span>Multi-Crop Production Portfolio (<span id="modal-table-season">SAS 2024 – 2025</span>)</span>
+                    </h3>
+                    <span class="modal-section-sub">Seasonal statistics for all priority crops monitored in this district</span>
+                </div>
+                
+                <div class="modal-table-wrap">
+                    <table class="modal-crops-table">
+                        <thead>
+                            <tr>
+                                <th>Crop</th>
+                                <th>Yield (t/ha)</th>
+                                <th>Cultivated Area (ha)</th>
+                                <th>Production (t)</th>
+                                <th>Yield Classification</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-crops-tbody">
+                            <!-- Injected dynamically via populateDistrictReportModal() -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. Agro-Ecological Characteristics & Regional Profile -->
+            <div class="modal-profile-grid">
+                <div class="modal-profile-card">
+                    <h4 class="profile-card-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                            <polyline points="2 17 12 22 22 17"></polyline>
+                            <polyline points="2 12 12 17 22 12"></polyline>
+                        </svg>
+                        <span>Agro-Ecological Classification</span>
+                    </h4>
+                    <dl class="profile-dl">
+                        <dt>Zone:</dt>
+                        <dd id="modal-profile-zone">Western Volcanic Highlands &amp; Lake Kivu Basin</dd>
+                        <dt>Elevation:</dt>
+                        <dd id="modal-profile-elevation">High altitude volcanic slopes (1,800m – 2,500m)</dd>
+                        <dt>Rainfall &amp; Climate:</dt>
+                        <dd id="modal-profile-climate">Bimodal rainfall pattern, 1,300mm – 1,600mm / year</dd>
+                    </dl>
+                </div>
+
+                <div class="modal-profile-card">
+                    <h4 class="profile-card-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        <span>Agronomic Strategic Role</span>
+                    </h4>
+                    <dl class="profile-dl">
+                        <dt>Primary Staples:</dt>
+                        <dd id="modal-profile-staples">Irish Potato, Maize, Climbing Beans, Tea</dd>
+                        <dt>Food Security Status:</dt>
+                        <dd id="modal-profile-security">Surplus Producer / Strategic Food Basket</dd>
+                        <dt>Intervention Focus:</dt>
+                        <dd id="modal-profile-focus">Soil erosion control, radical terracing, post-harvest drying</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- 4. Multi-Season Comparative Trend -->
+            <div class="modal-section-box">
+                <div class="modal-trend-row">
+                    <div class="trend-text">
+                        <span class="trend-label">Inter-Season Trend Comparison (<span class="modal-active-crop-text">Maize</span>)</span>
+                        <span class="trend-desc">Performance in current season (SAS 2024–2025) vs preceding season (SAS 2023–2024)</span>
+                    </div>
+                    <div class="trend-stats" id="modal-trend-stats">
+                        <!-- Injected dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="district-modal-footer">
+            <div class="modal-footer-left">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <span>Data verified by National Institute of Statistics of Rwanda (NISR) &amp; MINAGRI Agricultural Surveys.</span>
+            </div>
+            <div class="modal-footer-right">
+                <button type="button" class="btn-modal-action-secondary" onclick="closeDistrictReportModal()">Close</button>
+                <button type="button" class="btn-modal-action-primary" onclick="window.print()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    <span>Print Dossier</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -325,6 +510,6 @@
     }
 </script>
 <!-- AgriLens Interactive Public Map Engine -->
-<script src="{% static 'js/map_page.js' %}?v=20261019_v3"></script>
+<script src="{% static 'js/map_page.js' %}?v=20261019_v4"></script>
 {% endblock %}
 

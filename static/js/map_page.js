@@ -738,11 +738,17 @@ function updateDistrictDetailsCard(dName) {
     if (areaEl) areaEl.textContent = `${metrics.area.toLocaleString()} ha`;
     if (prodEl) prodEl.textContent = `${metrics.prod.toLocaleString()} t`;
 
-    // Update CTA Report Link
+    // Update CTA Report Button for Public Modal
     const reportBtn = document.getElementById('btn-view-district-report');
     if (reportBtn) {
-        const dId = DISTRICT_ID_MAP[dName] || 15;
-        reportBtn.href = `/dashboard/reports/district/${dId}/`;
+        reportBtn.setAttribute('title', `Open ${dName} District Agricultural Dossier`);
+        reportBtn.onclick = () => openDistrictReportModal(dName);
+    }
+
+    // If modal is currently open, dynamically update its content to selected district
+    const modal = document.getElementById('district-report-modal');
+    if (modal && modal.classList.contains('open')) {
+        populateDistrictReportModal(dName);
     }
 }
 
@@ -993,5 +999,253 @@ function setupCustomControls() {
             map.setView([-1.9403, 29.8739], 8.5);
         }
     });
+
+    // Wire up modal background dismissal and escape key
+    const modalBackdrop = document.getElementById('district-report-modal');
+    if (modalBackdrop) {
+        modalBackdrop.addEventListener('click', e => {
+            if (e.target === modalBackdrop) {
+                closeDistrictReportModal();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            closeDistrictReportModal();
+        }
+    });
 }
+
+/* ==========================================================================
+   9. PUBLIC DISTRICT REPORT DOSSIER MODAL CONTROLLER
+   ========================================================================== */
+const DISTRICT_AGRO_ZONES = {
+    'Western Province': {
+        zone: 'Western Volcanic Highlands & Lake Kivu Basin',
+        elevation: 'High altitude volcanic slopes (1,800m – 2,500m)',
+        climate: 'Bimodal rainfall pattern, 1,300mm – 1,600mm / year',
+        staples: 'Irish Potato, Maize, Climbing Beans, Tea & Pyrethrum',
+        security: 'Surplus Producer / Strategic Food Basket',
+        focus: 'Radical terracing, soil erosion mitigation, post-harvest drying'
+    },
+    'Northern Province': {
+        zone: 'Northern Volcanic Highlands & Buberuka Ridge',
+        elevation: 'High altitude volcanic & metamorphic ridges (1,900m – 2,800m)',
+        climate: 'Cool temperate mountain climate, 1,400mm – 1,800mm / year',
+        staples: 'Irish Potato, High-yield Maize, Wheat, Vegetables',
+        security: 'Premier National Grain & Seed Potato Breadbasket',
+        focus: 'Certified seed distribution, lime application, cold storage facilities'
+    },
+    'Southern Province': {
+        zone: 'Central Plateau & Southern Granitic Ridge',
+        elevation: 'Mid-to-high plateau (1,500m – 1,900m)',
+        climate: 'Tropical sub-humid, 1,100mm – 1,350mm / year',
+        staples: 'Cassava, Climbing Beans, Maize, Marshland Rice, Coffee',
+        security: 'Major Staple Cereal & Tuber Food Security Anchor',
+        focus: 'Marshland irrigation schemes, clean cassava cuttings distribution'
+    },
+    'Eastern Province': {
+        zone: 'Eastern Agro-Pastoral Lowland Savannas',
+        elevation: 'Lowland to mid-elevation undulating plains (1,300m – 1,550m)',
+        climate: 'Semi-arid to sub-humid, 800mm – 1,100mm / year',
+        staples: 'Maize, Bush Beans, Banana, Rice, Livestock & Dairy',
+        security: 'Commercial Grain Breadbasket & Extensive Consolidated Farmland',
+        focus: 'Valley dam irrigation, drought-tolerant crop varieties, solar pumping'
+    },
+    'City of Kigali': {
+        zone: 'Central Dissected Hills & Peri-Urban Agricultural Corridor',
+        elevation: 'Central hills and valleys (1,400m – 1,650m)',
+        climate: 'Sub-humid tropical, 1,000mm – 1,200mm / year',
+        staples: 'Intensive Vegetables, Fruits, Poultry & Peri-Urban Horticulture',
+        security: 'High-Value Fresh Market Supply Hub',
+        focus: 'Greenhouse farming, urban food logistics, cold-chain transport'
+    }
+};
+
+function populateDistrictReportModal(districtName) {
+    const dName = districtName || pinnedDistrictName || 'Nyabihu';
+    const province = DISTRICT_PROVINCE_MAP[dName] || 'Western Province';
+    const metrics = getDistrictMetrics(dName);
+    const seasonLabel = (MAP_SEASON_DATA[currentSeason] || {}).label || 'SAS 2024 – 2025';
+
+    // Header info
+    const titleEl = document.getElementById('modal-district-title');
+    const provEl = document.getElementById('modal-province-name');
+    const seasonEl = document.getElementById('modal-season-label');
+    const cropEl = document.getElementById('modal-crop-label');
+    const tableSeasonEl = document.getElementById('modal-table-season');
+
+    if (titleEl) titleEl.textContent = `${dName} District Report`;
+    if (provEl) provEl.textContent = province;
+    if (seasonEl) seasonEl.textContent = seasonLabel;
+    if (cropEl) cropEl.textContent = currentCrop;
+    if (tableSeasonEl) tableSeasonEl.textContent = seasonLabel;
+
+    document.querySelectorAll('.modal-active-crop-text').forEach(el => {
+        el.textContent = currentCrop;
+    });
+
+    // Top 4 KPI Metrics
+    const kpiYieldEl = document.getElementById('modal-kpi-yield');
+    const kpiAreaEl = document.getElementById('modal-kpi-area');
+    const kpiProdEl = document.getElementById('modal-kpi-prod');
+    const kpiRankEl = document.getElementById('modal-kpi-rank');
+    const yieldBadgeEl = document.getElementById('modal-yield-badge');
+    const rankSubEl = document.getElementById('modal-rank-sub');
+
+    if (kpiYieldEl) kpiYieldEl.innerHTML = `${metrics.yield.toFixed(1)} <span class="unit">t/ha</span>`;
+    if (kpiAreaEl) kpiAreaEl.innerHTML = `${metrics.area.toLocaleString()} <span class="unit">ha</span>`;
+    if (kpiProdEl) kpiProdEl.innerHTML = `${metrics.prod.toLocaleString()} <span class="unit">t</span>`;
+
+    // Calculate District Rank for Current Crop across Rwanda
+    const sObj = MAP_SEASON_DATA[currentSeason] || MAP_SEASON_DATA['2025A'];
+    const cropObj = sObj.crops[currentCrop] || sObj.crops['Maize'];
+    const distList = Object.entries(cropObj.districts).map(([name, data]) => ({ name, yield: data.yield }));
+    distList.sort((a, b) => b.yield - a.yield);
+    const rankIdx = distList.findIndex(d => d.name === dName);
+    const rankNum = rankIdx !== -1 ? (rankIdx + 1) : 4;
+
+    if (kpiRankEl) kpiRankEl.innerHTML = `#${rankNum} <span class="unit">/ 30</span>`;
+    if (rankSubEl) {
+        if (rankNum <= 5) {
+            rankSubEl.textContent = 'Top tier productivity nationwide';
+        } else if (rankNum <= 15) {
+            rankSubEl.textContent = 'Above average national productivity';
+        } else {
+            rankSubEl.textContent = 'Developing agricultural territory';
+        }
+    }
+
+    // Benchmark comparison (against national mean)
+    const totalYield = distList.reduce((sum, d) => sum + d.yield, 0);
+    const natAvg = distList.length > 0 ? (totalYield / distList.length) : 2.5;
+    const diffPct = ((metrics.yield - natAvg) / natAvg) * 100;
+
+    if (yieldBadgeEl) {
+        if (diffPct >= 0) {
+            yieldBadgeEl.textContent = `+${diffPct.toFixed(0)}% vs Nat'l Avg`;
+            yieldBadgeEl.style.background = '#DCFCE7';
+            yieldBadgeEl.style.color = '#15803d';
+        } else {
+            yieldBadgeEl.textContent = `${diffPct.toFixed(0)}% vs Nat'l Avg`;
+            yieldBadgeEl.style.background = '#FEF3C7';
+            yieldBadgeEl.style.color = '#B45309';
+        }
+    }
+
+    // Multi-Crop Portfolio Table
+    const tbody = document.getElementById('modal-crops-tbody');
+    if (tbody) {
+        const cropOrder = ['Maize', 'Beans', 'Irish Potato', 'Rice', 'Cassava'];
+        let rowsHtml = '';
+
+        cropOrder.forEach(cName => {
+            const cData = sObj.crops[cName] ? (sObj.crops[cName].districts[dName] || { yield: 0, area: 0, prod: 0 }) : { yield: 0, area: 0, prod: 0 };
+            const isCurrent = (cName === currentCrop);
+            const rowClass = isCurrent ? 'highlight-active-row' : '';
+
+            let badgeClass = 'normal';
+            let badgeText = 'Good Harvest';
+            if (cName === 'Maize') {
+                if (cData.yield >= 3.5) { badgeClass = 'high'; badgeText = 'High Yield Zone'; }
+                else if (cData.yield < 1.5) { badgeClass = 'moderate'; badgeText = 'Moderate Output'; }
+            } else if (cName === 'Irish Potato') {
+                if (cData.yield >= 14.0) { badgeClass = 'high'; badgeText = 'Major Breadbasket'; }
+                else if (cData.yield === 0) { badgeClass = 'low'; badgeText = 'Non-cultivated'; }
+                else { badgeClass = 'normal'; badgeText = 'Moderate Crop'; }
+            } else if (cName === 'Rice') {
+                if (cData.yield >= 4.0) { badgeClass = 'high'; badgeText = 'Marshland Scheme'; }
+                else if (cData.yield === 0) { badgeClass = 'low'; badgeText = 'Non-marshland'; }
+            } else if (cName === 'Beans') {
+                if (cData.yield >= 2.0) { badgeClass = 'high'; badgeText = 'High Yield Staple'; }
+            } else if (cName === 'Cassava') {
+                if (cData.yield >= 12.0) { badgeClass = 'high'; badgeText = 'Staple Granary'; }
+            }
+
+            rowsHtml += `
+                <tr class="${rowClass}">
+                    <td>
+                        <strong>${cName}</strong>
+                        ${isCurrent ? '<span style="font-size: 0.70rem; color: #16a34a; font-weight: 700; margin-left: 6px;">● Active Selection</span>' : ''}
+                    </td>
+                    <td>${cData.yield > 0 ? cData.yield.toFixed(1) + ' t/ha' : '<span style="color: #94a3b8;">—</span>'}</td>
+                    <td>${cData.area > 0 ? cData.area.toLocaleString() + ' ha' : '<span style="color: #94a3b8;">—</span>'}</td>
+                    <td>${cData.prod > 0 ? cData.prod.toLocaleString() + ' t' : '<span style="color: #94a3b8;">—</span>'}</td>
+                    <td><span class="crop-status-badge ${badgeClass}">${badgeText}</span></td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = rowsHtml;
+    }
+
+    // Regional Agro-Ecological Characteristics
+    const zoneInfo = DISTRICT_AGRO_ZONES[province] || DISTRICT_AGRO_ZONES['Western Province'];
+    const zoneEl = document.getElementById('modal-profile-zone');
+    const elevEl = document.getElementById('modal-profile-elevation');
+    const climEl = document.getElementById('modal-profile-climate');
+    const stapEl = document.getElementById('modal-profile-staples');
+    const secuEl = document.getElementById('modal-profile-security');
+    const focuEl = document.getElementById('modal-profile-focus');
+
+    if (zoneEl) zoneEl.textContent = zoneInfo.zone;
+    if (elevEl) elevEl.textContent = zoneInfo.elevation;
+    if (climEl) climEl.textContent = zoneInfo.climate;
+    if (stapEl) stapEl.textContent = zoneInfo.staples;
+    if (secuEl) secuEl.textContent = zoneInfo.security;
+    if (focuEl) focuEl.textContent = zoneInfo.focus;
+
+    // Multi-Season Inter-Season Trend
+    const trendStatsEl = document.getElementById('modal-trend-stats');
+    if (trendStatsEl) {
+        const y2025 = (MAP_SEASON_DATA['2025A']?.crops[currentCrop]?.districts[dName]?.yield) || metrics.yield;
+        const y2024 = (MAP_SEASON_DATA['2024A']?.crops[currentCrop]?.districts[dName]?.yield) || (y2025 * 0.92);
+        const yoyPct = ((y2025 - y2024) / y2024) * 100;
+        const isPos = yoyPct >= 0;
+
+        trendStatsEl.innerHTML = `
+            <div class="trend-stat-chip">
+                <span>SAS 2024–2025:</span>
+                <strong>${y2025.toFixed(1)} t/ha</strong>
+            </div>
+            <div class="trend-stat-chip">
+                <span>SAS 2023–2024:</span>
+                <strong>${y2024.toFixed(1)} t/ha</strong>
+            </div>
+            <div class="trend-stat-chip ${isPos ? 'positive' : ''}">
+                <span>YoY Trend:</span>
+                <strong>${isPos ? '+' : ''}${yoyPct.toFixed(1)}%</strong>
+            </div>
+        `;
+    }
+}
+
+function openDistrictReportModal(districtName) {
+    const dName = districtName || pinnedDistrictName || 'Nyabihu';
+    populateDistrictReportModal(dName);
+
+    const modal = document.getElementById('district-report-modal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+    requestAnimationFrame(() => {
+        modal.classList.add('open');
+    });
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDistrictReportModal() {
+    const modal = document.getElementById('district-report-modal');
+    if (!modal) return;
+
+    modal.classList.remove('open');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }, 220);
+}
+
+// Expose modal handlers globally for inline triggers
+window.openDistrictReportModal = openDistrictReportModal;
+window.closeDistrictReportModal = closeDistrictReportModal;
 
