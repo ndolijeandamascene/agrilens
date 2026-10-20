@@ -1,0 +1,132 @@
+{% extends "markets/internal/internal_base.html" %}
+
+{% block internal_content %}
+<!-- Top Action Bar -->
+<div class="internal-top-action-bar">
+    <div class="internal-page-heading">
+        <h2>Commodity Price Intelligence Dashboard</h2>
+        <p>Operational surveillance across Rwanda's commercial hubs &bull; 5-Stage Verification Workflow</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="{% url 'markets:internal_record_create' %}" class="btn-action primary" style="padding: 10px 18px; background: #059669; color: #FFFFFF; font-weight: 700; border-radius: 8px; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-plus"></i>
+            <span>Record Price</span>
+        </a>
+        <a href="{% url 'markets:internal_records_import' %}" class="btn-action" style="padding: 10px 16px; background: #FFFFFF; border: 1px solid #CBD5E1; color: #334155; font-weight: 600; border-radius: 8px; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-file-import"></i>
+            <span>Import CSV</span>
+        </a>
+    </div>
+</div>
+
+<!-- 5-Stage Workflow Visualizer -->
+<div class="workflow-stage-bar">
+    <div class="stage-step active">
+        <span class="stage-num-badge">1</span>
+        <span>Collect ({{ workflow_counts.draft|add:workflow_counts.submitted }})</span>
+    </div>
+    <i class="fa-solid fa-chevron-right stage-arrow"></i>
+    <div class="stage-step {% if workflow_counts.under_review %}active{% endif %}">
+        <span class="stage-num-badge">2</span>
+        <span>Validate ({{ workflow_counts.under_review }})</span>
+    </div>
+    <i class="fa-solid fa-chevron-right stage-arrow"></i>
+    <div class="stage-step {% if needs_correction %}active{% endif %}">
+        <span class="stage-num-badge">3</span>
+        <span>Review / Corrections ({{ needs_correction }})</span>
+    </div>
+    <i class="fa-solid fa-chevron-right stage-arrow"></i>
+    <div class="stage-step {% if workflow_counts.approved %}active{% endif %}">
+        <span class="stage-num-badge">4</span>
+        <span>Approve ({{ workflow_counts.approved }})</span>
+    </div>
+    <i class="fa-solid fa-chevron-right stage-arrow"></i>
+    <div class="stage-step active">
+        <span class="stage-num-badge">5</span>
+        <span>Publish ({{ total_published }})</span>
+    </div>
+</div>
+
+<!-- Operational KPI Cards -->
+<div class="internal-kpi-grid">
+    <div class="internal-kpi-card published">
+        <span class="kpi-label">Live Published Prices</span>
+        <div class="kpi-num" style="color: #065F46;">{{ total_published }}</div>
+        <span style="font-size: 0.74rem; color: #059669; font-weight: 600;">Visible to public</span>
+    </div>
+
+    <div class="internal-kpi-card pending">
+        <span class="kpi-label">Pending Approval Queue</span>
+        <div class="kpi-num" style="color: #D97706;">{{ pending_approvals }}</div>
+        <span style="font-size: 0.74rem; color: #B45309; font-weight: 600;">Awaiting review</span>
+    </div>
+
+    <div class="internal-kpi-card correction">
+        <span class="kpi-label">Returned for Correction</span>
+        <div class="kpi-num" style="color: #DC2626;">{{ needs_correction }}</div>
+        <span style="font-size: 0.74rem; color: #B91C1C; font-weight: 600;">Action required by collector</span>
+    </div>
+
+    <div class="internal-kpi-card">
+        <span class="kpi-label">Active Market Hubs</span>
+        <div class="kpi-num">{{ active_markets_count }}</div>
+        <span style="font-size: 0.74rem; color: #64748B; font-weight: 600;">Across Rwanda</span>
+    </div>
+
+    <div class="internal-kpi-card">
+        <span class="kpi-label">Today's Collections</span>
+        <div class="kpi-num">{{ today_collected }}</div>
+        <span style="font-size: 0.74rem; color: #64748B; font-weight: 600;">Recorded today</span>
+    </div>
+</div>
+
+<!-- Recent Submissions Table -->
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div>
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: #0F172A; margin: 0 0 4px 0;">Recent Price Surveillance Submissions</h3>
+            <p style="font-size: 0.8rem; color: #64748B; margin: 0;">Latest market observations entering the verification queue</p>
+        </div>
+        <a href="{% url 'markets:internal_records' %}" style="font-size: 0.82rem; font-weight: 700; color: #059669; text-decoration: none;">View All Records &rarr;</a>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
+            <thead>
+                <tr style="border-bottom: 1px solid #E2E8F0; text-align: left; background: #F8FAFC;">
+                    <th style="padding: 10px 14px; font-weight: 700; color: #475569;">ID</th>
+                    <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Commodity</th>
+                    <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Market Hub</th>
+                    <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Retail Price</th>
+                    <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Date</th>
+                    <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Status</th>
+                    <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Collector</th>
+                    <th style="padding: 10px 14px; font-weight: 700; color: #475569; text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in recent_records %}
+                <tr style="border-bottom: 1px solid #F1F5F9;">
+                    <td style="padding: 12px 14px; font-weight: 600; color: #64748B;">#{{ r.id }}</td>
+                    <td style="padding: 12px 14px; font-weight: 700; color: #0F172A;">{{ r.crop.name }}</td>
+                    <td style="padding: 12px 14px; color: #334155;">{{ r.market.name }} ({{ r.market.district.name }})</td>
+                    <td style="padding: 12px 14px; font-weight: 800; color: #0F172A;">{{ r.price_per_kg_rwf }} RWF</td>
+                    <td style="padding: 12px 14px; color: #64748B;">{{ r.date_recorded }}</td>
+                    <td style="padding: 12px 14px;">
+                        <span class="status-pill {{ r.status }}">{{ r.get_status_display }}</span>
+                    </td>
+                    <td style="padding: 12px 14px; color: #64748B;">{{ r.collected_by.username|default:"System" }}</td>
+                    <td style="padding: 12px 14px; text-align: right;">
+                        <a href="{% url 'markets:internal_record_edit' r.id %}" style="color: #059669; font-weight: 700; text-decoration: none; padding: 4px 8px; border: 1px solid #A7F3D0; border-radius: 4px; font-size: 0.78rem;">Audit Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align: center; padding: 30px; color: #64748B;">No recent records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

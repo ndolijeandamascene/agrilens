@@ -28,6 +28,7 @@
 </head>
 <body class="public-body">
     <!-- Clean White Navigation Header matching Reference Specification -->
+    {% block header %}
     <header class="public-header" id="public-header">
         <div class="nav-container">
             <!-- Brand Logo & Tagline -->
@@ -95,12 +96,19 @@
                     {% if '/data-api/' in request.path %}<span class="nav-active-bar" aria-hidden="true"></span>{% endif %}
                 </a>
 
+                <a href="/markets/" class="public-nav-link {% if '/markets/' in request.path and not '/markets/internal/' in request.path %}active{% endif %}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    <span>Market Prices</span>
+                    {% if '/markets/' in request.path and not '/markets/internal/' in request.path %}<span class="nav-active-bar" aria-hidden="true"></span>{% endif %}
+                </a>
 
                 <a href="/about/" class="public-nav-link {% if '/about/' in request.path %}active{% endif %}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+                        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
                     </svg>
                     <span>About</span>
                     {% if '/about/' in request.path %}<span class="nav-active-bar" aria-hidden="true"></span>{% endif %}
@@ -171,6 +179,7 @@
             </div>
         </div>
     </header>
+    {% endblock %}
 
     <!-- Main Public Content -->
     <main class="public-main-content">
@@ -178,6 +187,7 @@
     </main>
 
     <!-- Deep Green Reference Footer -->
+    {% block footer %}
     <footer class="public-footer-reference" id="about">
         <div class="footer-reference-inner">
             <!-- Brand & Tagline -->
@@ -225,6 +235,7 @@
             </div>
         </div>
     </footer>
+    {% endblock %}
 
     <!-- Mobile Nav Toggle Helper Script -->
     <script>

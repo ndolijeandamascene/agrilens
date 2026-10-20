@@ -37,7 +37,8 @@
         <a href="/surveys/" class="nav-item {% if request.path|slice:':9' == '/surveys/' %}active{% endif %}"><i class="fa-solid fa-calendar-days"></i> Seasonal Surveys</a>
         <a href="/farmers/" class="nav-item {% if request.path|slice:':9' == '/farmers/' %}active{% endif %}"><i class="fa-solid fa-people-group"></i> Farmers & Cooperatives</a>
         <a href="/inputs/" class="nav-item {% if request.path|slice:':8' == '/inputs/' %}active{% endif %}"><i class="fa-solid fa-box"></i> Inputs & Subsidies</a>
-        <a href="/markets/" class="nav-item {% if request.path|slice:':9' == '/markets/' %}active{% endif %}"><i class="fa-solid fa-shop"></i> Commodity Markets</a>
+        <a href="/markets/" class="nav-item {% if request.path == '/markets/' %}active{% endif %}"><i class="fa-solid fa-shop"></i> Commodity Markets</a>
+        <a href="/markets/internal/" class="nav-item {% if '/markets/internal/' in request.path %}active{% endif %}"><i class="fa-solid fa-scale-balanced"></i> Commodity Prices (Staff)</a>
         <a href="/api/" class="nav-item {% if request.path|slice:':5' == '/api/' %}active{% endif %}"><i class="fa-solid fa-code"></i> Developer Data API</a>
     </div>
     

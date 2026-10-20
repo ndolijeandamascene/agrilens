@@ -23,6 +23,11 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
+            if form.cleaned_data.get('remember_me'):
+                request.session.set_expiry(1209600)  # 2 weeks
+            else:
+                request.session.set_expiry(0)  # expires on browser close
+
             messages.success(request, f"Welcome back, {user.get_full_name() or user.username}! ({user.get_role_display()})")
 
             # Validate redirect URL safely to prevent open-redirect attacks

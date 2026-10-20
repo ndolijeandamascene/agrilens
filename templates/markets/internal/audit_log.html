@@ -1,0 +1,98 @@
+{% extends "markets/internal/internal_base.html" %}
+
+{% block internal_content %}
+<div class="internal-top-action-bar">
+    <div class="internal-page-heading">
+        <h2>Commodity Price Surveillance Audit Log</h2>
+        <p>Immutable lineage tracking of all entries, corrections, validation returns, and publications</p>
+    </div>
+    <span style="font-size: 0.8rem; color: #64748B; background: #FFFFFF; border: 1px solid #CBD5E1; padding: 6px 12px; border-radius: 6px; font-weight: 600;">
+        <i class="fa-solid fa-lock" style="color: #059669;"></i> Tamper-evident Audit Lineage
+    </span>
+</div>
+
+<!-- Filter Bar -->
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px 20px; margin-bottom: 20px;">
+    <form method="GET" style="display: flex; gap: 10px; align-items: center;">
+        <input type="text" name="action" value="{{ selected_action }}" placeholder="Filter by action (e.g. corrected, publish, workflow)..." style="padding: 8px 14px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; min-width: 260px;" />
+        <button type="submit" style="padding: 8px 16px; background: #0F172A; color: #FFFFFF; font-weight: 700; border: none; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+            Filter Audit Trail
+        </button>
+        {% if selected_action %}
+        <a href="{% url 'markets:internal_audit_log' %}" style="padding: 8px 12px; background: #F1F5F9; color: #475569; text-decoration: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">Reset</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Audit Log Table -->
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;">
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
+            <thead>
+                <tr style="border-bottom: 1px solid #E2E8F0; background: #F8FAFC; text-align: left;">
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Timestamp</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Action</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Actor / Officer</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Affected Record</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Audit Reason / Justification</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Payload Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in page_obj %}
+                <tr style="border-bottom: 1px solid #F1F5F9;">
+                    <td style="padding: 12px 14px; color: #64748B; font-size: 0.78rem; white-space: nowrap;">
+                        {{ log.timestamp|date:"Y-m-d H:i:s" }}
+                    </td>
+                    <td style="padding: 12px 14px;">
+                        <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; {% if 'correct' in log.action %}background: #FEF3C7; color: #92400E;{% elif 'publish' in log.action %}background: #DCFCE7; color: #166534;{% elif 'reject' in log.action %}background: #FEE2E2; color: #991B1B;{% else %}background: #F1F5F9; color: #334155;{% endif %}">
+                            {{ log.action }}
+                        </span>
+                    </td>
+                    <td style="padding: 12px 14px; font-weight: 700; color: #0F172A;">
+                        {{ log.actor.username|default:"System Engine" }}
+                    </td>
+                    <td style="padding: 12px 14px;">
+                        {% if log.price_record %}
+                        <a href="{% url 'markets:internal_record_edit' log.price_record.id %}" style="font-weight: 700; color: #059669; text-decoration: none;">
+                            Record #{{ log.price_record.id }}
+                        </a>
+                        <span style="font-size: 0.75rem; color: #64748B; display: block;">
+                            {{ log.price_record.crop.name }} &bull; {{ log.price_record.market.name }}
+                        </span>
+                        {% else %}
+                        <span style="color: #94A3B8;">Batch / Global</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px 14px; color: #334155; max-width: 280px;">
+                        {{ log.reason|default:"System surveillance event" }}
+                    </td>
+                    <td style="padding: 12px 14px; font-family: monospace; font-size: 0.74rem; color: #475569; max-width: 220px; overflow-x: auto;">
+                        {{ log.details }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px; color: #64748B;">No audit trail entries found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-top: 1px solid #E2E8F0; font-size: 0.85rem; color: #64748B;">
+        <span>Showing Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        <div style="display: flex; gap: 6px;">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if selected_action %}&action={{ selected_action }}{% endif %}" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #334155;">Previous</a>
+            {% endif %}
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if selected_action %}&action={{ selected_action }}{% endif %}" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #334155;">Next</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

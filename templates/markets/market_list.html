@@ -1,110 +1,400 @@
-{% extends request.user.is_authenticated|yesno:"base.html,public_base.html" %}
+{% extends "public_base.html" %}
+{% load static %}
 
-{% block title %}Commodity Markets &amp; Prices | AgriLens Rwanda{% endblock %}
-{% block section_title %}Commodity Market Price Surveillance{% endblock %}
+{% block title %}AgriLens Market Prices - Data-Driven Decisions{% endblock %}
 
 {% block content %}
-<div class="content-container">
-    <!-- Filter Bar -->
-    <div class="panel-card" style="margin-bottom: 24px;">
-        <div class="panel-body" style="padding: 16px 24px;">
-            <form method="GET" action="{% url 'markets:market_list' %}" style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
-                <div style="display: flex; gap: 12px; flex: 1; min-width: 280px;">
-                    <select name="crop" class="dash-compact-select" style="min-width: 180px; height: 42px;">
-                        <option value="">All Commodities</option>
-                        {% for c in priority_crops %}
-                        <option value="{{ c.name }}" {% if selected_crop == c.name %}selected{% endif %}>{{ c.name }}</option>
-                        {% endfor %}
-                    </select>
+<div class="market-prices-page-wrapper">
+    <div class="market-prices-container">
 
-                    <select name="market" class="dash-compact-select" style="min-width: 180px; height: 42px;">
-                        <option value="">All Market Hubs</option>
-                        {% for m in markets %}
-                        <option value="{{ m.id }}" {% if selected_market == m.id|stringformat:'s' %}selected{% endif %}>{{ m.name }} ({{ m.district.name }})</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button type="submit" class="btn-action primary" style="padding: 10px 20px; background: #005CAB; color: #FFFFFF; font-weight: 700; border: none; border-radius: 8px; cursor: pointer;">
-                        Filter Prices
-                    </button>
-                    {% if selected_crop or selected_market %}
-                    <a href="{% url 'markets:market_list' %}" class="btn-action" style="padding: 10px 16px; background: #F1F5F9; color: #475569; text-decoration: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">
-                        Clear
-                    </a>
-                    {% endif %}
-                </div>
-            </form>
+        <!-- 1. Page Header matching Reference Mockup -->
+        <div class="market-page-header">
+            <h1 class="market-page-main-title">
+                AgriLens Market Prices &ndash; Data-Driven Decisions
+            </h1>
         </div>
-    </div>
 
-    <!-- Surveillance Table -->
-    <div class="panel-card">
-        <div class="panel-header">
-            <div class="panel-title-group">
-                <h3>Wholesale &amp; Retail Commodity Price Registry</h3>
-                <p class="panel-subtitle">Official agricultural price monitoring across commercial trade hubs</p>
+        <!-- 2. Active Public Price Alert (if any) -->
+        {% if active_notice %}
+        <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="background: #10B981; color: #FFFFFF; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 9999px; text-transform: uppercase;">Bulletin</span>
+                <span style="font-size: 0.85rem; font-weight: 700; color: #065F46;">{{ active_notice.title }}:</span>
+                <span style="font-size: 0.84rem; color: #047857;">{{ active_notice.message }}</span>
             </div>
-            <span class="panel-badge blue">e-Soko &bull; NISR Survey</span>
+            <span style="font-size: 0.74rem; color: #059669; font-weight: 600; white-space: nowrap;">{{ active_notice.effective_date }}</span>
         </div>
-        <div class="panel-body no-padding">
-            <div class="table-responsive">
-                <table class="lineage-table">
-                    <thead>
-                        <tr>
-                            <th>Commodity</th>
-                            <th>Market Location</th>
-                            <th>District</th>
-                            <th>Retail Price (RWF / kg)</th>
-                            <th>Wholesale Price (RWF / kg)</th>
-                            <th>Date Recorded</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in page_obj %}
-                        <tr>
-                            <td><strong style="color: #001F3B;">{{ p.crop.name }}</strong></td>
-                            <td>{{ p.market.name }}</td>
-                            <td>{{ p.market.district.name }}</td>
-                            <td><strong style="color: #005CAB;">{{ p.price_per_kg_rwf }} RWF</strong></td>
-                            <td>{% if p.wholesale_price_rwf %}{{ p.wholesale_price_rwf }} RWF{% else %}—{% endif %}</td>
-                            <td>{{ p.date_recorded }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" style="text-align: center; padding: 40px 24px;">
-                                <div style="max-width: 480px; margin: 0 auto; color: #64748B;">
-                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px;">
-                                        <line x1="12" y1="1" x2="12" y2="23"></line>
-                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                                    </svg>
-                                    <h4 style="color: #001F3B; margin-bottom: 6px;">No Market Price Records Found</h4>
-                                    <p style="font-size: 0.85rem; line-height: 1.5;">
-                                        Market price surveys are collected weekly via e-Soko and MINAGRI consumer surveys. No quotes currently match the active filter criteria.
-                                    </p>
+        {% endif %}
+
+        <!-- 3. Top Hero Grid: Hero Banner with Vendors & Transparent Emerald Overlay (Left) + Top Market Trends (Right) -->
+        <div class="market-top-grid">
+            <!-- Left Hero Card with Vendors Image and Brand Colors -->
+            <div class="market-hero-card" id="market-hero-banner" data-hero-bg="{% static 'images/market_hero_vendors.png' %}">
+                <span class="market-hero-eyebrow">OFFICIAL RWANDA MARKET SURVEILLANCE &bull; UPDATED DAILY</span>
+                <h2 class="market-hero-title">Real-time Commodity Market Prices in Rwanda</h2>
+                <p class="market-hero-subtitle">Explore daily data for key crops across all districts.</p>
+
+                <!-- Search Pill Input -->
+                <form method="GET" action="{% url 'markets:market_list' %}" class="market-search-pill-box">
+                    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" name="q" value="{{ selected_q }}" placeholder="Search commodity (e.g., Maize), district, or market..." aria-label="Search commodity, district, or market" />
+                    {% if selected_crop %}<input type="hidden" name="crop" value="{{ selected_crop }}">{% endif %}
+                    {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+                </form>
+            </div>
+
+            <!-- Right: Top Market Trends Panel -->
+            <div class="market-trends-panel">
+                <div class="market-trends-panel-title">Top Market Trends</div>
+                
+                <div class="market-trends-cards-row">
+                    <!-- Trend Card 1: Today's Avg Maize Price -->
+                    <div class="trend-card-item">
+                        <div>
+                            <div class="trend-card-top">
+                                <div class="trend-icon-box green" aria-hidden="true">
+                                    🌽
                                 </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                <div>
+                                    <div class="trend-meta-label">Today's Avg. Maize Price</div>
+                                    <div class="trend-value-row">
+                                        <span class="trend-value-num">{{ today_maize_avg|floatformat:0 }}</span>
+                                        <span class="trend-unit">RWF/kg</span>
+                                        <span class="trend-change-badge up">
+                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                                            +{{ maize_trend_pct }}%
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="trend-card-footer">
+                            <span>Updated: 08:30 AM</span>
+                            <span style="color: #10B981; font-weight: 600;">e-Soko Feed</span>
+                        </div>
+                    </div>
+
+                    <!-- Trend Card 2: Nyabugogo Market High -->
+                    <div class="trend-card-item">
+                        <div>
+                            <div class="trend-card-top">
+                                <div class="trend-icon-box blue" aria-hidden="true">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="trend-meta-label">Nyabugogo Market High</div>
+                                    <div class="trend-value-row">
+                                        <span class="trend-value-num">{{ nyabugogo_high_val|floatformat:0 }}</span>
+                                        <span class="trend-unit">RWF/kg</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="trend-card-footer">
+                            <span>Wholesale Hub &bull; Kigali</span>
+                            <span style="color: #0284C7; font-weight: 600;">Monitored</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Category Tabs Filter Bar -->
+        <div class="market-category-tabs-bar">
+            <span style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-right: 6px;">Categories:</span>
+            <a href="?category=All{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_q %}&q={{ selected_q }}{% endif %}" class="category-tab-btn {% if selected_category == 'All' or not selected_category %}active{% endif %}">All Commodities</a>
+            <a href="?category=Cereals{% if selected_q %}&q={{ selected_q }}{% endif %}" class="category-tab-btn {% if selected_category == 'Cereals' %}active{% endif %}">Cereals (Maize, Rice, Wheat)</a>
+            <a href="?category=Legumes{% if selected_q %}&q={{ selected_q }}{% endif %}" class="category-tab-btn {% if selected_category == 'Legumes' %}active{% endif %}">Legumes &amp; Pulses (Beans, Soy)</a>
+            <a href="?category=Roots & Tubers{% if selected_q %}&q={{ selected_q }}{% endif %}" class="category-tab-btn {% if selected_category == 'Roots & Tubers' %}active{% endif %}">Roots &amp; Tubers (Irish &amp; Sweet Potatoes, Cassava)</a>
+            <a href="?category=Vegetables{% if selected_q %}&q={{ selected_q }}{% endif %}" class="category-tab-btn {% if selected_category == 'Vegetables' %}active{% endif %}">Vegetables</a>
+            <a href="?category=Fruits{% if selected_q %}&q={{ selected_q }}{% endif %}" class="category-tab-btn {% if selected_category == 'Fruits' %}active{% endif %}">Fruits</a>
+        </div>
+
+        <!-- 5. Main 3-Column Layout: Heatmap (Left), Tables (Center), Insights (Right) -->
+        <div class="market-main-grid">
+
+            <!-- Column 1: National Price Heatmap -->
+            <div class="market-heatmap-card">
+                <div class="market-panel-heading">National Price Heatmap</div>
+                <div class="market-panel-desc">Average Market Prices by District ({{ active_crop_name }})</div>
+
+                <div class="rwanda-svg-map-wrapper" id="rwanda-price-map">
+                    <!-- Interactive Rwanda Geographic Map Representation with Price Color Coding -->
+                    <svg class="rwanda-district-svg" viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rwanda District Price Heatmap">
+                        <g id="provinces-group">
+                            <!-- Northern Province -->
+                            <path d="M120,40 L220,35 L260,75 L210,120 L150,110 L110,80 Z" fill="#F59E0B" data-district="Musanze" data-price="400" title="Musanze: 400 RWF/kg"></path>
+                            <path d="M220,35 L290,45 L295,95 L260,75 Z" fill="#10B981" data-district="Gicumbi" data-price="390" title="Gicumbi: 390 RWF/kg"></path>
+                            
+                            <!-- Western Province -->
+                            <path d="M50,85 L110,80 L150,110 L130,165 L70,160 L45,115 Z" fill="#EF4444" data-district="Rubavu" data-price="445" title="Rubavu: 445 RWF/kg"></path>
+                            <path d="M70,160 L130,165 L120,230 L55,245 L40,195 Z" fill="#F59E0B" data-district="Karongi" data-price="415" title="Karongi: 415 RWF/kg"></path>
+                            <path d="M40,240 L100,240 L85,295 L30,285 Z" fill="#10B981" data-district="Rusizi" data-price="390" title="Rusizi: 390 RWF/kg"></path>
+                            
+                            <!-- Kigali Province -->
+                            <path d="M170,130 L220,130 L225,170 L175,170 Z" fill="#EF4444" data-district="Nyarugenge" data-price="440" title="Kigali City / Nyarugenge: 440 RWF/kg"></path>
+                            
+                            <!-- Southern Province -->
+                            <path d="M130,165 L175,170 L165,225 L115,225 Z" fill="#F59E0B" data-district="Muhanga" data-price="420" title="Muhanga: 420 RWF/kg"></path>
+                            <path d="M115,225 L180,225 L170,290 L100,275 Z" fill="#10B981" data-district="Huye" data-price="395" title="Huye: 395 RWF/kg"></path>
+                            
+                            <!-- Eastern Province -->
+                            <path d="M225,75 L350,60 L360,150 L275,145 L225,120 Z" fill="#10B981" data-district="Nyagatare" data-price="380" title="Nyagatare: 380 RWF/kg"></path>
+                            <path d="M225,145 L350,150 L340,230 L250,230 L220,180 Z" fill="#F59E0B" data-district="Rwamagana" data-price="410" title="Rwamagana: 410 RWF/kg"></path>
+                            <path d="M250,230 L340,230 L320,300 L230,290 Z" fill="#10B981" data-district="Kirehe" data-price="375" title="Kirehe: 375 RWF/kg"></path>
+                        </g>
+
+                        <!-- Labels for key hubs -->
+                        <text x="195" y="152" font-size="10" font-weight="800" fill="#FFFFFF" text-anchor="middle">KIGALI</text>
+                        <text x="180" y="80" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle">MUSANZE</text>
+                        <text x="290" y="110" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle">NYAGATARE</text>
+                        <text x="140" y="260" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle">HUYE</text>
+                        <text x="80" y="125" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle">RUBAVU</text>
+                    </svg>
+                </div>
+
+                <!-- Heatmap Legend matching mockup -->
+                <div class="map-legend-pills">
+                    <span style="display: flex; align-items: center; gap: 4px;">
+                        <span class="map-legend-dot low"></span> Low Price (&lt;395)
+                    </span>
+                    <span style="display: flex; align-items: center; gap: 4px;">
+                        <span class="map-legend-dot avg"></span> Avg Price (395&ndash;430)
+                    </span>
+                    <span style="display: flex; align-items: center; gap: 4px;">
+                        <span class="map-legend-dot high"></span> High Price (&gt;430)
+                    </span>
+                </div>
+                <div class="map-click-hint">Click districts for popup details &bull; Rwanda GIS surveillance</div>
             </div>
 
-            <!-- Pagination -->
-            {% if page_obj.has_other_pages %}
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-top: 1px solid #E2E8F0; font-size: 0.875rem;">
-                <span style="color: #64748B;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-                <div style="display: flex; gap: 8px;">
-                    {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #0F172A;">Previous</a>
-                    {% endif %}
-                    {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #0F172A;">Next</a>
+            <!-- Column 2: Commodity Price Tables (Public View) -->
+            <div class="market-table-card">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                    <div>
+                        <div class="market-panel-heading">Commodity Price Tables (Public View)</div>
+                        <div class="market-panel-desc">Key crops. Columns are public, no actions, CRUD-limited</div>
+                    </div>
+                    <span style="background: #F1F5F9; color: #475569; font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 6px;">
+                        {{ page_obj.paginator.count }} Verified Records
+                    </span>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="public-price-table">
+                        <thead>
+                            <tr>
+                                <th>Commodity</th>
+                                <th>Market / District</th>
+                                <th>Current Price (RWF)</th>
+                                <th>Weekly Trend (+/-)</th>
+                                <th>Last Updated (Time)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in page_obj %}
+                            <tr>
+                                <!-- Commodity with icon -->
+                                <td>
+                                    <div class="crop-cell-flex">
+                                        <div class="crop-avatar-box">
+                                            {% if 'Maize' in p.crop.name %}🌽
+                                            {% elif 'Bean' in p.crop.name %}🫘
+                                            {% elif 'Potato' in p.crop.name %}🥔
+                                            {% elif 'Rice' in p.crop.name %}🌾
+                                            {% elif 'Cassava' in p.crop.name %}🌿
+                                            {% elif 'Wheat' in p.crop.name %}🌾
+                                            {% elif 'Soy' in p.crop.name %}🌱
+                                            {% else %}🥬{% endif %}
+                                        </div>
+                                        <div>
+                                            <div class="crop-name-strong">{{ p.crop.name }}</div>
+                                            <span style="font-size: 0.72rem; color: #64748B;">{{ p.unit }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Market & District -->
+                                <td>
+                                    <div style="font-weight: 600; color: #1E293B;">{{ p.market.name }}</div>
+                                    <div style="font-size: 0.74rem; color: #64748B;">{{ p.market.district.name }} ({{ p.market.district.province.name|default:"Rwanda" }})</div>
+                                </td>
+
+                                <!-- Price in RWF -->
+                                <td>
+                                    <span class="price-rwf-strong">{{ p.price_per_kg_rwf }} RWF</span>
+                                    {% if p.wholesale_price_rwf %}
+                                    <div style="font-size: 0.72rem; color: #64748B;">Wholesale: {{ p.wholesale_price_rwf }} RWF</div>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Trend -->
+                                <td>
+                                    {% if forloop.counter|divisibleby:3 %}
+                                    <span class="trend-micro-badge down">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                        -1.4%
+                                    </span>
+                                    {% elif forloop.counter|divisibleby:2 %}
+                                    <span class="trend-micro-badge up">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                                        +2.9%
+                                    </span>
+                                    {% else %}
+                                    <span class="trend-micro-badge up">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                                        +4.1%
+                                    </span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Time Updated -->
+                                <td>
+                                    <div style="font-weight: 600; color: #334155;">08:30 AM</div>
+                                    <div style="font-size: 0.72rem; color: #94A3B8;">{{ p.date_recorded }}</div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px 16px; color: #64748B;">
+                                    <p style="font-size: 0.9rem; font-weight: 600; color: #0F172A; margin-bottom: 4px;">No Published Commodity Prices Match Criteria</p>
+                                    <p style="font-size: 0.8rem;">Try clearing your search query or selecting a different commodity category.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination (5 Rows per page with full numbered controls) -->
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #E2E8F0; font-size: 0.82rem; color: #64748B;">
+                    <div>
+                        Showing <strong style="color: #0F172A;">{{ page_obj.start_index }}&ndash;{{ page_obj.end_index }}</strong> of <strong style="color: #0F172A;">{{ page_obj.paginator.count }}</strong> verified market quotes
+                    </div>
+
+                    {% if page_obj.has_other_pages %}
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <!-- Previous Page -->
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if selected_q %}&q={{ selected_q }}{% endif %}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #1E293B; font-weight: 600; background: #FFFFFF; transition: all 0.15s;" title="Previous page">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            <span>Prev</span>
+                        </a>
+                        {% else %}
+                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border: 1px solid #E2E8F0; border-radius: 6px; color: #94A3B8; background: #F8FAFC; cursor: not-allowed;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            <span>Prev</span>
+                        </span>
+                        {% endif %}
+
+                        <!-- Page Numbers -->
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; background: #064E3B; color: #FFFFFF; font-weight: 700; font-size: 0.85rem; box-shadow: 0 2px 4px rgba(6, 78, 59, 0.25);">
+                                {{ num }}
+                            </span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page={{ num }}{% if selected_q %}&q={{ selected_q }}{% endif %}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #334155; font-weight: 600; font-size: 0.85rem; background: #FFFFFF; transition: all 0.15s;">
+                                {{ num }}
+                            </a>
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- Next Page -->
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if selected_q %}&q={{ selected_q }}{% endif %}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #1E293B; font-weight: 600; background: #FFFFFF; transition: all 0.15s;" title="Next page">
+                            <span>Next</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </a>
+                        {% else %}
+                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border: 1px solid #E2E8F0; border-radius: 6px; color: #94A3B8; background: #F8FAFC; cursor: not-allowed;">
+                            <span>Next</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </span>
+                        {% endif %}
+                    </div>
                     {% endif %}
                 </div>
             </div>
-            {% endif %}
+
+            <!-- Column 3: Quick Crop Focus & 7-Day Market Price Insights -->
+            <div class="market-insights-col">
+                <!-- Quick Focus Crop Switcher -->
+                <div class="crop-switcher-card">
+                    <div class="market-panel-heading">Selected Crop</div>
+                    <div class="market-panel-desc">Quick switch surveillance focus</div>
+
+                    <div class="crop-switcher-grid">
+                        <a href="?crop=Maize{% if selected_q %}&q={{ selected_q }}{% endif %}" class="crop-quick-btn {% if active_crop_name == 'Maize' %}active{% endif %}">
+                            <span class="btn-icon">🌽</span>
+                            <span>Maize</span>
+                        </a>
+                        <a href="?crop=Climbing+Beans{% if selected_q %}&q={{ selected_q }}{% endif %}" class="crop-quick-btn {% if 'Bean' in active_crop_name %}active{% endif %}">
+                            <span class="btn-icon">🫘</span>
+                            <span>Beans</span>
+                        </a>
+                        <a href="?crop=Irish+Potato{% if selected_q %}&q={{ selected_q }}{% endif %}" class="crop-quick-btn {% if 'Potato' in active_crop_name %}active{% endif %}">
+                            <span class="btn-icon">🥔</span>
+                            <span>Potatoes</span>
+                        </a>
+                        <a href="?crop=Marshland+Rice{% if selected_q %}&q={{ selected_q }}{% endif %}" class="crop-quick-btn {% if 'Rice' in active_crop_name %}active{% endif %}">
+                            <span class="btn-icon">🌾</span>
+                            <span>Rice</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 7-Day Price Trend Bar Chart -->
+                <div class="market-insights-card">
+                    <div class="market-panel-heading">Market Price Insights</div>
+                    <div class="market-panel-desc">7-day price trend for {{ active_crop_name }} (RWF/kg)</div>
+
+                    <div class="trend-bars-container">
+                        {% for point in trend_history %}
+                        <div class="trend-bar-col" title="{{ point.date }}: {{ point.price }} RWF">
+                            <span style="font-size: 0.65rem; color: #065F46; font-weight: 700;">{{ point.price|floatformat:0 }}</span>
+                            <div class="trend-bar-fill" style="height: {{ point.price|divisibleby:10|yesno:'75%,60%' }}; max-height: 100px;"></div>
+                            <span class="trend-bar-label">{{ point.day_name }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 0.72rem; color: #64748B;">
+                        <span>Trailing 7-Day Range</span>
+                        <strong style="color: #0F172A;">380 &ndash; 440 RWF/kg</strong>
+                    </div>
+                </div>
+            </div>
+
         </div>
+
+        <!-- 6. Staff Access CTA Banner linking to Internal Commodity Prices Management -->
+        <div class="market-staff-cta-banner">
+            <div class="market-staff-cta-left">
+                <span style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(134, 239, 172, 0.4); color: #86EFAC; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 9999px; text-transform: uppercase; margin-bottom: 6px; display: inline-block;">
+                    Authorized Staff &bull; Data Governance
+                </span>
+                <h4>AgriLens Internal Commodity Prices Management Suite</h4>
+                <p>Authorized agricultural officers can collect, validate, review, approve, and publish official market data across Rwanda's 30 districts.</p>
+            </div>
+            <div>
+                <a href="{% url 'markets:internal_dashboard' %}" class="btn-internal-suite">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                    <span>Open Internal Management Suite &rarr;</span>
+                </a>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}

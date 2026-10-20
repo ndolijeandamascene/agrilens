@@ -7,21 +7,38 @@ from .models import User
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
+        label="Username or Email",
         widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'Enter your official username',
+            'class': 'auth-field-input',
+            'id': 'id_username',
+            'placeholder': 'Enter your username or email',
             'autocomplete': 'username',
             'required': True
         })
     )
     password = forms.CharField(
+        label="Password",
         widget=forms.PasswordInput(attrs={
-            'class': 'form-input',
+            'class': 'auth-field-input',
+            'id': 'id_password',
             'placeholder': 'Enter your password',
             'autocomplete': 'current-password',
             'required': True
         })
     )
+    remember_me = forms.BooleanField(
+        required=False,
+        initial=False,
+        widget=forms.CheckboxInput(attrs={'id': 'id_remember_me'})
+    )
+
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        if username and '@' in username:
+            user = User.objects.filter(email__iexact=username.strip()).first()
+            if user:
+                self.cleaned_data['username'] = user.username
+        return super().clean()
 
 
 class UserProfileForm(forms.ModelForm):

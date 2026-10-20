@@ -1,0 +1,76 @@
+{% extends "markets/internal/internal_base.html" %}
+
+{% block internal_content %}
+<div class="internal-top-action-bar">
+    <div class="internal-page-heading">
+        <h2>{{ page_title }}</h2>
+        <p>Market surveillance observation entry &bull; Automated sanity bound validation</p>
+    </div>
+    <a href="{% url 'markets:internal_records' %}" style="padding: 8px 16px; background: #FFFFFF; border: 1px solid #CBD5E1; color: #475569; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600;">
+        &larr; Back to Records
+    </a>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 28px; max-width: 720px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+    {% if record %}
+    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <span style="font-size: 0.72rem; color: #64748B; font-weight: 700; text-transform: uppercase;">Record Lineage</span>
+                <div style="font-size: 1rem; font-weight: 800; color: #0F172A;">{{ record.crop.name }} at {{ record.market.name }}</div>
+                <div style="font-size: 0.78rem; color: #64748B;">Recorded on {{ record.date_recorded }} &bull; Current Status: <strong>{{ record.get_status_display }}</strong></div>
+            </div>
+            {% if record.original_price %}
+            <div style="text-align: right;">
+                <span style="font-size: 0.72rem; color: #DC2626; font-weight: 700;">Previous Price</span>
+                <div style="font-size: 1.1rem; font-weight: 800; color: #DC2626; text-decoration: line-through;">{{ record.original_price }} RWF</div>
+            </div>
+            {% endif %}
+        </div>
+        {% if record.correction_reason %}
+        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #E2E8F0; font-size: 0.8rem; color: #475569;">
+            <strong>Prior Correction Note:</strong> {{ record.correction_reason }}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px;">
+            {% for field in form %}
+            <div style="{% if field.name == 'correction_reason' or field.name == 'source_document' %}grid-column: span 2;{% endif %}">
+                <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #334155; margin-bottom: 6px;">
+                    {{ field.label }} {% if field.field.required %}<span style="color: #DC2626;">*</span>{% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                <span style="font-size: 0.72rem; color: #64748B; display: block; margin-top: 4px;">{{ field.help_text }}</span>
+                {% endif %}
+                {% if field.errors %}
+                <span style="font-size: 0.75rem; color: #DC2626; font-weight: 600; display: block; margin-top: 4px;">{{ field.errors.0 }}</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div style="padding-top: 20px; border-top: 1px solid #E2E8F0; display: flex; justify-content: flex-end; gap: 10px;">
+            <a href="{% url 'markets:internal_records' %}" style="padding: 10px 18px; background: #F1F5F9; color: #475569; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600;">Cancel</a>
+
+            {% if not record %}
+            <button type="submit" name="action_intent" value="draft" style="padding: 10px 18px; background: #E2E8F0; color: #334155; font-weight: 700; border: none; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                Save as Draft
+            </button>
+            <button type="submit" name="action_intent" value="submit" style="padding: 10px 20px; background: #059669; color: #FFFFFF; font-weight: 700; border: none; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                Submit for Verification &rarr;
+            </button>
+            {% else %}
+            <button type="submit" style="padding: 10px 20px; background: #0F172A; color: #FFFFFF; font-weight: 700; border: none; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                Save Audit Correction &rarr;
+            </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endblock %}

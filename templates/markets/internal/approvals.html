@@ -1,0 +1,135 @@
+{% extends "markets/internal/internal_base.html" %}
+
+{% block internal_content %}
+<div class="internal-top-action-bar">
+    <div class="internal-page-heading">
+        <h2>Validation &amp; Approval Surveillance Queue</h2>
+        <p>Review and verify field observations &bull; Ensure sanity boundaries before public release</p>
+    </div>
+    <span style="background: #FEF3C7; color: #92400E; font-size: 0.82rem; font-weight: 700; padding: 6px 14px; border-radius: 9999px; border: 1px solid #FCD34D;">
+        {{ pending_count }} Records Pending Supervisory Action
+    </span>
+</div>
+
+<!-- Workflow Governance Rule Callout -->
+<div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+    <i class="fa-solid fa-scale-balanced" style="font-size: 1.2rem; color: #1D4ED8;"></i>
+    <div style="font-size: 0.82rem; color: #1E40AF; line-height: 1.45;">
+        <strong>Governance Rule:</strong> Collectors cannot self-approve or publish their own observations. Approved prices transition to the public AgriLens Market Price board. Returned records preserve feedback in the audit trail without silent overwrites.
+    </div>
+</div>
+
+<!-- Review Queue Table -->
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;">
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
+            <thead>
+                <tr style="border-bottom: 1px solid #E2E8F0; background: #F8FAFC; text-align: left;">
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Record</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Commodity &amp; Market</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Submitted Quote</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Date &amp; Collector</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Validation Flags</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569; text-align: right;">Review Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in queue_records %}
+                <tr style="border-bottom: 1px solid #F1F5F9; {% if r.status == 'needs_correction' %}background: #FFFBFB;{% endif %}">
+                    <!-- Record ID and Status -->
+                    <td style="padding: 14px; vertical-align: top;">
+                        <span style="font-weight: 700; color: #0F172A;">#{{ r.id }}</span>
+                        <div style="margin-top: 4px;">
+                            <span class="status-pill {{ r.status }}">{{ r.get_status_display }}</span>
+                        </div>
+                    </td>
+
+                    <!-- Commodity & Market -->
+                    <td style="padding: 14px; vertical-align: top;">
+                        <div style="font-weight: 800; color: #0F172A; font-size: 0.92rem;">{{ r.crop.name }}</div>
+                        <div style="color: #475569; font-size: 0.8rem; margin-top: 2px;">
+                            {{ r.market.name }} &bull; {{ r.market.district.name }}
+                        </div>
+                        {% if r.correction_reason %}
+                        <div style="margin-top: 6px; padding: 6px 10px; background: #FEE2E2; border-radius: 6px; font-size: 0.74rem; color: #991B1B;">
+                            <strong>Correction Reason:</strong> {{ r.correction_reason }}
+                        </div>
+                        {% endif %}
+                    </td>
+
+                    <!-- Price Quotes -->
+                    <td style="padding: 14px; vertical-align: top;">
+                        <span style="font-size: 1.05rem; font-weight: 800; color: #0F172A;">{{ r.price_per_kg_rwf }} RWF</span>
+                        <div style="font-size: 0.74rem; color: #64748B;">Per {{ r.unit }}</div>
+                        {% if r.wholesale_price_rwf %}
+                        <div style="font-size: 0.74rem; color: #475569; margin-top: 2px;">Wholesale: {{ r.wholesale_price_rwf }} RWF</div>
+                        {% endif %}
+                    </td>
+
+                    <!-- Date & Collector -->
+                    <td style="padding: 14px; vertical-align: top; font-size: 0.78rem; color: #475569;">
+                        <div>Date: <strong>{{ r.date_recorded }}</strong></div>
+                        <div>Officer: <strong>{{ r.collected_by.username|default:"System" }}</strong></div>
+                        <div style="color: #64748B;">Source: {{ r.get_source_type_display }}</div>
+                    </td>
+
+                    <!-- Validation Flags -->
+                    <td style="padding: 14px; vertical-align: top;">
+                        {% if r.validation_flags %}
+                            {% for flag in r.validation_flags %}
+                            <span style="display: inline-block; background: #FEE2E2; color: #991B1B; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-bottom: 4px;">
+                                ⚠️ {{ flag }}
+                            </span>
+                            {% endfor %}
+                        {% else %}
+                            <span style="color: #059669; font-size: 0.74rem; font-weight: 700;">✓ Pass Bounds Check</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Action Controls -->
+                    <td style="padding: 14px; vertical-align: top; text-align: right;">
+                        <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+                            <!-- One-click Publish / Approve Form -->
+                            <form method="POST" action="{% url 'markets:internal_approval_action' r.id %}">
+                                {% csrf_token %}
+                                <button type="submit" name="action" value="publish" style="padding: 6px 14px; background: #059669; color: #FFFFFF; font-weight: 700; border: none; border-radius: 6px; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                    <i class="fa-solid fa-check"></i>
+                                    <span>Approve &amp; Publish</span>
+                                </button>
+                            </form>
+
+                            <!-- Return for Correction Form with Reason Prompt -->
+                            <form method="POST" action="{% url 'markets:internal_approval_action' r.id %}" style="display: flex; gap: 4px;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="return_for_correction">
+                                <input type="text" name="reason" placeholder="Correction reason..." required style="padding: 4px 8px; border: 1px solid #CBD5E1; border-radius: 4px; font-size: 0.74rem; width: 140px;" />
+                                <button type="submit" style="padding: 4px 8px; background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; border-radius: 4px; font-size: 0.74rem; font-weight: 700; cursor: pointer;">
+                                    Return
+                                </button>
+                            </form>
+
+                            <!-- Reject Button -->
+                            <form method="POST" action="{% url 'markets:internal_approval_action' r.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" onclick="return confirm('Confirm rejection of this price quote?');" style="background: none; border: none; color: #DC2626; font-size: 0.74rem; font-weight: 600; cursor: pointer; text-decoration: underline;">
+                                    Reject Quote
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px; color: #64748B;">
+                        <i class="fa-solid fa-circle-check" style="font-size: 2rem; color: #10B981; margin-bottom: 10px; display: block;"></i>
+                        <h4 style="color: #0F172A; margin-bottom: 4px;">Validation Queue Clean</h4>
+                        <p style="font-size: 0.84rem; margin: 0;">All submitted commodity observations have been reviewed and published.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

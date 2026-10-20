@@ -1,0 +1,135 @@
+{% extends "markets/internal/internal_base.html" %}
+
+{% block internal_content %}
+<div class="internal-top-action-bar">
+    <div class="internal-page-heading">
+        <h2>Commodity Price Records Registry</h2>
+        <p>Authoritative agricultural price surveillance repository with workflow status filters</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="{% url 'markets:internal_record_create' %}" class="btn-action primary" style="padding: 10px 18px; background: #059669; color: #FFFFFF; font-weight: 700; border-radius: 8px; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-plus"></i>
+            <span>New Price Record</span>
+        </a>
+        <a href="{% url 'markets:internal_records_import' %}" class="btn-action" style="padding: 10px 16px; background: #FFFFFF; border: 1px solid #CBD5E1; color: #334155; font-weight: 600; border-radius: 8px; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-file-import"></i>
+            <span>Bulk CSV Import</span>
+        </a>
+    </div>
+</div>
+
+<!-- Filters Bar -->
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;">
+    <form method="GET" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; flex: 1;">
+            <input type="text" name="q" value="{{ selected_q }}" placeholder="Search commodity, market, district..." style="padding: 8px 14px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; min-width: 240px;" />
+
+            <select name="status" style="padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;">
+                <option value="">All Statuses</option>
+                {% for val, label in status_choices %}
+                <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="crop" style="padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;">
+                <option value="">All Commodities</option>
+                {% for c in crops %}
+                <option value="{{ c.name }}" {% if selected_crop == c.name %}selected{% endif %}>{{ c.name }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="market" style="padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;">
+                <option value="">All Market Hubs</option>
+                {% for m in markets %}
+                <option value="{{ m.id }}" {% if selected_market == m.id|stringformat:'s' %}selected{% endif %}>{{ m.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+            <button type="submit" style="padding: 8px 16px; background: #0F172A; color: #FFFFFF; font-weight: 700; border: none; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                Apply Filters
+            </button>
+            {% if selected_q or selected_status or selected_crop or selected_market %}
+            <a href="{% url 'markets:internal_records' %}" style="padding: 8px 12px; background: #F1F5F9; color: #475569; text-decoration: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">Reset</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Table Container -->
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;">
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
+            <thead>
+                <tr style="border-bottom: 1px solid #E2E8F0; background: #F8FAFC; text-align: left;">
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">ID</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Commodity</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Market &amp; District</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Retail Price</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Wholesale</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Date Recorded</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Workflow Status</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569;">Governance Actors</th>
+                    <th style="padding: 12px 14px; font-weight: 700; color: #475569; text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in page_obj %}
+                <tr style="border-bottom: 1px solid #F1F5F9;">
+                    <td style="padding: 12px 14px; color: #64748B; font-weight: 600;">#{{ r.id }}</td>
+                    <td style="padding: 12px 14px; font-weight: 700; color: #0F172A;">{{ r.crop.name }}</td>
+                    <td style="padding: 12px 14px; color: #334155;">
+                        <span style="font-weight: 600;">{{ r.market.name }}</span>
+                        <div style="font-size: 0.74rem; color: #64748B;">{{ r.market.district.name }}</div>
+                    </td>
+                    <td style="padding: 12px 14px; font-weight: 800; color: #0F172A;">{{ r.price_per_kg_rwf }} RWF</td>
+                    <td style="padding: 12px 14px; color: #64748B;">
+                        {% if r.wholesale_price_rwf %}{{ r.wholesale_price_rwf }} RWF{% else %}&mdash;{% endif %}
+                    </td>
+                    <td style="padding: 12px 14px; color: #334155;">{{ r.date_recorded }}</td>
+                    <td style="padding: 12px 14px;">
+                        <span class="status-pill {{ r.status }}">{{ r.get_status_display }}</span>
+                        {% if r.validation_flags %}
+                        <div style="font-size: 0.68rem; color: #DC2626; margin-top: 4px; font-weight: 600;">⚠️ Flags: {{ r.validation_flags|join:", " }}</div>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px 14px; font-size: 0.75rem; color: #64748B;">
+                        <div>Collected: <strong>{{ r.collected_by.username|default:"System" }}</strong></div>
+                        {% if r.approved_by %}
+                        <div style="color: #059669;">Approved: <strong>{{ r.approved_by.username }}</strong></div>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px 14px; text-align: right;">
+                        <a href="{% url 'markets:internal_record_edit' r.id %}" style="padding: 4px 10px; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 4px; color: #1E293B; font-weight: 600; text-decoration: none; font-size: 0.78rem;">
+                            Edit
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" style="text-align: center; padding: 40px; color: #64748B;">
+                        No price surveillance records match your filter criteria.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-top: 1px solid #E2E8F0; font-size: 0.85rem; color: #64748B;">
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} ({{ page_obj.paginator.count }} records)</span>
+        <div style="display: flex; gap: 8px;">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if selected_q %}&q={{ selected_q }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #334155;">Previous</a>
+            {% endif %}
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if selected_q %}&q={{ selected_q }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}" style="padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #334155;">Next</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

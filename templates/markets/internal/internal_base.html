@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Commodity Prices &bull; Internal Management &bull; AgriLens{% endblock %}
+
+{% block content %}
+<div class="internal-market-wrapper">
+    <!-- Internal Dedicated Commodity Prices Sidebar matching Proposed Menu -->
+    <aside class="internal-market-sidebar" aria-label="Commodity Prices Internal Menu">
+        <!-- Sidebar Header matching specification -->
+        <div class="internal-sidebar-header">
+            <div class="internal-sidebar-title">Commodity Prices</div>
+            <span class="internal-sidebar-sub">Internal management &bull; AgriLens</span>
+            <span class="internal-sidebar-badge">Staff only</span>
+        </div>
+
+        <!-- 10 PROPOSED SIDEBAR MENU ITEMS -->
+        <nav class="internal-nav-list">
+            <!-- 1. Price Dashboard -->
+            <a href="{% url 'markets:internal_dashboard' %}" class="internal-nav-link {% if active_subnav == 'dashboard' %}active{% endif %}">
+                <span class="internal-nav-icon-group">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span>Price Dashboard</span>
+                </span>
+            </a>
+
+            <!-- 2. Price Records -->
+            <a href="{% url 'markets:internal_records' %}" class="internal-nav-link {% if active_subnav == 'records' %}active{% endif %}">
+                <span class="internal-nav-icon-group">
+                    <i class="fa-solid fa-table-list"></i>
+                    <span>Price Records</span>
+                </span>
+            </a>
+
+            <!-- 3. Markets & Locations -->
+            <a href="{% url 'markets:internal_markets' %}" class="internal-nav-link {% if active_subnav == 'markets' %}active{% endif %}">
+                <span class="internal-nav-icon-group">
+                    <i class="fa-solid fa-shop"></i>
+                    <span>Markets &amp; Locations</span>
+                </span>
+            </a>
+
+            <!-- 4. Commodities -->
+            <a href="{% url 'markets:internal_commodities' %}" class="internal-nav-link {% if active_subnav == 'commodities' %}active{% endif %}">
+                <span class="internal-nav-icon-group">
+                    <i class="fa-solid fa-wheat-awn"></i>
+                    <span>Commodities</span>
+                </span>
+            </a>
+
+            <!-- 5. Data Collection -->
+            <a href="{% url 'markets:internal_collection' %}" class="internal-nav-link {% if active_subnav == 'collection' %}active{% endif %}">
+                <span class="internal-nav-icon-group">
+                    <i class="fa-solid fa-clipboard-check"></i>
+                    <span>Data Collection</span>
+                </span>
+            </a>
+
+            <!-- 6. Validation & Approval -->
+            <a href="{% url 'markets:internal_approvals' %}" class="internal-nav-link {% if active_subnav == 'approvals' %}active{% endif %}">
+                <span class="internal-nav-icon-group">
+                    <i class="fa-solid fa-stamp"></i>
+                    <span>Validation &amp; Approval</span>
+                </span>
+                {% if pending_approvals %}
+                <span class="internal-count-pill">{{ pending_approvals }}</span>
+                {% endif %}
+            </a>
+
+            <!-- 7. Price Analytics -->
+            <a href="{% url 'markets:internal_analytics' %}" class="internal-nav-link {% if active_subnav == 'analytics' %}active{% endif %}">
+                <span class="internal-nav-icon-group">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Price Analytics</span>
+                </span>
+            </a>
+
+            <!-- 8. Reports & Exports -->
+            <a href="{% url 'markets:internal_reports' %}" class="internal-nav-link {% if active_subnav == 'reports' %}active{% endif %}">
+                <span class="internal-nav-icon-group">
+                    <i class="fa-solid fa-file-export"></i>
+                    <span>Reports &amp; Exports</span>
+                </span>
+            </a>
+
+            <!-- 9. Publications -->
+            <a href="{% url 'markets:internal_publications' %}" class="internal-nav-link {% if active_subnav == 'publications' %}active{% endif %}">
+                <span class="internal-nav-icon-group">
+                    <i class="fa-solid fa-bullhorn"></i>
+                    <span>Publications</span>
+                </span>
+            </a>
+
+            <!-- 10. Audit Log -->
+            <a href="{% url 'markets:internal_audit_log' %}" class="internal-nav-link {% if active_subnav == 'audit' %}active{% endif %}">
+                <span class="internal-nav-icon-group">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Audit Log</span>
+                </span>
+            </a>
+        </nav>
+
+        <!-- Back to Public Portal Link -->
+        <div class="internal-sidebar-footer">
+            <a href="{% url 'markets:market_list' %}" title="View Public Commodity Price Board">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                <span>Public Price Board &rarr;</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Internal Workspace Area -->
+    <main class="internal-main-workspace">
+        <!-- Messages -->
+        {% if messages %}
+        <div style="margin-bottom: 20px;">
+            {% for m in messages %}
+            <div style="padding: 12px 18px; border-radius: 8px; margin-bottom: 10px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between; {% if m.tags == 'error' %}background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5;{% else %}background: #DCFCE7; color: #166534; border: 1px solid #86EFAC;{% endif %}">
+                <span>{{ m }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block internal_content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}

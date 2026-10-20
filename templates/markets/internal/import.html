@@ -1,0 +1,62 @@
+{% extends "markets/internal/internal_base.html" %}
+
+{% block internal_content %}
+<div class="internal-top-action-bar">
+    <div class="internal-page-heading">
+        <h2>Bulk CSV Price Import</h2>
+        <p>Upload periodic market surveillance spreadsheets into the verification queue</p>
+    </div>
+    <a href="{% url 'markets:internal_records' %}" style="padding: 8px 16px; background: #FFFFFF; border: 1px solid #CBD5E1; color: #475569; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600;">
+        &larr; Back to Records
+    </a>
+</div>
+
+<div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px;">
+    <!-- Form Card -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 28px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 6px;">
+                    Select CSV File <span style="color: #DC2626;">*</span>
+                </label>
+                {{ form.csv_file }}
+                <span style="font-size: 0.74rem; color: #64748B; display: block; margin-top: 6px;">{{ form.csv_file.help_text }}</span>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 6px;">
+                    Default Market Hub (Optional override)
+                </label>
+                {{ form.market_hub }}
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; padding-top: 20px; border-top: 1px solid #E2E8F0;">
+                <a href="{% url 'markets:internal_records' %}" style="padding: 10px 18px; background: #F1F5F9; color: #475569; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600;">Cancel</a>
+                <button type="submit" style="padding: 10px 22px; background: #059669; color: #FFFFFF; font-weight: 700; border: none; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                    Upload &amp; Process Import &rarr;
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Instructions Card -->
+    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 24px;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: #0F172A; margin: 0 0 12px 0;">Expected CSV Format</h4>
+        <p style="font-size: 0.82rem; color: #475569; line-height: 1.5; margin-bottom: 14px;">
+            The uploaded spreadsheet must follow standard MINAGRI surveillance format with the following header row:
+        </p>
+        <div style="background: #0F172A; color: #F1F5F9; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 0.75rem; overflow-x: auto; margin-bottom: 14px;">
+            date,market,crop,retail_price,wholesale_price<br>
+            2026-10-20,Nyabugogo,Maize,440.0,410.0<br>
+            2026-10-20,Kimironko,Climbing Beans,460.0,420.0
+        </div>
+        <ul style="font-size: 0.78rem; color: #64748B; padding-left: 18px; line-height: 1.6; margin: 0;">
+            <li>All imported prices enter the queue in <strong>Submitted for Review</strong> status.</li>
+            <li>Prices cannot be published directly to the public without validation.</li>
+            <li>Outliers beyond commodity boundaries will be flagged automatically.</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -1,94 +1,374 @@
 {% extends "public_base.html" %}
+{% load static %}
 
-{% block title %}Officer Sign In &bull; AgriLens Rwanda{% endblock %}
+{% block title %}Officer Login &bull; AgriLens Rwanda{% endblock %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
 
 {% block content %}
-<section class="public-auth-section">
-    <div class="public-auth-card">
-        <!-- Official NISR Brand 4-Color Stripe -->
-        <div class="auth-brand-stripe">
-            <span class="stripe-blue" title="Pantone 2728 C (Royal Blue)"></span>
-            <span class="stripe-cyan" title="Pantone Cyan"></span>
-            <span class="stripe-green" title="Pantone 362 C (Green)"></span>
-            <span class="stripe-yellow" title="Pantone 3965 C (Yellow)"></span>
+<div class="login-page-container">
+    <!-- Left Hero Pane -->
+    <div class="login-hero-pane">
+        <!-- Brand Header -->
+        <a href="/" class="login-hero-brand" title="AgriLens Rwanda">
+            <div class="login-brand-icon-box" aria-hidden="true">
+                <!-- Two-leaf modern AgriLens emblem -->
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18.5 33.5C9.5 33.5 6 26.5 6 18C15 16.5 21.5 19.5 24 23.5C21 28.5 20.5 33.5 18.5 33.5Z" fill="#34D399" opacity="0.9"/>
+                    <path d="M19 33.5C28.5 33.5 34 26 34 11C23 11 15 18 13.5 26.5C15.5 29.5 17.5 33.5 19 33.5Z" fill="#10B981"/>
+                    <path d="M11 36C15 32 19 25 21 16" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="login-brand-text">
+                <span class="login-brand-title">AgriLens</span>
+                <span class="login-brand-subtitle">See Agriculture Through Data.</span>
+            </div>
+        </a>
+
+        <!-- Hero Center Content -->
+        <div class="login-hero-center">
+            <h1 class="login-hero-title">
+                Smarter Agriculture.<br>
+                A Prosperous <span class="highlight-rwanda">Rwanda.</span>
+            </h1>
+            <p class="login-hero-desc">
+                AgriLens provides reliable agricultural data, insights and tools to support better decisions for a sustainable agricultural future.
+            </p>
+
+            <!-- 4 Pillar Feature Highlights matching Reference Design -->
+            <div class="login-feature-list">
+                <!-- 1. Real Data -->
+                <div class="login-feature-item">
+                    <div class="login-feature-icon" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                            <polyline points="17 6 23 6 23 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="login-feature-text">
+                        <h4>Real Data</h4>
+                        <p>From NISR &amp; MINAGRI</p>
+                    </div>
+                </div>
+
+                <!-- 2. Interactive Maps -->
+                <div class="login-feature-item">
+                    <div class="login-feature-icon" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+                            <line x1="9" y1="3" x2="9" y2="18"></line>
+                            <line x1="15" y1="6" x2="15" y2="21"></line>
+                        </svg>
+                    </div>
+                    <div class="login-feature-text">
+                        <h4>Interactive Maps</h4>
+                        <p>Explore Rwanda&rsquo;s agriculture</p>
+                    </div>
+                </div>
+
+                <!-- 3. Actionable Insights -->
+                <div class="login-feature-item">
+                    <div class="login-feature-icon" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="login-feature-text">
+                        <h4>Actionable Insights</h4>
+                        <p>For farmers, businesses &amp; policymakers</p>
+                    </div>
+                </div>
+
+                <!-- 4. Sustainable Future -->
+                <div class="login-feature-item">
+                    <div class="login-feature-icon" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+                            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+                        </svg>
+                    </div>
+                    <div class="login-feature-text">
+                        <h4>Sustainable Future</h4>
+                        <p>Better data. Better decisions.</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Header -->
-        <div class="public-auth-header">
-            <div class="public-auth-header-top">
-                <div class="auth-header-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        <!-- Hero Footer Badge with Official Rwanda Flag -->
+        <div class="login-hero-footer">
+            <svg width="30" height="20" viewBox="0 0 30 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); flex-shrink: 0;" aria-label="Flag of Rwanda">
+                <rect width="30" height="20" rx="2" fill="#0077C8"/>
+                <rect y="10" width="30" height="5" fill="#FAD201"/>
+                <rect y="15" width="30" height="5" fill="#20603D"/>
+                <!-- Sun symbol in top right -->
+                <circle cx="23" cy="5" r="2.4" fill="#FAD201"/>
+                <path d="M23 1.8V8.2M19.8 5H26.2M20.8 2.8L25.2 7.2M20.8 7.2L25.2 2.8" stroke="#FAD201" stroke-width="0.6"/>
+            </svg>
+            <div class="login-footer-text">
+                <h5>Rwanda Agricultural Intelligence Platform</h5>
+                <p>Powered by data. Driven by people.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Login Card Pane -->
+    <div class="login-card-pane">
+        <div class="officer-login-card">
+            <!-- Brand Logo atop Card -->
+            <div class="card-brand-header">
+                <div class="card-brand-icon" aria-hidden="true">
+                    <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.5 33.5C9.5 33.5 6 26.5 6 18C15 16.5 21.5 19.5 24 23.5C21 28.5 20.5 33.5 18.5 33.5Z" fill="#16A34A" opacity="0.85"/>
+                        <path d="M19 33.5C28.5 33.5 34 26 34 11C23 11 15 18 13.5 26.5C15.5 29.5 17.5 33.5 19 33.5Z" fill="#15803D"/>
+                        <path d="M11 36C15 32 19 25 21 16" stroke="#064E3B" stroke-width="2" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <div>
-                    <h1 class="auth-title">AgriLens Institutional Sign In</h1>
-                    <p class="auth-subtitle">National Agricultural Intelligence Access Control</p>
+                <div class="login-brand-text">
+                    <span class="card-brand-title">AgriLens</span>
+                    <span class="card-brand-subtitle">See Agriculture Through Data.</span>
                 </div>
             </div>
-            <div class="auth-role-tag">
-                <span>Enterprise Portal</span> &bull; <span>MINAGRI &bull; NISR &bull; Institutional Clearance</span>
-            </div>
-        </div>
 
-        <!-- Body -->
-        <div class="public-auth-body">
+            <!-- Card Titles -->
+            <div class="card-title-group">
+                <h1>Officer Login</h1>
+                <p>Access your workspace and manage agricultural data, reports and analytics.</p>
+            </div>
+
+            <!-- Messages / Feedback Banners -->
             {% if messages %}
                 {% for message in messages %}
-                <div class="alert-box {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %}" style="padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; {% if message.tags == 'error' %}background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA;{% elif message.tags == 'success' %}background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0;{% else %}background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE;{% endif %}">
+                <div class="alert-box {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %}" style="padding: 12px 14px; border-radius: 10px; margin-bottom: 20px; font-size: 0.88rem; display: flex; align-items: center; gap: 10px; {% if message.tags == 'error' %}background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA;{% elif message.tags == 'success' %}background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0;{% else %}background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE;{% endif %}">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                        {% if message.tags == 'error' %}
+                        <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        {% else %}
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        {% endif %}
+                    </svg>
                     <span>{{ message }}</span>
                 </div>
                 {% endfor %}
             {% endif %}
 
-            <form method="post" action="{% url 'accounts:login' %}" novalidate>
+            <!-- Login Form -->
+            <form method="post" action="{% url 'accounts:login' %}" novalidate id="officer-login-form">
                 {% csrf_token %}
                 {% if next %}
                 <input type="hidden" name="next" value="{{ next }}">
                 {% endif %}
 
-                <div class="form-group" style="margin-bottom: 18px;">
-                    <label for="id_username" style="display: block; font-weight: 600; font-size: 0.85rem; color: #0F172A; margin-bottom: 6px;">
-                        Username or Officer ID <span style="color: #DC2626;">*</span>
-                    </label>
-                    <input type="text" name="username" id="id_username" class="form-input" style="width: 100%; padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.95rem;" placeholder="e.g. analyst_rwanda" required autofocus>
+                <!-- Username or Email Field -->
+                <div class="auth-input-group">
+                    <label for="id_username">Username or Email</label>
+                    <div class="auth-input-wrapper">
+                        <span class="auth-input-icon" aria-hidden="true">
+                            <!-- User outline icon -->
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </span>
+                        <input type="text" name="username" id="id_username" class="auth-field-input" placeholder="Enter your username or email" value="{{ form.username.value|default:'' }}" required autofocus>
+                    </div>
                     {% if form.username.errors %}
-                    <div style="color: #DC2626; font-size: 0.8rem; margin-top: 4px;">{{ form.username.errors.0 }}</div>
+                    <div style="color: #DC2626; font-size: 0.8rem; margin-top: 4px; font-weight: 500;">
+                        {{ form.username.errors.0 }}
+                    </div>
                     {% endif %}
                 </div>
 
-                <div class="form-group" style="margin-bottom: 24px;">
-                    <label for="id_password" style="display: block; font-weight: 600; font-size: 0.85rem; color: #0F172A; margin-bottom: 6px;">
-                        Secure Password <span style="color: #DC2626;">*</span>
-                    </label>
-                    <input type="password" name="password" id="id_password" class="form-input" style="width: 100%; padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.95rem;" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required>
+                <!-- Password Field -->
+                <div class="auth-input-group">
+                    <label for="id_password">Password</label>
+                    <div class="auth-input-wrapper">
+                        <span class="auth-input-icon" aria-hidden="true">
+                            <!-- Lock outline icon -->
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </span>
+                        <input type="password" name="password" id="id_password" class="auth-field-input" placeholder="Enter your password" required>
+                        <!-- Password Visibility Toggle Button -->
+                        <button type="button" class="password-toggle-btn" id="password-toggle-btn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility" title="Show/Hide Password">
+                            <!-- Eye Icon -->
+                            <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <!-- Eye Off Icon (hidden initially) -->
+                            <svg id="eye-off-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                        </button>
+                    </div>
                     {% if form.password.errors %}
-                    <div style="color: #DC2626; font-size: 0.8rem; margin-top: 4px;">{{ form.password.errors.0 }}</div>
+                    <div style="color: #DC2626; font-size: 0.8rem; margin-top: 4px; font-weight: 500;">
+                        {{ form.password.errors.0 }}
+                    </div>
                     {% endif %}
                 </div>
 
-                <button type="submit" class="btn-primary-action" id="submit-login-btn" style="width: 100%; padding: 13px; font-size: 0.95rem; font-weight: 700; border-radius: 8px; justify-content: center;">
-                    Sign In to Institutional Hub &rarr;
+                <!-- Remember Me & Forgot Password Row -->
+                <div class="auth-options-row">
+                    <label class="remember-checkbox-label">
+                        <input type="checkbox" name="remember_me" id="id_remember_me">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="javascript:void(0)" class="forgot-password-link" onclick="openForgotModal(event)">Forgot password?</a>
+                </div>
+
+                <!-- Submit Sign In Button -->
+                <button type="submit" class="btn-officer-signin" id="submit-login-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                    <span>Sign In</span>
+                </button>
+
+                <!-- OR Divider -->
+                <div class="auth-divider-or" aria-hidden="true">
+                    <span>OR</span>
+                </div>
+
+                <!-- Login with SSO Button -->
+                <button type="button" class="btn-officer-sso" onclick="openSSOModal(event)" id="btn-sso-login">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        <polyline points="9 12 11 14 15 10"></polyline>
+                    </svg>
+                    <span>Login with SSO</span>
                 </button>
             </form>
 
-            <div class="auth-tier-box">
-                <strong>Authorized Access Tiers:</strong>
-                <ul class="auth-tier-list">
-                    <li><strong>Policy Maker / MINAGRI:</strong> National analytics, NST2 priorities, approvals.</li>
-                    <li><strong>Agricultural Analyst:</strong> Data validation, yield gap benchmarking.</li>
-                    <li><strong>Field Extension Officer:</strong> Sector-level manual observation submission.</li>
-                    <li><strong>Agricultural Researcher:</strong> Lineage audit logs and SPSS dataset downloads.</li>
-                </ul>
+            <!-- Card Bottom Navigation Link -->
+            <div class="card-portal-footer">
+                <span>Not an officer?</span>
+                <a href="/" class="portal-link">
+                    <span>Visit public portal</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </a>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Footer -->
-        <div class="public-auth-footer">
-            <a href="/">&larr; Return to Public Portal</a>
-            <span style="color: #94A3B8;">AgriLens v2.6 &bull; NISR 2026</span>
+<!-- Modal: Forgot Password -->
+<div id="forgot-modal" class="auth-modal-backdrop" style="display: none;" onclick="closeModalOnBackdrop(event, 'forgot-modal')">
+    <div class="auth-modal-card">
+        <div class="auth-modal-header">
+            <div class="auth-modal-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+            <h3 class="auth-modal-title">Password Recovery</h3>
+        </div>
+        <div class="auth-modal-body">
+            <p>AgriLens accounts are issued and managed under the official Government of Rwanda MINAGRI &amp; NISR security directory.</p>
+            <p style="margin-top: 10px;">To reset your institutional credentials, please contact your Platform Administrator or the National Helpdesk:</p>
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px 14px; margin-top: 12px; font-size: 0.84rem;">
+                <div><strong>Email:</strong> <a href="mailto:support@agrilens.gov.rw" style="color: #047857; text-decoration: underline;">support@agrilens.gov.rw</a></div>
+                <div style="margin-top: 4px;"><strong>National Hotline:</strong> +250 252 575 813 / 814</div>
+            </div>
+        </div>
+        <div class="auth-modal-footer">
+            <button type="button" class="btn-officer-signin" style="width: auto; padding: 9px 18px; font-size: 0.88rem;" onclick="closeModal('forgot-modal')">Understood</button>
         </div>
     </div>
-</section>
+</div>
+
+<!-- Modal: Single Sign-On (SSO) -->
+<div id="sso-modal" class="auth-modal-backdrop" style="display: none;" onclick="closeModalOnBackdrop(event, 'sso-modal')">
+    <div class="auth-modal-card">
+        <div class="auth-modal-header">
+            <div class="auth-modal-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <polyline points="9 12 11 14 15 10"></polyline>
+                </svg>
+            </div>
+            <h3 class="auth-modal-title">Institutional Single Sign-On</h3>
+        </div>
+        <div class="auth-modal-body">
+            <p>You are connecting to the <strong>Government of Rwanda Unified Authentication Service</strong> (GoR IAM / MINAGRI SSO).</p>
+            <div style="margin-top: 12px; padding: 12px; background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; font-size: 0.84rem; color: #166534;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Active Identity Provider: <strong>MINAGRI &bull; NISR Secure Directory</strong>
+            </div>
+        </div>
+        <div class="auth-modal-footer">
+            <button type="button" class="btn-officer-sso" style="width: auto; padding: 9px 16px; font-size: 0.86rem;" onclick="closeModal('sso-modal')">Cancel</button>
+            <button type="button" class="btn-officer-signin" style="width: auto; padding: 9px 18px; font-size: 0.86rem;" onclick="simulateSSO()">Continue with SSO &rarr;</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('id_password');
+        const eyeIcon = document.getElementById('eye-icon');
+        const eyeOffIcon = document.getElementById('eye-off-icon');
+        if (!passwordInput) return;
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            if (eyeIcon) eyeIcon.style.display = 'none';
+            if (eyeOffIcon) eyeOffIcon.style.display = 'block';
+        } else {
+            passwordInput.type = 'password';
+            if (eyeIcon) eyeIcon.style.display = 'block';
+            if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+        }
+    }
+
+    function openForgotModal(e) {
+        if (e) e.preventDefault();
+        const m = document.getElementById('forgot-modal');
+        if (m) m.style.display = 'flex';
+    }
+
+    function openSSOModal(e) {
+        if (e) e.preventDefault();
+        const m = document.getElementById('sso-modal');
+        if (m) m.style.display = 'flex';
+    }
+
+    function closeModal(id) {
+        const m = document.getElementById(id);
+        if (m) m.style.display = 'none';
+    }
+
+    function closeModalOnBackdrop(e, id) {
+        if (e.target && e.target.id === id) {
+            closeModal(id);
+        }
+    }
+
+    function simulateSSO() {
+        // Redirect to institutional SSO handler or populate default demo officer
+        const usernameInput = document.getElementById('id_username');
+        if (usernameInput) usernameInput.value = 'analyst_rwanda';
+        const passwordInput = document.getElementById('id_password');
+        if (passwordInput) passwordInput.value = 'Analyst@2026!';
+        closeModal('sso-modal');
+        const form = document.getElementById('officer-login-form');
+        if (form) form.submit();
+    }
+</script>
 {% endblock %}

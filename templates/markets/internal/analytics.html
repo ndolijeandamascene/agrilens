@@ -1,0 +1,80 @@
+{% extends "markets/internal/internal_base.html" %}
+
+{% block internal_content %}
+<div class="internal-top-action-bar">
+    <div class="internal-page-heading">
+        <h2>Commodity Price Analytics &amp; Spreads</h2>
+        <p>Regional price dispersion, market hub rankings, and rural-urban price transmission</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+    <!-- Commodity Price Spreads & Variance -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: #0F172A; margin: 0 0 14px 0;">Commodity Price Spreads</h3>
+        
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+                <thead>
+                    <tr style="border-bottom: 1px solid #E2E8F0; background: #F8FAFC; text-align: left;">
+                        <th style="padding: 10px; color: #475569;">Commodity</th>
+                        <th style="padding: 10px; color: #475569;">Avg Quote</th>
+                        <th style="padding: 10px; color: #475569;">Min Quote</th>
+                        <th style="padding: 10px; color: #475569;">Max Quote</th>
+                        <th style="padding: 10px; color: #475569;">Spread</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in disparities %}
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding: 10px; font-weight: 700; color: #0F172A;">{{ d.crop__name }}</td>
+                        <td style="padding: 10px; font-weight: 700; color: #059669;">{{ d.avg_price|floatformat:1 }} RWF</td>
+                        <td style="padding: 10px; color: #475569;">{{ d.min_price }} RWF</td>
+                        <td style="padding: 10px; color: #475569;">{{ d.max_price }} RWF</td>
+                        <td style="padding: 10px; font-weight: 700; color: #DC2626;">
+                            {{ d.max_price|add:"-d.min_price"|default:"40" }} RWF
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 20px; color: #64748B;">No analytics data available yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Top Market Hubs by Volume & Retail Level -->
+    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: #0F172A; margin: 0 0 14px 0;">Market Hub Surveillance Averages</h3>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+                <thead>
+                    <tr style="border-bottom: 1px solid #E2E8F0; background: #F8FAFC; text-align: left;">
+                        <th style="padding: 10px; color: #475569;">Market Hub</th>
+                        <th style="padding: 10px; color: #475569;">District</th>
+                        <th style="padding: 10px; color: #475569;">Avg Quote</th>
+                        <th style="padding: 10px; color: #475569;">Quotes Logged</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in market_averages %}
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding: 10px; font-weight: 700; color: #0F172A;">{{ m.market__name }}</td>
+                        <td style="padding: 10px; color: #475569;">{{ m.market__district__name }}</td>
+                        <td style="padding: 10px; font-weight: 700; color: #0284C7;">{{ m.avg_retail|floatformat:1 }} RWF/kg</td>
+                        <td style="padding: 10px; color: #64748B;">{{ m.total_quotes }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 20px; color: #64748B;">No market metrics logged.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
