@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <radialGradient id="riceBowlGrad" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#FFFDF7" />
+      <stop offset="55%" stop-color="#F5EFE0" />
+      <stop offset="85%" stop-color="#E2D4B7" />
+      <stop offset="100%" stop-color="#CBB892" />
+    </radialGradient>
+    <filter id="riceShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <circle cx="50" cy="50" r="44" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
+  <circle cx="50" cy="50" r="39" fill="url(#riceBowlGrad)" filter="url(#riceShadow)" />
+  <!-- Realistic Rice Grains Texture Pattern -->
+  <g fill="#FFFFFF" stroke="#E5DEC9" stroke-width="0.6" opacity="0.95">
+    <ellipse cx="42" cy="38" rx="7" ry="2.8" transform="rotate(-25 42 38)" />
+    <ellipse cx="56" cy="35" rx="7.2" ry="2.7" transform="rotate(35 56 35)" />
+    <ellipse cx="48" cy="45" rx="7.5" ry="2.8" transform="rotate(-10 48 45)" />
+    <ellipse cx="36" cy="48" rx="6.8" ry="2.6" transform="rotate(50 36 48)" />
+    <ellipse cx="62" cy="47" rx="7" ry="2.7" transform="rotate(-40 62 47)" />
+    <ellipse cx="44" cy="56" rx="7.3" ry="2.8" transform="rotate(15 44 56)" />
+    <ellipse cx="57" cy="57" rx="7.1" ry="2.7" transform="rotate(-30 57 57)" />
+    <ellipse cx="50" cy="65" rx="6.9" ry="2.6" transform="rotate(70 50 65)" />
+    <ellipse cx="35" cy="58" rx="6.5" ry="2.5" transform="rotate(-15 35 58)" />
+    <ellipse cx="65" cy="58" rx="6.6" ry="2.6" transform="rotate(25 65 58)" />
+  </g>
+</svg>

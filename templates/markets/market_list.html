@@ -1,400 +1,1727 @@
 {% extends "public_base.html" %}
 {% load static %}
 
-{% block title %}AgriLens Market Prices - Data-Driven Decisions{% endblock %}
+{% block title %}AgriLens &bull; Public Market Prices Surveillance &ndash; Rwanda Agricultural Intelligence{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ==========================================================================
+   OFFICIAL PUBLIC MARKET PRICES SURVEILLANCE STYLESHEET
+   100% Aligned with Rwanda Agricultural Intelligence Reference Design
+   ========================================================================== */
+
+:root {
+  --agl-emerald-950: #064e3b;
+  --agl-emerald-900: #065f46;
+  --agl-emerald-800: #047857;
+  --agl-emerald-700: #059669;
+  --agl-emerald-600: #10b981;
+  --agl-emerald-100: #d1fae5;
+  --agl-emerald-50:  #ecfdf5;
+  --agl-slate-900:   #0f172a;
+  --agl-slate-800:   #1e293b;
+  --agl-slate-700:   #334155;
+  --agl-slate-600:   #475569;
+  --agl-slate-500:   #64748b;
+  --agl-slate-400:   #94a3b8;
+  --agl-slate-200:   #e2e8f0;
+  --agl-slate-100:   #f1f5f9;
+  --agl-slate-50:    #f8fafc;
+  --agl-map-low:     #86efac;
+  --agl-map-medium:  #facc15;
+  --agl-map-high:    #f59e0b;
+}
+
+.public-market-page-wrap {
+  width: 100%;
+  background: #f8fafc;
+  min-height: 100vh;
+  padding: 24px 0 64px 0;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--agl-slate-900);
+}
+
+.public-market-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==========================================================================
+   1. HERO BANNER
+   ========================================================================== */
+.market-hero-banner {
+  width: 100%;
+  background: #f4fbf7;
+  border-radius: 16px;
+  border: 1px solid #dcf2e5;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  min-height: 250px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.market-hero-content {
+  flex: 1.2;
+  padding: 36px 36px 32px 36px;
+  z-index: 2;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.market-hero-eyebrow {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #15803d;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.market-hero-title {
+  font-size: 2.15rem;
+  font-weight: 800;
+  line-height: 1.18;
+  color: #0b2e21;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.025em;
+}
+
+.market-hero-subtitle {
+  font-size: 0.96rem;
+  color: #4b6354;
+  line-height: 1.5;
+  margin: 0 0 18px 0;
+  max-width: 520px;
+}
+
+.market-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  border-radius: 9999px;
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #166534;
+  width: fit-content;
+}
+
+.market-hero-image-wrap {
+  flex: 1;
+  position: relative;
+  min-height: 220px;
+  background-image: url('{% static "images/public_market_hero_banner.jpg" %}');
+  background-size: cover;
+  background-position: center right;
+  background-repeat: no-repeat;
+}
+
+/* Gradient blending overlay from left text into right image */
+.market-hero-image-wrap::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 140px;
+  background: linear-gradient(90deg, #f4fbf7 0%, rgba(244, 251, 247, 0.85) 45%, transparent 100%);
+  pointer-events: none;
+}
+
+@media (max-width: 860px) {
+  .market-hero-banner {
+    flex-direction: column;
+  }
+  .market-hero-image-wrap {
+    height: 180px;
+    order: -1;
+  }
+  .market-hero-image-wrap::before {
+    display: none;
+  }
+  .market-hero-title {
+    font-size: 1.75rem;
+  }
+}
+
+/* ==========================================================================
+   2. TOP KPI STAT CARDS (4-Column Grid)
+   ========================================================================== */
+.market-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.market-kpi-card {
+  background: #ffffff;
+  border: 1px solid var(--agl-slate-200);
+  border-radius: 12px;
+  padding: 20px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.market-kpi-card:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.market-kpi-icon-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--agl-emerald-950);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.market-kpi-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.market-kpi-label {
+  font-size: 0.82rem;
+  color: var(--agl-slate-600);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.market-kpi-val-row {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.market-kpi-number {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--agl-slate-900);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.market-kpi-unit {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--agl-slate-700);
+}
+
+.market-kpi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #ecfdf5;
+  color: #059669;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  margin-top: 4px;
+  width: fit-content;
+}
+
+@media (max-width: 980px) {
+  .market-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .market-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   3. FILTER BAR
+   ========================================================================== */
+.market-filter-bar-card {
+  background: #ffffff;
+  border: 1px solid var(--agl-slate-200);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-top: 20px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.market-filter-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.filter-input-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-input-wrap.search-col {
+  flex: 1.5;
+  min-width: 220px;
+}
+
+.filter-input-wrap.select-col {
+  flex: 1;
+  min-width: 140px;
+}
+
+.filter-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--agl-slate-600);
+  margin-bottom: 5px;
+}
+
+.filter-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.filter-search-box .search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--agl-slate-400);
+  pointer-events: none;
+}
+
+.filter-search-box input {
+  width: 100%;
+  padding: 9px 12px 9px 38px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--agl-slate-900);
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.filter-search-box input:focus {
+  border-color: var(--agl-emerald-700);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.filter-select-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.filter-select-box select {
+  width: 100%;
+  padding: 9px 32px 9px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--agl-slate-800);
+  background: #ffffff;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.filter-select-box select:focus {
+  border-color: var(--agl-emerald-700);
+}
+
+.filter-select-arrow {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+  color: var(--agl-slate-500);
+}
+
+.filter-btn-col {
+  margin-left: auto;
+}
+
+.filter-submit-btn {
+  background: #0f4c3a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.filter-submit-btn:hover {
+  background: #064e3b;
+}
+
+/* ==========================================================================
+   4. MIDDLE 2-COLUMN SECTION: MAP & TREND CHART
+   ========================================================================== */
+.market-mid-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.market-panel-card {
+  background: #ffffff;
+  border: 1px solid var(--agl-slate-200);
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Map Header & Legend */
+.map-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.map-card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--agl-slate-900);
+  margin: 0;
+}
+
+.map-legend-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.map-legend-heading {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--agl-slate-500);
+  margin-bottom: 4px;
+}
+
+.map-legend-items {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.map-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--agl-slate-700);
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-dot.low { background: var(--agl-map-low); }
+.legend-dot.medium { background: var(--agl-map-medium); }
+.legend-dot.high { background: var(--agl-map-high); }
+
+/* Rwanda SVG Map Container */
+.rwanda-svg-viewport {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 330px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rwanda-vector-map {
+  width: 100%;
+  height: auto;
+  max-height: 380px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.04));
+}
+
+.district-polygon {
+  stroke: #ffffff;
+  stroke-width: 1.3px;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: opacity 0.15s, stroke 0.15s, stroke-width 0.15s;
+}
+
+.district-polygon:hover {
+  opacity: 0.9;
+  stroke: #0f172a;
+  stroke-width: 2px;
+}
+
+.map-region-label {
+  font-size: 11px;
+  font-weight: 800;
+  fill: #064e3b;
+  pointer-events: none;
+  text-anchor: middle;
+  letter-spacing: -0.01em;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 3px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kigali-dot {
+  fill: #0f172a;
+  stroke: #ffffff;
+  stroke-width: 1.5px;
+}
+
+/* Map Metadata: Compass & Scale */
+.map-scale-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 8px;
+  padding: 0 8px;
+}
+
+.map-compass {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #0f172a;
+  font-weight: 800;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.map-scale-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--agl-slate-500);
+}
+
+.scale-ticks {
+  display: flex;
+  justify-content: space-between;
+  width: 100px;
+  margin-bottom: 2px;
+}
+
+.scale-line {
+  width: 100px;
+  height: 3px;
+  background: var(--agl-slate-400);
+  border-radius: 2px;
+}
+
+/* Interactive Map Tooltip */
+#district-tooltip {
+  position: absolute;
+  display: none;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  pointer-events: none;
+  z-index: 50;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Right Column: Trend Chart & Insights
+   -------------------------------------------------------------------------- */
+.trend-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.trend-card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--agl-slate-900);
+  margin: 0;
+}
+
+.trend-stat-box {
+  text-align: right;
+}
+
+.trend-stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--agl-slate-500);
+}
+
+.trend-stat-value {
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: var(--agl-slate-900);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.trend-stat-change {
+  color: #059669;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* SVG Line Chart */
+.trend-svg-container {
+  width: 100%;
+  height: 180px;
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.trend-svg-chart {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.chart-grid-line {
+  stroke: #f1f5f9;
+  stroke-width: 1px;
+}
+
+.chart-axis-text {
+  font-size: 10.5px;
+  font-weight: 500;
+  fill: #94a3b8;
+}
+
+.chart-curve-path {
+  fill: none;
+  stroke: #047857;
+  stroke-width: 2.4px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-dot {
+  fill: #047857;
+  stroke: #ffffff;
+  stroke-width: 2px;
+  cursor: pointer;
+  transition: r 0.15s;
+}
+
+.chart-dot:hover {
+  r: 6;
+}
+
+.chart-pill-badge {
+  fill: #064e3b;
+  rx: 4;
+}
+
+.chart-pill-text {
+  fill: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  text-anchor: middle;
+}
+
+/* Key Insights Box */
+.trend-insights-box {
+  background: #f0fdf4;
+  border: 1px solid #d1fae5;
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-top: auto;
+}
+
+.insights-heading-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+
+.insights-heading-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #065f46;
+}
+
+.insights-list {
+  margin: 0;
+  padding-left: 16px;
+  list-style-type: disc;
+}
+
+.insights-list li {
+  font-size: 0.82rem;
+  color: #1e3a2f;
+  line-height: 1.45;
+  margin-bottom: 5px;
+}
+
+.insights-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #047857;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  margin-top: 8px;
+  transition: gap 0.15s;
+}
+
+.insights-link:hover {
+  gap: 7px;
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .market-mid-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   5. BOTTOM TABLE: LATEST VERIFIED MARKET PRICES
+   ========================================================================== */
+.market-table-card {
+  background: #ffffff;
+  border: 1px solid var(--agl-slate-200);
+  border-radius: 12px;
+  padding: 22px;
+  margin-top: 20px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.table-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.table-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.table-title-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--agl-emerald-950);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.table-title-text {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--agl-slate-900);
+  margin: 0;
+}
+
+.table-view-all-link {
+  color: #047857;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: gap 0.15s;
+}
+
+.table-view-all-link:hover {
+  gap: 7px;
+  text-decoration: underline;
+}
+
+/* Data Table Structure */
+.table-responsive-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.verified-prices-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.88rem;
+}
+
+.verified-prices-table th {
+  background: #f8fafc;
+  color: var(--agl-slate-600);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--agl-slate-200);
+  white-space: nowrap;
+}
+
+.verified-prices-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.verified-prices-table tr:hover td {
+  background: #fbfdfc;
+}
+
+/* Commodity Cell with Photo/Icon */
+.commodity-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.commodity-photo-thumb {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  flex-shrink: 0;
+}
+
+.commodity-svg-icon-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #059669;
+  flex-shrink: 0;
+}
+
+.commodity-name-text {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--agl-slate-900);
+}
+
+/* Market & District Cell */
+.market-name-line {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--agl-slate-900);
+  line-height: 1.25;
+}
+
+.district-name-line {
+  font-size: 0.78rem;
+  color: var(--agl-slate-500);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* Price Cells */
+.retail-price-val {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--agl-slate-900);
+}
+
+.wholesale-price-val {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--agl-slate-700);
+}
+
+/* Change Badges */
+.table-change-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.table-change-badge.positive {
+  color: #059669;
+}
+
+.table-change-badge.negative {
+  color: #dc2626;
+}
+
+/* Updated Time */
+.updated-date-line {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--agl-slate-700);
+  line-height: 1.2;
+}
+
+.updated-time-line {
+  font-size: 0.74rem;
+  color: var(--agl-slate-500);
+  margin-top: 2px;
+}
+
+/* Pagination Controls */
+.table-pagination-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.pagination-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: var(--agl-slate-700);
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.pagination-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.pagination-btn.active {
+  background: #064e3b;
+  border-color: #064e3b;
+  color: #ffffff;
+}
+
+.pagination-btn.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="market-prices-page-wrapper">
-    <div class="market-prices-container">
+<div class="public-market-page-wrap">
+  <div class="public-market-inner">
 
-        <!-- 1. Page Header matching Reference Mockup -->
-        <div class="market-page-header">
-            <h1 class="market-page-main-title">
-                AgriLens Market Prices &ndash; Data-Driven Decisions
-            </h1>
+    <!-- ====================================================================
+         1. HERO BANNER
+         ==================================================================== -->
+    <section class="market-hero-banner" aria-label="Rwanda Agricultural Intelligence Hero">
+      <div class="market-hero-content">
+        <span class="market-hero-eyebrow">RWANDA AGRICULTURAL INTELLIGENCE</span>
+        <h1 class="market-hero-title">
+          Know the market.<br>
+          Make better decisions.
+        </h1>
+        <p class="market-hero-subtitle">
+          Transparent, timely agricultural prices from markets across Rwanda.
+        </p>
+        <div class="market-hero-badge">
+          <!-- Clock SVG Icon -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>Last updated &middot; {{ kpi_last_updated_date }}</span>
         </div>
+      </div>
+      <div class="market-hero-image-wrap" role="img" aria-label="Rwandan agricultural market trader with fresh produce"></div>
+    </section>
 
-        <!-- 2. Active Public Price Alert (if any) -->
-        {% if active_notice %}
-        <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="background: #10B981; color: #FFFFFF; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 9999px; text-transform: uppercase;">Bulletin</span>
-                <span style="font-size: 0.85rem; font-weight: 700; color: #065F46;">{{ active_notice.title }}:</span>
-                <span style="font-size: 0.84rem; color: #047857;">{{ active_notice.message }}</span>
-            </div>
-            <span style="font-size: 0.74rem; color: #059669; font-weight: 600; white-space: nowrap;">{{ active_notice.effective_date }}</span>
+    <!-- ====================================================================
+         2. TOP KPI STAT CARDS (4-Column)
+         ==================================================================== -->
+    <section class="market-kpi-grid" aria-label="Market Overview Statistics">
+      <!-- Card 1: Maize Average -->
+      <div class="market-kpi-card">
+        <div class="market-kpi-icon-circle" aria-hidden="true">
+          <!-- Cereal Grain SVG -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 22 16 8"></path>
+            <path d="M9 15c1.5-3 5-5 8-5-1.5 3-5 5-8 5Z"></path>
+            <path d="M11 11c1.5-3 5-5 8-5-1.5 3-5 5-8 5Z"></path>
+            <path d="M13 7c1.5-3 5-5 8-5-1.5 3-5 5-8 5Z"></path>
+          </svg>
         </div>
+        <div class="market-kpi-info">
+          <span class="market-kpi-label">{{ kpi_commodity_name }} average</span>
+          <div class="market-kpi-val-row">
+            <span class="market-kpi-number">{{ kpi_commodity_avg }}</span>
+            <span class="market-kpi-unit">RWF/kg</span>
+          </div>
+          <span class="market-kpi-badge">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+            +{{ kpi_commodity_trend }}%
+          </span>
+        </div>
+      </div>
+
+      <!-- Card 2: Markets Monitored -->
+      <div class="market-kpi-card">
+        <div class="market-kpi-icon-circle" aria-hidden="true">
+          <!-- Market Stall / Store SVG -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path>
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+            <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path>
+            <path d="M2 7h20"></path>
+            <path d="M9 10a3 3 0 0 1-6 0"></path>
+            <path d="M15 10a3 3 0 0 1-6 0"></path>
+            <path d="M21 10a3 3 0 0 1-6 0"></path>
+          </svg>
+        </div>
+        <div class="market-kpi-info">
+          <span class="market-kpi-label">Markets monitored</span>
+          <div class="market-kpi-val-row">
+            <span class="market-kpi-number">{{ kpi_markets_monitored }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Commodities Tracked -->
+      <div class="market-kpi-card">
+        <div class="market-kpi-icon-circle" aria-hidden="true">
+          <!-- Leaf / Sprout SVG -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+          </svg>
+        </div>
+        <div class="market-kpi-info">
+          <span class="market-kpi-label">Commodities tracked</span>
+          <div class="market-kpi-val-row">
+            <span class="market-kpi-number">{{ kpi_commodities_tracked }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Last Price Update -->
+      <div class="market-kpi-card">
+        <div class="market-kpi-icon-circle" aria-hidden="true">
+          <!-- Clock SVG -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <div class="market-kpi-info">
+          <span class="market-kpi-label">Last price update</span>
+          <div class="market-kpi-val-row">
+            <span class="market-kpi-number" style="font-size: 1.55rem;">{{ kpi_last_update_time }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         3. FILTER BAR
+         ==================================================================== -->
+    <section class="market-filter-bar-card" aria-label="Market Price Filters">
+      <form method="GET" action="{% url 'markets:market_list' %}" class="market-filter-form" id="market-filter-form">
+        <!-- Hidden input for district if selected -->
+        {% if selected_district and selected_district != 'Nyanza' %}
+        <input type="hidden" name="district" value="{{ selected_district }}" id="hidden-filter-district">
         {% endif %}
 
-        <!-- 3. Top Hero Grid: Hero Banner with Vendors & Transparent Emerald Overlay (Left) + Top Market Trends (Right) -->
-        <div class="market-top-grid">
-            <!-- Left Hero Card with Vendors Image and Brand Colors -->
-            <div class="market-hero-card" id="market-hero-banner" data-hero-bg="{% static 'images/market_hero_vendors.png' %}">
-                <span class="market-hero-eyebrow">OFFICIAL RWANDA MARKET SURVEILLANCE &bull; UPDATED DAILY</span>
-                <h2 class="market-hero-title">Real-time Commodity Market Prices in Rwanda</h2>
-                <p class="market-hero-subtitle">Explore daily data for key crops across all districts.</p>
-
-                <!-- Search Pill Input -->
-                <form method="GET" action="{% url 'markets:market_list' %}" class="market-search-pill-box">
-                    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <input type="text" name="q" value="{{ selected_q }}" placeholder="Search commodity (e.g., Maize), district, or market..." aria-label="Search commodity, district, or market" />
-                    {% if selected_crop %}<input type="hidden" name="crop" value="{{ selected_crop }}">{% endif %}
-                    {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
-                </form>
-            </div>
-
-            <!-- Right: Top Market Trends Panel -->
-            <div class="market-trends-panel">
-                <div class="market-trends-panel-title">Top Market Trends</div>
-                
-                <div class="market-trends-cards-row">
-                    <!-- Trend Card 1: Today's Avg Maize Price -->
-                    <div class="trend-card-item">
-                        <div>
-                            <div class="trend-card-top">
-                                <div class="trend-icon-box green" aria-hidden="true">
-                                    🌽
-                                </div>
-                                <div>
-                                    <div class="trend-meta-label">Today's Avg. Maize Price</div>
-                                    <div class="trend-value-row">
-                                        <span class="trend-value-num">{{ today_maize_avg|floatformat:0 }}</span>
-                                        <span class="trend-unit">RWF/kg</span>
-                                        <span class="trend-change-badge up">
-                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                                            +{{ maize_trend_pct }}%
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="trend-card-footer">
-                            <span>Updated: 08:30 AM</span>
-                            <span style="color: #10B981; font-weight: 600;">e-Soko Feed</span>
-                        </div>
-                    </div>
-
-                    <!-- Trend Card 2: Nyabugogo Market High -->
-                    <div class="trend-card-item">
-                        <div>
-                            <div class="trend-card-top">
-                                <div class="trend-icon-box blue" aria-hidden="true">
-                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                        <circle cx="12" cy="10" r="3"></circle>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div class="trend-meta-label">Nyabugogo Market High</div>
-                                    <div class="trend-value-row">
-                                        <span class="trend-value-num">{{ nyabugogo_high_val|floatformat:0 }}</span>
-                                        <span class="trend-unit">RWF/kg</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="trend-card-footer">
-                            <span>Wholesale Hub &bull; Kigali</span>
-                            <span style="color: #0284C7; font-weight: 600;">Monitored</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Search Input -->
+        <div class="filter-input-wrap search-col">
+          <div class="filter-search-box">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" name="q" value="{{ selected_q }}" placeholder="Search commodity, district or market" aria-label="Search commodity, district or market" />
+          </div>
         </div>
 
-        <!-- 4. Category Tabs Filter Bar -->
-        <div class="market-category-tabs-bar">
-            <span style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-right: 6px;">Categories:</span>
-            <a href="?category=All{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_q %}&q={{ selected_q }}{% endif %}" class="category-tab-btn {% if selected_category == 'All' or not selected_category %}active{% endif %}">All Commodities</a>
-            <a href="?category=Cereals{% if selected_q %}&q={{ selected_q }}{% endif %}" class="category-tab-btn {% if selected_category == 'Cereals' %}active{% endif %}">Cereals (Maize, Rice, Wheat)</a>
-            <a href="?category=Legumes{% if selected_q %}&q={{ selected_q }}{% endif %}" class="category-tab-btn {% if selected_category == 'Legumes' %}active{% endif %}">Legumes &amp; Pulses (Beans, Soy)</a>
-            <a href="?category=Roots & Tubers{% if selected_q %}&q={{ selected_q }}{% endif %}" class="category-tab-btn {% if selected_category == 'Roots & Tubers' %}active{% endif %}">Roots &amp; Tubers (Irish &amp; Sweet Potatoes, Cassava)</a>
-            <a href="?category=Vegetables{% if selected_q %}&q={{ selected_q }}{% endif %}" class="category-tab-btn {% if selected_category == 'Vegetables' %}active{% endif %}">Vegetables</a>
-            <a href="?category=Fruits{% if selected_q %}&q={{ selected_q }}{% endif %}" class="category-tab-btn {% if selected_category == 'Fruits' %}active{% endif %}">Fruits</a>
+        <!-- Commodity Filter -->
+        <div class="filter-input-wrap select-col">
+          <label class="filter-label" for="filter-commodity">Commodity</label>
+          <div class="filter-select-box">
+            <select name="commodity" id="filter-commodity" aria-label="Select commodity" onchange="this.form.submit()">
+              <option value="all" {% if selected_crop == 'all' or not selected_crop %}selected{% endif %}>All commodities</option>
+              {% for crop in priority_crops %}
+              <option value="{{ crop.name }}" {% if selected_crop == crop.name or trend_crop.name == crop.name %}selected{% endif %}>{{ crop.name }}</option>
+              {% endfor %}
+            </select>
+            <svg class="filter-select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
         </div>
 
-        <!-- 5. Main 3-Column Layout: Heatmap (Left), Tables (Center), Insights (Right) -->
-        <div class="market-main-grid">
-
-            <!-- Column 1: National Price Heatmap -->
-            <div class="market-heatmap-card">
-                <div class="market-panel-heading">National Price Heatmap</div>
-                <div class="market-panel-desc">Average Market Prices by District ({{ active_crop_name }})</div>
-
-                <div class="rwanda-svg-map-wrapper" id="rwanda-price-map">
-                    <!-- Interactive Rwanda Geographic Map Representation with Price Color Coding -->
-                    <svg class="rwanda-district-svg" viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rwanda District Price Heatmap">
-                        <g id="provinces-group">
-                            <!-- Northern Province -->
-                            <path d="M120,40 L220,35 L260,75 L210,120 L150,110 L110,80 Z" fill="#F59E0B" data-district="Musanze" data-price="400" title="Musanze: 400 RWF/kg"></path>
-                            <path d="M220,35 L290,45 L295,95 L260,75 Z" fill="#10B981" data-district="Gicumbi" data-price="390" title="Gicumbi: 390 RWF/kg"></path>
-                            
-                            <!-- Western Province -->
-                            <path d="M50,85 L110,80 L150,110 L130,165 L70,160 L45,115 Z" fill="#EF4444" data-district="Rubavu" data-price="445" title="Rubavu: 445 RWF/kg"></path>
-                            <path d="M70,160 L130,165 L120,230 L55,245 L40,195 Z" fill="#F59E0B" data-district="Karongi" data-price="415" title="Karongi: 415 RWF/kg"></path>
-                            <path d="M40,240 L100,240 L85,295 L30,285 Z" fill="#10B981" data-district="Rusizi" data-price="390" title="Rusizi: 390 RWF/kg"></path>
-                            
-                            <!-- Kigali Province -->
-                            <path d="M170,130 L220,130 L225,170 L175,170 Z" fill="#EF4444" data-district="Nyarugenge" data-price="440" title="Kigali City / Nyarugenge: 440 RWF/kg"></path>
-                            
-                            <!-- Southern Province -->
-                            <path d="M130,165 L175,170 L165,225 L115,225 Z" fill="#F59E0B" data-district="Muhanga" data-price="420" title="Muhanga: 420 RWF/kg"></path>
-                            <path d="M115,225 L180,225 L170,290 L100,275 Z" fill="#10B981" data-district="Huye" data-price="395" title="Huye: 395 RWF/kg"></path>
-                            
-                            <!-- Eastern Province -->
-                            <path d="M225,75 L350,60 L360,150 L275,145 L225,120 Z" fill="#10B981" data-district="Nyagatare" data-price="380" title="Nyagatare: 380 RWF/kg"></path>
-                            <path d="M225,145 L350,150 L340,230 L250,230 L220,180 Z" fill="#F59E0B" data-district="Rwamagana" data-price="410" title="Rwamagana: 410 RWF/kg"></path>
-                            <path d="M250,230 L340,230 L320,300 L230,290 Z" fill="#10B981" data-district="Kirehe" data-price="375" title="Kirehe: 375 RWF/kg"></path>
-                        </g>
-
-                        <!-- Labels for key hubs -->
-                        <text x="195" y="152" font-size="10" font-weight="800" fill="#FFFFFF" text-anchor="middle">KIGALI</text>
-                        <text x="180" y="80" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle">MUSANZE</text>
-                        <text x="290" y="110" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle">NYAGATARE</text>
-                        <text x="140" y="260" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle">HUYE</text>
-                        <text x="80" y="125" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle">RUBAVU</text>
-                    </svg>
-                </div>
-
-                <!-- Heatmap Legend matching mockup -->
-                <div class="map-legend-pills">
-                    <span style="display: flex; align-items: center; gap: 4px;">
-                        <span class="map-legend-dot low"></span> Low Price (&lt;395)
-                    </span>
-                    <span style="display: flex; align-items: center; gap: 4px;">
-                        <span class="map-legend-dot avg"></span> Avg Price (395&ndash;430)
-                    </span>
-                    <span style="display: flex; align-items: center; gap: 4px;">
-                        <span class="map-legend-dot high"></span> High Price (&gt;430)
-                    </span>
-                </div>
-                <div class="map-click-hint">Click districts for popup details &bull; Rwanda GIS surveillance</div>
-            </div>
-
-            <!-- Column 2: Commodity Price Tables (Public View) -->
-            <div class="market-table-card">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-                    <div>
-                        <div class="market-panel-heading">Commodity Price Tables (Public View)</div>
-                        <div class="market-panel-desc">Key crops. Columns are public, no actions, CRUD-limited</div>
-                    </div>
-                    <span style="background: #F1F5F9; color: #475569; font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 6px;">
-                        {{ page_obj.paginator.count }} Verified Records
-                    </span>
-                </div>
-
-                <div style="overflow-x: auto;">
-                    <table class="public-price-table">
-                        <thead>
-                            <tr>
-                                <th>Commodity</th>
-                                <th>Market / District</th>
-                                <th>Current Price (RWF)</th>
-                                <th>Weekly Trend (+/-)</th>
-                                <th>Last Updated (Time)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for p in page_obj %}
-                            <tr>
-                                <!-- Commodity with icon -->
-                                <td>
-                                    <div class="crop-cell-flex">
-                                        <div class="crop-avatar-box">
-                                            {% if 'Maize' in p.crop.name %}🌽
-                                            {% elif 'Bean' in p.crop.name %}🫘
-                                            {% elif 'Potato' in p.crop.name %}🥔
-                                            {% elif 'Rice' in p.crop.name %}🌾
-                                            {% elif 'Cassava' in p.crop.name %}🌿
-                                            {% elif 'Wheat' in p.crop.name %}🌾
-                                            {% elif 'Soy' in p.crop.name %}🌱
-                                            {% else %}🥬{% endif %}
-                                        </div>
-                                        <div>
-                                            <div class="crop-name-strong">{{ p.crop.name }}</div>
-                                            <span style="font-size: 0.72rem; color: #64748B;">{{ p.unit }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-
-                                <!-- Market & District -->
-                                <td>
-                                    <div style="font-weight: 600; color: #1E293B;">{{ p.market.name }}</div>
-                                    <div style="font-size: 0.74rem; color: #64748B;">{{ p.market.district.name }} ({{ p.market.district.province.name|default:"Rwanda" }})</div>
-                                </td>
-
-                                <!-- Price in RWF -->
-                                <td>
-                                    <span class="price-rwf-strong">{{ p.price_per_kg_rwf }} RWF</span>
-                                    {% if p.wholesale_price_rwf %}
-                                    <div style="font-size: 0.72rem; color: #64748B;">Wholesale: {{ p.wholesale_price_rwf }} RWF</div>
-                                    {% endif %}
-                                </td>
-
-                                <!-- Trend -->
-                                <td>
-                                    {% if forloop.counter|divisibleby:3 %}
-                                    <span class="trend-micro-badge down">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                        -1.4%
-                                    </span>
-                                    {% elif forloop.counter|divisibleby:2 %}
-                                    <span class="trend-micro-badge up">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                                        +2.9%
-                                    </span>
-                                    {% else %}
-                                    <span class="trend-micro-badge up">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                                        +4.1%
-                                    </span>
-                                    {% endif %}
-                                </td>
-
-                                <!-- Time Updated -->
-                                <td>
-                                    <div style="font-weight: 600; color: #334155;">08:30 AM</div>
-                                    <div style="font-size: 0.72rem; color: #94A3B8;">{{ p.date_recorded }}</div>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="5" style="text-align: center; padding: 40px 16px; color: #64748B;">
-                                    <p style="font-size: 0.9rem; font-weight: 600; color: #0F172A; margin-bottom: 4px;">No Published Commodity Prices Match Criteria</p>
-                                    <p style="font-size: 0.8rem;">Try clearing your search query or selecting a different commodity category.</p>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination (5 Rows per page with full numbered controls) -->
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #E2E8F0; font-size: 0.82rem; color: #64748B;">
-                    <div>
-                        Showing <strong style="color: #0F172A;">{{ page_obj.start_index }}&ndash;{{ page_obj.end_index }}</strong> of <strong style="color: #0F172A;">{{ page_obj.paginator.count }}</strong> verified market quotes
-                    </div>
-
-                    {% if page_obj.has_other_pages %}
-                    <div style="display: flex; align-items: center; gap: 5px;">
-                        <!-- Previous Page -->
-                        {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}{% if selected_q %}&q={{ selected_q }}{% endif %}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #1E293B; font-weight: 600; background: #FFFFFF; transition: all 0.15s;" title="Previous page">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                            <span>Prev</span>
-                        </a>
-                        {% else %}
-                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border: 1px solid #E2E8F0; border-radius: 6px; color: #94A3B8; background: #F8FAFC; cursor: not-allowed;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                            <span>Prev</span>
-                        </span>
-                        {% endif %}
-
-                        <!-- Page Numbers -->
-                        {% for num in page_obj.paginator.page_range %}
-                            {% if page_obj.number == num %}
-                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; background: #064E3B; color: #FFFFFF; font-weight: 700; font-size: 0.85rem; box-shadow: 0 2px 4px rgba(6, 78, 59, 0.25);">
-                                {{ num }}
-                            </span>
-                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                            <a href="?page={{ num }}{% if selected_q %}&q={{ selected_q }}{% endif %}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #334155; font-weight: 600; font-size: 0.85rem; background: #FFFFFF; transition: all 0.15s;">
-                                {{ num }}
-                            </a>
-                            {% endif %}
-                        {% endfor %}
-
-                        <!-- Next Page -->
-                        {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}{% if selected_q %}&q={{ selected_q }}{% endif %}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; text-decoration: none; color: #1E293B; font-weight: 600; background: #FFFFFF; transition: all 0.15s;" title="Next page">
-                            <span>Next</span>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </a>
-                        {% else %}
-                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border: 1px solid #E2E8F0; border-radius: 6px; color: #94A3B8; background: #F8FAFC; cursor: not-allowed;">
-                            <span>Next</span>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </span>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Column 3: Quick Crop Focus & 7-Day Market Price Insights -->
-            <div class="market-insights-col">
-                <!-- Quick Focus Crop Switcher -->
-                <div class="crop-switcher-card">
-                    <div class="market-panel-heading">Selected Crop</div>
-                    <div class="market-panel-desc">Quick switch surveillance focus</div>
-
-                    <div class="crop-switcher-grid">
-                        <a href="?crop=Maize{% if selected_q %}&q={{ selected_q }}{% endif %}" class="crop-quick-btn {% if active_crop_name == 'Maize' %}active{% endif %}">
-                            <span class="btn-icon">🌽</span>
-                            <span>Maize</span>
-                        </a>
-                        <a href="?crop=Climbing+Beans{% if selected_q %}&q={{ selected_q }}{% endif %}" class="crop-quick-btn {% if 'Bean' in active_crop_name %}active{% endif %}">
-                            <span class="btn-icon">🫘</span>
-                            <span>Beans</span>
-                        </a>
-                        <a href="?crop=Irish+Potato{% if selected_q %}&q={{ selected_q }}{% endif %}" class="crop-quick-btn {% if 'Potato' in active_crop_name %}active{% endif %}">
-                            <span class="btn-icon">🥔</span>
-                            <span>Potatoes</span>
-                        </a>
-                        <a href="?crop=Marshland+Rice{% if selected_q %}&q={{ selected_q }}{% endif %}" class="crop-quick-btn {% if 'Rice' in active_crop_name %}active{% endif %}">
-                            <span class="btn-icon">🌾</span>
-                            <span>Rice</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- 7-Day Price Trend Bar Chart -->
-                <div class="market-insights-card">
-                    <div class="market-panel-heading">Market Price Insights</div>
-                    <div class="market-panel-desc">7-day price trend for {{ active_crop_name }} (RWF/kg)</div>
-
-                    <div class="trend-bars-container">
-                        {% for point in trend_history %}
-                        <div class="trend-bar-col" title="{{ point.date }}: {{ point.price }} RWF">
-                            <span style="font-size: 0.65rem; color: #065F46; font-weight: 700;">{{ point.price|floatformat:0 }}</span>
-                            <div class="trend-bar-fill" style="height: {{ point.price|divisibleby:10|yesno:'75%,60%' }}; max-height: 100px;"></div>
-                            <span class="trend-bar-label">{{ point.day_name }}</span>
-                        </div>
-                        {% endfor %}
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 0.72rem; color: #64748B;">
-                        <span>Trailing 7-Day Range</span>
-                        <strong style="color: #0F172A;">380 &ndash; 440 RWF/kg</strong>
-                    </div>
-                </div>
-            </div>
-
+        <!-- Province Filter -->
+        <div class="filter-input-wrap select-col">
+          <label class="filter-label" for="filter-province">Province</label>
+          <div class="filter-select-box">
+            <select name="province" id="filter-province" aria-label="Select province" onchange="this.form.submit()">
+              <option value="all">All provinces</option>
+              {% for prov in provinces_list %}
+              <option value="{{ prov.name }}" {% if selected_province == prov.name %}selected{% endif %}>{{ prov.name }}</option>
+              {% endfor %}
+            </select>
+            <svg class="filter-select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
         </div>
 
-        <!-- 6. Staff Access CTA Banner linking to Internal Commodity Prices Management -->
-        <div class="market-staff-cta-banner">
-            <div class="market-staff-cta-left">
-                <span style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(134, 239, 172, 0.4); color: #86EFAC; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 9999px; text-transform: uppercase; margin-bottom: 6px; display: inline-block;">
-                    Authorized Staff &bull; Data Governance
+        <!-- Market Type Filter -->
+        <div class="filter-input-wrap select-col">
+          <label class="filter-label" for="filter-market-type">Market type</label>
+          <div class="filter-select-box">
+            <select name="market_type" id="filter-market-type" aria-label="Select market type" onchange="this.form.submit()">
+              <option value="all">All types</option>
+              {% for mcode, mlabel in market_types_list %}
+              <option value="{{ mcode }}" {% if selected_market_type == mcode %}selected{% endif %}>{{ mlabel }}</option>
+              {% endfor %}
+            </select>
+            <svg class="filter-select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+
+        <!-- Date Range Filter -->
+        <div class="filter-input-wrap select-col">
+          <label class="filter-label" for="filter-date-range">Date range</label>
+          <div class="filter-select-box">
+            <select name="date_range" id="filter-date-range" aria-label="Select date range" onchange="this.form.submit()">
+              {% for dval, dlabel in date_ranges_list %}
+              <option value="{{ dval }}" {% if selected_date_range == dval %}selected{% endif %}>{{ dlabel }}</option>
+              {% endfor %}
+            </select>
+            <svg class="filter-select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="filter-input-wrap filter-btn-col">
+          <button type="submit" class="filter-submit-btn">
+            <!-- Filter Icon -->
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            <span>Apply filters</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ====================================================================
+         4. MIDDLE 2-COLUMN SECTION: MAP & TREND CHART
+         ==================================================================== -->
+    <section class="market-mid-grid">
+
+      <!-- Column 1: Rwanda District Market Prices Map (AgriLens Brand Map) -->
+      <div class="market-panel-card" style="padding: 16px 18px;">
+        <div class="map-header-row" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h2 class="map-card-title">Market prices across Rwanda</h2>
+            <div style="font-size: 0.78rem; font-weight: 600; color: #64748b; margin-top: 2px;">
+              <span style="color: #047857; font-weight: 700;">{{ kpi_commodity_name }}</span> &bull; 30-District Spatial Surveillance
+            </div>
+          </div>
+          <span style="font-size: 0.72rem; font-weight: 700; color: #166534; background: #dcfce7; border: 1px solid #bbf7d0; padding: 4px 10px; border-radius: 9999px;">
+            Dynamic Price Map
+          </span>
+        </div>
+
+        <!-- Leaflet Brand Map Stage -->
+        <div class="map-stage-container" style="border-radius: 10px; border: 1px solid #e2e8f0; height: 380px; position: relative; overflow: hidden; background: #f8fafc;">
+          <div id="rwanda-market-leaflet-map" class="rwanda-choropleth-canvas" style="height: 100%; width: 100%;"></div>
+
+          <!-- Neighboring Country Watermark Labels matching AgriLens Brand Specification -->
+          <div class="neighbor-country-tag tag-north" aria-hidden="true">UGANDA</div>
+          <div class="neighbor-country-tag tag-east" aria-hidden="true">TANZANIA</div>
+          <div class="neighbor-country-tag tag-south" aria-hidden="true">BURUNDI</div>
+          <div class="neighbor-country-tag tag-west" aria-hidden="true">DRC</div>
+
+          <!-- Floating Brand Legend Card (Top Right of Map) -->
+          <div class="floating-choropleth-legend" id="floating-market-legend">
+            <div class="legend-title" id="legend-market-title">{{ kpi_commodity_name|upper }} (RWF/KG)</div>
+            <div class="legend-swatch-list" id="legend-market-swatches">
+              <div class="swatch-row"><span class="swatch-box" style="background: #15803d;"></span> <span id="leg-tier-1">&gt; {{ legend_tiers.0 }}</span></div>
+              <div class="swatch-row"><span class="swatch-box" style="background: #22c55e;"></span> <span id="leg-tier-2">{{ legend_tiers.1 }} &ndash; {{ legend_tiers.0 }}</span></div>
+              <div class="swatch-row"><span class="swatch-box" style="background: #84cc16;"></span> <span id="leg-tier-3">{{ legend_tiers.2 }} &ndash; {{ legend_tiers.1 }}</span></div>
+              <div class="swatch-row"><span class="swatch-box" style="background: #eab308;"></span> <span id="leg-tier-4">{{ legend_tiers.3 }} &ndash; {{ legend_tiers.2 }}</span></div>
+              <div class="swatch-row"><span class="swatch-box" style="background: #0284c7;"></span> <span id="leg-tier-5">&lt; {{ legend_tiers.3 }}</span></div>
+              <div class="swatch-row"><span class="swatch-box" style="background: #cbd5e1;"></span> <span>No data</span></div>
+            </div>
+          </div>
+
+          <!-- Bottom-Left Geographic Scale & North Compass Needle -->
+          <div class="map-geog-scale-box" aria-hidden="true">
+            <div class="north-arrow-compass">
+              <span class="north-letter">N</span>
+              <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+                <polygon points="5,0 10,16 5,12 0,16" fill="#475569"/>
+              </svg>
+            </div>
+            <div class="scale-bar-ruler">
+              <div class="ruler-labels">
+                <span>0</span>
+                <span>25</span>
+                <span>50</span>
+                <span>75</span>
+                <span>100 km</span>
+              </div>
+              <div class="ruler-track"></div>
+            </div>
+          </div>
+
+          <!-- Bottom-Right Clean Map Controls (+, -, Recenter) -->
+          <div class="map-floating-controls" aria-label="Map Navigation Controls">
+            <button type="button" class="map-control-btn" id="btn-market-zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
+            <button type="button" class="map-control-btn" id="btn-market-zoom-out" title="Zoom out" aria-label="Zoom out">&minus;</button>
+            <button type="button" class="map-control-btn" id="btn-market-recenter" title="Recenter Rwanda Map" aria-label="Recenter Map">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="7"></circle>
+                <line x1="12" y1="1" x2="12" y2="5"></line>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="1" y1="12" x2="5" y2="12"></line>
+                <line x1="19" y1="12" x2="23" y2="12"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 2: Price Trend Chart & Key Insights -->
+      <div class="market-panel-card">
+        <div class="trend-header-row">
+          <h2 class="trend-card-title">{{ trend_chart_data.crop_name }} price trend</h2>
+          <div class="trend-stat-box">
+            <span class="trend-stat-label">National Average</span>
+            <div class="trend-stat-value">
+              <span>{{ trend_chart_data.national_avg }} RWF/kg</span>
+              <span class="trend-stat-change">&uarr; +{{ trend_chart_data.trend_pct }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SVG Trend Chart -->
+        <div class="trend-svg-container">
+          <svg class="trend-svg-chart" viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="7-Day Price Trend Chart">
+            <!-- Horizontal Grid Lines and Y-Axis Ticks -->
+            <g class="chart-grid">
+              {% for tick in trend_chart_data.chart_ticks reversed %}
+              <text class="chart-axis-text" x="5" y="{% cycle 24 64 104 144 %}">{{ tick }}</text>
+              <line class="chart-grid-line" x1="36" y1="{% cycle 20 60 100 140 %}" x2="470" y2="{% cycle 20 60 100 140 %}"></line>
+              {% endfor %}
+            </g>
+
+            <!-- X-Axis Labels: Wed to Tue -->
+            <g class="chart-x-labels">
+              <text class="chart-axis-text" x="55" y="166" text-anchor="middle">Wed</text>
+              <text class="chart-axis-text" x="120" y="166" text-anchor="middle">Thu</text>
+              <text class="chart-axis-text" x="185" y="166" text-anchor="middle">Fri</text>
+              <text class="chart-axis-text" x="250" y="166" text-anchor="middle">Sat</text>
+              <text class="chart-axis-text" x="315" y="166" text-anchor="middle">Sun</text>
+              <text class="chart-axis-text" x="380" y="166" text-anchor="middle">Mon</text>
+              <text class="chart-axis-text" x="445" y="166" text-anchor="middle">Tue</text>
+            </g>
+
+            <!-- Gradient Area Fill under Curve -->
+            <defs>
+              <linearGradient id="trendAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#10b981" stop-opacity="0.16"/>
+                <stop offset="100%" stop-color="#10b981" stop-opacity="0.0"/>
+              </linearGradient>
+            </defs>
+            <path d="M {{ trend_chart_data.x_coords.0 }},{{ trend_chart_data.y_coords.0 }} L {{ trend_chart_data.x_coords.1 }},{{ trend_chart_data.y_coords.1 }} L {{ trend_chart_data.x_coords.2 }},{{ trend_chart_data.y_coords.2 }} L {{ trend_chart_data.x_coords.3 }},{{ trend_chart_data.y_coords.3 }} L {{ trend_chart_data.x_coords.4 }},{{ trend_chart_data.y_coords.4 }} L {{ trend_chart_data.x_coords.5 }},{{ trend_chart_data.y_coords.5 }} L {{ trend_chart_data.x_coords.6 }},{{ trend_chart_data.y_coords.6 }} L {{ trend_chart_data.x_coords.6 }},140 L {{ trend_chart_data.x_coords.0 }},140 Z" fill="url(#trendAreaGrad)"></path>
+
+            <!-- Trend Curve Line -->
+            <path class="chart-curve-path" d="M {{ trend_chart_data.x_coords.0 }},{{ trend_chart_data.y_coords.0 }} L {{ trend_chart_data.x_coords.1 }},{{ trend_chart_data.y_coords.1 }} L {{ trend_chart_data.x_coords.2 }},{{ trend_chart_data.y_coords.2 }} L {{ trend_chart_data.x_coords.3 }},{{ trend_chart_data.y_coords.3 }} L {{ trend_chart_data.x_coords.4 }},{{ trend_chart_data.y_coords.4 }} L {{ trend_chart_data.x_coords.5 }},{{ trend_chart_data.y_coords.5 }} L {{ trend_chart_data.x_coords.6 }},{{ trend_chart_data.y_coords.6 }}"></path>
+
+            <!-- Plotted Dots -->
+            {% for x, y, pt in trend_chart_data.svg_pts %}
+            <circle class="chart-dot" cx="{{ x }}" cy="{{ y }}" r="4.2" data-price="{{ pt }}" title="{{ pt }} RWF/kg"></circle>
+            {% endfor %}
+
+            <!-- Dynamic Highlight Badge on Tuesday (Last Point) -->
+            <rect class="chart-pill-badge" x="422" y="100" width="46" height="18" rx="4"></rect>
+            <text class="chart-pill-text" x="445" y="113">{{ trend_chart_data.national_avg }}</text>
+          </svg>
+        </div>
+
+        <!-- Key Insights Box -->
+        <div class="trend-insights-box">
+          <div class="insights-heading-row">
+            <!-- Lightbulb SVG -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
+              <path d="M9 18h6"></path>
+              <path d="M10 22h4"></path>
+            </svg>
+            <span class="insights-heading-title">Key insights</span>
+          </div>
+          <ul class="insights-list">
+            <li><strong>{{ trend_chart_data.crop_name }}</strong> national average price is {{ trend_chart_data.national_avg }} RWF/kg (+{{ trend_chart_data.trend_pct }}% this week).</li>
+            <li>Highest retail prices are registered in Kigali urban markets and border hubs.</li>
+            <li>Consistent supply observed across major regional assembly markets.</li>
+          </ul>
+          <a href="{% url 'markets:market_list' %}?commodity={{ trend_chart_data.crop_name }}" class="insights-link">
+            <span>Filter all {{ trend_chart_data.crop_name }} prices</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         5. BOTTOM TABLE: LATEST VERIFIED MARKET PRICES
+         ==================================================================== -->
+    <section class="market-table-card" aria-label="Latest Verified Market Prices Table">
+      <div class="table-header-row">
+        <div class="table-title-group">
+          <div class="table-title-icon" aria-hidden="true">
+            <!-- Sprout/Leaf Icon -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 20h10"></path>
+              <path d="M10 20c5.5-2.5.8-6.4 3-10"></path>
+              <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4.1 5.5.8z"></path>
+              <path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4.3 1-4.9 2z"></path>
+            </svg>
+          </div>
+          <h2 class="table-title-text">Latest verified market prices</h2>
+        </div>
+        <a href="?date_range=all" class="table-view-all-link">
+          <span>View all prices</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+      </div>
+
+      <div class="table-responsive-wrapper">
+        <table class="verified-prices-table" aria-label="Published Commodity Prices">
+          <thead>
+            <tr>
+              <th scope="col" style="width: 22%;">Commodity</th>
+              <th scope="col" style="width: 30%;">Market &amp; district</th>
+              <th scope="col" style="width: 13%;">Retail (RWF/kg)</th>
+              <th scope="col" style="width: 13%;">Wholesale (RWF/kg)</th>
+              <th scope="col" style="width: 12%;">Weekly change</th>
+              <th scope="col" style="width: 10%;">Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for price in page_obj %}
+            <tr>
+              <!-- 1. Commodity with uploaded image or professional vector SVG fallback (NEVER emojis) -->
+              <td>
+                <div class="commodity-cell">
+                  {% if price.crop.image_url_or_default %}
+                    <img src="{{ price.crop.image_url_or_default }}" alt="{{ price.crop.name }}" class="commodity-photo-thumb" />
+                  {% else %}
+                    <div class="commodity-svg-icon-badge" aria-hidden="true">
+                      {% if price.crop.default_icon == 'cereal' %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22 16 8"></path><path d="M9 15c1.5-3 5-5 8-5-1.5 3-5 5-8 5Z"></path><path d="M11 11c1.5-3 5-5 8-5-1.5 3-5 5-8 5Z"></path></svg>
+                      {% elif price.crop.default_icon == 'rice' %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="9" ry="5"></ellipse><path d="M12 7v10"></path></svg>
+                      {% elif price.crop.default_icon == 'tuber' %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="9" ry="6"></ellipse><path d="M7 11c2 1 4 0 6 1"></path></svg>
+                      {% elif price.crop.default_icon == 'legume' %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 0-7 17l14-14A9.9 9.9 0 0 0 12 2Z"></path><circle cx="10" cy="10" r="1.5"></circle><circle cx="14" cy="14" r="1.5"></circle></svg>
+                      {% elif price.crop.default_icon == 'vegetable' %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                      {% else %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6"></path></svg>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                  <span class="commodity-name-text">{{ price.crop.name }}</span>
+                </div>
+              </td>
+
+              <!-- 2. Market & District -->
+              <td>
+                <div class="market-name-line">{{ price.market.name }}</div>
+                <div class="district-name-line">{{ price.market.district.name }}</div>
+              </td>
+
+              <!-- 3. Retail Price -->
+              <td>
+                <span class="retail-price-val">{{ price.price_per_kg_rwf|floatformat:0 }}</span>
+              </td>
+
+              <!-- 4. Wholesale Price -->
+              <td>
+                <span class="wholesale-price-val">
+                  {% if price.wholesale_price_rwf %}
+                    {{ price.wholesale_price_rwf|floatformat:0 }}
+                  {% else %}
+                    &mdash;
+                  {% endif %}
                 </span>
-                <h4>AgriLens Internal Commodity Prices Management Suite</h4>
-                <p>Authorized agricultural officers can collect, validate, review, approve, and publish official market data across Rwanda's 30 districts.</p>
-            </div>
-            <div>
-                <a href="{% url 'markets:internal_dashboard' %}" class="btn-internal-suite">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="3" y1="9" x2="21" y2="9"></line>
-                        <line x1="9" y1="21" x2="9" y2="9"></line>
-                    </svg>
-                    <span>Open Internal Management Suite &rarr;</span>
-                </a>
-            </div>
-        </div>
+              </td>
 
-    </div>
+              <!-- 5. Weekly Change -->
+              <td>
+                {% if price.is_positive_change %}
+                <span class="table-change-badge positive">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                  {{ price.change_display }}
+                </span>
+                {% else %}
+                <span class="table-change-badge negative">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  {{ price.change_display }}
+                </span>
+                {% endif %}
+              </td>
+
+              <!-- 6. Updated Date & Time -->
+              <td>
+                <div class="updated-date-line">{{ price.formatted_date }}</div>
+                <div class="updated-time-line">{{ price.formatted_time }}</div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 36px; color: #64748b;">
+                No published commodity prices match your filter criteria.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination matching Reference Mockup (< 1 2 3 4 5 >) -->
+      {% if page_obj.has_other_pages %}
+      <nav class="table-pagination-row" aria-label="Prices Table Pagination">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}{% if selected_q %}&q={{ selected_q }}{% endif %}{% if selected_crop %}&commodity={{ selected_crop }}{% endif %}{% if selected_province %}&province={{ selected_province }}{% endif %}{% if selected_market_type %}&market_type={{ selected_market_type }}{% endif %}{% if selected_date_range %}&date_range={{ selected_date_range }}{% endif %}" class="pagination-btn" aria-label="Previous Page">&lsaquo;</a>
+        {% else %}
+          <span class="pagination-btn disabled" aria-hidden="true">&lsaquo;</span>
+        {% endif %}
+
+        {% for pnum in page_obj.paginator.page_range %}
+          {% if pnum >= page_obj.number|add:"-2" and pnum <= page_obj.number|add:"2" %}
+            <a href="?page={{ pnum }}{% if selected_q %}&q={{ selected_q }}{% endif %}{% if selected_crop %}&commodity={{ selected_crop }}{% endif %}{% if selected_province %}&province={{ selected_province }}{% endif %}{% if selected_market_type %}&market_type={{ selected_market_type }}{% endif %}{% if selected_date_range %}&date_range={{ selected_date_range }}{% endif %}" class="pagination-btn {% if page_obj.number == pnum %}active{% endif %}" aria-current="{% if page_obj.number == pnum %}page{% else %}false{% endif %}">{{ pnum }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}{% if selected_q %}&q={{ selected_q }}{% endif %}{% if selected_crop %}&commodity={{ selected_crop }}{% endif %}{% if selected_province %}&province={{ selected_province }}{% endif %}{% if selected_market_type %}&market_type={{ selected_market_type }}{% endif %}{% if selected_date_range %}&date_range={{ selected_date_range }}{% endif %}" class="pagination-btn" aria-label="Next Page">&rsaquo;</a>
+        {% else %}
+          <span class="pagination-btn disabled" aria-hidden="true">&rsaquo;</span>
+        {% endif %}
+      </nav>
+      {% endif %}
+    </section>
+
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/**
+ * AgriLens Public Market Prices Surveillance GIS Map
+ * 100% Brand-Compliant Rwandan 30-District Dynamic Choropleth Engine
+ * Colors: #15803d (High), #22c55e (Good), #84cc16 (Mid), #eab308 (Low), #0284c7 (Lowest), #cbd5e1 (No data)
+ */
+(function() {
+  let marketMap = null;
+  let geoLayer = null;
+  let pinnedMarker = null;
+  let pinnedPopup = null;
+  let pinnedDistrictName = '{{ selected_district|default:"Nyanza" }}';
+
+  // Dynamic 30-District Market Prices passed from Django Backend
+  let districtPriceData = {{ district_price_json|safe }};
+  let currentTiers = {{ legend_tiers_json|safe }};
+  const allCropsData = {{ all_crops_json|safe }};
+
+  // District Centroids for Map Centering & Pinned Dark Popup Badges
+  const DISTRICT_CENTROIDS = {
+    "Nyarugenge": [-1.9977, 30.022], "Gasabo": [-1.8879, 30.119], "Kicukiro": [-2.0297, 30.1413],
+    "Nyanza": [-2.3203, 29.7702], "Gisagara": [-2.6446, 29.8371], "Nyaruguru": [-2.6934, 29.5077],
+    "Huye": [-2.5186, 29.7034], "Nyamagabe": [-2.3994, 29.4701], "Ruhango": [-2.1897, 29.7294],
+    "Muhanga": [-1.9764, 29.7144], "Kamonyi": [-2.0052, 29.9139], "Karongi": [-2.1669, 29.4665],
+    "Rutsiro": [-1.9116, 29.4399], "Rubavu": [-1.6829, 29.3625], "Nyabihu": [-1.6687, 29.5115],
+    "Ngororero": [-1.893, 29.5612], "Rusizi": [-2.5759, 29.1192], "Rulindo": [-1.7482, 29.9844],
+    "Gakenke": [-1.6974, 29.7774], "Musanze": [-1.5134, 29.631], "Burera": [-1.4811, 29.8543],
+    "Gicumbi": [-1.6023, 30.091], "Rwamagana": [-1.9819, 30.3297], "Nyagatare": [-1.2955, 30.3303],
+    "Gatsibo": [-1.6126, 30.3387], "Kayonza": [-1.9541, 30.5903], "Kirehe": [-2.2368, 30.6972],
+    "Ngoma": [-2.2045, 30.439], "Bugesera": [-2.1734, 30.1726], "Nyamasheke": [-2.4116, 29.1805]
+  };
+
+  function getDistrictPrice(dName) {
+    if (districtPriceData && districtPriceData[dName] !== undefined) {
+      return Math.round(districtPriceData[dName]);
+    }
+    return 0;
+  }
+
+  // Exact AgriLens Brand Choropleth Palette
+  function getMarketChoroplethColor(price) {
+    if (!price || price <= 0) return '#cbd5e1'; // Slate Gray (No Data)
+    if (price >= currentTiers[0]) return '#15803d'; // > Tier 1 (Forest Green)
+    if (price >= currentTiers[1]) return '#22c55e'; // Tier 2 (Emerald Green)
+    if (price >= currentTiers[2]) return '#84cc16'; // Tier 3 (Lime Green)
+    if (price >= currentTiers[3]) return '#eab308'; // Tier 4 (Amber Yellow)
+    return '#0284c7';                               // < Tier 4 (Sky Blue)
+  }
+
+  function showPinnedDistrictPopup(latlng, dName) {
+    if (!marketMap || !latlng) return;
+    const price = getDistrictPrice(dName);
+
+    // Small White Dot Marker at Centroid
+    if (!pinnedMarker) {
+      pinnedMarker = L.circleMarker(latlng, {
+        radius: 4,
+        fillColor: '#ffffff',
+        color: '#0f172a',
+        weight: 2.5,
+        fillOpacity: 1,
+        zIndexOffset: 1200
+      }).addTo(marketMap);
+    } else {
+      pinnedMarker.setLatLng(latlng);
+      if (!marketMap.hasLayer(pinnedMarker)) pinnedMarker.addTo(marketMap);
+    }
+
+    // Official AgriLens Dark Badge Tooltip matching Homepage Map
+    const contentHtml = `
+      <div style="font-size: 13px; font-weight: 800; color: #ffffff; line-height: 1.25;">${dName} District</div>
+      <div style="font-size: 11px; font-weight: 600; color: #4ade80; margin-top: 3px;">Avg. Price: ${price ? price.toLocaleString() + ' RWF/kg' : 'N/A'}</div>
+    `;
+
+    if (!pinnedPopup) {
+      pinnedPopup = L.popup({
+        className: 'custom-dark-popup',
+        closeButton: false,
+        autoClose: false,
+        closeOnClick: false,
+        offset: [0, -4]
+      })
+      .setLatLng(latlng)
+      .setContent(contentHtml)
+      .openOn(marketMap);
+    } else {
+      pinnedPopup.setLatLng(latlng)
+        .setContent(contentHtml)
+        .openOn(marketMap);
+    }
+  }
+
+  function highlightDistrict(dName) {
+    if (!geoLayer) return;
+    geoLayer.eachLayer(layer => {
+      const name = layer.feature.properties.shapeName || layer.feature.properties.name || '';
+      const price = getDistrictPrice(name);
+      const isSelected = (name === dName);
+      layer.setStyle({
+        color: isSelected ? '#0f172a' : '#ffffff',
+        weight: isSelected ? 2.8 : 1.2,
+        fillColor: getMarketChoroplethColor(price),
+        fillOpacity: isSelected ? 0.95 : 0.88
+      });
+      if (isSelected) layer.bringToFront();
+    });
+  }
+
+  function updateLegendUI(cropName, tiers) {
+    const titleEl = document.getElementById('legend-market-title');
+    if (titleEl) titleEl.textContent = (cropName || 'PRICE').toUpperCase() + ' (RWF/KG)';
+
+    const t1 = document.getElementById('leg-tier-1');
+    const t2 = document.getElementById('leg-tier-2');
+    const t3 = document.getElementById('leg-tier-3');
+    const t4 = document.getElementById('leg-tier-4');
+    const t5 = document.getElementById('leg-tier-5');
+
+    if (t1) t1.innerHTML = '&gt; ' + tiers[0].toLocaleString();
+    if (t2) t2.innerHTML = tiers[1].toLocaleString() + ' &ndash; ' + tiers[0].toLocaleString();
+    if (t3) t3.innerHTML = tiers[2].toLocaleString() + ' &ndash; ' + tiers[1].toLocaleString();
+    if (t4) t4.innerHTML = tiers[3].toLocaleString() + ' &ndash; ' + tiers[2].toLocaleString();
+    if (t5) t5.innerHTML = '&lt; ' + tiers[3].toLocaleString();
+  }
+
+  function initMarketMap() {
+    if (typeof L === 'undefined') {
+      setTimeout(initMarketMap, 80);
+      return;
+    }
+
+    const mapElement = document.getElementById('rwanda-market-leaflet-map');
+    if (!mapElement || marketMap) return;
+
+    // 1. Center map on Rwanda
+    marketMap = L.map('rwanda-market-leaflet-map', {
+      attributionControl: false,
+      zoomControl: false,
+      scrollWheelZoom: false
+    }).setView([-1.9403, 29.8739], 8.5);
+
+    // 2. Light Canvas basemap (Esri World Light Gray Base)
+    L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 16
+    }).addTo(marketMap);
+
+    // 3. Surrounding Country Watermark Labels matching AgriLens Brand Specification
+    const neighbors = [
+      { name: 'UGANDA', lat: -1.08, lng: 30.08 },
+      { name: 'DRC', lat: -1.90, lng: 28.70 },
+      { name: 'BURUNDI', lat: -2.80, lng: 29.85 },
+      { name: 'TANZANIA', lat: -1.95, lng: 31.15 }
+    ];
+    neighbors.forEach(n => {
+      L.marker([n.lat, n.lng], {
+        icon: L.divIcon({
+          className: 'country-watermark',
+          html: n.name,
+          iconSize: [80, 20],
+          iconAnchor: [40, 10]
+        }),
+        interactive: false
+      }).addTo(marketMap);
+    });
+
+    // 4. Zoom & Recenter Controls
+    const btnZoomIn = document.getElementById('btn-market-zoom-in');
+    const btnZoomOut = document.getElementById('btn-market-zoom-out');
+    const btnRecenter = document.getElementById('btn-market-recenter');
+
+    if (btnZoomIn) btnZoomIn.onclick = () => marketMap.zoomIn();
+    if (btnZoomOut) btnZoomOut.onclick = () => marketMap.zoomOut();
+
+    // 5. Fetch GeoJSON and Render 30 Districts
+    fetch('/static/data/rwanda_districts.geojson')
+      .then(res => res.json())
+      .then(geojson => {
+        geoLayer = L.geoJSON(geojson, {
+          style: feature => {
+            const dName = feature.properties.shapeName || feature.properties.name || '';
+            const price = getDistrictPrice(dName);
+            const isPinned = (dName === pinnedDistrictName);
+            return {
+              color: isPinned ? '#0f172a' : '#ffffff',
+              weight: isPinned ? 2.8 : 1.2,
+              fillColor: getMarketChoroplethColor(price),
+              fillOpacity: isPinned ? 0.95 : 0.88
+            };
+          },
+          onEachFeature: (feature, layer) => {
+            const dName = feature.properties.shapeName || feature.properties.name || 'District';
+
+            layer.on('click', e => {
+              L.DomEvent.stopPropagation(e);
+              pinnedDistrictName = dName;
+              const center = DISTRICT_CENTROIDS[dName] || layer.getBounds().getCenter();
+              showPinnedDistrictPopup(center, dName);
+              highlightDistrict(dName);
+
+              // Update search or hidden district field to filter table
+              const form = document.getElementById('market-filter-form');
+              if (form) {
+                let distInput = document.getElementById('hidden-filter-district');
+                if (!distInput) {
+                  distInput = document.createElement('input');
+                  distInput.type = 'hidden';
+                  distInput.name = 'district';
+                  distInput.id = 'hidden-filter-district';
+                  form.appendChild(distInput);
+                }
+                distInput.value = dName;
+                form.submit();
+              }
+            });
+
+            layer.on('mouseover', () => {
+              const center = DISTRICT_CENTROIDS[dName] || layer.getBounds().getCenter();
+              showPinnedDistrictPopup(center, dName);
+              layer.setStyle({
+                weight: 2.8,
+                color: '#0f172a',
+                fillOpacity: 0.96
+              });
+              layer.bringToFront();
+            });
+
+            layer.on('mouseout', () => {
+              if (geoLayer) {
+                geoLayer.resetStyle(layer);
+                if (pinnedDistrictName) {
+                  highlightDistrict(pinnedDistrictName);
+                  const center = DISTRICT_CENTROIDS[pinnedDistrictName] || [-2.3203, 29.7702];
+                  showPinnedDistrictPopup(center, pinnedDistrictName);
+                }
+              }
+            });
+          }
+        }).addTo(marketMap);
+
+        // Fit bounds cleanly
+        marketMap.fitBounds(geoLayer.getBounds(), { padding: [15, 15] });
+
+        if (btnRecenter) {
+          btnRecenter.onclick = () => {
+            marketMap.fitBounds(geoLayer.getBounds(), { padding: [15, 15] });
+          };
+        }
+
+        // Initialize pinned badge on selected district (Nyanza by default)
+        const initialCenter = DISTRICT_CENTROIDS[pinnedDistrictName] || [-2.3203, 29.7702];
+        showPinnedDistrictPopup(initialCenter, pinnedDistrictName);
+        highlightDistrict(pinnedDistrictName);
+      })
+      .catch(err => console.error('Error loading Rwanda GeoJSON for market map:', err));
+
+    setTimeout(() => { marketMap.invalidateSize(); }, 300);
+  }
+
+  // Initialize on DOM load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMarketMap);
+  } else {
+    initMarketMap();
+  }
+})();
+</script>
 {% endblock %}
