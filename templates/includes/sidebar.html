@@ -17,6 +17,9 @@
     <div class="nav-section">
         <div class="nav-title">Productivity & Gap</div>
         <a href="/indicators/productivity/" class="nav-item {% if request.path|slice:':12' == '/indicators/' %}active{% endif %}"><i class="fa-solid fa-chart-line"></i> Yield Gap Intelligence</a>
+        <a href="/decision-support/" class="nav-item {% if request.path == '/decision-support/' %}active{% endif %}"><i class="fa-solid fa-compass"></i> Decision Support</a>
+        <a href="/decision-support/recommendations/" class="nav-item {% if request.path|slice:':34' == '/decision-support/recommendations/' %}active{% endif %}"><i class="fa-solid fa-list-check"></i> Recommendations</a>
+        <a href="/decision-support/impact/" class="nav-item {% if request.path|slice:':25' == '/decision-support/impact/' %}active{% endif %}"><i class="fa-solid fa-chart-column"></i> Impact Monitoring</a>
     </div>
 
     <div class="nav-section">
