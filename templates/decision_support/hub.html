@@ -47,35 +47,14 @@
   min-width: 0;
 }
 
-/* 1. Header Row (Title on Left, Last updated & Refresh on Right, Same Row) */
+/* 1. Header Utility Bar (Last updated & Refresh on Right) */
 .hub-header-topline {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-bottom: 12px;
   flex-wrap: nowrap;
   gap: 12px;
-}
-
-.hub-title-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.hub-header-h1 {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #0F2E24;
-  letter-spacing: -0.02em;
-  margin: 0 0 2px 0;
-  line-height: 1.2;
-}
-
-.hub-header-sub {
-  font-size: 0.72rem;
-  color: var(--agl-slate-500);
-  margin: 0;
-  font-weight: 400;
 }
 
 .hub-header-actions {
@@ -141,16 +120,16 @@
   background: #FFFFFF;
   border: 1px solid var(--agl-slate-200);
   border-radius: 8px;
-  padding: 8px 10px;
+  padding: 10px 12px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.02);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
 }
 
 .kpi-icon-circ {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -171,12 +150,20 @@
 }
 
 .kpi-row-1 {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: 0.68rem;
+  font-size: 0.70rem;
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.2;
+  margin-bottom: 1px;
+  overflow: hidden;
+}
+.kpi-row-1 > span { display: block; }
+
+.kpi-right-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  flex-shrink: 0;
 }
 .kpi-title-dark   { color: var(--agl-slate-800); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kpi-title-blue   { color: #0284C7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -198,8 +185,9 @@
 .kpi-row-2 {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  margin: 1px 0;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 1px 0;
 }
 
 .kpi-bold-val {
@@ -247,12 +235,13 @@
   background: #FFFFFF;
   border: 1px solid var(--agl-slate-200);
   border-radius: 8px;
-  padding: 8px 9px;
+  padding: 10px 10px 9px 10px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  position: relative;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 80px;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 78px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -262,15 +251,17 @@
   box-shadow: 0 3px 8px rgba(0,0,0,0.04);
 }
 
-.stk-title-line {
+.stk-body {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  padding-top: 1px;
 }
 
 .stk-circ-icon {
-  width: 26px;
-  height: 26px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -320,7 +311,10 @@
   text-overflow: ellipsis;
 }
 .stk-link-arrow {
-  font-size: 0.60rem;
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  font-size: 0.58rem;
   font-weight: 700;
   text-decoration: none;
   white-space: nowrap;
@@ -335,7 +329,7 @@
 /* 4. Middle 3-Column Grid */
 .hub-middle-3panel-grid {
   display: grid;
-  grid-template-columns: 1.05fr 1fr 1fr;
+  grid-template-columns: 1.12fr 0.95fr 1.05fr;
   gap: 10px;
   margin-bottom: 12px;
 }
@@ -370,7 +364,7 @@
 /* Map Canvas Container */
 .map-canvas-outer {
   width: 100%;
-  height: 235px;
+  height: 205px;
   border-radius: 6px;
   position: relative;
   background: #F8FAFC;
@@ -389,16 +383,19 @@
 
 .map-corner-legend-card {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(4px);
-  border: 1px solid #E2E8F0;
-  border-radius: 6px;
-  padding: 6px 8px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 76px;
+  background: #FFFFFF;
+  border-left: 1px solid #EEF2F6;
+  padding: 12px 8px;
   z-index: 500;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   pointer-events: none;
+}
+.map-corner-legend-card .legend-dot-swatch {
+  width: 9px;
+  height: 9px;
 }
 .legend-card-title {
   font-size: 0.60rem;
@@ -409,11 +406,11 @@
 .legend-card-row {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 0.58rem;
+  gap: 6px;
+  font-size: 0.62rem;
   color: var(--agl-slate-700);
   font-weight: 600;
-  margin-bottom: 2px;
+  margin-bottom: 7px;
 }
 .legend-card-row:last-child { margin-bottom: 0; }
 .legend-dot-swatch {
@@ -425,21 +422,53 @@
 
 .map-corner-scale-tag {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
-  font-size: 0.56rem;
+  bottom: 9px;
+  right: 7px;
+  width: 62px;
+  font-size: 0.48rem;
   color: #64748B;
-  font-weight: 700;
-  z-index: 500;
-  background: rgba(255,255,255,0.88);
-  padding: 2px 5px;
-  border-radius: 4px;
-  border: 1px solid #E2E8F0;
+  font-weight: 600;
+  z-index: 501;
   pointer-events: none;
   display: flex;
-  align-items: center;
-  gap: 4px;
+  flex-direction: column;
+  gap: 2px;
 }
+.scale-bar-line {
+  height: 4px;
+  border: 1px solid #64748B;
+  border-top: none;
+}
+.scale-bar-nums {
+  display: flex;
+  justify-content: space-between;
+  white-space: nowrap;
+}
+.map-north-arrow {
+  position: absolute;
+  right: 86px;
+  bottom: 8px;
+  z-index: 501;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: #334155;
+  pointer-events: none;
+  line-height: 1;
+}
+.leaflet-tooltip.district-map-label {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  color: #FFFFFF;
+  font-size: 9px;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+.leaflet-tooltip.district-map-label::before { display: none; }
 
 .map-corner-tools {
   position: absolute;
@@ -566,8 +595,8 @@
 }
 
 .themes-canvas-box {
-  width: 95px;
-  height: 95px;
+  width: 118px;
+  height: 118px;
   position: relative;
   flex-shrink: 0;
 }
@@ -581,13 +610,13 @@
   pointer-events: none;
 }
 .themes-lbl-small {
-  font-size: 0.55rem;
+  font-size: 0.60rem;
   color: var(--agl-slate-500);
   font-weight: 600;
   line-height: 1;
 }
 .themes-val-big {
-  font-size: 1.00rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: var(--agl-slate-900);
   line-height: 1.1;
@@ -626,7 +655,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 15px;
 }
 
 .advisory-filters-toolbar {
@@ -906,18 +935,246 @@
   font-weight: 700;
   font-size: 0.60rem;
 }
+
+/* Date range label above date pill (as in mockup) */
+.filter-date-pill {
+  position: relative;
+  min-width: 96px;
+  justify-content: space-between;
+}
+.filter-date-label {
+  position: absolute;
+  top: -13px;
+  left: 1px;
+  font-size: 0.56rem;
+  color: var(--agl-slate-500);
+  font-weight: 500;
+}
+
+/* ---- Final polish overrides (match mockup) ---- */
+.stk-box-card { min-height: 86px; }
+.stk-body { padding-bottom: 12px; }
+
+.card-panel-heading { line-height: 1.35; }
+
+.hub-card-panel .map-canvas-outer {
+  flex: 1;
+  min-height: 215px;
+  height: auto;
+}
+.map-corner-legend-card { width: 82px; }
+.legend-card-title { white-space: nowrap; margin-bottom: 8px; }
+
+.themes-canvas-box { width: 128px; height: 128px; }
+.themes-flex-container { gap: 14px; padding: 0 4px; }
+
+.data-table-clean td:nth-child(4),
+.data-table-clean th:nth-child(4) { white-space: nowrap; }
+.badge-ontrack, .badge-atrisk, .badge-higher { white-space: nowrap; }
+
+/* ==========================================================================
+   HUB RESPONSIVE BREAKPOINTS (Tablet & Mobile)
+   Strictly preserves 100% of desktop styles for > 1024px viewports
+   ========================================================================== */
+
+/* Tablet & Landscape Devices (<= 1024px) */
+@media (max-width: 1024px) {
+  .hub-page-wrapper {
+    padding: 12px 14px 28px 14px;
+  }
+
+  /* 4 KPI cards -> 2x2 grid */
+  .hub-kpi-row-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  /* Stakeholder cards -> 3 columns */
+  .hub-stakeholders-5col-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  /* Middle 3-column grid -> Map spans full width on top, urgency & themes side-by-side underneath */
+  .hub-middle-3panel-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .hub-middle-3panel-grid > .hub-card-panel:first-child {
+    grid-column: 1 / -1;
+  }
+  .hub-card-panel .map-canvas-outer {
+    min-height: 250px;
+    height: 250px;
+  }
+
+  /* Advisory Filters Toolbar: wrap nicely */
+  .advisory-filters-toolbar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .filter-search-box {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 160px;
+    height: 28px;
+  }
+  .filter-dropdown-pill {
+    flex: 1 1 calc(25% - 6px);
+    min-width: 90px;
+    height: 28px;
+  }
+  .filter-date-pill {
+    flex: 1 1 auto;
+    height: 28px;
+  }
+  .filter-apply-btn {
+    height: 28px;
+    padding: 0 14px;
+  }
+
+  /* Advisory Cards 5-col -> 3 columns on tablet */
+  .advisory-cards-5col-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  /* Bottom 2 tables -> stacked */
+  .hub-tables-duo-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* Medium Tablet & Large Mobile (<= 768px) */
+@media (max-width: 768px) {
+  /* Advisory cards -> 2 columns */
+  .advisory-cards-5col-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Filters toolbar wrap */
+  .filter-search-box {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+  .filter-dropdown-pill {
+    flex: 1 1 calc(33.33% - 6px);
+  }
+}
+
+/* Handheld Phones (<= 680px) */
+@media (max-width: 680px) {
+  /* Stakeholders -> 2 columns */
+  .hub-stakeholders-5col-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  /* Middle panels -> 1 column stacked */
+  .hub-middle-3panel-grid {
+    grid-template-columns: 1fr;
+  }
+  .hub-middle-3panel-grid > .hub-card-panel:first-child {
+    grid-column: auto;
+  }
+  .hub-card-panel .map-canvas-outer {
+    min-height: 220px;
+    height: 220px;
+  }
+
+  /* Donut chart container center aligned */
+  .themes-flex-container {
+    justify-content: center;
+    gap: 16px;
+  }
+}
+
+/* Standard Mobile (<= 540px) */
+@media (max-width: 540px) {
+  .hub-page-wrapper {
+    padding: 10px 10px 24px 10px;
+  }
+
+  /* Header Topline wraps cleanly */
+  .hub-header-topline {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  /* KPI cards -> 1 column full width */
+  .hub-kpi-row-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  /* Stakeholders -> 2 columns */
+  .hub-stakeholders-5col-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  /* Advisory filters full stacking for touch friendly tapping */
+  .advisory-filters-toolbar {
+    gap: 8px;
+  }
+  .filter-dropdown-pill {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 120px;
+    height: 30px;
+  }
+  .filter-date-pill {
+    flex: 1 1 100%;
+    margin-top: 14px;
+    height: 30px;
+  }
+  .filter-apply-btn {
+    flex: 1 1 100%;
+    height: 32px;
+    justify-content: center;
+    font-size: 0.72rem;
+  }
+
+  /* Advisory cards -> 1 column */
+  .advisory-cards-5col-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  /* Donut chart wraps on small screen */
+  .themes-flex-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .themes-legend-column {
+    width: 100%;
+    max-width: 280px;
+  }
+  .themes-legend-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+/* Extra Small Mobile (<= 380px) */
+@media (max-width: 380px) {
+  .hub-stakeholders-5col-grid {
+    grid-template-columns: 1fr;
+  }
+  .filter-dropdown-pill {
+    flex: 1 1 100%;
+  }
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="hub-page-wrapper">
 
-  <!-- 1. Header Row (Title on Left, Last updated & Refresh on Right) -->
+  <!-- 1. Header Utility Bar: Last updated & Refresh -->
   <div class="hub-header-topline">
-    <div class="hub-title-group">
-      <h1 class="hub-header-h1">Agricultural Decision Support &amp; Stakeholder Intelligence Hub</h1>
-      <p class="hub-header-sub">Data-driven insights for better decisions and increased agricultural productivity in Rwanda.</p>
-    </div>
     <div class="hub-header-actions">
       <div class="hub-updated-block">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
@@ -945,23 +1202,25 @@
     <!-- Card 1: National Crop Production -->
     <div class="kpi-box-card">
       <div class="kpi-icon-circ circ-green">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2v20"/>
-          <path d="M12 4c-2 2-3 4-3 6 3 0 5-2 6-4"/>
-          <path d="M12 4c2 2 3 4 3 6-3 0-5-2-6-4"/>
-          <path d="M12 10c-2 2-3 4-3 6 3 0 5-2 6-4"/>
-          <path d="M12 10c2 2 3 4 3 6-3 0-5-2-6-4"/>
-          <path d="M12 16c-2 2-3 3-3 5 3 0 5-2 6-3"/>
-          <path d="M12 16c2 2 3 3 3 5-3 0-5-2-6-3"/>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 22 16 8"/>
+          <path d="M3.47 12.53 5 11l1.53 1.53a3.5 3.5 0 0 1 0 4.94L5 19l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z"/>
+          <path d="M7.47 8.53 9 7l1.53 1.53a3.5 3.5 0 0 1 0 4.94L9 15l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z"/>
+          <path d="M11.47 4.53 13 3l1.53 1.53a3.5 3.5 0 0 1 0 4.94L13 11l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z"/>
+          <path d="M20 2h2v2a4 4 0 0 1-4 4h-2V6a4 4 0 0 1 4-4Z"/>
+          <path d="M11.47 17.47 13 19l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L5 19l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z"/>
+          <path d="M15.47 13.47 17 15l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L9 15l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z"/>
+          <path d="M19.47 9.47 21 11l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L13 11l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z"/>
         </svg>
       </div>
       <div class="kpi-meta-container">
         <div class="kpi-row-1">
           <span class="kpi-title-dark">National Crop Production</span>
-          <span class="kpi-trend-pill trend-col-green">&uarr; +2.8%</span>
         </div>
         <div class="kpi-row-2">
           <span class="kpi-bold-val">106</span>
+          <div class="kpi-right-col">
+          <span class="kpi-trend-pill trend-col-green">&uarr; +2.8%</span>
           <svg class="kpi-spark-svg" viewBox="0 0 60 25" fill="none">
             <defs>
               <linearGradient id="grad-green" x1="0" y1="0" x2="0" y2="1">
@@ -972,6 +1231,7 @@
             <path d="M2 20 Q 15 22, 25 15 T 45 10 T 58 4 L 58 25 L 2 25 Z" fill="url(#grad-green)"/>
             <path d="M2 20 Q 15 22, 25 15 T 45 10 T 58 4" stroke="#10B981" stroke-width="2" stroke-linecap="round" fill="none"/>
           </svg>
+          </div>
         </div>
         <div class="kpi-row-3">Kigabiro, 2026 (thousand tons)</div>
       </div>
@@ -989,10 +1249,11 @@
       <div class="kpi-meta-container">
         <div class="kpi-row-1">
           <span class="kpi-title-blue">National Yield (Avg.)</span>
-          <span class="kpi-trend-pill trend-col-blue">&uarr; +3.2%</span>
         </div>
         <div class="kpi-row-2">
           <span class="kpi-bold-val">989</span>
+          <div class="kpi-right-col">
+          <span class="kpi-trend-pill trend-col-blue">&uarr; +3.2%</span>
           <svg class="kpi-spark-svg" viewBox="0 0 60 25" fill="none">
             <defs>
               <linearGradient id="grad-blue" x1="0" y1="0" x2="0" y2="1">
@@ -1003,6 +1264,7 @@
             <path d="M2 18 Q 12 21, 24 16 T 42 12 T 58 5 L 58 25 L 2 25 Z" fill="url(#grad-blue)"/>
             <path d="M2 18 Q 12 21, 24 16 T 42 12 T 58 5" stroke="#0284C7" stroke-width="2" stroke-linecap="round" fill="none"/>
           </svg>
+          </div>
         </div>
         <div class="kpi-row-3">kg/ha</div>
       </div>
@@ -1021,10 +1283,11 @@
       <div class="kpi-meta-container">
         <div class="kpi-row-1">
           <span class="kpi-title-amber">Households Reached</span>
-          <span class="kpi-trend-pill trend-col-amber">&uarr; +14.5%</span>
         </div>
         <div class="kpi-row-2">
           <span class="kpi-bold-val kpi-val-compact">142,600 ha</span>
+          <div class="kpi-right-col">
+          <span class="kpi-trend-pill trend-col-amber">&uarr; +14.5%</span>
           <svg class="kpi-spark-svg" viewBox="0 0 60 25" fill="none">
             <defs>
               <linearGradient id="grad-amber" x1="0" y1="0" x2="0" y2="1">
@@ -1035,6 +1298,7 @@
             <path d="M2 22 Q 14 20, 26 18 T 46 12 T 58 6 L 58 25 L 2 25 Z" fill="url(#grad-amber)"/>
             <path d="M2 22 Q 14 20, 26 18 T 46 12 T 58 6" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" fill="none"/>
           </svg>
+          </div>
         </div>
         <div class="kpi-row-3">with extension services</div>
       </div>
@@ -1052,10 +1316,11 @@
       <div class="kpi-meta-container">
         <div class="kpi-row-1">
           <span class="kpi-title-purple">Risk Zones</span>
-          <span class="kpi-trend-pill trend-col-purple">&darr; -6.7%</span>
         </div>
         <div class="kpi-row-2">
           <span class="kpi-bold-val kpi-val-compact">248,500 MT</span>
+          <div class="kpi-right-col">
+          <span class="kpi-trend-pill trend-col-purple">&darr; -6.7%</span>
           <svg class="kpi-spark-svg" viewBox="0 0 60 25" fill="none">
             <defs>
               <linearGradient id="grad-purple" x1="0" y1="0" x2="0" y2="1">
@@ -1066,6 +1331,7 @@
             <path d="M2 12 Q 15 15, 28 10 T 45 18 T 58 14 L 58 25 L 2 25 Z" fill="url(#grad-purple)"/>
             <path d="M2 12 Q 15 15, 28 10 T 45 18 T 58 14" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" fill="none"/>
           </svg>
+          </div>
         </div>
         <div class="kpi-row-3">total potential loss (est.)</div>
       </div>
@@ -1078,86 +1344,77 @@
   <div class="hub-stakeholders-5col-grid">
     <!-- Card 1: MINAGRI & Extension -->
     <div class="stk-box-card" onclick="filterStakeholder('MINAGRI')">
-      <div class="stk-title-line">
-        <div class="stk-circ-icon stk-bg-green">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            <path d="M12 7v5"/>
-            <path d="M10 9c0-1.5 1-2.5 2-2.5s2 1 2 2.5"/>
-          </svg>
-        </div>
+      <div class="stk-circ-icon stk-bg-green">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          <path d="M12 7v5"/>
+          <path d="M10 9c0-1.5 1-2.5 2-2.5s2 1 2 2.5"/>
+        </svg>
+      </div>
+      <div class="stk-body">
         <span class="stk-name-label stk-col-green">MINAGRI &amp; Extension</span>
-      </div>
-      <div class="stk-big-val">64</div>
-      <div class="stk-bottom-flex">
+        <div class="stk-big-val">64</div>
         <span class="stk-sub-txt">Advisories</span>
-        <span class="stk-link-arrow link-col-green">View details &rarr;</span>
       </div>
+      <span class="stk-link-arrow link-col-green">View details &rarr;</span>
     </div>
 
     <!-- Card 2: Agricultural Lenders -->
     <div class="stk-box-card" onclick="filterStakeholder('BANK')">
-      <div class="stk-title-line">
-        <div class="stk-circ-icon stk-bg-blue">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="21" x2="21" y2="21"/>
-            <line x1="6" y1="18" x2="6" y2="10"/>
-            <line x1="12" y1="18" x2="12" y2="10"/>
-            <line x1="18" y1="18" x2="18" y2="10"/>
-            <polygon points="12 3 2 9 22 9 12 3"/>
-          </svg>
-        </div>
+      <div class="stk-circ-icon stk-bg-blue">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="21" x2="21" y2="21"/>
+          <line x1="6" y1="18" x2="6" y2="10"/>
+          <line x1="12" y1="18" x2="12" y2="10"/>
+          <line x1="18" y1="18" x2="18" y2="10"/>
+          <polygon points="12 3 2 9 22 9 12 3"/>
+        </svg>
+      </div>
+      <div class="stk-body">
         <span class="stk-name-label stk-col-blue">Agricultural Lenders</span>
-      </div>
-      <div class="stk-big-val">13</div>
-      <div class="stk-bottom-flex">
+        <div class="stk-big-val">13</div>
         <span class="stk-sub-txt">Advisories</span>
-        <span class="stk-link-arrow link-col-blue">View details &rarr;</span>
       </div>
+      <span class="stk-link-arrow link-col-blue">View details &rarr;</span>
     </div>
 
     <!-- Card 3: Crop Insurers -->
     <div class="stk-box-card" onclick="filterStakeholder('INSURER')">
-      <div class="stk-title-line">
-        <div class="stk-circ-icon stk-bg-purple">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            <path d="M9 12l2 2 4-4"/>
-          </svg>
-        </div>
+      <div class="stk-circ-icon stk-bg-purple">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </div>
+      <div class="stk-body">
         <span class="stk-name-label stk-col-purple">Crop Insurers</span>
-      </div>
-      <div class="stk-big-val">27</div>
-      <div class="stk-bottom-flex">
+        <div class="stk-big-val">27</div>
         <span class="stk-sub-txt">Advisories</span>
-        <span class="stk-link-arrow link-col-purple">View details &rarr;</span>
       </div>
+      <span class="stk-link-arrow link-col-purple">View details &rarr;</span>
     </div>
 
     <!-- Card 4: Agribusiness -->
     <div class="stk-box-card" onclick="filterStakeholder('AGRIBUSINESS')">
-      <div class="stk-title-line">
-        <div class="stk-circ-icon stk-bg-amber">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-            <path d="M12 11v4"/>
-            <path d="M10 13h4"/>
-          </svg>
-        </div>
+      <div class="stk-circ-icon stk-bg-amber">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+          <path d="M12 11v4"/>
+          <path d="M10 13h4"/>
+        </svg>
+      </div>
+      <div class="stk-body">
         <span class="stk-name-label stk-col-amber">Agribusiness</span>
-      </div>
-      <div class="stk-big-val">2</div>
-      <div class="stk-bottom-flex">
+        <div class="stk-big-val">2</div>
         <span class="stk-sub-txt">Advisories</span>
-        <span class="stk-link-arrow link-col-amber">View details &rarr;</span>
       </div>
+      <span class="stk-link-arrow link-col-amber">View details &rarr;</span>
     </div>
 
     <!-- Card 5: National -->
     <div class="stk-box-card" onclick="filterStakeholder('ALL')">
-      <div class="stk-title-line">
-        <div class="stk-circ-icon stk-bg-teal">
+      <div class="stk-circ-icon stk-bg-teal">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 8V5a2 2 0 0 1 2-2h3"/>
             <path d="M16 3h3a2 2 0 0 1 2 2v3"/>
@@ -1167,13 +1424,12 @@
             <line x1="8" y1="12" x2="16" y2="12"/>
           </svg>
         </div>
+      <div class="stk-body">
         <span class="stk-name-label stk-col-teal">National</span>
-      </div>
-      <div class="stk-big-val">1</div>
-      <div class="stk-bottom-flex">
+        <div class="stk-big-val">1</div>
         <span class="stk-sub-txt" style="font-size: 0.58rem;">Special Decision Map</span>
-        <span class="stk-link-arrow link-col-teal">View details &rarr;</span>
       </div>
+      <span class="stk-link-arrow link-col-teal">View details &rarr;</span>
     </div>
   </div>
 
@@ -1208,8 +1464,14 @@
 
         <!-- In-Map Scale Bar -->
         <div class="map-corner-scale-tag">
-          <span>0 &nbsp; 25 &nbsp; 50 &nbsp; 75 km</span>
-          <span style="border-left: 1px solid #CBD5E1; padding-left: 4px;">&uarr; N</span>
+          <div class="scale-bar-line"></div>
+          <div class="scale-bar-nums"><span>0</span><span>25</span><span>50</span><span>75 km</span></div>
+        </div>
+
+        <!-- North Arrow -->
+        <div class="map-north-arrow">
+          <svg width="8" height="10" viewBox="0 0 10 12"><polygon points="5 0 10 12 5 9 0 12" fill="#334155"/></svg>
+          <span>N</span>
         </div>
 
         <!-- Navigation Controls Top-Left -->
@@ -1402,7 +1664,7 @@
     </select>
 
     <div class="filter-date-pill">
-      <span>Date range:</span>
+      <span class="filter-date-label">Date range</span>
       <span style="color: var(--agl-slate-800); font-weight: 600;">Last 7 days</span>
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     </div>
@@ -1582,47 +1844,49 @@
         </div>
       </div>
 
-      <table class="data-table-clean">
-        <thead>
-          <tr>
-            <th>Plan</th>
-            <th>Area</th>
-            <th>Districts</th>
-            <th>Target Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="font-weight: 700; color: var(--agl-slate-900);">CIP III - Value chain support</td>
-            <td>Maize &amp; Beans</td>
-            <td>Nyagatare, Gatsibo</td>
-            <td>30 Oct 2026</td>
-            <td><span class="badge-ontrack">On track</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 700; color: var(--agl-slate-900);">Irrigation expansion program</td>
-            <td>Irrigation</td>
-            <td>Bugesera, Rwamagana</td>
-            <td>15 Nov 2026</td>
-            <td><span class="badge-ontrack">On track</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 700; color: var(--agl-slate-900);">Soil fertility management</td>
-            <td>Soil Health</td>
-            <td>Nyabihu, Musanze</td>
-            <td>30 Nov 2026</td>
-            <td><span class="badge-atrisk">At risk</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 700; color: var(--agl-slate-900);">Market access facilitation</td>
-            <td>Value Addition</td>
-            <td>Huye, Nyamagabe</td>
-            <td>15 Dec 2026</td>
-            <td><span class="badge-ontrack">On track</span></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-responsive-wrapper">
+        <table class="data-table-clean">
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th>Area</th>
+              <th>Districts</th>
+              <th>Target Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight: 700; color: var(--agl-slate-900);">CIP III - Value chain support</td>
+              <td>Maize &amp; Beans</td>
+              <td>Nyagatare, Gatsibo</td>
+              <td>30 Oct 2026</td>
+              <td><span class="badge-ontrack">On track</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight: 700; color: var(--agl-slate-900);">Irrigation expansion program</td>
+              <td>Irrigation</td>
+              <td>Bugesera, Rwamagana</td>
+              <td>15 Nov 2026</td>
+              <td><span class="badge-ontrack">On track</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight: 700; color: var(--agl-slate-900);">Soil fertility management</td>
+              <td>Soil Health</td>
+              <td>Nyabihu, Musanze</td>
+              <td>30 Nov 2026</td>
+              <td><span class="badge-atrisk">At risk</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight: 700; color: var(--agl-slate-900);">Market access facilitation</td>
+              <td>Value Addition</td>
+              <td>Huye, Nyamagabe</td>
+              <td>15 Dec 2026</td>
+              <td><span class="badge-ontrack">On track</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Right Table: Recent Validated Observations & Prioritized Locations -->
@@ -1639,57 +1903,59 @@
         <a href="{% url 'decision_support:impact_dashboard' %}" style="font-size: 0.66rem; font-weight: 700; color: #047857; text-decoration: none;">View all &rarr;</a>
       </div>
 
-      <table class="data-table-clean">
-        <thead>
-          <tr>
-            <th>Location</th>
-            <th>Crop</th>
-            <th>District</th>
-            <th>Province</th>
-            <th>Observed Yield</th>
-            <th>Benchmark</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="font-weight: 700; color: var(--agl-slate-900);">Kigali</td>
-            <td>Maize</td>
-            <td>Kicukiro</td>
-            <td>Kigali</td>
-            <td>6.2 t/ha</td>
-            <td>5.8 t/ha</td>
-            <td><span class="badge-higher">Higher</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 700; color: var(--agl-slate-900);">Musanze</td>
-            <td>Beans</td>
-            <td>Musanze</td>
-            <td>Northern</td>
-            <td>1.8 t/ha</td>
-            <td>1.6 t/ha</td>
-            <td><span class="badge-higher">Higher</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 700; color: var(--agl-slate-900);">Ruhango</td>
-            <td>Irish potato</td>
-            <td>Ruhango</td>
-            <td>Southern</td>
-            <td>18.5 t/ha</td>
-            <td>16.7 t/ha</td>
-            <td><span class="badge-higher">Higher</span></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 700; color: var(--agl-slate-900);">Nyagatare</td>
-            <td>Cassava</td>
-            <td>Nyagatare</td>
-            <td>Eastern</td>
-            <td>22.4 t/ha</td>
-            <td>20.1 t/ha</td>
-            <td><span class="badge-higher">Higher</span></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-responsive-wrapper">
+        <table class="data-table-clean">
+          <thead>
+            <tr>
+              <th>Location</th>
+              <th>Crop</th>
+              <th>District</th>
+              <th>Province</th>
+              <th>Observed Yield</th>
+              <th>Benchmark</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight: 700; color: var(--agl-slate-900);">Kigali</td>
+              <td>Maize</td>
+              <td>Kicukiro</td>
+              <td>Kigali</td>
+              <td>6.2 t/ha</td>
+              <td>5.8 t/ha</td>
+              <td><span class="badge-higher">Higher</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight: 700; color: var(--agl-slate-900);">Musanze</td>
+              <td>Beans</td>
+              <td>Musanze</td>
+              <td>Northern</td>
+              <td>1.8 t/ha</td>
+              <td>1.6 t/ha</td>
+              <td><span class="badge-higher">Higher</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight: 700; color: var(--agl-slate-900);">Ruhango</td>
+              <td>Irish potato</td>
+              <td>Ruhango</td>
+              <td>Southern</td>
+              <td>18.5 t/ha</td>
+              <td>16.7 t/ha</td>
+              <td><span class="badge-higher">Higher</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight: 700; color: var(--agl-slate-900);">Nyagatare</td>
+              <td>Cassava</td>
+              <td>Nyagatare</td>
+              <td>Eastern</td>
+              <td>22.4 t/ha</td>
+              <td>20.1 t/ha</td>
+              <td><span class="badge-higher">Higher</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -1748,8 +2014,36 @@
     "Nyaruguru": "#16A34A"
   };
 
+  // Colour distribution matching the reference mockup:
+  // predominantly green/yellow, red hotspot around Kigali, a few orange districts.
+  const MOCKUP_DISTRICT_COLORS = {
+    "Nyarugenge": "#DC2626", "Kicukiro": "#DC2626", "Kamonyi": "#DC2626",
+    "Gasabo": "#EA580C", "Rulindo": "#EA580C", "Muhanga": "#EA580C",
+    "Rwamagana": "#EA580C", "Bugesera": "#EA580C",
+    "Gicumbi": "#EAB308", "Kayonza": "#EAB308", "Ngororero": "#EAB308",
+    "Nyanza": "#EAB308", "Gisagara": "#EAB308", "Ruhango": "#EAB308",
+    "Gakenke": "#EAB308", "Nyamasheke": "#EAB308", "Kirehe": "#EAB308",
+    "Rubavu": "#15803D", "Nyabihu": "#15803D", "Rutsiro": "#15803D",
+    "Karongi": "#15803D", "Rusizi": "#15803D", "Nyamagabe": "#15803D",
+    "Gatsibo": "#15803D", "Burera": "#15803D",
+    "Musanze": "#22C55E", "Nyagatare": "#22C55E", "Huye": "#22C55E",
+    "Nyaruguru": "#22C55E", "Ngoma": "#22C55E"
+  };
+
   function getPriorityColor(dName) {
-    return DISTRICT_PRIORITY_COLORS[dName] || "#16A34A";
+    return MOCKUP_DISTRICT_COLORS[dName] || DISTRICT_PRIORITY_COLORS[dName] || "#16A34A";
+  }
+
+  // Fit the whole of Rwanda inside the visible map area (left of the legend panel)
+  function fitRwanda() {
+    if (!decisionMap || !geoLayer) return;
+    decisionMap.invalidateSize();
+    const legend = document.querySelector('.map-corner-legend-card');
+    const rightPad = (legend ? legend.offsetWidth : 0) + 8;
+    decisionMap.fitBounds(geoLayer.getBounds(), {
+      paddingTopLeft: [32, 8],
+      paddingBottomRight: [rightPad, 8]
+    });
   }
 
   // 1. Initialize Rwanda 30-District Decision Map (Whole Country Visible!)
@@ -1804,7 +2098,7 @@
     if (btnOut) btnOut.onclick = () => decisionMap.zoomOut();
     const resetCenter = () => {
       if (geoLayer) {
-        decisionMap.fitBounds(geoLayer.getBounds(), { padding: [10, 10], maxZoom: 8.35 });
+        fitRwanda();
       } else {
         decisionMap.setView([-1.94, 29.87], 8.1);
       }
@@ -1851,19 +2145,23 @@
               layer.bindTooltip(dName, {
                 permanent: true,
                 direction: 'center',
-                className: 'country-watermark-label'
+                className: 'district-map-label'
               }).openTooltip();
             }
           }
         }).addTo(decisionMap);
 
-        // Auto-fit Rwanda bounds cleanly
-        setTimeout(() => {
-          if (decisionMap && geoLayer) {
-            decisionMap.invalidateSize();
-            decisionMap.fitBounds(geoLayer.getBounds(), { padding: [10, 10], maxZoom: 8.35 });
-          }
-        }, 120);
+        // Auto-fit Rwanda bounds: now, after layout settles, and whenever the card resizes
+        fitRwanda();
+        setTimeout(fitRwanda, 150);
+        window.addEventListener('load', fitRwanda);
+        if (typeof ResizeObserver !== 'undefined') {
+          let resizeTimer = null;
+          new ResizeObserver(() => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(fitRwanda, 80);
+          }).observe(mapElement);
+        }
       })
       .catch(err => console.warn("GeoJSON load failed:", err));
   }

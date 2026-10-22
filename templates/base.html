@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -880,12 +881,272 @@
             display: flex;
             justify-content: flex-end;
         }
+
+        /* ==========================================================================
+           GLOBAL RESPONSIVE NAVIGATION & LAYOUT (Tablet & Mobile)
+           Preserves 100% of desktop aesthetics and colors for > 992px
+           ========================================================================== */
+
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            z-index: 1040;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            pointer-events: none;
+        }
+        .sidebar-backdrop.active {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sidebar-close-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 6px;
+            margin-left: auto;
+            border-radius: 4px;
+            transition: color 0.15s ease;
+        }
+        .sidebar-close-btn:hover {
+            color: #ffffff;
+        }
+
+        /* Table Responsive Container Utility */
+        .table-responsive-wrapper,
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Tablet & Mobile Breakpoints (<= 992px) */
+        @media (max-width: 992px) {
+            body {
+                height: 100vh;
+                overflow-x: hidden;
+            }
+
+            /* Universal Table Container Scroll Handling */
+            .card, .table-card-container, .box, .panel, .data-card {
+                max-width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Convert Sidebar to Off-Canvas Drawer */
+            .sidebar {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                bottom: 0 !important;
+                height: 100vh !important;
+                z-index: 1050 !important;
+                box-shadow: 4px 0 25px rgba(0, 0, 0, 0.4) !important;
+                transform: translateX(-100%) !important;
+                transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                max-width: 82vw;
+            }
+
+            .sidebar.mobile-active,
+            .sidebar.active,
+            .sidebar.show-mobile {
+                transform: translateX(0) !important;
+            }
+
+            .sidebar-close-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Main Content gets 100% of the screen */
+            .main-content {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            /* Topbar adjustments */
+            .topbar {
+                padding: 10px 14px !important;
+                gap: 8px !important;
+            }
+
+            .topbar-left {
+                gap: 10px !important;
+                min-width: 0 !important;
+                flex: 1 1 auto !important;
+            }
+
+            .topbar-sidebar-toggle-btn {
+                background: transparent;
+                border: none;
+                color: var(--text-main);
+                font-size: 18px;
+                padding: 4px;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 1;
+                border-radius: 4px;
+            }
+            .topbar-sidebar-toggle-btn:hover {
+                color: var(--primary-green);
+            }
+
+            .topbar-title h2 {
+                font-size: 15px !important;
+                white-space: nowrap !important;
+                line-height: 1.2 !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+
+            .topbar-title p {
+                display: none !important;
+            }
+
+            .topbar-right {
+                gap: 8px !important;
+                flex-shrink: 0 !important;
+            }
+
+            .data-verified {
+                display: none !important;
+            }
+
+            .badge-dropdown {
+                padding: 5px 8px !important;
+                gap: 4px !important;
+            }
+
+            .badge-dropdown select {
+                max-width: 100px !important;
+                font-size: 12px !important;
+            }
+
+            .user-profile {
+                padding-left: 8px !important;
+                gap: 6px !important;
+            }
+
+            .user-info span {
+                display: none !important;
+            }
+
+            .user-info p {
+                max-width: 75px !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                white-space: nowrap !important;
+                font-size: 12px !important;
+            }
+
+            /* Global Dashboard grids for other views (e.g. index.html) */
+            .dashboard-container {
+                padding: 14px 16px !important;
+                gap: 16px !important;
+            }
+
+            .metrics-row {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 12px !important;
+            }
+
+            .middle-row {
+                grid-template-columns: 1fr !important;
+                gap: 14px !important;
+            }
+
+            .card-header {
+                flex-wrap: wrap !important;
+                gap: 10px !important;
+            }
+
+            .card-header-filters {
+                flex-wrap: wrap !important;
+                gap: 6px !important;
+            }
+        }
+
+        /* Small Tablet & Mobile Breakpoints (<= 640px) */
+        @media (max-width: 640px) {
+            .metrics-row {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+            }
+
+            .card-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+            }
+
+            .card-header-filters {
+                width: 100% !important;
+            }
+
+            .filter-field {
+                flex: 1 1 calc(50% - 6px) !important;
+                min-width: 100px !important;
+            }
+
+            .filter-field select, .filter-select {
+                width: 100% !important;
+            }
+
+            .topbar {
+                padding: 8px 10px !important;
+            }
+
+            .topbar-left {
+                gap: 8px !important;
+            }
+
+            .badge-dropdown select {
+                max-width: 85px !important;
+                font-size: 11px !important;
+            }
+
+            .user-info {
+                display: none !important;
+            }
+        }
+
+        /* Extra small mobile (<= 400px) */
+        @media (max-width: 400px) {
+            .metrics-row {
+                grid-template-columns: 1fr !important;
+            }
+
+            .topbar-title h2 {
+                font-size: 13px !important;
+                max-width: 110px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
     <!-- SIDEBAR -->
     {% include "includes/sidebar.html" %}
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="window.closeAgriLensSidebar(event)" aria-hidden="true"></div>
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
@@ -896,6 +1157,7 @@
         {% block content %}{% endblock %}
     </main>
 
+    <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

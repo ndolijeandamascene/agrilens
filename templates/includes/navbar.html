@@ -1,7 +1,9 @@
 <!-- TOPBAR -->
 <header class="topbar">
     <div class="topbar-left">
-        <i class="fa-solid fa-bars" id="topbar-sidebar-toggle" role="button" aria-label="Toggle navigation menu" style="cursor: pointer; padding: 4px; border-radius: 4px;"></i>
+        <button type="button" class="topbar-sidebar-toggle-btn" id="topbar-sidebar-toggle" aria-label="Toggle navigation menu" onclick="window.toggleAgriLensSidebar(event)">
+            <i class="fa-solid fa-bars"></i>
+        </button>
         <div class="topbar-title">
             {% with last_crumb=breadcrumbs|last %}
             <h2>{% if page_heading %}{{ page_heading }}{% elif request.path == '/' or request.path == '/dashboard/' %}National Dashboard{% elif breadcrumbs|length > 1 and last_crumb.label %}{{ last_crumb.label }}{% else %}National Dashboard{% endif %}</h2>
@@ -236,16 +238,33 @@
         }
     });
 
-    const sbToggle = document.getElementById('topbar-sidebar-toggle');
-    if (sbToggle) {
-        sbToggle.addEventListener('click', function(e) {
+    window.toggleAgriLensSidebar = function(e) {
+        if (e) {
             e.preventDefault();
-            const sidebar = document.querySelector('.sidebar');
-            if (sidebar) {
-                sidebar.classList.toggle('active');
-                sidebar.classList.toggle('show-mobile');
-            }
-        });
-    }
+            e.stopPropagation();
+        }
+        var sidebar = document.querySelector('.sidebar');
+        var backdrop = document.getElementById('sidebar-backdrop');
+        if (!sidebar) return;
+        var isOpen = sidebar.classList.contains('mobile-active') || sidebar.classList.contains('active') || sidebar.classList.contains('show-mobile');
+        if (isOpen) {
+            sidebar.classList.remove('mobile-active', 'active', 'show-mobile');
+            if (backdrop) backdrop.classList.remove('active');
+            document.body.classList.remove('sidebar-open');
+        } else {
+            sidebar.classList.add('mobile-active', 'active', 'show-mobile');
+            if (backdrop) backdrop.classList.add('active');
+            document.body.classList.add('sidebar-open');
+        }
+    };
+
+    window.closeAgriLensSidebar = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        var sidebar = document.querySelector('.sidebar');
+        var backdrop = document.getElementById('sidebar-backdrop');
+        if (sidebar) sidebar.classList.remove('mobile-active', 'active', 'show-mobile');
+        if (backdrop) backdrop.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
+    };
 })();
 </script>

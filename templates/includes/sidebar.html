@@ -6,6 +6,9 @@
             <h1>AgriLens</h1>
             <p>See Agriculture Through Data.</p>
         </div>
+        <button type="button" class="sidebar-close-btn" aria-label="Close navigation menu" onclick="window.closeAgriLensSidebar(event)">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
     </div>
 
     <div class="nav-section">
@@ -99,6 +102,15 @@
                 section.classList.add('active');
             }
         }
+
+        // Close sidebar on navigation tap when on mobile viewports
+        navItems.forEach(function(item) {
+            item.addEventListener('click', function() {
+                if (window.innerWidth <= 992 && window.closeAgriLensSidebar) {
+                    window.closeAgriLensSidebar();
+                }
+            });
+        });
     }
 
     if (document.readyState === 'loading') {

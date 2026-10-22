@@ -12,32 +12,17 @@ document.addEventListener('DOMContentLoaded', () => {
  * Responsive Mobile Navigation Drawer
  */
 function initMobileNavigation() {
-    const toggleBtn = document.getElementById('mobile-sidebar-toggle');
-    const sidebar = document.querySelector('.sidebar');
-    if (!toggleBtn || !sidebar) return;
-
-    // Show toggle button on narrow viewports
-    const checkViewport = () => {
-        if (window.innerWidth <= 992) {
-            toggleBtn.style.display = 'inline-flex';
-        } else {
-            toggleBtn.style.display = 'none';
-            sidebar.classList.remove('mobile-active');
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && window.closeAgriLensSidebar) {
+            window.closeAgriLensSidebar();
         }
-    };
-
-    window.addEventListener('resize', checkViewport);
-    checkViewport();
-
-    toggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        sidebar.classList.toggle('mobile-active');
     });
 
-    // Close when tapping outside on mobile
-    document.addEventListener('click', (e) => {
-        if (sidebar.classList.contains('mobile-active') && !sidebar.contains(e.target) && e.target !== toggleBtn) {
-            sidebar.classList.remove('mobile-active');
+    // Window resize check: close drawer if window expands to desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 992 && window.closeAgriLensSidebar) {
+            window.closeAgriLensSidebar();
         }
     });
 }
@@ -58,3 +43,4 @@ function initNotificationDismissal() {
         }, 6000);
     });
 }
+
