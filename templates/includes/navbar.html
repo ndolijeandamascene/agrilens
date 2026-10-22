@@ -1,7 +1,7 @@
 <!-- TOPBAR -->
 <header class="topbar">
     <div class="topbar-left">
-        <button type="button" class="topbar-sidebar-toggle-btn" id="topbar-sidebar-toggle" aria-label="Toggle navigation menu" onclick="window.toggleAgriLensSidebar(event)">
+        <button type="button" class="topbar-sidebar-toggle-btn" id="topbar-sidebar-toggle" aria-label="Toggle navigation menu" title="Toggle navigation menu (Ctrl+B)" onclick="window.toggleAgriLensSidebar(event)">
             <i class="fa-solid fa-bars"></i>
         </button>
         <div class="topbar-title">
@@ -238,23 +238,70 @@
         }
     });
 
+    function triggerLayoutResize() {
+        setTimeout(function() {
+            window.dispatchEvent(new Event('resize'));
+            if (window.rwandaMap && typeof window.rwandaMap.invalidateSize === 'function') {
+                window.rwandaMap.invalidateSize();
+            }
+            if (window.decisionMap && typeof window.decisionMap.invalidateSize === 'function') {
+                window.decisionMap.invalidateSize();
+            }
+            if (window.marketMap && typeof window.marketMap.invalidateSize === 'function') {
+                window.marketMap.invalidateSize();
+            }
+            if (window.dashMap && typeof window.dashMap.invalidateSize === 'function') {
+                window.dashMap.invalidateSize();
+            }
+            if (window.map && typeof window.map.invalidateSize === 'function') {
+                window.map.invalidateSize();
+            }
+        }, 300);
+    }
+
     window.toggleAgriLensSidebar = function(e) {
         if (e) {
-            e.preventDefault();
-            e.stopPropagation();
+            if (e.preventDefault) e.preventDefault();
+            if (e.stopPropagation) e.stopPropagation();
         }
         var sidebar = document.querySelector('.sidebar');
         var backdrop = document.getElementById('sidebar-backdrop');
+        var toggleBtn = document.getElementById('topbar-sidebar-toggle');
         if (!sidebar) return;
-        var isOpen = sidebar.classList.contains('mobile-active') || sidebar.classList.contains('active') || sidebar.classList.contains('show-mobile');
-        if (isOpen) {
+
+        if (window.innerWidth > 992) {
+            // DESKTOP FULL SCREEN (PC): Toggle sidebar collapse
+            var isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+
+            // Make sure mobile classes and backdrop are NEVER on desktop
             sidebar.classList.remove('mobile-active', 'active', 'show-mobile');
             if (backdrop) backdrop.classList.remove('active');
             document.body.classList.remove('sidebar-open');
+
+            if (toggleBtn) {
+                toggleBtn.setAttribute('title', isCollapsed ? 'Expand sidebar (Ctrl+B)' : 'Collapse sidebar (Ctrl+B)');
+                toggleBtn.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+            }
+
+            try {
+                localStorage.setItem('agrilens_sidebar_collapsed', isCollapsed ? '1' : '0');
+            } catch (err) {}
+
+            triggerLayoutResize();
         } else {
-            sidebar.classList.add('mobile-active', 'active', 'show-mobile');
-            if (backdrop) backdrop.classList.add('active');
-            document.body.classList.add('sidebar-open');
+            // TABLET & MOBILE: Off-canvas drawer
+            var isOpen = sidebar.classList.contains('mobile-active') || sidebar.classList.contains('active') || sidebar.classList.contains('show-mobile');
+            if (isOpen) {
+                sidebar.classList.remove('mobile-active', 'active', 'show-mobile');
+                if (backdrop) backdrop.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
+                if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+            } else {
+                sidebar.classList.add('mobile-active', 'active', 'show-mobile');
+                if (backdrop) backdrop.classList.add('active');
+                document.body.classList.add('sidebar-open');
+                if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
+            }
         }
     };
 
@@ -262,9 +309,47 @@
         if (e && e.stopPropagation) e.stopPropagation();
         var sidebar = document.querySelector('.sidebar');
         var backdrop = document.getElementById('sidebar-backdrop');
+        var toggleBtn = document.getElementById('topbar-sidebar-toggle');
         if (sidebar) sidebar.classList.remove('mobile-active', 'active', 'show-mobile');
         if (backdrop) backdrop.classList.remove('active');
         document.body.classList.remove('sidebar-open');
+        if (toggleBtn && window.innerWidth <= 992) {
+            toggleBtn.setAttribute('aria-expanded', 'false');
+        }
     };
+
+    // Restore desktop preference on load
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.innerWidth > 992) {
+            try {
+                if (localStorage.getItem('agrilens_sidebar_collapsed') === '1') {
+                    document.body.classList.add('sidebar-collapsed');
+                    var toggleBtn = document.getElementById('topbar-sidebar-toggle');
+                    if (toggleBtn) {
+                        toggleBtn.setAttribute('title', 'Expand sidebar (Ctrl+B)');
+                        toggleBtn.setAttribute('aria-expanded', 'false');
+                    }
+                    triggerLayoutResize();
+                }
+            } catch (err) {}
+        }
+    });
+
+    // Handle window resize between mobile and desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 992) {
+            window.closeAgriLensSidebar();
+        } else {
+            document.body.classList.remove('sidebar-collapsed');
+        }
+    });
+
+    // Keyboard shortcut Ctrl+B or Cmd+B to toggle sidebar
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+            e.preventDefault();
+            window.toggleAgriLensSidebar();
+        }
+    });
 })();
 </script>
