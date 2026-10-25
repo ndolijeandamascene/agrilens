@@ -21,9 +21,13 @@
     </div>
     <div class="topbar-right">
         <!-- Dynamic Season Selector backed by Database -->
-        <div class="badge-dropdown" title="Select Agricultural Season">
-            <i class="fa-regular fa-calendar"></i> 
-            <select id="topbar-season-select" onchange="if(window.switchSeason){ window.switchSeason(this.value); } else { window.location.href='/dashboard/?year=' + this.value.substring(0,4) + '&season=' + this.value.substring(4); }" style="background: transparent; border: none; font-size: 13px; font-weight: 500; cursor: pointer; outline: none; font-family: inherit; color: inherit; appearance: none; -webkit-appearance: none; -moz-appearance: none; padding-right: 0;">
+        <div class="badge-dropdown" title="Select Agricultural Season" onclick="var s = this.querySelector('select'); if (s && s.showPicker && event.target !== s) { try { s.showPicker(); } catch(e){} }">
+            <i class="fa-regular fa-calendar" style="color: var(--text-main); font-size: 13px;"></i> 
+            <span id="topbar-season-label" style="font-size: 13px; font-weight: 500; color: var(--text-main); white-space: nowrap;">
+                {% for season_opt in db_seasons %}{% if season_opt.is_selected %}{{ season_opt.label }}{% endif %}{% empty %}{% if selected_year == 2024 %}SAS 2023 – 2024{% else %}SAS 2024 – 2025{% endif %}{% endfor %}
+            </span>
+            <i class="fa-solid fa-chevron-down badge-dropdown-icon"></i>
+            <select id="topbar-season-select" aria-label="Select Agricultural Season" onchange="var lbl = document.getElementById('topbar-season-label'); if(lbl && this.selectedIndex >= 0) { lbl.textContent = this.options[this.selectedIndex].text; } if(window.switchSeason){ window.switchSeason(this.value); } else { window.location.href='/dashboard/?year=' + this.value.substring(0,4) + '&season=' + this.value.substring(4); }">
                 {% for season_opt in db_seasons %}
                 <option value="{{ season_opt.code }}" {% if season_opt.is_selected %}selected{% endif %}>{{ season_opt.label }}</option>
                 {% empty %}
@@ -31,7 +35,6 @@
                 <option value="2024A" {% if selected_year == 2024 and selected_season == 'A' %}selected{% endif %}>SAS 2023 – 2024</option>
                 {% endfor %}
             </select>
-            <i class="fa-solid fa-chevron-down" style="font-size: 10px; margin-left: 4px; pointer-events: none;"></i>
         </div>
 
         <!-- Verification status backed by DB timestamp -->
@@ -320,6 +323,12 @@
 
     // Restore desktop preference on load
     document.addEventListener('DOMContentLoaded', function() {
+        var topSel = document.getElementById('topbar-season-select');
+        var topLbl = document.getElementById('topbar-season-label');
+        if (topSel && topLbl && topSel.selectedIndex >= 0) {
+            topLbl.textContent = topSel.options[topSel.selectedIndex].text;
+        }
+
         if (window.innerWidth > 992) {
             try {
                 if (localStorage.getItem('agrilens_sidebar_collapsed') === '1') {

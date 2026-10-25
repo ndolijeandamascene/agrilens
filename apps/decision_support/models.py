@@ -143,6 +143,13 @@ class Recommendation(models.Model):
         """Convenience alias for recommendation_text."""
         return self.recommendation_text
 
+    @property
+    def reviewer_display(self):
+        """Safe human-readable reviewer name or fallback."""
+        if self.reviewer:
+            return self.reviewer.get_full_name() or self.reviewer.username
+        return "Pending Review"
+
 
 class ActionPlan(models.Model):
     """
@@ -183,6 +190,15 @@ class ActionPlan(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.get_status_display()})"
+
+    @property
+    def assignee_display(self):
+        """Safe human-readable assigned entity or officer name."""
+        if self.assigned_organization:
+            return self.assigned_organization
+        if self.assigned_to:
+            return self.assigned_to.get_full_name() or self.assigned_to.username
+        return "Unassigned"
 
 
 class OutcomeMeasurement(models.Model):

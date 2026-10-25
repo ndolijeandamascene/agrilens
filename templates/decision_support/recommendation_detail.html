@@ -62,7 +62,7 @@
         </div>
 
         <div style="font-size: 0.78rem; color: #64748B;">
-            Generated on {{ rec.created_at|date:"M d, Y H:i" }} &bull; Reviewer: {{ rec.reviewer.get_full_name|default:"Pending Review" }}
+            Generated on {{ rec.created_at|date:"M d, Y H:i" }} &bull; Reviewer: {% if rec.reviewer %}{{ rec.reviewer.get_full_name|default:rec.reviewer.username }}{% else %}Pending Review{% endif %}
         </div>
     </div>
 
@@ -234,7 +234,7 @@
                             <div style="font-weight: 400; font-size: 0.78rem; color: #64748B; margin-top: 2px;">{{ a.action_details }}</div>
                         </td>
                         <td style="padding: 12px 14px; color: #334155;">
-                            {{ a.assigned_organization|default:a.assigned_to.get_full_name|default:"Unassigned" }}
+                            {% if a.assigned_organization %}{{ a.assigned_organization }}{% elif a.assigned_to %}{{ a.assigned_to.get_full_name|default:a.assigned_to.username }}{% else %}Unassigned{% endif %}
                         </td>
                         <td style="padding: 12px 14px; color: #64748B;">
                             {{ a.target_date|date:"M d, Y"|default:"Not specified" }}

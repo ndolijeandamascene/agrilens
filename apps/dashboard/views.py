@@ -200,7 +200,7 @@ def dashboard_overview(request):
         if season_obs_qs.exists():
             obs_qs = season_obs_qs
 
-    recent_observations = list(obs_qs[:50])
+    recent_observations = list(obs_qs[:100])
     for obs in recent_observations:
         if obs.calculated_yield_kg_per_ha:
             obs.yield_t_ha = round(float(obs.calculated_yield_kg_per_ha) / 1000.0, 1)

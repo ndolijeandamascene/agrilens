@@ -200,19 +200,65 @@
 
         .topbar-right { display: flex; align-items: center; gap: 20px; font-size: 13px; flex-wrap: nowrap; }
         
-        .badge-dropdown, .data-verified {
-            display: flex;
+        .badge-dropdown {
+            position: relative;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
             padding: 6px 12px;
             border-radius: 6px;
             border: 1px solid var(--border-color);
-            background: #fff;
+            background: #ffffff;
             font-weight: 500;
             cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
         }
 
-        .data-verified { border: none; background: transparent; color: var(--text-muted); font-size: 11px; }
+        .badge-dropdown:hover {
+            border-color: #94a3b8;
+            background: #f8fafc;
+        }
+
+        .badge-dropdown .badge-dropdown-icon {
+            color: var(--text-muted);
+            font-size: 10px;
+            transition: color 0.15s ease;
+            margin-left: 2px;
+            pointer-events: none;
+        }
+
+        .badge-dropdown:hover .badge-dropdown-icon {
+            color: var(--text-main);
+        }
+
+        .badge-dropdown select {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 5;
+            -webkit-appearance: none;
+            appearance: none;
+            border: none;
+            background: transparent;
+        }
+
+        .data-verified {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 11px;
+        }
         .data-verified span { color: var(--primary-green); font-weight: 600; }
 
         .user-profile {

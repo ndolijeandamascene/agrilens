@@ -67,7 +67,7 @@
                     </div>
                     <div class="filter-field">
                         <span class="filter-field-label">Season</span>
-                        <select class="filter-select" id="map-season-select">
+                        <select class="filter-select" id="map-season-select" style="min-width: 130px;">
                             {% for season_opt in db_seasons %}
                             <option value="{{ season_opt.code }}" {% if season_opt.is_selected %}selected{% endif %}>{{ season_opt.label }}</option>
                             {% empty %}
@@ -443,6 +443,82 @@
     var selectedDistrictLatLng = [-1.66, 29.50];
     var liveTypologies = {};
 
+    var CROP_PRICE_AND_POSTHARVEST_DATA = {
+        'Maize': {
+            prices: {
+                months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                kigali: [650, 680, 640, 710, 730, 700],
+                secondaryName: 'Musanze',
+                secondary: [600, 620, 590, 670, 690, 660],
+                maxPrice: 1000
+            },
+            postHarvest: { storage: 42, processing: 24, losses: 14, marketing: 12, other: 8 }
+        },
+        'Irish Potato': {
+            prices: {
+                months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                kigali: [420, 450, 480, 410, 390, 430],
+                secondaryName: 'Musanze',
+                secondary: [360, 390, 410, 350, 340, 380],
+                maxPrice: 700
+            },
+            postHarvest: { storage: 48, processing: 18, losses: 18, marketing: 10, other: 6 }
+        },
+        'Cassava': {
+            prices: {
+                months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                kigali: [350, 360, 370, 350, 380, 390],
+                secondaryName: 'Rwamagana',
+                secondary: [300, 310, 320, 310, 330, 340],
+                maxPrice: 600
+            },
+            postHarvest: { storage: 35, processing: 35, losses: 15, marketing: 10, other: 5 }
+        },
+        'Bush Beans': {
+            prices: {
+                months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                kigali: [950, 980, 1020, 960, 990, 1050],
+                secondaryName: 'Huye',
+                secondary: [880, 910, 950, 890, 920, 980],
+                maxPrice: 1400
+            },
+            postHarvest: { storage: 40, processing: 20, losses: 16, marketing: 16, other: 8 }
+        },
+        'Climbing Beans': {
+            prices: {
+                months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                kigali: [980, 1010, 1050, 990, 1020, 1080],
+                secondaryName: 'Musanze',
+                secondary: [900, 930, 970, 920, 940, 1000],
+                maxPrice: 1400
+            },
+            postHarvest: { storage: 40, processing: 20, losses: 16, marketing: 16, other: 8 }
+        },
+        'Soyabean': {
+            prices: {
+                months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                kigali: [820, 840, 860, 830, 870, 890],
+                secondaryName: 'Kayonza',
+                secondary: [760, 780, 800, 770, 810, 830],
+                maxPrice: 1200
+            },
+            postHarvest: { storage: 38, processing: 28, losses: 12, marketing: 14, other: 8 }
+        },
+        'Rice': {
+            prices: {
+                months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                kigali: [1100, 1150, 1200, 1180, 1220, 1250],
+                secondaryName: 'Rwamagana',
+                secondary: [1020, 1070, 1120, 1100, 1140, 1170],
+                maxPrice: 1600
+            },
+            postHarvest: { storage: 45, processing: 25, losses: 12, marketing: 12, other: 6 }
+        }
+    };
+    var currentCropData = CROP_PRICE_AND_POSTHARVEST_DATA[currentCrop] || CROP_PRICE_AND_POSTHARVEST_DATA['Maize'];
+    var currentPage = 1;
+    var PAGE_SIZE = 10;
+
     fetch('/api/v1/ml/district-clusters/')
         .then(function(r) { return r.json(); })
         .then(function(d) {
@@ -576,7 +652,7 @@
     var hoverDarkPopup = null;
     var isUserInteracted = false;
 
-    function selectDistrict(dName, latlng, shouldPan) {
+    function selectDistrict(dName, latlng, shouldPan, syncTable) {
         if (!dName) return;
         selectedDistrictName = dName;
         isUserInteracted = true;
@@ -654,12 +730,14 @@
             }
         }
 
-        // Sync with Recent Validated Observations Table filter
-        var distFilter = document.getElementById('obs-dist-filter');
-        if (distFilter && distFilter.value !== dName) {
-            distFilter.value = dName;
-            currentPage = 1;
-            renderTable();
+        // Sync with Recent Validated Observations Table filter if explicitly requested
+        if (syncTable) {
+            var distFilter = document.getElementById('obs-dist-filter');
+            if (distFilter && distFilter.value !== dName) {
+                distFilter.value = dName;
+                currentPage = 1;
+                if (typeof renderTable === 'function') renderTable();
+            }
         }
     }
 
@@ -1169,44 +1247,56 @@
     });
 
     // --- 3. Line Chart (Commodity Market Prices) ---
-    var ctxLine = document.getElementById('priceChart').getContext('2d');
-    var priceChart = new Chart(ctxLine, {
-        type: 'line',
-        data: {
-            labels: currentCropData.prices.months,
-            datasets: [
-                {
-                    label: 'Kigali',
-                    data: currentCropData.prices.kigali,
-                    borderColor: '#15803D',
-                    backgroundColor: '#15803D',
-                    tension: 0.3,
-                    pointRadius: 3
-                },
-                {
-                    label: currentCropData.prices.secondaryName,
-                    data: currentCropData.prices.secondary,
-                    borderColor: '#2563EB',
-                    backgroundColor: '#2563EB',
-                    tension: 0.3,
-                    pointRadius: 3
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'top', align: 'end', labels: { boxWidth: 10, font: {size: 10} } }
+    var priceChartEl = document.getElementById('priceChart');
+    var priceChart = null;
+    if (priceChartEl) {
+        var cropPrices = (currentCropData && currentCropData.prices) ? currentCropData.prices : {
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            kigali: [650, 680, 640, 710, 730, 700],
+            secondaryName: 'Musanze',
+            secondary: [600, 620, 590, 670, 690, 660],
+            maxPrice: 1000
+        };
+        var ctxLine = priceChartEl.getContext('2d');
+        priceChart = new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: cropPrices.months,
+                datasets: [
+                    {
+                        label: 'Kigali',
+                        data: cropPrices.kigali,
+                        borderColor: '#15803D',
+                        backgroundColor: '#15803D',
+                        tension: 0.3,
+                        pointRadius: 3
+                    },
+                    {
+                        label: cropPrices.secondaryName,
+                        data: cropPrices.secondary,
+                        borderColor: '#2563EB',
+                        backgroundColor: '#2563EB',
+                        tension: 0.3,
+                        pointRadius: 3
+                    }
+                ]
             },
-            scales: {
-                y: { beginAtZero: true, max: currentCropData.prices.maxPrice, title: { display: true, text: 'Price (RWF/kg)', font: {size: 10} } },
-                x: { grid: { display: false } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', align: 'end', labels: { boxWidth: 10, font: {size: 10} } }
+                },
+                scales: {
+                    y: { beginAtZero: true, max: cropPrices.maxPrice, title: { display: true, text: 'Price (RWF/kg)', font: {size: 10} } },
+                    x: { grid: { display: false } }
+                }
             }
-        }
-    });
+        });
+    }
 
     function updatePriceChart() {
+        if (!priceChart) return;
         // Price surveillance line chart reflects real surveillance quotes
         fetch('/api/v1/commodity-prices/?crop=' + encodeURIComponent(currentCrop))
             .then(function(r) { return r.json(); })
@@ -1238,42 +1328,60 @@
     if (priceMarketSelect) priceMarketSelect.addEventListener('change', updatePriceChart);
 
     // --- 4. Doughnut Chart (Post-Harvest Analysis) ---
-    var ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
-    var doughnutChart = new Chart(ctxDoughnut, {
-        type: 'doughnut',
-        data: {
-            labels: ['Storage', 'Processing', 'Losses', 'Marketing', 'Other'],
-            datasets: [{
-                data: [
-                    currentCropData.postHarvest.storage,
-                    currentCropData.postHarvest.processing,
-                    currentCropData.postHarvest.losses,
-                    currentCropData.postHarvest.marketing,
-                    currentCropData.postHarvest.other
-                ],
-                backgroundColor: [
-                    '#166534', // Primary Green
-                    '#15803D', // Action Green
-                    '#D97706', // Warning
-                    '#2563EB', // Info Blue
-                    '#7C3AED'  // Purple
-                ],
-                borderWidth: 0,
-                cutout: '75%'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: { enabled: true }
+    var doughnutChartEl = document.getElementById('doughnutChart');
+    var doughnutChart = null;
+    if (doughnutChartEl) {
+        var postHarvestData = (currentCropData && currentCropData.postHarvest) ? currentCropData.postHarvest : {
+            storage: 42, processing: 24, losses: 14, marketing: 12, other: 8
+        };
+        var ctxDoughnut = doughnutChartEl.getContext('2d');
+        doughnutChart = new Chart(ctxDoughnut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Storage', 'Processing', 'Losses', 'Marketing', 'Other'],
+                datasets: [{
+                    data: [
+                        postHarvestData.storage,
+                        postHarvestData.processing,
+                        postHarvestData.losses,
+                        postHarvestData.marketing,
+                        postHarvestData.other
+                    ],
+                    backgroundColor: [
+                        '#166534', // Primary Green
+                        '#15803D', // Action Green
+                        '#D97706', // Warning
+                        '#2563EB', // Info Blue
+                        '#7C3AED'  // Purple
+                    ],
+                    borderWidth: 0,
+                    cutout: '75%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true }
+                }
             }
-        }
-    });
+        });
+    }
 
     function updatePostHarvestChart(cropKey) {
-        var lossRate = parseFloat("{{ summary.loss_rate_percentage|default:'0' }}") || 0;
+        var cropInfo = CROP_PRICE_AND_POSTHARVEST_DATA[cropKey] || CROP_PRICE_AND_POSTHARVEST_DATA['Maize'];
+        if (doughnutChart && cropInfo && cropInfo.postHarvest) {
+            doughnutChart.data.datasets[0].data = [
+                cropInfo.postHarvest.storage,
+                cropInfo.postHarvest.processing,
+                cropInfo.postHarvest.losses,
+                cropInfo.postHarvest.marketing,
+                cropInfo.postHarvest.other
+            ];
+            doughnutChart.update();
+        }
+        var lossRate = (cropInfo && cropInfo.postHarvest) ? cropInfo.postHarvest.losses : (parseFloat("{{ summary.loss_rate_percentage|default:'0' }}") || 0);
         var centerLoss = document.getElementById('postharvest-center-val');
         if (centerLoss) centerLoss.textContent = lossRate > 0 ? (lossRate.toFixed(1) + '%') : '—';
     }
@@ -1364,7 +1472,7 @@
     var paginationInfo = document.getElementById('pagination-info');
     var paginationButtons = document.getElementById('pagination-buttons');
 
-    var PAGE_SIZE = 5;
+    var PAGE_SIZE = 10;
     var currentPage = 1;
 
     function getMatchingRows() {
@@ -1372,19 +1480,22 @@
         var q = (searchInput ? searchInput.value : '').toLowerCase().trim();
         var c = (cropFilter ? cropFilter.value : '').toLowerCase().trim();
         var d = (distFilter ? distFilter.value : '').toLowerCase().trim();
-        var rows = Array.from(tbody.getElementsByTagName('tr'));
+        var rows = Array.from(tbody.querySelectorAll('tr:not(.obs-empty-placeholder)'));
         return rows.filter(function(row) {
             var text = row.textContent.toLowerCase();
+            var rowCrop = (row.dataset.crop || '').toLowerCase();
+            var rowDist = (row.dataset.location || '').toLowerCase();
             var matchQ = !q || text.indexOf(q) !== -1;
-            var matchC = !c || text.indexOf(c) !== -1;
-            var matchD = !d || text.indexOf(d) !== -1;
+            var matchC = !c || rowCrop.indexOf(c) !== -1 || text.indexOf(c) !== -1;
+            var matchD = !d || rowDist.indexOf(d) !== -1 || text.indexOf(d) !== -1;
             return matchQ && matchC && matchD;
         });
     }
 
     function renderTable() {
         if (!tbody) return;
-        var allRows = Array.from(tbody.getElementsByTagName('tr'));
+        var allRows = Array.from(tbody.querySelectorAll('tr:not(.obs-empty-placeholder)'));
+        var emptyPlaceholder = tbody.querySelector('.obs-empty-placeholder');
         var matchingRows = getMatchingRows();
         var totalRows = matchingRows.length;
         var totalPages = Math.ceil(totalRows / PAGE_SIZE) || 1;
@@ -1393,32 +1504,46 @@
         if (currentPage < 1) currentPage = 1;
 
         var startIdx = (currentPage - 1) * PAGE_SIZE;
-        var endIdx = startIdx + PAGE_SIZE;
+        var endIdx = Math.min(startIdx + PAGE_SIZE, totalRows);
 
+        // Hide all data rows first
         allRows.forEach(function(row) { row.style.display = 'none'; });
 
+        if (totalRows === 0) {
+            if (!emptyPlaceholder) {
+                emptyPlaceholder = document.createElement('tr');
+                emptyPlaceholder.className = 'obs-empty-placeholder';
+                emptyPlaceholder.innerHTML = '<td colspan="10" style="text-align: center; padding: 28px 16px; color: var(--text-muted);"><i class="fa-solid fa-inbox" style="margin-right: 8px;"></i>No validated observations match the filter criteria.</td>';
+                tbody.appendChild(emptyPlaceholder);
+            }
+            emptyPlaceholder.style.display = '';
+            if (paginationInfo) paginationInfo.textContent = 'Showing 0 observations';
+            if (paginationButtons) paginationButtons.innerHTML = '';
+            return;
+        } else {
+            if (emptyPlaceholder) emptyPlaceholder.style.display = 'none';
+        }
+
+        // Show slice for current page
         matchingRows.slice(startIdx, endIdx).forEach(function(row) {
             row.style.display = '';
         });
 
+        // Update info text
         if (paginationInfo) {
-            if (totalRows === 0) {
-                paginationInfo.textContent = 'Showing 0 observations';
-            } else {
-                var shownEnd = Math.min(endIdx, totalRows);
-                paginationInfo.textContent = 'Showing ' + (startIdx + 1) + ' to ' + shownEnd + ' of ' + totalRows + ' observations';
-            }
+            paginationInfo.textContent = 'Showing ' + (startIdx + 1) + ' to ' + endIdx + ' of ' + totalRows + ' observations';
         }
 
+        // Render pagination controls
         if (paginationButtons) {
             var buttonsHtml = '';
             buttonsHtml += '<button class="page-btn" ' + (currentPage === 1 ? 'disabled' : '') + ' onclick="window.setTablePage(' + (currentPage - 1) + ')" title="Previous Page"><i class="fa-solid fa-chevron-left"></i></button>';
 
             for (var p = 1; p <= totalPages; p++) {
-                if (p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1)) {
+                if (totalPages <= 7 || p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1)) {
                     buttonsHtml += '<button class="page-btn ' + (p === currentPage ? 'active' : '') + '" onclick="window.setTablePage(' + p + ')">' + p + '</button>';
                 } else if (p === currentPage - 2 || p === currentPage + 2) {
-                    buttonsHtml += '<span style="color:var(--text-muted); padding:0 2px;">...</span>';
+                    buttonsHtml += '<span style="color:var(--text-muted); padding:0 3px; font-size:11px;">...</span>';
                 }
             }
 
@@ -1441,7 +1566,7 @@
             var dVal = this.value.trim();
             if (dVal) {
                 var center = DISTRICT_CENTROIDS[dVal];
-                selectDistrict(dVal, center, true);
+                selectDistrict(dVal, center, true, false);
             } else {
                 resetDistrictSelection();
             }
@@ -1456,15 +1581,18 @@
         document.getElementById('m-record-id').textContent = rowElem.dataset.recordId || '—';
         document.getElementById('m-source').textContent = rowElem.dataset.source || '—';
         document.getElementById('m-crop').textContent = rowElem.dataset.crop || '—';
+        document.getElementById('m-season').textContent = rowElem.dataset.season || '—';
         document.getElementById('m-location').textContent = rowElem.dataset.location || '—';
         document.getElementById('m-area').textContent = rowElem.dataset.area || '—';
         document.getElementById('m-prod').textContent = rowElem.dataset.prod || '—';
         document.getElementById('m-yield').textContent = rowElem.dataset.yield || '—';
-        document.getElementById('obs-detail-modal').classList.add('active');
+        var modalEl = document.getElementById('obs-detail-modal');
+        if (modalEl) modalEl.classList.add('active');
     };
 
     window.closeObsModal = function() {
-        document.getElementById('obs-detail-modal').classList.remove('active');
+        var modalEl = document.getElementById('obs-detail-modal');
+        if (modalEl) modalEl.classList.remove('active');
     };
 
     // Close modal on Escape key or backdrop click
