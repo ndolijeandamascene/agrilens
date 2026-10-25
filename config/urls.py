@@ -25,6 +25,7 @@ urlpatterns = [
     path('indicators/', include('apps.indicators.urls', namespace='indicators')),
     path('data-management/', include('apps.data_management.urls', namespace='data_management')),
     path('decision-support/', include('apps.decision_support.urls', namespace='decision_support')),
+    path('notifications/', include('apps.notifications.urls', namespace='notifications')),
     path('api/', include('apps.api.urls', namespace='api')),
     path('api/v1/ml/', include('apps.ml.urls', namespace='ml')),
 ]

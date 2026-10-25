@@ -197,10 +197,42 @@ def report_center_generate(request):
             # Execute Generation Engine
             ReportEngine.generate_report_artifact(report)
             messages.success(request, f"Report '{report.title}' successfully generated in {report.execution_duration_sec}s.")
+
+            try:
+                from apps.notifications.services import NotificationService
+                from apps.notifications.models import Notification
+                NotificationService.send(
+                    recipient=user,
+                    notification_type=Notification.Type.REPORT_GENERATED,
+                    title=f"Report Generated: {report.title}",
+                    message=f"Your report '{report.title}' ({report.output_format.upper()}) was successfully generated in {report.execution_duration_sec or 0}s.",
+                    action_url=reverse('dashboard:internal_report_detail', kwargs={'report_id': report.id}),
+                    related_object=report,
+                    priority=Notification.Priority.LOW,
+                )
+            except Exception:
+                pass
+
             return redirect('dashboard:internal_report_detail', report_id=report.id)
 
         except Exception as e:
             messages.error(request, f"Report generation failed: {str(e)}")
+
+            try:
+                from apps.notifications.services import NotificationService
+                from apps.notifications.models import Notification
+                NotificationService.send(
+                    recipient=user,
+                    notification_type=Notification.Type.REPORT_FAILED,
+                    title=f"Report Generation Failed: {report.title}",
+                    message=f"Report '{report.title}' generation failed: {str(e)}",
+                    action_url=reverse('dashboard:internal_report_detail', kwargs={'report_id': report.id}),
+                    related_object=report,
+                    priority=Notification.Priority.HIGH,
+                )
+            except Exception:
+                pass
+
             return redirect('dashboard:internal_report_detail', report_id=report.id)
 
     context = {

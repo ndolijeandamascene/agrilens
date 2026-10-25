@@ -66,5 +66,37 @@
             </form>
         </div>
     </div>
+
+    <!-- Security & Password Management Card -->
+    <div class="panel-card" style="box-shadow: 0 4px 12px -2px rgba(0, 31, 59, 0.05); border: 1px solid #E2E8F0; margin-top: 24px; border-radius: 12px; overflow: hidden; background: #FFFFFF;">
+        <div class="panel-header" style="border-bottom: 1px solid #E2E8F0; padding: 18px 24px; background: #F8FAFC; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 38px; height: 38px; border-radius: 8px; background: #DCFCE7; color: #166534; display: flex; align-items: center; justify-content: center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #0F172A;">Account Security &amp; Password</h4>
+                    <p style="margin: 2px 0 0 0; font-size: 0.82rem; color: #64748B;">Keep your credentials protected according to NISR security guidelines</p>
+                </div>
+            </div>
+            <a href="{% url 'accounts:password_change' %}" class="btn-action primary" style="padding: 9px 16px; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; background: #16A34A; color: #FFFFFF; font-weight: 600;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 2l-2 2m-1.5 6.1L12.9 4.7a2.1 2.1 0 0 0-3 0L3.5 11.1a2.1 2.1 0 0 0 0 3l6.4 6.4a2.1 2.1 0 0 0 3 0l6.4-6.4a2.1 2.1 0 0 0 0-3z"></path>
+                </svg>
+                <span>Change Password</span>
+            </a>
+        </div>
+        <div class="panel-body" style="padding: 18px 24px; font-size: 0.86rem; color: #475569; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <strong>Active Authentication Status:</strong> Password authenticated &bull; Single Session GoR Protection
+            </div>
+            <a href="{% url 'notifications:preferences' %}" style="color: #047857; text-decoration: underline; font-weight: 600; font-size: 0.84rem;">
+                Notification Preferences &rarr;
+            </a>
+        </div>
+    </div>
 </div>
 {% endblock %}

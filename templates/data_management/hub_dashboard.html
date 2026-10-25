@@ -1,151 +1,818 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Data Management &amp; Lineage Hub | AgriLens Rwanda{% endblock %}
-{% block section_title %}Data Governance &amp; Provenance Hub{% endblock %}
+{% block title %}Data Governance &amp; Lineage Hub | AgriLens Rwanda{% endblock %}
+{% block page_heading %}Data Governance &amp; Provenance Hub{% endblock %}
+{% block page_subheading %}Data lineage hub, manual registry, and observation governance{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ==========================================================================
+   AgriLens Data Governance & Lineage Hub
+   Enterprise-grade visual styling matching National Dashboard
+   ========================================================================== */
+
+:root {
+    --gov-primary: #15803D;
+    --gov-primary-dark: #166534;
+    --gov-primary-subtle: #F0FDF4;
+    --gov-primary-border: #BBF7D0;
+    --gov-card-bg: #FFFFFF;
+    --gov-border: #E2E8F0;
+    --gov-text-main: #0F172A;
+    --gov-text-muted: #64748B;
+    --gov-blue: #2563EB;
+    --gov-blue-subtle: #EFF6FF;
+    --gov-blue-border: #BFDBFE;
+    --gov-amber: #D97706;
+    --gov-amber-subtle: #FFFBEB;
+    --gov-amber-border: #FDE68A;
+    --gov-purple: #7C3AED;
+    --gov-purple-subtle: #FAF5FF;
+    --gov-purple-border: #DDD6FE;
+    --gov-red: #DC2626;
+    --gov-red-subtle: #FEF2F2;
+    --gov-red-border: #FECACA;
+}
+
+.data-gov-container {
+    padding: 20px 24px 40px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* --- 1. Hero Governance Header Strip --- */
+.gov-hero-strip {
+    background: #FFFFFF;
+    border: 1px solid var(--gov-border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.gov-meta-badges {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.gov-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gov-primary-subtle);
+    border: 1px solid var(--gov-primary-border);
+    color: var(--gov-primary-dark);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 9999px;
+}
+
+.gov-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10B981;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: govPulse 2s infinite;
+}
+
+@keyframes govPulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.gov-stat-tag {
+    font-size: 12px;
+    color: var(--gov-text-muted);
+    font-weight: 500;
+    background: #F8FAFC;
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--gov-border);
+}
+.gov-stat-tag strong {
+    color: var(--gov-text-main);
+    font-weight: 700;
+}
+
+.gov-security-badge {
+    font-size: 11px;
+    color: var(--gov-primary-dark);
+    font-weight: 600;
+    background: #F0FDF4;
+    border: 1px solid #DCFCE7;
+    padding: 5px 10px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.gov-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.gov-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+}
+.gov-btn-primary {
+    background: var(--gov-primary);
+    color: #FFFFFF;
+    border-color: var(--gov-primary);
+}
+.gov-btn-primary:hover {
+    background: var(--gov-primary-dark);
+    color: #FFFFFF;
+    box-shadow: 0 2px 6px rgba(21, 128, 61, 0.25);
+}
+
+.gov-btn-secondary {
+    background: #FFFFFF;
+    color: var(--gov-text-main);
+    border-color: var(--gov-border);
+}
+.gov-btn-secondary:hover {
+    background: #F8FAFC;
+    border-color: #94A3B8;
+    color: var(--gov-primary);
+}
+
+.gov-btn-outline {
+    background: transparent;
+    color: var(--gov-primary);
+    border-color: var(--gov-primary-border);
+}
+.gov-btn-outline:hover {
+    background: var(--gov-primary-subtle);
+    border-color: var(--gov-primary);
+}
+
+/* --- 2. Top Metric KPI Cards --- */
+.gov-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.gov-kpi-card {
+    background: #FFFFFF;
+    border: 1px solid var(--gov-border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+.gov-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+    border-color: #CBD5E1;
+}
+
+.gov-kpi-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.gov-kpi-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+.gov-kpi-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gov-text-main);
+    line-height: 1.2;
+}
+
+.gov-kpi-val {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--gov-text-main);
+    line-height: 1;
+    margin-bottom: 6px;
+    font-feature-settings: "tnum";
+}
+
+.gov-kpi-sub {
+    font-size: 11px;
+    color: var(--gov-text-muted);
+    line-height: 1.3;
+    margin-bottom: 14px;
+}
+
+.gov-kpi-tag-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: auto;
+}
+
+.gov-pill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+.gov-pill-blue { background: var(--gov-blue-subtle); color: var(--gov-blue); border: 1px solid var(--gov-blue-border); }
+.gov-pill-green { background: var(--gov-primary-subtle); color: var(--gov-primary-dark); border: 1px solid var(--gov-primary-border); }
+.gov-pill-amber { background: var(--gov-amber-subtle); color: var(--gov-amber); border: 1px solid var(--gov-amber-border); }
+.gov-pill-purple { background: var(--gov-purple-subtle); color: var(--gov-purple); border: 1px solid var(--gov-purple-border); }
+.gov-pill-gray { background: #F1F5F9; color: var(--gov-text-muted); border: 1px solid var(--gov-border); }
+
+/* --- 3. Subtab Navigation Bar --- */
+.gov-subtab-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--gov-border);
+    padding-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.gov-subtab-list {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.gov-subtab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gov-text-muted);
+    background: #FFFFFF;
+    border: 1px solid var(--gov-border);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+.gov-subtab-btn:hover {
+    color: var(--gov-text-main);
+    border-color: #94A3B8;
+    background: #F8FAFC;
+}
+.gov-subtab-btn.active {
+    background: var(--gov-primary);
+    color: #FFFFFF;
+    border-color: var(--gov-primary);
+    box-shadow: 0 1px 3px rgba(21, 128, 61, 0.25);
+}
+.gov-subtab-btn.active .gov-tab-count {
+    background: rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
+}
+
+.gov-tab-count {
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    background: #F1F5F9;
+    color: var(--gov-text-muted);
+}
+
+/* --- 4. Content Panels & Tables --- */
+.gov-panel-card {
+    background: #FFFFFF;
+    border: 1px solid var(--gov-border);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+}
+
+.gov-panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--gov-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: #FAFAFA;
+}
+
+.gov-panel-title-block h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gov-text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.gov-panel-title-block p {
+    margin: 3px 0 0 0;
+    font-size: 12px;
+    color: var(--gov-text-muted);
+}
+
+.gov-panel-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.gov-search-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+.gov-search-wrap i {
+    position: absolute;
+    left: 10px;
+    font-size: 11px;
+    color: var(--gov-text-muted);
+    pointer-events: none;
+}
+.gov-search-input {
+    padding: 6px 12px 6px 30px;
+    border: 1px solid var(--gov-border);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--gov-text-main);
+    background: #FFFFFF;
+    width: 220px;
+    outline: none;
+    transition: all 0.15s;
+}
+.gov-search-input:focus {
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.12);
+}
+
+.gov-table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.gov-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    text-align: left;
+}
+.gov-table th {
+    padding: 10px 16px;
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--gov-text-muted);
+    background: #F8FAFC;
+    border-bottom: 1px solid var(--gov-border);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+.gov-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #F1F5F9;
+    color: #334155;
+    vertical-align: middle;
+}
+.gov-table tr:last-child td {
+    border-bottom: none;
+}
+.gov-table tr:hover td {
+    background: #F8FAFC;
+}
+
+.gov-badge-official {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #DCFCE7;
+    color: #166534;
+    border: 1px solid #BBF7D0;
+}
+.gov-badge-manual {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+}
+
+/* Code Pills */
+.gov-code-pill {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 11px;
+    color: #2563EB;
+    background: #EFF6FF;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #BFDBFE;
+    display: inline-block;
+}
+
+/* Severity Pills */
+.gov-sev-critical {
+    background: #FEE2E2;
+    color: #991B1B;
+    border: 1px solid #FCA5A5;
+    font-weight: 700;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+.gov-sev-high {
+    background: #FFEDD5;
+    color: #9A3412;
+    border: 1px solid #FDBA74;
+    font-weight: 700;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+.gov-sev-medium {
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FCD34D;
+    font-weight: 600;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+
+/* Architecture Blueprint Section */
+.gov-arch-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding: 20px;
+}
+.gov-arch-card {
+    border: 1px solid var(--gov-border);
+    border-radius: 8px;
+    padding: 18px;
+    background: #FFFFFF;
+    position: relative;
+}
+.gov-arch-card.tier-1 { border-top: 4px solid #2563EB; }
+.gov-arch-card.tier-2 { border-top: 4px solid #15803D; }
+.gov-arch-card.tier-3 { border-top: 4px solid #7C3AED; }
+
+.gov-arch-step {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+}
+.gov-arch-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gov-text-main);
+    margin-bottom: 8px;
+}
+.gov-arch-desc {
+    font-size: 12px;
+    color: var(--gov-text-muted);
+    line-height: 1.4;
+    margin-bottom: 14px;
+}
+.gov-arch-table-name {
+    font-family: monospace;
+    font-size: 11px;
+    background: #F8FAFC;
+    border: 1px solid var(--gov-border);
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #334155;
+    display: inline-block;
+}
+
+/* Empty State Card */
+.gov-empty-box {
+    padding: 42px 20px;
+    text-align: center;
+    color: var(--gov-text-muted);
+}
+.gov-empty-box i {
+    font-size: 32px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .gov-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .gov-arch-grid {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 768px) {
+    .gov-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+    .gov-hero-strip {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .gov-actions-group {
+        width: 100%;
+    }
+    .gov-btn {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="content-container">
-    <!-- Header Strip -->
-    <div class="dashboard-header-strip">
-        <div class="header-left-meta">
-            <span class="live-stream-badge">
-                <span class="pulse-dot"></span>
-                <span>PostgreSQL Lineage Active</span>
+<div class="data-gov-container">
+
+    <!-- 1. Hero Governance Header Strip -->
+    <div class="gov-hero-strip">
+        <div class="gov-meta-badges">
+            <span class="gov-live-badge">
+                <span class="gov-pulse-dot"></span>
+                <span>PostgreSQL 16 Lineage Active</span>
             </span>
-            <span class="header-coverage-tag"><strong>{{ total_validated_obs|default:0 }}</strong> Verified Survey Observations</span>
+            <span class="gov-stat-tag">
+                <strong>{{ total_validated_obs|default:0 }}</strong> Verified Observations
+            </span>
+            <span class="gov-security-badge">
+                <i class="fa-solid fa-shield-halved"></i> Strictly Segregated
+            </span>
         </div>
-        <div class="header-right-tools">
-            <a href="{% url 'data_management:data_source_create' %}" class="btn-action primary">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <div class="gov-actions-group">
+            <a href="{% url 'data_management:data_source_create' %}" class="gov-btn gov-btn-primary">
+                <i class="fa-solid fa-plus"></i>
                 <span>Register Data Source</span>
             </a>
-            <a href="{% url 'data_management:manual_entry_create' %}" class="btn-action secondary">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <a href="{% url 'data_management:manual_entry_create' %}" class="gov-btn gov-btn-secondary">
+                <i class="fa-solid fa-pen-to-square"></i>
                 <span>New Manual Record</span>
             </a>
-            <a href="{% url 'data_management:manual_entry_list' %}" class="btn-action">
-                <span>View Manual Registry &rarr;</span>
+            <a href="{% url 'data_management:manual_entry_list' %}" class="gov-btn gov-btn-outline">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Manual Registry ({{ manual_counts.total|default:0 }}) &rarr;</span>
             </a>
         </div>
     </div>
 
-    <!-- KPI Grid -->
-    <section class="metrics-grid">
-        <div class="metric-card card-nisr-blue">
-            <div class="metric-card-header">
-                <span class="metric-label">Verified Microdata</span>
-                <span class="badge-dot" style="background:#2563EB;"></span>
+    <!-- 2. Top Metric KPI Cards -->
+    <div class="gov-kpi-grid">
+        <!-- Card 1: Verified Survey Microdata -->
+        <div class="gov-kpi-card">
+            <div>
+                <div class="gov-kpi-top">
+                    <div class="gov-kpi-icon-wrap" style="background:#EFF6FF; color:#2563EB;">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+                    <span class="gov-kpi-title">Verified Microdata</span>
+                </div>
+                <div class="gov-kpi-val">{{ total_validated_obs|default:0 }}</div>
+                <div class="gov-kpi-sub">Strictly isolated official NISR survey observations</div>
             </div>
-            <div class="metric-value">{{ total_validated_obs|default:0 }}</div>
-            <div class="metric-sub">Strictly isolated official survey observations</div>
-            <div class="metric-footer">
-                <span class="metric-status blue">100% Traceable</span>
-            </div>
-        </div>
-
-        <div class="metric-card card-nisr-yellow">
-            <div class="metric-card-header">
-                <span class="metric-label">Review Queue</span>
-                <span class="badge-dot" style="background:#F3EA00;"></span>
-            </div>
-            <div class="metric-value">{{ manual_counts.pending|default:0 }}</div>
-            <div class="metric-sub">Manual observations awaiting authority sign-off</div>
-            <div class="metric-footer">
-                <span class="metric-status yellow">Vetting Lifecycle</span>
+            <div class="gov-kpi-tag-row">
+                <span class="gov-pill-badge gov-pill-blue"><i class="fa-solid fa-check-double"></i> 100% Traceable</span>
+                <span class="gov-pill-badge gov-pill-gray">Tier 2 Validated</span>
             </div>
         </div>
 
-        <div class="metric-card card-nisr-green">
-            <div class="metric-card-header">
-                <span class="metric-label">Approved Manual Entries</span>
-                <span class="badge-dot" style="background:#46962B;"></span>
+        <!-- Card 2: Manual Review Queue -->
+        <div class="gov-kpi-card">
+            <div>
+                <div class="gov-kpi-top">
+                    <div class="gov-kpi-icon-wrap" style="background:#FFFBEB; color:#D97706;">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <span class="gov-kpi-title">Review Queue</span>
+                </div>
+                <div class="gov-kpi-val" style="color: {% if manual_counts.pending > 0 %}#D97706{% else %}var(--gov-text-main){% endif %};">
+                    {{ manual_counts.pending|default:0 }}
+                </div>
+                <div class="gov-kpi-sub">Field submissions awaiting authority sign-off</div>
             </div>
-            <div class="metric-value">{{ manual_counts.approved|default:0 }}</div>
-            <div class="metric-sub">Vetted agricultural field reports</div>
-            <div class="metric-footer">
-                <span class="metric-status green">Isolated from Survey Stats</span>
+            <div class="gov-kpi-tag-row">
+                {% if manual_counts.pending > 0 %}
+                <span class="gov-pill-badge gov-pill-amber"><i class="fa-solid fa-circle-exclamation"></i> Action Required</span>
+                {% else %}
+                <span class="gov-pill-badge gov-pill-green"><i class="fa-solid fa-circle-check"></i> Queue Clear</span>
+                {% endif %}
+                <span class="gov-pill-badge gov-pill-gray">Vetting Lifecycle</span>
             </div>
         </div>
 
-        <div class="metric-card card-nisr-cyan">
-            <div class="metric-card-header">
-                <span class="metric-label">Draft Submissions</span>
-                <span class="badge-dot" style="background:#00AEEF;"></span>
+        <!-- Card 3: Approved Manual Entries -->
+        <div class="gov-kpi-card">
+            <div>
+                <div class="gov-kpi-top">
+                    <div class="gov-kpi-icon-wrap" style="background:#F0FDF4; color:#15803D;">
+                        <i class="fa-solid fa-shield-check"></i>
+                    </div>
+                    <span class="gov-kpi-title">Approved Field Entries</span>
+                </div>
+                <div class="gov-kpi-val">{{ manual_counts.approved|default:0 }}</div>
+                <div class="gov-kpi-sub">Vetted agricultural extension &amp; cooperative reports</div>
             </div>
-            <div class="metric-value">{{ manual_counts.draft|default:0 }}</div>
-            <div class="metric-sub">Unsubmitted field entries in progress</div>
-            <div class="metric-footer">
-                <span class="metric-status cyan">Draft State</span>
+            <div class="gov-kpi-tag-row">
+                <span class="gov-pill-badge gov-pill-green"><i class="fa-solid fa-lock"></i> Isolated from SAS Stats</span>
+                <span class="gov-pill-badge gov-pill-gray">Vetted Records</span>
             </div>
         </div>
-    </section>
 
-    <!-- Dynamic Data Sources Registry -->
-    <div class="panel-card">
-        <div class="panel-header">
-            <div class="panel-title-group">
-                <h3>Active Data Sources &amp; Provenance Registry</h3>
-                <p class="panel-subtitle">Dynamic registration of statistical surveys, administrative records, cooperative reports, and manual submissions</p>
+        <!-- Card 4: Data Quality & Plausibility -->
+        <div class="gov-kpi-card">
+            <div>
+                <div class="gov-kpi-top">
+                    <div class="gov-kpi-icon-wrap" style="background:#FAF5FF; color:#7C3AED;">
+                        <i class="fa-solid fa-shield-virus"></i>
+                    </div>
+                    <span class="gov-kpi-title">Data Quality Guardrails</span>
+                </div>
+                <div class="gov-kpi-val" style="color: {% if qa_issues %}#D97706{% else %}#15803D{% endif %};">
+                    {% if qa_issues %}{{ qa_issues|length }} Flags{% else %}100% Nominal{% endif %}
+                </div>
+                <div class="gov-kpi-sub">Automated boundary &amp; statistical plausibility audits</div>
             </div>
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <span class="panel-badge blue">{{ data_sources|length }} Sources</span>
-                <a href="{% url 'data_management:data_source_create' %}" class="btn-action primary" style="font-size: 0.8rem; padding: 6px 14px;">
-                    + Register New Source
-                </a>
+            <div class="gov-kpi-tag-row">
+                {% if qa_issues %}
+                <span class="gov-pill-badge gov-pill-amber"><i class="fa-solid fa-triangle-exclamation"></i> Quality Flags Active</span>
+                {% else %}
+                <span class="gov-pill-badge gov-pill-green"><i class="fa-solid fa-circle-check"></i> Zero Outliers</span>
+                {% endif %}
+                <span class="gov-pill-badge gov-pill-purple">Rule Enforced</span>
             </div>
         </div>
-        <div class="panel-body no-padding">
-            <div class="table-responsive">
-                <table class="lineage-table">
+    </div>
+
+    <!-- 3. Subtab Navigation Bar -->
+    <div class="gov-subtab-bar">
+        <div class="gov-subtab-list">
+            <button class="gov-subtab-btn active" data-tab="tab-sources" onclick="switchGovTab('tab-sources')">
+                <i class="fa-solid fa-database"></i>
+                <span>Active Data Sources</span>
+                <span class="gov-tab-count">{{ data_sources|length }}</span>
+            </button>
+            <button class="gov-subtab-btn" data-tab="tab-batches" onclick="switchGovTab('tab-batches')">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>ETL Ingestion Ledger</span>
+                <span class="gov-tab-count">{{ batches|length }}</span>
+            </button>
+            <button class="gov-subtab-btn" data-tab="tab-quality" onclick="switchGovTab('tab-quality')">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Quality &amp; Plausibility Flags</span>
+                <span class="gov-tab-count">{{ qa_issues|length }}</span>
+            </button>
+            <button class="gov-subtab-btn" data-tab="tab-architecture" onclick="switchGovTab('tab-architecture')">
+                <i class="fa-solid fa-diagram-project"></i>
+                <span>Lineage Architecture</span>
+            </button>
+        </div>
+
+        <div style="font-size: 11px; color: var(--gov-text-muted);">
+            <i class="fa-solid fa-lock" style="color: var(--gov-primary); margin-right: 4px;"></i>
+            <span>Tiered Ingestion &amp; Row-Level Immutability</span>
+        </div>
+    </div>
+
+    <!-- 4. Tab Content: Data Sources & Provenance Registry -->
+    <div class="gov-tab-content active" id="tab-sources">
+        <div class="gov-panel-card">
+            <div class="gov-panel-header">
+                <div class="gov-panel-title-block">
+                    <h3><i class="fa-solid fa-database" style="color:var(--gov-primary);"></i> Dynamic Data Sources &amp; Provenance Registry</h3>
+                    <p>Registration of official surveys, administrative censuses, cooperative reports, and manual submissions</p>
+                </div>
+                <div class="gov-panel-tools">
+                    <div class="gov-search-wrap">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="sourceSearchInput" class="gov-search-input" placeholder="Search data sources..." oninput="filterSourcesTable()">
+                    </div>
+                    <a href="{% url 'data_management:data_source_create' %}" class="gov-btn gov-btn-primary" style="padding: 6px 14px; font-size: 11px;">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Register New Source</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="gov-table-container">
+                <table class="gov-table" id="sourcesTable">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th style="width: 60px;">ID</th>
                             <th>Source Name</th>
                             <th>Identifier Slug</th>
                             <th>Kind of Data</th>
                             <th>Year</th>
                             <th>Season</th>
                             <th>Organization</th>
-                            <th>Provenance Classification</th>
+                            <th>Classification</th>
                             <th style="text-align: right;">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="sourcesTableBody">
                         {% for ds in data_sources %}
-                        <tr>
+                        <tr class="source-row" data-text="{{ ds.name }} {{ ds.source_type }} {{ ds.organization }} {{ ds.get_data_kind_display }}">
                             <td style="font-weight: 700; color: #2563EB;">#{{ ds.id }}</td>
-                            <td style="font-weight: 700; color: #0F172A;">{{ ds.name }}</td>
-                            <td>
-                                <code style="font-family: monospace; font-size: 0.8rem; color: #2563EB; background: #EFF6FF; padding: 2px 6px; border-radius: 4px; border: 1px solid #BFDBFE;">{{ ds.source_type }}</code>
+                            <td style="font-weight: 700; color: #0F172A;">
+                                <div>{{ ds.name }}</div>
+                                {% if ds.description %}
+                                <div style="font-size: 11px; font-weight: 400; color: #64748B; margin-top: 2px;">{{ ds.description|truncatewords:10 }}</div>
+                                {% endif %}
                             </td>
                             <td>
-                                <span class="panel-badge cyan">{{ ds.get_data_kind_display }}</span>
+                                <span class="gov-code-pill">{{ ds.source_type }}</span>
+                            </td>
+                            <td>
+                                <span class="gov-pill-badge gov-pill-blue">{{ ds.get_data_kind_display }}</span>
                             </td>
                             <td style="font-weight: 600;">{{ ds.year|default:"All / N/A" }}</td>
                             <td>{{ ds.season|default:"All" }}</td>
                             <td style="color: #64748B;">{{ ds.organization|default:"Official NISR" }}</td>
                             <td>
                                 {% if ds.is_official_survey %}
-                                    <span class="status-pill verified">Official NISR</span>
+                                    <span class="gov-badge-official"><i class="fa-solid fa-shield-check"></i> Official NISR</span>
                                 {% else %}
-                                    <span class="status-pill pending">Manual / Extension</span>
+                                    <span class="gov-badge-manual"><i class="fa-solid fa-pen"></i> Manual / Field</span>
                                 {% endif %}
                             </td>
                             <td style="text-align: right; white-space: nowrap;">
                                 {% if request.user.is_authenticated %}
-                                <a href="{% url 'data_management:data_source_edit' pk=ds.pk %}" class="btn-action" style="padding: 4px 10px; font-size: 0.78rem; margin-right: 6px; color: #15803D;">Edit</a>
-                                <form method="POST" action="{% url 'data_management:data_source_delete' pk=ds.pk %}" style="display: inline;" onsubmit="return confirm('Delete data source \'{{ ds.name|escapejs }}\'?');">
+                                <a href="{% url 'data_management:data_source_edit' pk=ds.pk %}" class="gov-btn gov-btn-secondary" style="padding: 4px 10px; font-size: 11px; margin-right: 6px;">
+                                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                                </a>
+                                <form method="POST" action="{% url 'data_management:data_source_delete' pk=ds.pk %}" style="display: inline;" onsubmit="return confirm('Delete data source \'{{ ds.name|escapejs }}\'? All related staging batches will be protected.');">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn-action danger" style="padding: 4px 10px; font-size: 0.78rem;">Delete</button>
+                                    <button type="submit" class="gov-btn gov-btn-secondary" style="padding: 4px 10px; font-size: 11px; color: #DC2626; border-color: #FECACA;">
+                                        <i class="fa-solid fa-trash-can"></i> Delete
+                                    </button>
                                 </form>
                                 {% else %}
-                                <span style="color: #94A3B8; font-size: 0.8rem;">Read-only</span>
+                                <span style="color: #94A3B8; font-size: 11px;">Read-only</span>
                                 {% endif %}
                             </td>
                         </tr>
                         {% empty %}
-                        <tr>
-                            <td colspan="9" style="padding: 32px; text-align: center; color: #94A3B8;">No data sources registered yet.</td>
+                        <tr id="sourcesEmptyRow">
+                            <td colspan="9">
+                                <div class="gov-empty-box">
+                                    <i class="fa-solid fa-inbox" style="color: #CBD5E1;"></i>
+                                    <div>No data sources registered in the database yet.</div>
+                                </div>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -154,61 +821,84 @@
         </div>
     </div>
 
-    <!-- Recent Import Batches -->
-    <div class="panel-card">
-        <div class="panel-header">
-            <div class="panel-title-group">
-                <h3>Recent Ingestion Batches</h3>
-                <p class="panel-subtitle">ETL ingestion log &amp; microdata row integrity ledger</p>
+    <!-- 5. Tab Content: ETL Ingestion Ledger -->
+    <div class="gov-tab-content" id="tab-batches" style="display: none;">
+        <div class="gov-panel-card">
+            <div class="gov-panel-header">
+                <div class="gov-panel-title-block">
+                    <h3><i class="fa-solid fa-layer-group" style="color:var(--gov-primary);"></i> Recent Ingestion Batches &amp; ETL Ledger</h3>
+                    <p>Row integrity ledger tracking accepted microdata rows, boundary violations, and ingestion status</p>
+                </div>
+                <div class="gov-panel-tools">
+                    <div class="gov-search-wrap">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="batchSearchInput" class="gov-search-input" placeholder="Search batch or filename..." oninput="filterBatchesTable()">
+                    </div>
+                    <span class="gov-pill-badge gov-pill-green"><i class="fa-solid fa-shield-check"></i> PostgreSQL ACID Ledger</span>
+                </div>
             </div>
-            <span class="panel-badge green">ETL Ledger</span>
-        </div>
-        <div class="panel-body no-padding">
-            <div class="table-responsive">
-                <table class="lineage-table">
+
+            <div class="gov-table-container">
+                <table class="gov-table" id="batchesTable">
                     <thead>
                         <tr>
-                            <th>Batch ID</th>
-                            <th>Source</th>
-                            <th>Filename</th>
+                            <th style="width: 70px;">Batch ID</th>
+                            <th>Data Source</th>
+                            <th>Source Filename</th>
                             <th>Total Rows</th>
-                            <th>Accepted</th>
+                            <th>Accepted Ratio</th>
                             <th>Rejected</th>
-                            <th>Started At</th>
-                            <th>Status</th>
+                            <th>Ingestion Date</th>
+                            <th style="text-align: right;">Status</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="batchesTableBody">
                         {% for b in batches %}
-                        <tr>
+                        <tr class="batch-row" data-text="{{ b.id }} {{ b.source.source_type }} {{ b.filename }} {{ b.status }}">
                             <td style="font-weight: 700; color: #0F172A;">#{{ b.id }}</td>
                             <td>
-                                <code style="font-family: monospace; font-size: 0.78rem; color: #2563EB; background: #EFF6FF; padding: 2px 6px; border-radius: 4px; border: 1px solid #BFDBFE;">{{ b.source.source_type }}</code>
+                                <span class="gov-code-pill">{{ b.source.source_type }}</span>
                             </td>
-                            <td style="font-family: monospace; font-size: 0.82rem; color: #334155;">{{ b.filename }}</td>
-                            <td style="font-weight: 600;">{{ b.total_rows }}</td>
-                            <td><strong style="color: #16A34A;">{{ b.rows_accepted }}</strong></td>
+                            <td style="font-family: monospace; font-size: 12px; color: #334155; font-weight: 500;">
+                                <i class="fa-regular fa-file-lines" style="color:#64748B; margin-right:4px;"></i>{{ b.filename }}
+                            </td>
+                            <td style="font-weight: 700;">{{ b.total_rows }}</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <strong style="color: #16A34A; font-feature-settings: 'tnum'; min-width: 45px;">{{ b.rows_accepted }}</strong>
+                                    {% if b.total_rows > 0 %}
+                                    <div style="flex: 1; max-width: 90px; height: 5px; background: #E2E8F0; border-radius: 3px; overflow: hidden;">
+                                        <div style="width: {% widthratio b.rows_accepted b.total_rows 100 %}%; height: 100%; background: #16A34A;"></div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </td>
                             <td>
                                 {% if b.rows_rejected > 0 %}
-                                    <strong style="color: #DC2626;">{{ b.rows_rejected }}</strong>
+                                    <strong style="color: #DC2626; font-feature-settings: 'tnum';">{{ b.rows_rejected }}</strong>
                                 {% else %}
                                     <span style="color: #94A3B8;">0</span>
                                 {% endif %}
                             </td>
-                            <td style="color: #64748B; font-size: 0.82rem;">{{ b.started_at|date:"M d, Y H:i" }}</td>
-                            <td>
+                            <td style="color: #64748B; font-size: 11px;">{{ b.started_at|date:"M d, Y H:i" }}</td>
+                            <td style="text-align: right;">
                                 {% if b.status == 'SUCCESS' %}
-                                    <span class="status-pill approved">Completed</span>
+                                    <span class="gov-badge-official"><i class="fa-solid fa-circle-check"></i> Completed</span>
                                 {% elif b.status == 'PARTIAL' %}
-                                    <span class="status-pill pending">With Warnings</span>
+                                    <span class="gov-badge-manual"><i class="fa-solid fa-triangle-exclamation"></i> With Warnings</span>
                                 {% else %}
-                                    <span class="status-pill rejected">{{ b.status }}</span>
+                                    <span class="gov-sev-critical">{{ b.status }}</span>
                                 {% endif %}
                             </td>
                         </tr>
                         {% empty %}
-                        <tr>
-                            <td colspan="8" style="padding: 32px; text-align: center; color: #94A3B8;">No import batches recorded yet.</td>
+                        <tr id="batchesEmptyRow">
+                            <td colspan="8">
+                                <div class="gov-empty-box">
+                                    <i class="fa-solid fa-file-excel" style="color: #CBD5E1;"></i>
+                                    <div>No import batches recorded yet.</div>
+                                </div>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -217,26 +907,29 @@
         </div>
     </div>
 
-    <!-- Data Quality Outliers Log -->
-    <div class="panel-card">
-        <div class="panel-header">
-            <div class="panel-title-group">
-                <h3>Data Quality &amp; Plausibility Flags</h3>
-                <p class="panel-subtitle">Automated statistical anomaly detection &amp; boundary variance audits</p>
+    <!-- 6. Tab Content: Quality & Plausibility Flags -->
+    <div class="gov-tab-content" id="tab-quality" style="display: none;">
+        <div class="gov-panel-card">
+            <div class="gov-panel-header">
+                <div class="gov-panel-title-block">
+                    <h3><i class="fa-solid fa-shield-virus" style="color:var(--gov-primary);"></i> Data Quality &amp; Plausibility Audit Flags</h3>
+                    <p>Automated statistical anomaly detection, biological yield boundaries, and provenance variance checks</p>
+                </div>
+                <div class="gov-panel-tools">
+                    <span class="gov-pill-badge gov-pill-purple"><i class="fa-solid fa-bolt"></i> Real-time Evaluation</span>
+                </div>
             </div>
-            <span class="panel-badge yellow">QA Flags</span>
-        </div>
-        <div class="panel-body no-padding">
-            <div class="table-responsive">
-                <table class="lineage-table">
+
+            <div class="gov-table-container">
+                <table class="gov-table">
                     <thead>
                         <tr>
-                            <th>Severity</th>
+                            <th style="width: 90px;">Severity</th>
                             <th>Dataset</th>
                             <th>Variable</th>
-                            <th>Reference</th>
+                            <th>Record Reference</th>
                             <th>Issue Description</th>
-                            <th>Action Recommended</th>
+                            <th>Recommended Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -244,28 +937,35 @@
                         <tr>
                             <td>
                                 {% if q.severity == 'CRITICAL' %}
-                                    <span class="status-pill rejected">CRITICAL</span>
+                                    <span class="gov-sev-critical"><i class="fa-solid fa-circle-xmark"></i> CRITICAL</span>
                                 {% elif q.severity == 'HIGH' %}
-                                    <span class="status-pill pending" style="background: #FFEDD5; color: #9A3412; border-color: #FDBA74;">HIGH</span>
+                                    <span class="gov-sev-high"><i class="fa-solid fa-triangle-exclamation"></i> HIGH</span>
                                 {% else %}
-                                    <span class="status-pill pending">MEDIUM</span>
+                                    <span class="gov-sev-medium"><i class="fa-solid fa-circle-info"></i> MEDIUM</span>
                                 {% endif %}
                             </td>
                             <td>
-                                <code style="font-family: monospace; font-size: 0.8rem; color: #001F3B;">{{ q.dataset_name }}</code>
+                                <span class="gov-code-pill">{{ q.dataset_name }}</span>
                             </td>
                             <td style="font-weight: 700; color: #0F172A;">{{ q.variable_name }}</td>
-                            <td style="color: #64748B; font-size: 0.82rem;">{{ q.record_reference }}</td>
-                            <td style="font-size: 0.84rem; color: #334155;">{{ q.description }}</td>
+                            <td style="color: #64748B; font-family: monospace; font-size: 11px;">{{ q.record_reference }}</td>
+                            <td style="color: #334155;">{{ q.description }}</td>
                             <td>
-                                <span style="color: #2563EB; font-weight: 600; font-size: 0.82rem;">{{ q.recommended_action }}</span>
+                                <span style="color: #2563EB; font-weight: 600; font-size: 11px;">
+                                    <i class="fa-solid fa-arrow-right" style="margin-right:4px;"></i>{{ q.recommended_action }}
+                                </span>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" style="padding: 32px; text-align: center; color: #16A34A; font-weight: 600;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="vertical-align: middle; margin-right: 6px;"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                                Zero unhandled data quality flags. Statistical integrity nominal.
+                            <td colspan="6" style="padding: 40px 20px; text-align: center;">
+                                <div style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: #DCFCE7; color: #166534; font-size: 20px; margin-bottom: 12px;">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                </div>
+                                <div style="font-weight: 700; font-size: 14px; color: #15803D; margin-bottom: 4px;">Zero Unhandled Data Quality Flags</div>
+                                <div style="font-size: 12px; color: #64748B; max-width: 520px; margin: 0 auto;">
+                                    Statistical plausibility and agronomic boundary checks nominal. Microdata conforms to NISR validation rules.
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
@@ -274,5 +974,145 @@
             </div>
         </div>
     </div>
+
+    <!-- 7. Tab Content: Lineage Architecture Blueprint -->
+    <div class="gov-tab-content" id="tab-architecture" style="display: none;">
+        <div class="gov-panel-card">
+            <div class="gov-panel-header">
+                <div class="gov-panel-title-block">
+                    <h3><i class="fa-solid fa-diagram-project" style="color:var(--gov-primary);"></i> 3-Tier Sovereign Agricultural Data Pipeline</h3>
+                    <p>Architectural segregation of raw surveys, verified domain observations, and policy-grade aggregates</p>
+                </div>
+                <span class="gov-pill-badge gov-pill-blue"><i class="fa-solid fa-shield-halved"></i> Governance Standard</span>
+            </div>
+
+            <div class="gov-arch-grid">
+                <!-- Tier 1 -->
+                <div class="gov-arch-card tier-1">
+                    <div class="gov-arch-step" style="color: #2563EB;">Tier 1 &bull; Ingestion &amp; Raw Staging</div>
+                    <div class="gov-arch-title">Raw Microdata Staging</div>
+                    <div class="gov-arch-desc">
+                        Verbatim ingestion of raw NISR SAS/AHS survey dumps and field records. Preserves source row indexes, unconstrained variables, and checksum ledger without altering raw values.
+                    </div>
+                    <div class="gov-arch-table-name">apps_data_management_stagingsasproduction</div>
+                </div>
+
+                <!-- Tier 2 -->
+                <div class="gov-arch-card tier-2">
+                    <div class="gov-arch-step" style="color: #15803D;">Tier 2 &bull; Verification &amp; Segregation</div>
+                    <div class="gov-arch-title">Validated Domain Observations</div>
+                    <div class="gov-arch-desc">
+                        Rigorous schema normalization and foreign key constraints across Rwanda's 30 districts, seasons, and priority crops. Strict provenance tagging isolates official NISR statistics from manual field submissions.
+                    </div>
+                    <div class="gov-arch-table-name">apps_data_management_validatedobservation</div>
+                </div>
+
+                <!-- Tier 3 -->
+                <div class="gov-arch-card tier-3">
+                    <div class="gov-arch-step" style="color: #7C3AED;">Tier 3 &bull; Intelligence &amp; Analytics</div>
+                    <div class="gov-arch-title">Decision Intelligence Layer</div>
+                    <div class="gov-arch-desc">
+                        Computed productivity benchmarks, provincial yield gaps, ML typologies, and market price surveillance. Serves the National Dashboard, Minister's Brief, and bank/insurance APIs with audit lineage.
+                    </div>
+                    <div class="gov-arch-table-name">apps_indicators_aggregatedindicator</div>
+                </div>
+            </div>
+
+            <!-- Guarantee Principles -->
+            <div style="border-top: 1px solid var(--gov-border); padding: 18px 20px; background: #FAFAFA; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <i class="fa-solid fa-shield-halved" style="color: #15803D; font-size: 16px; margin-top: 2px;"></i>
+                    <div>
+                        <strong style="font-size: 12px; color: #0F172A; display: block;">Strict Statistical Segregation</strong>
+                        <span style="font-size: 11px; color: #64748B;">Manual farmer entries are strictly quarantined and never contaminate official NISR survey statistics without formal clearance.</span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <i class="fa-solid fa-link" style="color: #2563EB; font-size: 16px; margin-top: 2px;"></i>
+                    <div>
+                        <strong style="font-size: 12px; color: #0F172A; display: block;">End-to-End Data Lineage</strong>
+                        <span style="font-size: 11px; color: #64748B;">Every observation links back to its parent ETL batch, source CSV filename, ingestion timestamp, and cryptographic hash.</span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <i class="fa-solid fa-user-shield" style="color: #7C3AED; font-size: 16px; margin-top: 2px;"></i>
+                    <div>
+                        <strong style="font-size: 12px; color: #0F172A; display: block;">Institutional Clearance Workflow</strong>
+                        <span style="font-size: 11px; color: #64748B;">Multi-stage review lifecycle (Draft &rarr; Submitted &rarr; Approved/Rejected) enforced by role-based access control.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// --- Tab Switching Logic ---
+function switchGovTab(targetTabId) {
+    document.querySelectorAll('.gov-subtab-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-tab') === targetTabId) {
+            btn.classList.add('active');
+        }
+    });
+
+    document.querySelectorAll('.gov-tab-content').forEach(function(content) {
+        content.style.display = 'none';
+        content.classList.remove('active');
+    });
+
+    var activeEl = document.getElementById(targetTabId);
+    if (activeEl) {
+        activeEl.style.display = 'block';
+        activeEl.classList.add('active');
+    }
+}
+
+// --- Live Filter on Data Sources Table ---
+function filterSourcesTable() {
+    var query = (document.getElementById('sourceSearchInput').value || '').toLowerCase().trim();
+    var rows = document.querySelectorAll('#sourcesTableBody .source-row');
+    var visibleCount = 0;
+
+    rows.forEach(function(row) {
+        var text = (row.getAttribute('data-text') || row.textContent).toLowerCase();
+        if (!query || text.indexOf(query) !== -1) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    var emptyRow = document.getElementById('sourcesEmptyRow');
+    if (emptyRow) {
+        emptyRow.style.display = (visibleCount === 0 && rows.length > 0) ? '' : 'none';
+    }
+}
+
+// --- Live Filter on Ingestion Batches Table ---
+function filterBatchesTable() {
+    var query = (document.getElementById('batchSearchInput').value || '').toLowerCase().trim();
+    var rows = document.querySelectorAll('#batchesTableBody .batch-row');
+    var visibleCount = 0;
+
+    rows.forEach(function(row) {
+        var text = (row.getAttribute('data-text') || row.textContent).toLowerCase();
+        if (!query || text.indexOf(query) !== -1) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    var emptyRow = document.getElementById('batchesEmptyRow');
+    if (emptyRow) {
+        emptyRow.style.display = (visibleCount === 0 && rows.length > 0) ? '' : 'none';
+    }
+}
+</script>
 {% endblock %}

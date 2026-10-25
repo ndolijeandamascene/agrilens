@@ -1,0 +1,14 @@
+================================================================================
+AGRILENS RWANDA — National Agricultural Intelligence Platform
+National Institute of Statistics of Rwanda (NISR) • MINAGRI
+================================================================================
+
+{{ subject|default:"AgriLens Notification" }}
+
+{% block content %}{% endblock %}
+
+--------------------------------------------------------------------------------
+This is an official automated notification from AgriLens Rwanda.
+Manage your notification preferences: {{ preferences_url|default:"https://agrilens.ndoli.dev/notifications/preferences/" }}
+(c) {{ current_year|default:2026 }} AgriLens Rwanda. All rights reserved.
+================================================================================

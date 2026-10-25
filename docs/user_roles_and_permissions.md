@@ -1,17 +1,16 @@
-# AgriLens User Management, Roles &amp; Permissions
+# AgriLens User Management, Roles & Permissions
 
 **Platform:** AgriLens &bull; See Agriculture Through Data  
 **Event:** 2026 NISR Big Data Hackathon &bull; Track 1: Agricultural Productivity  
-**Milestone:** Milestone 4: Dashboard Navigation, User Management &amp; Role-Based Access Control  
-**Document Version:** 1.0 &bull; October 2026  
+**Document Version:** 2.0 &bull; Updated for Complete Notification, Password Security & RBAC Workflows  
 
 ---
 
 ## 1. Institutional Role Architecture
 
-AgriLens defines seven primary institutional roles structured according to NISR, MINAGRI, and local government hierarchies in Rwanda, plus an unauthenticated Public Visitor tier:
+AgriLens defines seven primary institutional roles structured according to NISR, MINAGRI, and decentralized administrative governance in Rwanda, plus an unauthenticated Public Visitor tier:
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────────────┐
 │                        AgriLens Institutional Hierarchy                │
 ├────────────────────────────────┬───────────────────────────────────────┤
@@ -29,12 +28,12 @@ AgriLens defines seven primary institutional roles structured according to NISR,
 └────────────────────────────────┴───────────────────────────────────────┘
 ```
 
-### Role Descriptions &amp; Responsibilities
+### Role Descriptions & Responsibilities
 
 | Role Identifier | Display Title | Jurisdiction | Primary Responsibilities |
 | :--- | :--- | :--- | :--- |
-| `ADMIN` | Administrator | National | Full institutional governance, user onboarding, role &amp; geographic assignments, system audit logs. |
-| `NISR_DATA_MANAGER`| NISR Data Manager | National | Ingestion pipelines, survey weight auditing, batch reconciliation, QA issue tracking, dynamic data sources. |
+| `ADMIN` | Administrator | National | Full institutional governance, user onboarding, role & geographic assignments, security audits, broadcast announcements. |
+| `NISR_DATA_MANAGER`| NISR Data Manager | National | Ingestion pipelines, survey weight auditing, batch reconciliation, QA issue tracking, data source validation. |
 | `ANALYST` | Agricultural Analyst | National | Yield gap modeling, indicator analytics, benchmark rankings, crop productivity assessments, report exports. |
 | `NATIONAL_OFFICER` | National Agricultural Officer | National | Policy decision-support, national bulletin generation, high-level priority crop monitoring. |
 | `DISTRICT_OFFICER` | District Agricultural Officer | District Scoped | District-level performance dossiers, local manual observation submission, sector performance monitoring. |
@@ -46,7 +45,7 @@ AgriLens defines seven primary institutional roles structured according to NISR,
 
 ## 2. Backward Compatibility with Legacy Roles
 
-To preserve 100% backward compatibility with pre-existing database records, sessions, and tests, legacy role aliases are explicitly mapped to canonical institutional roles in `User.Role`:
+To preserve 100% backward compatibility with pre-existing database records, sessions, and automated tests, legacy role aliases are explicitly mapped to canonical institutional roles in `User.Role`:
 
 ```python
 class Role(models.TextChoices):
@@ -75,16 +74,15 @@ class Role(models.TextChoices):
 
 ## 3. Server-Side Security Guards
 
-### A. Conflict-of-Interest &amp; Self-Approval Guard (Condition 5)
+### A. Conflict-of-Interest & Self-Approval Guard
 Officers with reviewer privileges cannot approve their own submissions:
 ```python
-# Self-Approval Conflict of Interest Guard (Milestone 4 Condition 5)
 if entry.created_by == request.user and not request.user.is_superuser:
     messages.error(request, "Conflict of Interest Guard: You cannot review or approve your own manual submissions.")
     return redirect('data_management:manual_entry_detail', pk=entry.pk)
 ```
 
-### B. Administrator Self-Lockout Prevention (Condition 5)
+### B. Administrator Self-Lockout Prevention
 Administrators cannot deactivate their own account or remove their own administrative privileges:
 ```python
 if request.user.pk == officer.pk:
@@ -97,31 +95,49 @@ Non-superusers cannot grant `is_superuser` status or assign roles higher than th
 
 ---
 
-## 4. Single-Use Password Setup Workflow (Condition 6)
+## 4. Single-Use Password Setup & Self-Service Account Security
 
-In strict compliance with Milestone 4 Condition 6, raw passwords are **never** displayed to administrators, returned in HTTP responses, or stored in plaintext:
+AgriLens strictly enforces zero-plaintext credential handling:
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor Admin as Administrator
     participant Sys as AgriLens Core
+    participant Worker as Async Email Worker
     actor Officer as New Officer
     
     Admin->>Sys: Submit officer registration (/accounts/users/new/)
     Note over Sys: Creates user shell with unusable password<br/>Generates signed token via default_token_generator
-    Sys-->>Admin: Display single-use setup link (copyable)
-    Admin->>Officer: Transmit secure link via official agency channel
-    Officer->>Sys: Click link (/accounts/users/setup-password/<uidb64>/<token>/)
+    Sys->>Worker: Dispatch user_creation_setup_email task
+    Worker-->>Officer: Deliver email with secure single-use link
+    Officer->>Sys: Click link (/accounts/set-password/<uidb64>/<token>/)
     Note over Sys: Validates HMAC cryptographic signature & expiry
     Officer->>Sys: Submit new strong password
     Note over Sys: Activates account, sets password, invalidates token
     Sys-->>Officer: Redirect to login with confirmation
 ```
 
+### Self-Service Password Security Features:
+1. **Self-Service Password Change (`/accounts/password-change/`):** Authenticated users can update their passwords with session preservation and automatic security alerts dispatched across in-app and email channels.
+2. **Self-Service Password Reset (`/accounts/password-reset/`):** Comprehensive tokenized forgot-password workflow allowing users to securely recover access via their verified email address.
+
 ---
 
-## 5. Security &amp; Audit Trail (`AuditLog`)
+## 5. Multi-Channel Notifications & Communication Authority
+
+AgriLens provides an integrated communication suite with strict permission boundaries:
+
+| Communication Feature | Route | Access Authority | Capability |
+| :--- | :--- | :--- | :--- |
+| **Notification Center** | `/notifications/` | Authenticated Users | In-app notification drawer, unread counter badges, instant mark-as-read. |
+| **Notification Preferences** | `/notifications/preferences/` | Authenticated Users | Manage email/in-app subscription toggles by category (Approvals, Prices, System). |
+| **Broadcast Announcements** | `/notifications/admin/` | `ADMIN` Only | Publish platform-wide banners with priority levels (`Normal`, `High`, `Critical`). |
+| **Email Delivery Audit & Retry** | `/notifications/admin/` | `ADMIN` Only | Inspect failed/sent transactional emails and trigger immediate delivery retries. |
+
+---
+
+## 6. Security & Audit Trail (`AuditLog`)
 
 Every administrative action, privilege change, password issuance, and manual record approval is permanently recorded in an append-only `AuditLog` table with client IP address, actor ID, target reference, and sanitized JSON details:
 
@@ -136,3 +152,22 @@ AuditService.log(
 ```
 
 Automatic credential sanitization ensures keys such as `password`, `token`, `secret`, and `csrfmiddlewaretoken` are redacted prior to database persistence.
+
+---
+
+## ⚖️ Intellectual Property, License & Usage Policy
+
+> ### ⚠️ STRICT RESTRICTED USE NOTICE
+> **All Rights Reserved © 2026 AgriLens Development Team.**
+>
+> 1. **Non-Commercial & No Personal Profit:**  
+>    No individual, entity, or third party is permitted to use, copy, reproduce, monetize, sub-license, or exploit any portion of this codebase, architecture, machine learning models, algorithms, or visual designs for commercial purposes, revenue generation, or personal financial profit under any circumstances.
+>
+> 2. **Public Hackathon Visibility Disclaimer:**  
+>    Although this repository is publicly accessible solely for the purpose of evaluation, review, and judging during the **2026 NISR Big Data Hackathon (Track 1: Agricultural Productivity)**, public availability does **NOT** constitute an open-source license, public domain dedication, or waiver of intellectual property rights.
+>
+> 3. **Prohibition of Modifications & Derivative Works:**  
+>    Any unauthorized modification, alteration, redistribution, fork, decompilation, reverse-engineering, or derivation of this codebase or its underlying assets is strictly prohibited.
+>
+> 4. **Exclusive Authorization for NISR:**  
+>    Operational utilization, institutional adoption, data integration, and platform deployment are **exclusively and solely permitted for the National Institute of Statistics of Rwanda (NISR)** and its officially designated national agricultural partners.

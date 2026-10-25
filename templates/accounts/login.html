@@ -223,7 +223,7 @@
                         <input type="checkbox" name="remember_me" id="id_remember_me">
                         <span>Remember me</span>
                     </label>
-                    <a href="javascript:void(0)" class="forgot-password-link" onclick="openForgotModal(event)">Forgot password?</a>
+                    <a href="{% url 'accounts:password_reset' %}" class="forgot-password-link">Forgot password?</a>
                 </div>
 
                 <!-- Submit Sign In Button -->
@@ -285,8 +285,11 @@
                 <div style="margin-top: 4px;"><strong>National Hotline:</strong> +250 252 575 813 / 814</div>
             </div>
         </div>
-        <div class="auth-modal-footer">
-            <button type="button" class="btn-officer-signin" style="width: auto; padding: 9px 18px; font-size: 0.88rem;" onclick="closeModal('forgot-modal')">Understood</button>
+        <div class="auth-modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button type="button" class="btn-officer-sso" style="width: auto; padding: 9px 16px; font-size: 0.86rem;" onclick="closeModal('forgot-modal')">Close</button>
+            <a href="{% url 'accounts:password_reset' %}" class="btn-officer-signin" style="width: auto; padding: 9px 18px; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                Reset Password Online &rarr;
+            </a>
         </div>
     </div>
 </div>

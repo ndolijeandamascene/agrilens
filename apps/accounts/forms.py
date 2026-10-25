@@ -155,8 +155,51 @@ class UserAdminEditForm(forms.ModelForm):
         return cleaned_data
 
 
+from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm, PasswordChangeForm
+
+
 class PasswordSetupForm(SetPasswordForm):
     """Secure single-use token password setup form with standard validation."""
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs.update({
+                'class': 'form-input',
+                'placeholder': 'Enter secure password',
+            })
+
+
+class PasswordChangeCustomForm(PasswordChangeForm):
+    """Secure password change form for authenticated officers."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs.update({
+                'class': 'form-input',
+                'placeholder': '••••••••••••',
+            })
+
+
+class PasswordResetRequestForm(forms.Form):
+    """Form to initiate self-service password recovery by email or username."""
+    email_or_username = forms.CharField(
+        label="Official Email or Username",
+        widget=forms.TextInput(attrs={
+            'class': 'auth-field-input',
+            'id': 'id_email_or_username',
+            'placeholder': 'e.g. officer@minagri.gov.rw or username',
+            'required': True,
+            'autofocus': True,
+        })
+    )
+
+    def get_user(self):
+        """Resolves active user safely without exposing enumeration errors."""
+        ident = self.cleaned_data.get('email_or_username', '').strip()
+        if not ident:
+            return None
+        if '@' in ident:
+            return User.objects.filter(email__iexact=ident, is_active=True).first()
+        return User.objects.filter(username__iexact=ident, is_active=True).first()
 
 

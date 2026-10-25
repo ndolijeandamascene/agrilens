@@ -1,0 +1,24 @@
+{% extends "notifications/emails/base_email.txt" %}
+
+{% block content %}
+PRIORITY: {{ notification.get_priority_display }}
+TYPE: {{ notification.get_notification_type_display }}
+TITLE: {{ notification.title }}
+
+MESSAGE:
+{{ notification.message }}
+
+{% if details %}
+RECORD DETAILS:
+{% for k, v in details.items %}- {{ k|title }}: {{ v }}
+{% endfor %}
+{% endif %}
+
+{% if action_url %}
+ACTION LINK:
+{{ action_url }}
+{% endif %}
+
+SECURITY & DATA GOVERNANCE:
+This communication was delivered per NISR official protocols. Confidential credentials, passwords, and private tokens are never transmitted via email.
+{% endblock %}

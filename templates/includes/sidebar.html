@@ -58,7 +58,7 @@
     <div class="nav-section">
         <div class="nav-title">Administration</div>
         <a href="/accounts/users/" class="nav-item {% if request.path == '/accounts/users/' or request.path == '/accounts/users' %}active{% endif %}"><i class="fa-solid fa-users-gear"></i> Officers &amp; Roles</a>
-        <a href="/accounts/users/create/" class="nav-item {% if request.path == '/accounts/users/create/' or request.path == '/accounts/users/new/' %}active{% endif %}"><i class="fa-solid fa-user-plus"></i> Register Officer</a>
+        <a href="{% url 'accounts:user_create' %}" class="nav-item {% if '/accounts/users/create' in request.path or '/accounts/users/new' in request.path %}active{% endif %}"><i class="fa-solid fa-user-plus"></i> Register Officer</a>
         <a href="/accounts/audit-log/" class="nav-item {% if request.path|slice:':19' == '/accounts/audit-log' %}active{% endif %}"><i class="fa-solid fa-shield-halved"></i> Security Audit Trail</a>
     </div>
 

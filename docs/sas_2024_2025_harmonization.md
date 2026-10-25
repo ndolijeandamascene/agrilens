@@ -114,3 +114,23 @@ AgriLens implements the following weighted estimators:
    - `MANUAL_ENTRY`
 2. Analytical views, dashboard charts, and API endpoints filter strictly by `provenance.startswith('NISR_')` by default.
 3. Manual observations (`MANUAL_ENTRY`) are accessible under dedicated Data Governance reviews and can only be included in analytics if explicitly toggled by an authorized analyst via `source_filter=all`.
+
+---
+
+## ⚖️ Intellectual Property, License & Usage Policy
+
+> ### ⚠️ STRICT RESTRICTED USE NOTICE
+> **All Rights Reserved © 2026 AgriLens Development Team.**
+>
+> 1. **Non-Commercial & No Personal Profit:**  
+>    No individual, entity, or third party is permitted to use, copy, reproduce, monetize, sub-license, or exploit any portion of this codebase, architecture, machine learning models, algorithms, or visual designs for commercial purposes, revenue generation, or personal financial profit under any circumstances.
+>
+> 2. **Public Hackathon Visibility Disclaimer:**  
+>    Although this repository is publicly accessible solely for the purpose of evaluation, review, and judging during the **2026 NISR Big Data Hackathon (Track 1: Agricultural Productivity)**, public availability does **NOT** constitute an open-source license, public domain dedication, or waiver of intellectual property rights.
+>
+> 3. **Prohibition of Modifications & Derivative Works:**  
+>    Any unauthorized modification, alteration, redistribution, fork, decompilation, reverse-engineering, or derivation of this codebase or its underlying assets is strictly prohibited.
+>
+> 4. **Exclusive Authorization for NISR:**  
+>    Operational utilization, institutional adoption, data integration, and platform deployment are **exclusively and solely permitted for the National Institute of Statistics of Rwanda (NISR)** and its officially designated national agricultural partners.
+

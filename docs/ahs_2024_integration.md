@@ -87,3 +87,23 @@ graph TD
    $$\text{Extension Coverage (\%)} = \frac{\sum_{i=1}^n \left( W_{\text{hh}, i} \times \mathbb{I}(\text{Visited}_i = 1) \right)}{\sum_{i=1}^n W_{\text{hh}, i}} \times 100\%$$
 3. **Storage:** Ingest into `DistrictProductivityAggregate` with `provenance="NISR_AHS_2024"`.
 4. **Presentation:** Display alongside SAS yield data in the **Geographic Explorer** and **District Intelligence** dashboards, clearly labeled with data source badges (`NISR SAS 2025` vs. `NISR AHS 2024`).
+
+---
+
+## ⚖️ Intellectual Property, License & Usage Policy
+
+> ### ⚠️ STRICT RESTRICTED USE NOTICE
+> **All Rights Reserved © 2026 AgriLens Development Team.**
+>
+> 1. **Non-Commercial & No Personal Profit:**  
+>    No individual, entity, or third party is permitted to use, copy, reproduce, monetize, sub-license, or exploit any portion of this codebase, architecture, machine learning models, algorithms, or visual designs for commercial purposes, revenue generation, or personal financial profit under any circumstances.
+>
+> 2. **Public Hackathon Visibility Disclaimer:**  
+>    Although this repository is publicly accessible solely for the purpose of evaluation, review, and judging during the **2026 NISR Big Data Hackathon (Track 1: Agricultural Productivity)**, public availability does **NOT** constitute an open-source license, public domain dedication, or waiver of intellectual property rights.
+>
+> 3. **Prohibition of Modifications & Derivative Works:**  
+>    Any unauthorized modification, alteration, redistribution, fork, decompilation, reverse-engineering, or derivation of this codebase or its underlying assets is strictly prohibited.
+>
+> 4. **Exclusive Authorization for NISR:**  
+>    Operational utilization, institutional adoption, data integration, and platform deployment are **exclusively and solely permitted for the National Institute of Statistics of Rwanda (NISR)** and its officially designated national agricultural partners.
+

@@ -1,211 +1,1360 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ page_title }} | AgriLens Rwanda{% endblock %}
-{% block section_title %}{{ page_title }}{% endblock %}
+{% block page_heading %}{% if officer %}Edit Officer Account &bull; {{ officer.username }}{% else %}Register Institutional Officer{% endif %}{% endblock %}
+{% block page_subheading %}Institutional credentials, role clearances, and geographic jurisdictions{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ==========================================================================
+   AgriLens Officer Credential & Jurisdiction Management Form
+   Matches official National Dashboard & GovTech design standards
+   ========================================================================== */
+
+:root {
+    --form-primary: #15803D;
+    --form-primary-dark: #166534;
+    --form-primary-subtle: #F0FDF4;
+    --form-primary-border: #BBF7D0;
+    --form-card-bg: #FFFFFF;
+    --form-border: #E2E8F0;
+    --form-text-main: #0F172A;
+    --form-text-muted: #64748B;
+    --form-blue: #2563EB;
+    --form-blue-subtle: #EFF6FF;
+    --form-blue-border: #BFDBFE;
+    --form-amber: #D97706;
+    --form-amber-subtle: #FFFBEB;
+    --form-amber-border: #FDE68A;
+    --form-red: #DC2626;
+    --form-red-subtle: #FEF2F2;
+    --form-red-border: #FECACA;
+}
+
+.user-form-container {
+    max-width: 980px;
+    margin: 20px auto 48px auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Return Navigation */
+.form-nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.form-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--form-text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    transition: color 0.15s ease;
+}
+.form-back-link:hover {
+    color: var(--form-primary);
+}
+
+/* Activation Banner */
+.activation-banner {
+    background: #F0FDF4;
+    border: 1.5px solid #86EFAC;
+    border-radius: 10px;
+    padding: 20px 24px;
+    box-shadow: 0 4px 14px rgba(22, 101, 52, 0.07);
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+.activation-icon-wrap {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #DCFCE7;
+    color: #16A34A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+.activation-copy-box {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: #FFFFFF;
+    border: 1px solid #86EFAC;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin: 12px 0 8px 0;
+}
+.activation-input {
+    flex: 1;
+    border: none;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+    color: var(--form-text-main);
+    background: transparent;
+    outline: none;
+}
+.activation-copy-btn {
+    padding: 6px 14px;
+    background: var(--form-primary);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+.activation-copy-btn:hover {
+    background: var(--form-primary-dark);
+}
+
+/* Form Cards */
+.form-card {
+    background: #FFFFFF;
+    border: 1px solid var(--form-border);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+}
+
+.form-card-header {
+    background: #F8FAFC;
+    border-bottom: 1px solid var(--form-border);
+    padding: 16px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.form-card-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.form-card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    background: var(--form-primary-subtle);
+    color: var(--form-primary);
+}
+.form-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--form-text-main);
+    margin: 0;
+}
+.form-card-subtitle {
+    font-size: 11px;
+    color: var(--form-text-muted);
+    margin: 2px 0 0 0;
+}
+
+.form-card-body {
+    padding: 22px;
+}
+
+/* Grid Layouts */
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+.form-row-2:last-child {
+    margin-bottom: 0;
+}
+
+.form-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.form-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--form-text-main);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.form-label .req {
+    color: var(--form-red);
+}
+
+.form-control-input,
+.form-control-select,
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--form-border);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--form-text-main);
+    background: #FFFFFF;
+    outline: none;
+    transition: all 0.15s ease;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+.form-control-input:focus,
+.form-control-select:focus,
+.form-input:focus,
+.form-select:focus {
+    border-color: var(--form-primary);
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
+}
+
+.form-field-hint {
+    font-size: 11px;
+    color: var(--form-text-muted);
+    line-height: 1.3;
+}
+.form-field-error {
+    font-size: 11px;
+    color: var(--form-red);
+    font-weight: 600;
+}
+
+/* Role Clearance Callout */
+.role-clearance-box {
+    margin-top: 14px;
+    background: #F8FAFC;
+    border: 1px solid var(--form-border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+.role-clearance-icon {
+    font-size: 18px;
+    color: var(--form-blue);
+    margin-top: 2px;
+}
+.role-clearance-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--form-text-main);
+    margin-bottom: 2px;
+}
+.role-clearance-desc {
+    font-size: 11px;
+    color: var(--form-text-muted);
+    line-height: 1.4;
+}
+
+/* Modern District Selector Widget */
+.district-selector-hub {
+    border: 1px solid var(--form-border);
+    border-radius: 8px;
+    background: #FAFAFA;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.district-tools-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.district-search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    max-width: 320px;
+}
+.district-search-wrap i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--form-text-muted);
+    pointer-events: none;
+}
+.district-search-input {
+    width: 100%;
+    padding: 7px 10px 7px 30px;
+    border: 1px solid var(--form-border);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--form-text-main);
+    background: #FFFFFF;
+    outline: none;
+    box-sizing: border-box;
+}
+.district-search-input:focus {
+    border-color: var(--form-primary);
+    box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.12);
+}
+
+.district-quick-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.district-btn-sm {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--form-border);
+    background: #FFFFFF;
+    color: var(--form-text-muted);
+    transition: all 0.15s;
+}
+.district-btn-sm:hover {
+    color: var(--form-primary);
+    border-color: var(--form-primary);
+    background: var(--form-primary-subtle);
+}
+
+/* Step Number Indicators */
+.step-num-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #E2E8F0;
+    color: #334155;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 4px;
+}
+
+/* Province Quick Filter Pills */
+.province-quick-strip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.province-pill-btn {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--form-border);
+    background: #FFFFFF;
+    color: var(--form-text-muted);
+    transition: all 0.15s ease;
+}
+.province-pill-btn:hover {
+    background: #F1F5F9;
+    color: var(--form-text-main);
+    border-color: #CBD5E1;
+}
+.province-pill-btn.active {
+    background: var(--form-primary);
+    color: #FFFFFF;
+    border-color: var(--form-primary);
+    box-shadow: 0 1px 3px rgba(21, 128, 61, 0.2);
+}
+
+/* Empty Prompt when no province is chosen */
+.district-empty-prompt {
+    background: #FFFFFF;
+    border: 1.5px dashed #CBD5E1;
+    border-radius: 8px;
+    padding: 28px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.district-empty-prompt-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #EFF6FF;
+    color: #2563EB;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 2px;
+}
+.district-empty-prompt-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--form-text-main);
+    margin: 0;
+}
+.district-empty-prompt-desc {
+    font-size: 12px;
+    color: var(--form-text-muted);
+    max-width: 440px;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Selected Districts Chips Row */
+.selected-districts-preview {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    min-height: 28px;
+    padding: 6px 10px;
+    background: #FFFFFF;
+    border: 1px dashed var(--form-border);
+    border-radius: 6px;
+}
+.selected-district-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    background: var(--form-primary-subtle);
+    border: 1px solid var(--form-primary-border);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--form-primary-dark);
+}
+.selected-district-chip .chip-remove {
+    cursor: pointer;
+    color: #15803D;
+    font-size: 11px;
+    transition: color 0.1s;
+}
+.selected-district-chip .chip-remove:hover {
+    color: #DC2626;
+}
+
+/* District Grid Cards */
+.district-chips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 8px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+.district-chip-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #FFFFFF;
+    border: 1px solid var(--form-border);
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+}
+.district-chip-card:hover {
+    border-color: #94A3B8;
+    background: #F8FAFC;
+}
+.district-chip-card.selected {
+    background: #F0FDF4;
+    border-color: #86EFAC;
+    box-shadow: 0 1px 3px rgba(22, 101, 52, 0.08);
+}
+.district-chip-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--form-text-main);
+}
+.district-chip-card.selected .district-chip-left {
+    color: #166534;
+    font-weight: 700;
+}
+.district-check-icon {
+    font-size: 13px;
+    color: #CBD5E1;
+}
+.district-chip-card.selected .district-check-icon {
+    color: #16A34A;
+}
+.district-prov-badge {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--form-text-muted);
+    background: #F1F5F9;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+.district-chip-card.selected .district-prov-badge {
+    background: #DCFCE7;
+    color: #15803D;
+}
+
+/* Account Active Switch */
+.switch-control-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #F8FAFC;
+    border: 1px solid var(--form-border);
+    border-radius: 8px;
+}
+.switch-control-wrap input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--form-primary);
+    cursor: pointer;
+}
+
+/* Form Action Footer */
+.form-action-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 20px 0 0 0;
+}
+.form-submit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: var(--form-primary);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(21, 128, 61, 0.25);
+    transition: all 0.15s ease;
+}
+.form-submit-btn:hover {
+    background: var(--form-primary-dark);
+    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.35);
+}
+
+.form-cancel-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: #FFFFFF;
+    color: var(--form-text-muted);
+    border: 1px solid var(--form-border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+.form-cancel-btn:hover {
+    background: #F8FAFC;
+    color: var(--form-text-main);
+    border-color: #94A3B8;
+}
+
+@media (max-width: 768px) {
+    .form-row-2 {
+        grid-template-columns: 1fr;
+    }
+    .district-chips-grid {
+        grid-template-columns: 1fr;
+    }
+    .form-action-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .form-submit-btn, .form-cancel-btn {
+        justify-content: center;
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="dashboard-container" style="max-width: 900px; margin: 24px auto; padding: 0 20px;">
+<div class="user-form-container">
+
     <!-- Navigation Return Strip -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <a href="{% url 'accounts:user_list' %}" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #64748B; font-size: 0.88rem; font-weight: 600;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            <span>Back to Officers Registry</span>
+    <div class="form-nav-bar">
+        <a href="{% url 'accounts:user_list' %}" class="form-back-link">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to Officers &amp; Roles Registry</span>
         </a>
         {% if officer %}
-        <a href="{% url 'accounts:user_detail' pk=officer.pk %}" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #15803D; font-size: 0.88rem; font-weight: 600;">
-            <span>View Officer Dossier &rarr;</span>
+        <a href="{% url 'accounts:user_detail' pk=officer.pk %}" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--form-primary); font-size: 12px; font-weight: 700;">
+            <i class="fa-solid fa-file-contract"></i>
+            <span>View Officer Security Dossier &rarr;</span>
         </a>
         {% endif %}
     </div>
 
-    <!-- Activation Link Notification Banner (Condition 6 Compliance) -->
+    <!-- Activation Link Notification Banner (Milestone 4 Condition 6) -->
     {% if setup_link %}
-    <div style="background: #F0FDF4; border: 2px solid #86EFAC; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(22, 101, 52, 0.08);">
-        <div style="display: flex; gap: 14px; align-items: flex-start;">
-            <div style="width: 40px; height: 40px; border-radius: 50%; background: #DCFCE7; color: #16A34A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-            </div>
-            <div style="flex: 1;">
-                <h3 style="margin: 0 0 6px 0; color: #166534; font-size: 1.15rem; font-weight: 800;">
-                    Officer Account Created Successfully!
-                </h3>
-                <p style="margin: 0 0 14px 0; font-size: 0.88rem; color: #15803D; line-height: 1.5;">
-                    Per institutional security protocol (Milestone 4 Condition 6), raw passwords are <strong>never</strong> transmitted or displayed. Provide the following single-use cryptographic activation link to the officer to configure their official password.
-                </p>
+    <div class="activation-banner">
+        <div class="activation-icon-wrap">
+            <i class="fa-solid fa-key"></i>
+        </div>
+        <div style="flex: 1;">
+            <h3 style="margin: 0 0 4px 0; color: #166534; font-size: 15px; font-weight: 800;">
+                Officer Account Registered Successfully!
+            </h3>
+            <p style="margin: 0; font-size: 12px; color: #15803D; line-height: 1.4;">
+                Per institutional security protocol (Milestone 4 Condition 6), raw passwords are <strong>never</strong> transmitted in plaintext. Provide the following single-use cryptographic activation link to the officer to configure their credentials.
+            </p>
 
-                <div style="display: flex; gap: 10px; align-items: center; background: #FFFFFF; border: 1px solid #86EFAC; padding: 10px 14px; border-radius: 8px;">
-                    <input id="activation-link-input" type="text" readonly value="{{ setup_link }}" style="flex: 1; border: none; font-family: monospace; font-size: 0.86rem; color: #0F172A; background: transparent; outline: none;">
-                    <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('activation-link-input').value); alert('Activation link copied to clipboard!');" style="padding: 6px 14px; background: #16A34A; color: #FFFFFF; border: none; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer; white-space: nowrap;">
-                        Copy Link
-                    </button>
-                </div>
-                <div style="margin-top: 8px; font-size: 0.78rem; color: #166534;">
-                    * This single-use link automatically expires in 3 days or immediately upon first successful password submission.
-                </div>
+            <div class="activation-copy-box">
+                <i class="fa-solid fa-link" style="color: #16A34A; font-size: 13px;"></i>
+                <input id="activation-link-input" type="text" readonly value="{{ setup_link }}" class="activation-input">
+                <button type="button" class="activation-copy-btn" onclick="copySetupLink()">
+                    <i class="fa-regular fa-copy"></i>
+                    <span id="copy-btn-text">Copy Link</span>
+                </button>
+            </div>
+            <div style="font-size: 11px; color: #166534;">
+                <i class="fa-solid fa-clock-rotate-left"></i> This single-use link expires in 3 days or immediately upon first successful password submission.
             </div>
         </div>
     </div>
     {% endif %}
 
-    <!-- Main Form Panel -->
-    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 4px 12px -2px rgba(0, 31, 59, 0.05); overflow: hidden;">
-        <div style="background: #F8FAFC; border-bottom: 1px solid #E2E8F0; padding: 20px 28px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h2 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: #001F3B;">
-                    {% if officer %}Edit Officer Account &bull; {{ officer.username }}{% else %}Register Institutional Officer{% endif %}
-                </h2>
-                <p style="margin: 4px 0 0 0; font-size: 0.82rem; color: #64748B;">
-                    {% if officer %}Update organizational details, role clearances, and geographic jurisdictions.{% else %}Create official credential shell with role-based and geographic clearances.{% endif %}
-                </p>
-            </div>
-            {% if officer %}
-            <span style="font-size: 0.78rem; padding: 4px 10px; border-radius: 6px; font-weight: 700; {% if officer.is_active %}background: #DCFCE7; color: #166534;{% else %}background: #FEE2E2; color: #991B1B;{% endif %}">
-                {% if officer.is_active %}Active Account{% else %}Suspended / Inactive{% endif %}
-            </span>
-            {% endif %}
+    <!-- Main Registration Form -->
+    <form method="post" id="officerForm">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div style="padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 12px; background: #FEF2F2; color: #991B1B; border: 1px solid #FCA5A5;">
+            {% for error in form.non_field_errors %}
+                <p style="margin: 0;">{{ error }}</p>
+            {% endfor %}
         </div>
+        {% endif %}
 
-        <form method="post" style="padding: 28px;">
-            {% csrf_token %}
+        <div style="display: flex; flex-direction: column; gap: 20px;">
 
-            {% if form.non_field_errors %}
-            <div style="padding: 12px 18px; border-radius: 8px; margin-bottom: 24px; font-size: 0.88rem; background: #FEF2F2; color: #991B1B; border: 1px solid #FCA5A5;">
-                {% for error in form.non_field_errors %}
-                    <p style="margin: 0;">{{ error }}</p>
-                {% endfor %}
+            <!-- CARD 1: Officer Identity & Contact -->
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="form-card-title-group">
+                        <div class="form-card-icon">
+                            <i class="fa-solid fa-id-card"></i>
+                        </div>
+                        <div>
+                            <h3 class="form-card-title">1. Account Identity &amp; Contact</h3>
+                            <p class="form-card-subtitle">Official username, institutional email, and officer identity</p>
+                        </div>
+                    </div>
+                    {% if officer %}
+                    <span style="font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 700; {% if officer.is_active %}background: #DCFCE7; color: #166534;{% else %}background: #FEE2E2; color: #991B1B;{% endif %}">
+                        {% if officer.is_active %}Active Account{% else %}Suspended{% endif %}
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="form-card-body">
+                    <div class="form-row-2">
+                        {% if form.username %}
+                        <div class="form-field-group">
+                            <label class="form-label" for="{{ form.username.id_for_label }}">
+                                <span>Username</span> <span class="req">*</span>
+                            </label>
+                            {{ form.username }}
+                            {% if form.username.errors %}<div class="form-field-error">{{ form.username.errors.0 }}</div>{% endif %}
+                            <div class="form-field-hint">Letters, digits, and @/./+/-/_ only. Used for institutional sign-in.</div>
+                        </div>
+                        {% endif %}
+
+                        <div class="form-field-group">
+                            <label class="form-label" for="{{ form.email.id_for_label }}">
+                                <span>Official Email</span> <span class="req">*</span>
+                            </label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<div class="form-field-error">{{ form.email.errors.0 }}</div>{% endif %}
+                            <div class="form-field-hint">Used for audit notifications and password setup links.</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-field-group">
+                            <label class="form-label" for="{{ form.first_name.id_for_label }}">First Name</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}<div class="form-field-error">{{ form.first_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="form-field-group">
+                            <label class="form-label" for="{{ form.last_name.id_for_label }}">Last Name</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}<div class="form-field-error">{{ form.last_name.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-field-group">
+                            <label class="form-label" for="{{ form.organization.id_for_label }}">Organization / Ministry</label>
+                            {{ form.organization }}
+                            {% if form.organization.errors %}<div class="form-field-error">{{ form.organization.errors.0 }}</div>{% endif %}
+                            <div class="form-field-hint">e.g. MINAGRI / NISR / RAB / District Agronomist</div>
+                        </div>
+                        <div class="form-field-group">
+                            <label class="form-label" for="{{ form.phone_number.id_for_label }}">Phone Contact</label>
+                            {{ form.phone_number }}
+                            {% if form.phone_number.errors %}<div class="form-field-error">{{ form.phone_number.errors.0 }}</div>{% endif %}
+                            <div class="form-field-hint">e.g. +250 788 123 456 (optional)</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            {% endif %}
 
-            <!-- Section 1: Officer Identity -->
-            <div style="margin-bottom: 28px;">
-                <h3 style="font-size: 0.95rem; font-weight: 800; color: #001F3B; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
-                    1. Account Identity &amp; Contact
-                </h3>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
-                    {% if form.username %}
-                    <div>
-                        <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">
-                            Username <span style="color: #DC2626;">*</span>
+            <!-- CARD 2: Role & Institutional Authorization -->
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="form-card-title-group">
+                        <div class="form-card-icon" style="background:#EFF6FF; color:#2563EB;">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <h3 class="form-card-title">2. Institutional Role &amp; Clearances</h3>
+                            <p class="form-card-subtitle">Role-based access control determining permissions and workflow clearance</p>
+                        </div>
+                    </div>
+                    <span style="font-size: 11px; color: var(--form-text-muted); font-weight: 600;">
+                        <i class="fa-solid fa-lock" style="color:var(--form-primary);"></i> RBAC Enforced
+                    </span>
+                </div>
+                <div class="form-card-body">
+                    <div class="form-field-group">
+                        <label class="form-label" for="{{ form.role.id_for_label }}">
+                            <span>Assigned Role</span> <span class="req">*</span>
                         </label>
-                        {{ form.username }}
-                        {% if form.username.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.username.errors.0 }}</div>{% endif %}
-                        <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">Letters, digits, and @/./+/-/_ only.</div>
+                        {{ form.role }}
+                        {% if form.role.errors %}<div class="form-field-error">{{ form.role.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <!-- Dynamic Role Clearance Explainer Box -->
+                    <div class="role-clearance-box" id="role-clearance-explainer">
+                        <i class="fa-solid fa-circle-info role-clearance-icon" id="role-info-icon"></i>
+                        <div>
+                            <div class="role-clearance-title" id="role-clearance-title">Role Privileges &amp; Scoping</div>
+                            <div class="role-clearance-desc" id="role-clearance-desc">
+                                Select an assigned institutional role to inspect clearances, data access boundaries, and geographic requirements.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 3: Geographic Jurisdiction & Cascading District Assignment -->
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="form-card-title-group">
+                        <div class="form-card-icon" style="background:#FFFBEB; color:#D97706;">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                        </div>
+                        <div>
+                            <h3 class="form-card-title">3. Geographic Jurisdiction (Scope)</h3>
+                            <p class="form-card-subtitle">Select an administrative province first, then assign districts within its jurisdiction</p>
+                        </div>
+                    </div>
+                    <span class="district-counter-pill" id="selected-districts-count-badge" style="font-size: 11px; font-weight: 700; color: #166534; background: #DCFCE7; padding: 3px 8px; border-radius: 4px; border: 1px solid #BBF7D0;">
+                        0 Districts Selected
+                    </span>
+                </div>
+                <div class="form-card-body">
+                    
+                    <!-- STEP 1: Select Province -->
+                    <div class="form-field-group" style="margin-bottom: 20px;">
+                        <label class="form-label" for="{{ form.assigned_province.id_for_label }}">
+                            <span class="step-num-badge">Step 1</span>
+                            <span>Assigned Province</span>
+                            <span class="req">*</span>
+                        </label>
+                        {{ form.assigned_province }}
+                        {% if form.assigned_province.errors %}<div class="form-field-error">{{ form.assigned_province.errors.0 }}</div>{% endif %}
+
+                        <!-- Quick-Select Province Buttons -->
+                        <div class="province-quick-strip" style="margin-top: 8px;">
+                            <span style="font-size: 11px; color: var(--form-text-muted); font-weight: 600;">Quick Select:</span>
+                            <button type="button" class="province-pill-btn" data-prov-key="kigali">City of Kigali (3)</button>
+                            <button type="button" class="province-pill-btn" data-prov-key="northern">Northern (5)</button>
+                            <button type="button" class="province-pill-btn" data-prov-key="southern">Southern (8)</button>
+                            <button type="button" class="province-pill-btn" data-prov-key="eastern">Eastern (7)</button>
+                            <button type="button" class="province-pill-btn" data-prov-key="western">Western (7)</button>
+                            <button type="button" class="province-pill-btn" data-prov-key="all">All / National (30)</button>
+                        </div>
+                        <div class="form-field-hint" style="margin-top: 5px;">
+                            Selecting a province displays its constituent districts below. For District Officers, assigning their operational district is mandatory.
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: Assigned Districts (Cascades After Province) -->
+                    <div class="form-field-group">
+                        <label class="form-label">
+                            <span class="step-num-badge">Step 2</span>
+                            <span>Assigned Districts</span>
+                            <span id="province-context-badge" style="font-size: 11px; font-weight: 600; color: #15803D; margin-left: 4px;">• Select Province Above</span>
+                        </label>
+
+                        <!-- Hidden Native Select (Synchronized with Backend Form Submission) -->
+                        <div style="display: none;">
+                            {{ form.assigned_districts }}
+                        </div>
+                        {% if form.assigned_districts.errors %}<div class="form-field-error">{{ form.assigned_districts.errors.0 }}</div>{% endif %}
+
+                        <!-- Currently Assigned Jurisdiction Chips Bar (Always visible so selections across provinces are never lost) -->
+                        <div style="margin-bottom: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <span style="font-size: 11px; font-weight: 700; color: var(--form-text-main);">
+                                    <i class="fa-solid fa-layer-group" style="color: var(--form-primary); margin-right: 4px;"></i> Active District Assignments:
+                                </span>
+                                <button type="button" id="btnClearAllDistricts" class="district-btn-sm" style="display: none;">
+                                    <i class="fa-solid fa-xmark"></i> Clear All Selected
+                                </button>
+                            </div>
+                            <div class="selected-districts-preview" id="selectedDistrictsPreview">
+                                <span style="font-size: 11px; color: #94A3B8; font-style: italic;" id="noDistrictsPlaceholder">
+                                    No districts assigned yet. Select a province above to assign districts.
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Modern Cascading District Selector Container -->
+                        <div class="district-selector-hub" id="districtSelectorHub">
+                            
+                            <!-- State A: Prompt to select province first (shown when no province is chosen) -->
+                            <div class="district-empty-prompt" id="districtEmptyPrompt" style="display: none;">
+                                <div class="district-empty-prompt-icon">
+                                    <i class="fa-solid fa-map-location-dot"></i>
+                                </div>
+                                <h4 class="district-empty-prompt-title">Please Select a Province in Step 1</h4>
+                                <p class="district-empty-prompt-desc">
+                                    Choose an administrative province above to view and assign its constituent districts, or click below to assign nationwide coverage.
+                                </p>
+                                <button type="button" class="district-btn-sm" id="btnShowAllDistrictsNationwide" style="margin-top: 6px; padding: 6px 14px; background: #FFFFFF; font-weight: 700;">
+                                    <i class="fa-solid fa-earth-africa"></i> View All 30 Districts (Nationwide)
+                                </button>
+                            </div>
+
+                            <!-- State B: Districts Loaded for the Selected Province -->
+                            <div id="districtActiveView">
+                                <!-- Toolbar -->
+                                <div class="district-tools-bar">
+                                    <div class="district-search-wrap">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                        <input type="text" id="districtSearchInput" class="district-search-input" placeholder="Search districts in this province...">
+                                    </div>
+                                    <div class="district-quick-actions">
+                                        <button type="button" class="district-btn-sm" id="btnSelectAllVisible">
+                                            <i class="fa-solid fa-check-double"></i> Select All in Province
+                                        </button>
+                                        <button type="button" class="district-btn-sm" id="btnDeselectVisible">
+                                            <i class="fa-regular fa-square"></i> Deselect in Province
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- District Cards Grid -->
+                                <div class="district-chips-grid" id="districtCardsGrid" style="margin-top: 12px;">
+                                    <!-- Populated dynamically based on selected province -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-field-hint" style="margin-top: 8px;">
+                            <i class="fa-solid fa-circle-info" style="color: var(--form-primary);"></i> Click district cards to toggle assignments. For District Officers, this strictly defines their submission permissions, report filtering, and data query boundaries.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 4: Security Status & Account Lifecycle -->
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="form-card-title-group">
+                        <div class="form-card-icon" style="background:#F0FDF4; color:#15803D;">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <h3 class="form-card-title">4. Account Status &amp; Activation Protocol</h3>
+                            <p class="form-card-subtitle">Account authorization, login rights, and single-use credential provisioning</p>
+                        </div>
+                    </div>
+                    {% if not officer %}
+                    <span style="font-size: 11px; font-weight: 700; color: #15803D; background: #DCFCE7; border: 1px solid #BBF7D0; padding: 3px 8px; border-radius: 4px;">
+                        <i class="fa-solid fa-key" style="margin-right: 3px;"></i> Condition 6 Protocol
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="form-card-body">
+                    {% if form.is_active %}
+                    <div class="switch-control-wrap">
+                        {{ form.is_active }}
+                        <label for="{{ form.is_active.id_for_label }}" style="font-size: 13px; font-weight: 600; color: var(--form-text-main); cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                            <span>Account is Active</span>
+                            <span style="font-size: 11px; font-weight: 500; color: var(--form-text-muted);">(Authorizes login and API token requests)</span>
+                        </label>
+                    </div>
+                    {% if form.is_active.errors %}<div class="form-field-error" style="margin-top: 6px;">{{ form.is_active.errors.0 }}</div>{% endif %}
+                    {% endif %}
+
+                    {% if not officer %}
+                    <div style="margin-top: 14px; background: #F8FAFC; border: 1px solid var(--form-border); border-radius: 8px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start;">
+                        <i class="fa-solid fa-shield-cat" style="color: #15803D; font-size: 15px; margin-top: 2px;"></i>
+                        <div style="font-size: 12px; color: var(--form-text-muted); line-height: 1.5;">
+                            <strong style="color: var(--form-text-main);">Zero-Plaintext Security:</strong> Plaintext initial passwords are never generated, emailed, or stored. Upon submission, AgriLens generates a cryptographic <strong>single-use setup link</strong> (valid for 72 hours) that can be securely handed off to the officer to configure their password independently.
+                        </div>
                     </div>
                     {% endif %}
-                    <div>
-                        <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">
-                            Official Email <span style="color: #DC2626;">*</span>
-                        </label>
-                        {{ form.email }}
-                        {% if form.email.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.email.errors.0 }}</div>{% endif %}
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
-                    <div>
-                        <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">First Name</label>
-                        {{ form.first_name }}
-                        {% if form.first_name.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.first_name.errors.0 }}</div>{% endif %}
-                    </div>
-                    <div>
-                        <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">Last Name</label>
-                        {{ form.last_name }}
-                        {% if form.last_name.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.last_name.errors.0 }}</div>{% endif %}
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
-                    <div>
-                        <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">Organization / Ministry</label>
-                        {{ form.organization }}
-                        {% if form.organization.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.organization.errors.0 }}</div>{% endif %}
-                    </div>
-                    <div>
-                        <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">Phone Contact</label>
-                        {{ form.phone_number }}
-                        {% if form.phone_number.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.phone_number.errors.0 }}</div>{% endif %}
-                    </div>
                 </div>
             </div>
 
-            <!-- Section 2: Role & Institutional Authorization -->
-            <div style="margin-bottom: 28px;">
-                <h3 style="font-size: 0.95rem; font-weight: 800; color: #001F3B; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
-                    2. Institutional Role &amp; Clearances
-                </h3>
-
-                <div style="margin-bottom: 18px;">
-                    <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">
-                        Assigned Role <span style="color: #DC2626;">*</span>
-                    </label>
-                    {{ form.role }}
-                    {% if form.role.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.role.errors.0 }}</div>{% endif %}
-                    <div style="font-size: 0.76rem; color: #64748B; margin-top: 6px; line-height: 1.4;">
-                        Institutional Clearances: <strong>Administrator</strong> (Full Governance &amp; Users), <strong>NISR Data Manager</strong> (ETL &amp; Validation), <strong>Agricultural Analyst</strong> (Analytics &amp; Data Views), <strong>District Officer</strong> (District-Restricted Submissions &amp; Reports), <strong>Data Entry Officer</strong> (Manual Observation Drafting), <strong>Reviewer</strong> (Manual Record Approval).
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 3: Geographic Jurisdiction -->
-            <div style="margin-bottom: 28px;">
-                <h3 style="font-size: 0.95rem; font-weight: 800; color: #001F3B; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
-                    3. Geographic Jurisdiction (Scope)
-                </h3>
-
-                <div style="margin-bottom: 18px;">
-                    <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">
-                        Assigned Province (Optional Filter)
-                    </label>
-                    {{ form.assigned_province }}
-                    {% if form.assigned_province.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.assigned_province.errors.0 }}</div>{% endif %}
-                    <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">Optional grouping province for organizational clarity.</div>
-                </div>
-
-                <div style="margin-bottom: 18px;">
-                    <label style="display: block; font-weight: 700; font-size: 0.84rem; color: #0F172A; margin-bottom: 6px;">
-                        Assigned Districts (Mandatory for District Officers)
-                    </label>
-                    {{ form.assigned_districts }}
-                    {% if form.assigned_districts.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.assigned_districts.errors.0 }}</div>{% endif %}
-                    <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">
-                        Hold Ctrl (or Cmd on Mac) to select multiple districts. For District Officers, this strictly defines their query and submission boundaries.
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 4: Security & Activation (Edit Mode Only) -->
-            {% if form.is_active %}
-            <div style="margin-bottom: 28px;">
-                <h3 style="font-size: 0.95rem; font-weight: 800; color: #001F3B; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
-                    4. Account Status &amp; Self-Lockout Guard
-                </h3>
-
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    {{ form.is_active }}
-                    <label for="{{ form.is_active.id_for_label }}" style="font-size: 0.88rem; font-weight: 600; color: #0F172A; cursor: pointer;">
-                        Account is Active (Authorizes login and API token requests)
-                    </label>
-                </div>
-                {% if form.is_active.errors %}<div style="color: #DC2626; font-size: 0.78rem; margin-top: 4px;">{{ form.is_active.errors.0 }}</div>{% endif %}
-            </div>
-            {% endif %}
-
-            <!-- Form Action Buttons -->
-            <div style="display: flex; justify-content: flex-end; gap: 14px; border-top: 1px solid #E2E8F0; padding-top: 20px;">
-                <a href="{% url 'accounts:user_list' %}" class="btn-action">
-                    Cancel
+            <!-- Form Action Footer -->
+            <div class="form-action-footer">
+                <a href="{% url 'accounts:user_list' %}" class="form-cancel-btn">
+                    <i class="fa-solid fa-xmark"></i>
+                    <span>Cancel</span>
                 </a>
-                <button type="submit" class="btn-action primary" style="padding: 10px 26px;">
-                    {% if officer %}Save Officer Changes{% else %}Register Officer &amp; Generate Setup Link{% endif %}
-                </button>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 11px; color: var(--form-text-muted);">
+                        <i class="fa-solid fa-lock" style="color:var(--form-primary);"></i> Audit Trail Recorded
+                    </span>
+                    <button type="submit" class="form-submit-btn">
+                        <i class="fa-solid fa-user-check"></i>
+                        <span>{% if officer %}Save Officer Changes{% else %}Register Officer &amp; Generate Setup Link{% endif %} &rarr;</span>
+                    </button>
+                </div>
             </div>
-        </form>
-    </div>
+
+        </div>
+    </form>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// --- Role Explanations Mapping ---
+var ROLE_EXPLAINERS = {
+    'ADMIN': {
+        title: 'Administrator Clearances',
+        icon: 'fa-shield-halved',
+        color: '#15803D',
+        desc: 'Full administrative authority across all modules: user provisioning, security audit log inspection, ETL schema governance, and system-wide configuration.'
+    },
+    'NISR_DATA_MANAGER': {
+        title: 'NISR Data Manager Clearances',
+        icon: 'fa-database',
+        color: '#2563EB',
+        desc: 'Official statistical survey ETL ingestion, batch integrity checks, raw-to-validated normalization pipelines, and data quality flag resolution.'
+    },
+    'ANALYST': {
+        title: 'Agricultural Analyst Clearances',
+        icon: 'fa-chart-line',
+        color: '#7C3AED',
+        desc: 'Access to productivity intelligence, provincial yield gap benchmarks, ML yield simulator, and authoring official seasonal agricultural bulletins.'
+    },
+    'DISTRICT_OFFICER': {
+        title: 'District Officer (Strict Geographic Scope)',
+        icon: 'fa-location-dot',
+        color: '#D97706',
+        desc: 'Strictly restricted to assigned districts. Manages local crop performance, reviews field submissions for their jurisdiction, and generates district dossiers.'
+    },
+    'DATA_ENTRY_OFFICER': {
+        title: 'Data Entry Officer Clearances',
+        icon: 'fa-pen-to-square',
+        color: '#0284C7',
+        desc: 'Authoring and submitting manual observations from farmer cooperatives and field extension projects for institutional verification.'
+    },
+    'REVIEWER': {
+        title: 'Reviewer & Quality Assurance Clearances',
+        icon: 'fa-clipboard-check',
+        color: '#059669',
+        desc: 'Vetting and approving manual field observations. Authorized to approve records into verified domain storage or return for revision.'
+    }
+};
+
+function updateRoleExplainer(roleKey) {
+    var explainer = ROLE_EXPLAINERS[roleKey];
+    var titleEl = document.getElementById('role-clearance-title');
+    var descEl = document.getElementById('role-clearance-desc');
+    var iconEl = document.getElementById('role-info-icon');
+
+    if (explainer && titleEl && descEl) {
+        titleEl.textContent = explainer.title;
+        descEl.textContent = explainer.desc;
+        if (iconEl) {
+            iconEl.className = 'fa-solid ' + explainer.icon + ' role-clearance-icon';
+            iconEl.style.color = explainer.color;
+        }
+    }
+}
+
+// --- Interactive Cascading District Selector (Province-Dependent) ---
+function getProvinceKey(text) {
+    if (!text) return 'none';
+    var lower = text.toLowerCase().trim();
+    if (lower === '' || lower.indexOf('no specific') !== -1 || lower.indexOf('-- national') !== -1) return 'none';
+    if (lower.indexOf('all') !== -1 || lower.indexOf('nationwide') !== -1) return 'all';
+    if (lower.indexOf('kigali') !== -1) return 'kigali';
+    if (lower.indexOf('north') !== -1) return 'northern';
+    if (lower.indexOf('south') !== -1) return 'southern';
+    if (lower.indexOf('east') !== -1) return 'eastern';
+    if (lower.indexOf('west') !== -1) return 'western';
+    return 'other';
+}
+
+function getProvinceDisplayName(key) {
+    switch (key) {
+        case 'kigali': return 'City of Kigali';
+        case 'northern': return 'Northern Province';
+        case 'southern': return 'Southern Province';
+        case 'eastern': return 'Eastern Province';
+        case 'western': return 'Western Province';
+        case 'all': return 'All Provinces (Nationwide)';
+        default: return 'Selected Province';
+    }
+}
+
+function initDistrictSelector() {
+    var nativeSelect = document.getElementById('id_assigned_districts');
+    var provinceSelect = document.getElementById('id_assigned_province');
+    var gridContainer = document.getElementById('districtCardsGrid');
+    var previewContainer = document.getElementById('selectedDistrictsPreview');
+    var counterBadge = document.getElementById('selected-districts-count-badge');
+    var searchInput = document.getElementById('districtSearchInput');
+    var emptyPrompt = document.getElementById('districtEmptyPrompt');
+    var activeView = document.getElementById('districtActiveView');
+    var provinceContextBadge = document.getElementById('province-context-badge');
+    var btnSelectAll = document.getElementById('btnSelectAllVisible');
+    var btnDeselect = document.getElementById('btnDeselectVisible');
+    var btnClearAll = document.getElementById('btnClearAllDistricts');
+    var btnShowAllNationwide = document.getElementById('btnShowAllDistrictsNationwide');
+
+    if (!nativeSelect || !gridContainer || !provinceSelect) return;
+
+    var options = Array.from(nativeSelect.options);
+
+    // Parse options into structured data
+    var districtData = options.map(function(opt) {
+        var fullText = opt.text.trim();
+        // Regex handles "Gasabo (City of Kigali)", "Burera (Northern Province)", etc.
+        var match = fullText.match(/^(.+?)\s*\((.+?)\)$/);
+        var distName = match ? match[1].trim() : fullText;
+        var provRaw = match ? match[2].trim() : '';
+        var provKey = getProvinceKey(provRaw);
+
+        return {
+            id: opt.value,
+            name: distName,
+            provinceName: provRaw,
+            provinceKey: provKey,
+            fullText: fullText.toLowerCase(),
+            optionElem: opt
+        };
+    });
+
+    // Determine initial province key
+    var initialKey = 'none';
+    if (provinceSelect.selectedIndex >= 0) {
+        var opt = provinceSelect.options[provinceSelect.selectedIndex];
+        if (opt && opt.value) {
+            initialKey = getProvinceKey(opt.text);
+        }
+    }
+
+    // If no province selected in dropdown, check if existing districts are assigned (e.g. edit form)
+    if (initialKey === 'none') {
+        var preselected = districtData.filter(function(d) { return d.optionElem.selected; });
+        if (preselected.length > 0) {
+            var firstProv = preselected[0].provinceKey;
+            // Check if all selected are in the same province
+            var allSame = preselected.every(function(d) { return d.provinceKey === firstProv; });
+            initialKey = allSame ? firstProv : 'all';
+        }
+    }
+
+    var currentActiveProvKey = initialKey;
+
+    // Helper: sync pill active styles
+    function syncPillStates(key) {
+        document.querySelectorAll('.province-pill-btn').forEach(function(pill) {
+            if (pill.getAttribute('data-prov-key') === key) {
+                pill.classList.add('active');
+            } else {
+                pill.classList.remove('active');
+            }
+        });
+    }
+
+    // Helper: update dropdown select from key
+    function setDropdownFromKey(key) {
+        if (key === 'all' || key === 'none') {
+            provinceSelect.value = '';
+            return;
+        }
+        for (var i = 0; i < provinceSelect.options.length; i++) {
+            var opt = provinceSelect.options[i];
+            if (opt.value && getProvinceKey(opt.text) === key) {
+                provinceSelect.selectedIndex = i;
+                break;
+            }
+        }
+    }
+
+    // Render district cards into the grid
+    function renderGrid() {
+        var isNone = (currentActiveProvKey === 'none');
+
+        if (isNone) {
+            if (emptyPrompt) emptyPrompt.style.display = 'flex';
+            if (activeView) activeView.style.display = 'none';
+            if (provinceContextBadge) {
+                provinceContextBadge.textContent = '• Select Province in Step 1';
+                provinceContextBadge.style.color = '#64748B';
+            }
+        } else {
+            if (emptyPrompt) emptyPrompt.style.display = 'none';
+            if (activeView) activeView.style.display = 'block';
+
+            var dispName = getProvinceDisplayName(currentActiveProvKey);
+            if (provinceContextBadge) {
+                provinceContextBadge.textContent = '• In ' + dispName;
+                provinceContextBadge.style.color = '#15803D';
+            }
+            if (searchInput) {
+                searchInput.placeholder = 'Filter districts in ' + dispName + '...';
+            }
+            if (btnSelectAll) {
+                btnSelectAll.innerHTML = '<i class="fa-solid fa-check-double"></i> Select All in ' + (currentActiveProvKey === 'all' ? 'All' : dispName);
+            }
+            if (btnDeselect) {
+                btnDeselect.innerHTML = '<i class="fa-regular fa-square"></i> Deselect in ' + (currentActiveProvKey === 'all' ? 'All' : dispName);
+            }
+
+            var query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+            gridContainer.innerHTML = '';
+
+            var matchCount = 0;
+            districtData.forEach(function(item) {
+                var matchProv = (currentActiveProvKey === 'all' || item.provinceKey === currentActiveProvKey);
+                var matchQuery = !query || item.fullText.indexOf(query) !== -1;
+
+                if (matchProv && matchQuery) {
+                    matchCount++;
+                    var card = document.createElement('div');
+                    var isSelected = item.optionElem.selected;
+                    card.className = 'district-chip-card ' + (isSelected ? 'selected' : '');
+                    card.dataset.id = item.id;
+
+                    card.innerHTML = `
+                        <div class="district-chip-left">
+                            <i class="district-check-icon fa-solid ${isSelected ? 'fa-square-check' : 'fa-square'}"></i>
+                            <span>${item.name}</span>
+                        </div>
+                        <span class="district-prov-badge">${item.provinceName || dispName}</span>
+                    `;
+
+                    card.onclick = function() {
+                        item.optionElem.selected = !item.optionElem.selected;
+                        renderGrid();
+                    };
+
+                    gridContainer.appendChild(card);
+                }
+            });
+
+            if (matchCount === 0) {
+                gridContainer.innerHTML = '<div style="grid-column: 1 / -1; padding: 20px; text-align: center; color: #94A3B8; font-size: 12px; font-style: italic;">No matching districts found in ' + dispName + '.</div>';
+            }
+        }
+
+        updatePreviewAndCounter();
+    }
+
+    function updatePreviewAndCounter() {
+        var selectedItems = districtData.filter(function(d) { return d.optionElem.selected; });
+        var count = selectedItems.length;
+
+        if (counterBadge) {
+            counterBadge.textContent = count + ' of ' + districtData.length + ' Districts Assigned';
+            if (count > 0) {
+                counterBadge.style.background = '#DCFCE7';
+                counterBadge.style.color = '#166534';
+                counterBadge.style.borderColor = '#BBF7D0';
+            } else {
+                counterBadge.style.background = '#F1F5F9';
+                counterBadge.style.color = '#64748B';
+                counterBadge.style.borderColor = '#E2E8F0';
+            }
+        }
+
+        if (btnClearAll) {
+            btnClearAll.style.display = (count > 0) ? 'inline-flex' : 'none';
+        }
+
+        if (previewContainer) {
+            if (count === 0) {
+                previewContainer.innerHTML = '<span style="font-size: 11px; color: #94A3B8; font-style: italic;">No districts assigned yet. Select a province above to assign districts.</span>';
+            } else {
+                var chipsHtml = '';
+                selectedItems.forEach(function(item) {
+                    chipsHtml += `
+                        <span class="selected-district-chip">
+                            <span>${item.name}</span>
+                            <span style="font-size: 9px; opacity: 0.8;">(${item.provinceName})</span>
+                            <i class="fa-solid fa-xmark chip-remove" data-id="${item.id}" title="Remove district"></i>
+                        </span>
+                    `;
+                });
+                previewContainer.innerHTML = chipsHtml;
+
+                previewContainer.querySelectorAll('.chip-remove').forEach(function(xBtn) {
+                    xBtn.onclick = function() {
+                        var did = this.getAttribute('data-id');
+                        var target = districtData.find(function(d) { return d.id === did; });
+                        if (target) {
+                            target.optionElem.selected = false;
+                            renderGrid();
+                        }
+                    };
+                });
+            }
+        }
+    }
+
+    // Dropdown change listener
+    provinceSelect.addEventListener('change', function() {
+        var opt = this.options[this.selectedIndex];
+        if (!opt || !opt.value) {
+            currentActiveProvKey = 'none';
+        } else {
+            currentActiveProvKey = getProvinceKey(opt.text);
+        }
+        syncPillStates(currentActiveProvKey);
+        renderGrid();
+    });
+
+    // Quick-select pill buttons
+    document.querySelectorAll('.province-pill-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var key = this.getAttribute('data-prov-key');
+            currentActiveProvKey = key;
+            setDropdownFromKey(key);
+            syncPillStates(key);
+            renderGrid();
+        });
+    });
+
+    // Search input
+    if (searchInput) {
+        searchInput.addEventListener('input', renderGrid);
+    }
+
+    // Select all visible in current province
+    if (btnSelectAll) {
+        btnSelectAll.addEventListener('click', function() {
+            var query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+            districtData.forEach(function(item) {
+                var matchProv = (currentActiveProvKey === 'all' || item.provinceKey === currentActiveProvKey);
+                var matchQuery = !query || item.fullText.indexOf(query) !== -1;
+                if (matchProv && matchQuery) {
+                    item.optionElem.selected = true;
+                }
+            });
+            renderGrid();
+        });
+    }
+
+    // Deselect visible in current province
+    if (btnDeselect) {
+        btnDeselect.addEventListener('click', function() {
+            var query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+            districtData.forEach(function(item) {
+                var matchProv = (currentActiveProvKey === 'all' || item.provinceKey === currentActiveProvKey);
+                var matchQuery = !query || item.fullText.indexOf(query) !== -1;
+                if (matchProv && matchQuery) {
+                    item.optionElem.selected = false;
+                }
+            });
+            renderGrid();
+        });
+    }
+
+    // Clear all districts across all provinces
+    if (btnClearAll) {
+        btnClearAll.addEventListener('click', function() {
+            districtData.forEach(function(item) {
+                item.optionElem.selected = false;
+            });
+            renderGrid();
+        });
+    }
+
+    // Empty state "View All 30 Districts Nationwide" button
+    if (btnShowAllNationwide) {
+        btnShowAllNationwide.addEventListener('click', function() {
+            currentActiveProvKey = 'all';
+            provinceSelect.value = '';
+            syncPillStates('all');
+            renderGrid();
+        });
+    }
+
+    // Initial state
+    syncPillStates(currentActiveProvKey);
+    renderGrid();
+}
+
+// Copy Activation Link
+function copySetupLink() {
+    var input = document.getElementById('activation-link-input');
+    var btnText = document.getElementById('copy-btn-text');
+    if (input) {
+        input.select();
+        navigator.clipboard.writeText(input.value).then(function() {
+            if (btnText) btnText.textContent = 'Copied!';
+            setTimeout(function() {
+                if (btnText) btnText.textContent = 'Copy Link';
+            }, 2500);
+        });
+    }
+}
+
+// DOM Ready initialization
+document.addEventListener('DOMContentLoaded', function() {
+    var roleSelect = document.getElementById('id_role');
+    if (roleSelect) {
+        updateRoleExplainer(roleSelect.value);
+        roleSelect.addEventListener('change', function() {
+            updateRoleExplainer(this.value);
+        });
+    }
+
+    initDistrictSelector();
+});
+</script>
 {% endblock %}

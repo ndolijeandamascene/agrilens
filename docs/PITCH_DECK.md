@@ -7,6 +7,13 @@
 **Status:** Validated Technical Baseline & Commercial Architecture  
 **Accreditation Base:** Official Microdata from National Institute of Statistics of Rwanda (NISR)  
 
+### 🚀 Live Hackathon Submission & Demonstration
+| **Live Platform URL** | **Username** | **Password** | **Role** |
+| :--- | :--- | :--- | :--- |
+| **[https://agrilens.ndoli.dev](https://agrilens.ndoli.dev)** | `admin` | `AgriLens2026!` | `System Administrator (Full Superuser)` |
+
+> 🔐 **Environment Configuration (`.env`):** To request the complete production or testing `.env` configuration file, contact **[ndolijeandamascene@gmail.com](mailto:ndolijeandamascene@gmail.com)** or via WhatsApp at **[+250 789 312 765](https://wa.me/250789312765)**.
+
 ---
 
 > ### Strategic Mission
@@ -528,6 +535,25 @@ python manage.py test tests
 - **Total Tests Executed:** 81 tests across all core apps (`test_import_sas_production`, `test_validation_service`, `test_workflow_engine`, `test_indicator_service`, `test_reporting_service`, `test_decision_support_engine`).
 - **Failures / Errors:** 0 failures, 0 errors.
 - **Pass Rate:** **100.0%**.
+
+---
+
+## ⚖️ Intellectual Property, License & Usage Policy
+
+> ### ⚠️ STRICT RESTRICTED USE NOTICE
+> **All Rights Reserved © 2026 AgriLens Development Team.**
+>
+> 1. **Non-Commercial & No Personal Profit:**  
+>    No individual, entity, or third party is permitted to use, copy, reproduce, monetize, sub-license, or exploit any portion of this codebase, architecture, machine learning models, algorithms, or visual designs for commercial purposes, revenue generation, or personal financial profit under any circumstances.
+>
+> 2. **Public Hackathon Visibility Disclaimer:**  
+>    Although this repository is publicly accessible solely for the purpose of evaluation, review, and judging during the **2026 NISR Big Data Hackathon (Track 1: Agricultural Productivity)**, public availability does **NOT** constitute an open-source license, public domain dedication, or waiver of intellectual property rights.
+>
+> 3. **Prohibition of Modifications & Derivative Works:**  
+>    Any unauthorized modification, alteration, redistribution, fork, decompilation, reverse-engineering, or derivation of this codebase or its underlying assets is strictly prohibited.
+>
+> 4. **Exclusive Authorization for NISR:**  
+>    Operational utilization, institutional adoption, data integration, and platform deployment are **exclusively and solely permitted for the National Institute of Statistics of Rwanda (NISR)** and its officially designated national agricultural partners.
 
 ---
 *AgriLens Technical Lead & Architecture Team — NISR 2026 Big Data Hackathon Track 1*

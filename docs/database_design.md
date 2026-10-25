@@ -2,8 +2,7 @@
 
 **Project:** AgriLens • National Agricultural Productivity Intelligence Platform  
 **Hackathon:** NISR 2026 Big Data Hackathon – Track 1: Agricultural Productivity  
-**Date:** October 2026  
-**Status:** Approved Architectural Design (Stage 3 Deliverable)  
+**Document Version:** 2.0 &bull; Comprehensive Specification (Data Provenance, Notifications, ML & RBAC)  
 
 ---
 
@@ -17,6 +16,8 @@
    - **Tier 3: Analytical & Indicator Views (`analytics_*`):** Harmonized aggregates, weighted yield calculations, and productivity gap metrics.
 3. **Audit Trail & Role-Based Workflows:**  
    Manual data entry flows through a verifiable lifecycle: `Draft ➔ Submitted ➔ Reviewed ➔ Approved`. All edits are tracked with timestamps, user foreign keys, and change justifications.
+4. **Idempotent Asynchronous Communications:**  
+   Notification models isolate transaction-safe email logs and preferences with automatic retry counters to prevent duplicate notifications during network retries.
 
 ---
 
@@ -51,7 +52,17 @@
        │   • ProductivityMetric          │
        │   • YieldGapAnalysis            │
        │   • PracticeAdoptionKPI         │
-       └─────────────────────────────────┘
+       └────────────────┬────────────────┘
+                        │
+        ┌───────────────┴───────────────┐
+        ▼                               ▼
+┌──────────────────────────────┐ ┌──────────────────────────────┐
+│  Tier 4: Notification Core   │ │ Tier 5: Machine Learning Core│
+│  • Notification              │ │ • Model Registry             │
+│  • NotificationPreference    │ │ • Feature Weights / Clusters │
+│  • SystemAnnouncement        │ │ • Inference Logs             │
+│  • EmailDeliveryLog          │ └──────────────────────────────┘
+└──────────────────────────────┘
 ```
 
 ---
@@ -83,7 +94,7 @@ class ImportBatch(models.Model):
     rows_rejected = models.IntegerField(default=0)
     started_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=20, default='PENDING') # PENDING, SUCCESS, FAILED
+    status = models.CharField(max_length=20, default='PENDING')  # PENDING, SUCCESS, FAILED
     error_log = models.TextField(blank=True)
 ```
 
@@ -95,78 +106,20 @@ class ImportBatch(models.Model):
 Preserves authentic NISR column identifiers directly from `Rwa_raw_Season*202*_Production`:
 * `batch` $\rightarrow$ FK to `ImportBatch`
 * `Segment_ID` (BigInt)
-* `s1q1` (Province numeric code)
-* `s1q2` (District numeric code)
+* `s1q1` (Province numeric code: 1–5)
+* `s1q2` (District numeric code: 11–57)
 * `s1q3` (Stratum)
-* `s1q6` (Farmer ID)
-* `s1q7` (Farmer / LSF type)
-* `s2q1` (Plot number)
-* `s2q2` (Plot area sqm)
-* `s2q2_ha` (Plot area ha)
-* `s2q4` (Crop name string / code)
-* `CropCategory` (Category string)
-* `s2q9` (Improved seed flag)
-* `s2q19_3` (Harvested kg)
-* `s2q20_2` (Remaining harvest kg)
-* `s2q21` (Total production kg)
-* `s2q25` (Transformed / processed kg)
-* `s2q26` (Quantity sold kg)
-* `s2q28` (Market unit price)
-* `s2q36` (Stored quantity kg)
-* `s2q37` (Storage facility)
-* Post-harvest loss fields (`s2q41` to `s2q50`)
-* `s3q3`, `s3q9`, `s3q18` (Fertilizer & Pesticide flags)
-* `plot_weight` (Sampling weight)
+* `s4q3` (Crop Name)
+* `s4q4` (Crop Code)
+* `s4q5` (Plot Area)
+* `s4q9` (Harvested Quantity)
+* `weight` (Household sampling expansion factor)
 
 ---
 
-## 5. Tier 2: Validated Domain & Observation Tables
+## 5. Tier 2: Validated Domain Models
 
-### Model: `ValidatedObservation`
-Represents cleaned, verified, and mapped agricultural plot-level records:
-```python
-class ValidatedObservation(models.Model):
-    batch = models.ForeignKey(ImportBatch, on_delete=models.PROTECT, related_name='observations')
-    provenance = models.CharField(max_length=40, db_index=True) # e.g. NISR_SAS_2025
-    season = models.ForeignKey('agriculture.AgriculturalSeason', on_delete=models.PROTECT)
-    district = models.ForeignKey('geography.District', on_delete=models.PROTECT)
-    sector = models.ForeignKey('geography.Sector', on_delete=models.SET_NULL, null=True, blank=True)
-    crop = models.ForeignKey('agriculture.Crop', on_delete=models.PROTECT)
-    
-    # Identifiers
-    segment_id = models.CharField(max_length=50, blank=True, db_index=True)
-    plot_number = models.IntegerField(null=True, blank=True)
-    farmer_type = models.CharField(max_length=50, blank=True)
-    
-    # Area & Production
-    plot_area_ha = models.DecimalField(max_digits=10, decimal_places=4)
-    total_production_kg = models.DecimalField(max_digits=12, decimal_places=2)
-    calculated_yield_kg_per_ha = models.DecimalField(max_digits=12, decimal_places=2)
-    
-    # Practices
-    is_improved_seed = models.BooleanField(default=False)
-    uses_organic_fertilizer = models.BooleanField(default=False)
-    uses_inorganic_fertilizer = models.BooleanField(default=False)
-    uses_pesticide = models.BooleanField(default=False)
-    is_irrigated = models.BooleanField(default=False)
-    has_anti_erosion = models.BooleanField(default=False)
-    uses_mechanization = models.BooleanField(default=False)
-    
-    # Post-Harvest Losses (kg)
-    total_loss_kg = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
-    loss_rate_percentage = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
-    
-    # Sampling Weight
-    sampling_weight = models.DecimalField(max_digits=12, decimal_places=4, default=1.0)
-    
-    class Meta:
-        indexes = [
-            models.Index(fields=['provenance', 'season', 'district']),
-            models.Index(fields=['crop', 'season']),
-        ]
-```
-
-### Model: `ManualObservation` (Audited Manual Submissions)
+### Model: `ManualObservation` (Maker-Checker Submissions)
 ```python
 class ManualObservation(models.Model):
     class ReviewStatus(models.TextChoices):
@@ -210,3 +163,73 @@ $$\text{Weighted Yield} = \frac{\sum (\text{production\_kg}_i \times \text{weigh
 $$\text{Productivity Gap \%} = \frac{\text{Yield}_{\text{Ref}} - \text{Yield}_{\text{Dist}}}{\text{Yield}_{\text{Ref}}} \times 100$$
 
 By default, Tier 3 calculations execute exclusively where `provenance IN ('NISR_SAS_2024', 'NISR_SAS_2025')`. Manual entries are only evaluated under dedicated user-selected filter scenarios.
+
+---
+
+## 7. Tier 4: Notifications & Multi-Channel Communications
+
+```python
+class Notification(models.Model):
+    class NotificationType(models.TextChoices):
+        DATA_SUBMITTED = 'DATA_SUBMITTED', 'Data Submission'
+        DATA_APPROVED = 'DATA_APPROVED', 'Data Approved'
+        DATA_REJECTED = 'DATA_REJECTED', 'Data Rejected'
+        PRICE_ALERT = 'PRICE_ALERT', 'Commodity Price Alert'
+        REPORT_READY = 'REPORT_READY', 'Report Generated'
+        ANNOUNCEMENT = 'ANNOUNCEMENT', 'System Announcement'
+        SECURITY_ALERT = 'SECURITY_ALERT', 'Security & Access Alert'
+
+    recipient = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='notifications')
+    notification_type = models.CharField(max_length=40, choices=NotificationType.choices)
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    action_url = models.CharField(max_length=255, blank=True)
+    is_read = models.BooleanField(default=False, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+class NotificationPreference(models.Model):
+    user = models.OneToOneField('accounts.User', on_delete=models.CASCADE, related_name='notification_preference')
+    email_on_submission = models.BooleanField(default=True)
+    email_on_approval = models.BooleanField(default=True)
+    email_on_price_alert = models.BooleanField(default=False)
+    email_on_announcement = models.BooleanField(default=True)
+
+class EmailDeliveryLog(models.Model):
+    recipient_email = models.EmailField()
+    subject = models.CharField(max_length=255)
+    notification = models.ForeignKey(Notification, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=20, default='PENDING')  # PENDING, SENT, FAILED
+    error_message = models.TextField(blank=True)
+    retry_count = models.PositiveIntegerField(default=0)
+    sent_at = models.DateTimeField(null=True, blank=True)
+```
+
+---
+
+## 8. Tier 5: Machine Learning Models & Metadata Schema
+
+Stores serialized ML pipelines (Random Forest yield predictors, K-Means clusterers) alongside version metrics:
+- **`model_name`**: e.g., `yield_predictor_randomforest_v1`
+- **`algorithm`**: `RandomForestRegressor(n_estimators=100, max_depth=12)`
+- **`target_crop`**: e.g., `Maize`
+- **`r2_score`**, **`mae`**, **`rmse`**: Empirical model evaluation metrics.
+- **`feature_importance`**: JSON payload storing normalized weights for rainfall, fertilizer, irrigation, seed type, and soil pH.
+
+---
+
+## ⚖️ Intellectual Property, License & Usage Policy
+
+> ### ⚠️ STRICT RESTRICTED USE NOTICE
+> **All Rights Reserved © 2026 AgriLens Development Team.**
+>
+> 1. **Non-Commercial & No Personal Profit:**  
+>    No individual, entity, or third party is permitted to use, copy, reproduce, monetize, sub-license, or exploit any portion of this codebase, architecture, machine learning models, algorithms, or visual designs for commercial purposes, revenue generation, or personal financial profit under any circumstances.
+>
+> 2. **Public Hackathon Visibility Disclaimer:**  
+>    Although this repository is publicly accessible solely for the purpose of evaluation, review, and judging during the **2026 NISR Big Data Hackathon (Track 1: Agricultural Productivity)**, public availability does **NOT** constitute an open-source license, public domain dedication, or waiver of intellectual property rights.
+>
+> 3. **Prohibition of Modifications & Derivative Works:**  
+>    Any unauthorized modification, alteration, redistribution, fork, decompilation, reverse-engineering, or derivation of this codebase or its underlying assets is strictly prohibited.
+>
+> 4. **Exclusive Authorization for NISR:**  
+>    Operational utilization, institutional adoption, data integration, and platform deployment are **exclusively and solely permitted for the National Institute of Statistics of Rwanda (NISR)** and its officially designated national agricultural partners.

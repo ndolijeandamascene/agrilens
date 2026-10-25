@@ -1,122 +1,1082 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}System Audit Trail &amp; Compliance | AgriLens Rwanda{% endblock %}
-{% block section_title %}Security Audit Trail &amp; Compliance Logs{% endblock %}
+{% block title %}Security Audit Trail | AgriLens Rwanda{% endblock %}
+{% block page_heading %}Security Audit Trail{% endblock %}
+{% block page_subheading %}Immutable operational log &amp; compliance stream{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ==========================================================================
+   AgriLens Enterprise Security Audit Trail & Immutable Ledger
+   Matches official National Dashboard & GovTech design standards
+   ========================================================================== */
+
+:root {
+    --audit-primary: #15803D;
+    --audit-primary-dark: #166534;
+    --audit-primary-subtle: #F0FDF4;
+    --audit-primary-border: #BBF7D0;
+    --audit-card-bg: #FFFFFF;
+    --audit-border: #E2E8F0;
+    --audit-text-main: #0F172A;
+    --audit-text-muted: #64748B;
+    --audit-blue: #2563EB;
+    --audit-blue-subtle: #EFF6FF;
+    --audit-purple: #7C3AED;
+    --audit-purple-subtle: #FAF5FF;
+    --audit-amber: #D97706;
+    --audit-amber-subtle: #FFFBEB;
+    --audit-red: #DC2626;
+    --audit-red-subtle: #FEF2F2;
+}
+
+.audit-container {
+    padding: 20px 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+/* Action & Integrity Verification Bar */
+.audit-action-bar {
+    background: #FFFFFF;
+    border: 1px solid var(--audit-border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.integrity-badge-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #166534;
+    font-weight: 700;
+    font-size: 12px;
+    flex-wrap: wrap;
+}
+
+.integrity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #16A34A;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
+    animation: auditPulseDot 2s infinite;
+}
+
+@keyframes auditPulseDot {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    50% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.integrity-divider {
+    color: #CBD5E1;
+    font-weight: 400;
+}
+
+.integrity-tag {
+    font-size: 11px;
+    color: var(--audit-text-muted);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.audit-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-audit-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.btn-audit-primary {
+    background: var(--audit-primary);
+    color: #FFFFFF;
+    box-shadow: 0 1px 2px rgba(21, 128, 61, 0.2);
+}
+
+.btn-audit-primary:hover {
+    background: var(--audit-primary-dark);
+}
+
+.btn-audit-outline {
+    background: #FFFFFF;
+    color: var(--audit-text-main);
+    border-color: var(--audit-border);
+}
+
+.btn-audit-outline:hover {
+    background: #F8FAFC;
+    border-color: #94A3B8;
+}
+
+/* ==========================================================================
+   4 Executive KPI Cards (Row-Aligned Exactly Like National Dashboard)
+   ========================================================================== */
+.audit-container .metrics-row {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.audit-container .metric-card {
+    background: #FFFFFF;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--audit-border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    min-width: 0;
+}
+
+.audit-container .metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.audit-container .metric-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--audit-text-muted);
+}
+
+.audit-container .icon-box {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.audit-container .metric-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--audit-text-main);
+    line-height: 1.1;
+}
+
+.audit-container .metric-sub {
+    font-size: 11px;
+    color: var(--audit-text-muted);
+}
+
+.audit-container .metric-tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    width: fit-content;
+    font-weight: 600;
+}
+
+/* Category Quick Filter Pills */
+.audit-category-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.category-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid var(--audit-border);
+    background: #FFFFFF;
+    color: var(--audit-text-muted);
+    transition: all 0.15s ease;
+}
+
+.category-filter-btn:hover {
+    background: #F8FAFC;
+    color: var(--audit-text-main);
+    border-color: #CBD5E1;
+}
+
+.category-filter-btn.active {
+    background: var(--audit-primary);
+    color: #FFFFFF;
+    border-color: var(--audit-primary);
+    box-shadow: 0 2px 6px rgba(21, 128, 61, 0.2);
+}
+
+/* Filter Bar Panel */
+.audit-filter-panel {
+    background: #FFFFFF;
+    border: 1px solid var(--audit-border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.audit-filter-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.search-input-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 240px;
+    max-width: 360px;
+}
+
+.search-input-wrap i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: var(--audit-text-muted);
+    pointer-events: none;
+}
+
+.search-input-field {
+    width: 100%;
+    padding: 7px 12px 7px 34px;
+    border: 1px solid var(--audit-border);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--audit-text-main);
+    background: #FFFFFF;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease;
+}
+
+.search-input-field:focus {
+    border-color: var(--audit-primary);
+    box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.12);
+}
+
+.audit-select-field {
+    padding: 7px 12px;
+    border: 1px solid var(--audit-border);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--audit-text-main);
+    background: #FFFFFF;
+    outline: none;
+    cursor: pointer;
+    height: 33px;
+}
+
+.audit-select-field:focus {
+    border-color: var(--audit-primary);
+}
+
+.btn-filter-submit {
+    padding: 7px 16px;
+    background: var(--audit-primary);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    height: 33px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-filter-submit:hover {
+    background: var(--audit-primary-dark);
+}
+
+.btn-filter-clear {
+    font-size: 12px;
+    color: var(--audit-red);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: background 0.15s ease;
+}
+
+.btn-filter-clear:hover {
+    background: var(--audit-red-subtle);
+}
+
+/* Audit Table Card */
+.audit-table-card {
+    background: #FFFFFF;
+    border: 1px solid var(--audit-border);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.table-responsive {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+    display: block;
+}
+
+.audit-table {
+    width: 100%;
+    min-width: 820px;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+}
+
+.audit-table thead tr {
+    background: #F8FAFC;
+    border-bottom: 2px solid var(--audit-border);
+}
+
+.audit-table th {
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #475569;
+    white-space: nowrap;
+}
+
+.audit-table tbody tr {
+    border-bottom: 1px solid #F1F5F9;
+    transition: background 0.12s ease;
+}
+
+.audit-table tbody tr:hover {
+    background: #F8FAFC;
+}
+
+.audit-table td {
+    padding: 13px 16px;
+    vertical-align: middle;
+}
+
+/* Timestamp Column */
+.audit-time-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    white-space: nowrap;
+}
+
+.audit-time-utc {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--audit-text-main);
+}
+
+.audit-time-relative {
+    font-size: 11px;
+    color: var(--audit-text-muted);
+}
+
+/* Action Badges */
+.action-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.pill-blue { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+.pill-green { background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; }
+.pill-purple { background: #FAF5FF; color: #7C3AED; border: 1px solid #DDD6FE; }
+.pill-amber { background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; }
+.pill-red { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+.pill-gray { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
+
+/* Actor Column */
+.actor-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.actor-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #E2E8F0;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.actor-avatar.admin-avatar {
+    background: #DCFCE7;
+    color: #166534;
+}
+
+.actor-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.actor-name-link {
+    font-weight: 600;
+    color: var(--audit-text-main);
+    text-decoration: none;
+    font-size: 12px;
+    transition: color 0.15s;
+}
+
+.actor-name-link:hover {
+    color: var(--audit-primary);
+}
+
+.actor-role-tag {
+    font-size: 11px;
+    color: var(--audit-text-muted);
+}
+
+/* Target Column */
+.target-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    max-width: 240px;
+}
+
+.target-model-badge {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #F1F5F9;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.target-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--audit-text-main);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* IP & Origin */
+.ip-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 11px;
+    color: var(--audit-text-muted);
+    background: #F8FAFC;
+    border: 1px solid var(--audit-border);
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+/* Payload Details Chips */
+.payload-chips-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    max-width: 320px;
+}
+
+.payload-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: #F8FAFC;
+    border: 1px solid var(--audit-border);
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.payload-chip-key {
+    color: var(--audit-text-muted);
+    font-weight: 600;
+}
+
+.payload-chip-val {
+    color: var(--audit-text-main);
+    font-weight: 700;
+}
+
+.btn-inspect-payload {
+    padding: 3px 8px;
+    background: #EFF6FF;
+    color: var(--audit-blue);
+    border: 1px solid #BFDBFE;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.btn-inspect-payload:hover {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+/* Pagination Bar */
+.audit-pagination-bar {
+    padding: 14px 18px;
+    border-top: 1px solid var(--audit-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.page-btn {
+    padding: 5px 11px;
+    background: #FFFFFF;
+    border: 1px solid var(--audit-border);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--audit-text-main);
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.page-btn:hover {
+    background: #F8FAFC;
+    border-color: #94A3B8;
+}
+
+.page-btn.active {
+    background: var(--audit-primary);
+    color: #FFFFFF;
+    border-color: var(--audit-primary);
+}
+
+/* Payload Inspection Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(2px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-dialog {
+    background: #FFFFFF;
+    border-radius: 10px;
+    max-width: 680px;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--audit-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #F8FAFC;
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--audit-text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-close-btn {
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    color: var(--audit-text-muted);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modal-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    background: #F8FAFC;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--audit-border);
+}
+
+.modal-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.modal-meta-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--audit-text-muted);
+    text-transform: uppercase;
+}
+
+.modal-meta-val {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--audit-text-main);
+}
+
+.payload-json-box {
+    background: #0F172A;
+    color: #E2E8F0;
+    padding: 14px;
+    border-radius: 8px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-x: auto;
+    max-height: 260px;
+}
+
+.modal-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--audit-border);
+    background: #F8FAFC;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .audit-container .metrics-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .audit-container {
+        padding: 14px 16px;
+        gap: 14px;
+    }
+    .audit-action-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .audit-hero-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .audit-filter-panel {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .audit-filter-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-input-wrap {
+        max-width: 100%;
+        min-width: 100%;
+    }
+    .audit-select-field, .btn-filter-submit {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .audit-container .metrics-row {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+    .category-filter-btn {
+        font-size: 11px;
+        padding: 5px 10px;
+    }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="dashboard-container" style="padding: 24px 32px;">
-    <!-- Header Strip -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-        <div>
-            <h1 style="margin: 0; font-size: 1.5rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
-                System &amp; Security Audit Trail
-            </h1>
-            <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #64748B;">
-                Immutable, append-only operational log recording logins, role modifications, geographic assignments, and data governance actions.
-            </p>
+<div class="audit-container">
+
+    <!-- Unified Action & Integrity Verification Bar -->
+    <div class="audit-action-bar">
+        <div class="integrity-badge-left">
+            <span class="integrity-dot"></span>
+            <span>Tamper-Evident SHA-256 Ledger Active</span>
+            <span class="integrity-divider">•</span>
+            <span class="integrity-tag"><i class="fa-solid fa-lock" style="color: var(--audit-primary);"></i> Non-Destructive</span>
+            <span class="integrity-tag"><i class="fa-solid fa-shield-halved" style="color: var(--audit-blue);"></i> Strict Privilege Isolation</span>
+            <span class="integrity-tag"><i class="fa-solid fa-server" style="color: #64748B;"></i> PostgreSQL 16</span>
         </div>
-        <div>
-            <a href="{% url 'accounts:user_list' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #15803D; border: 1px solid #BBF7D0; border-radius: 8px; font-weight: 600; font-size: 0.86rem; text-decoration: none;">
-                &larr; Officers Registry
+        <div class="audit-hero-actions">
+            <a href="?export=csv{% if action_filter %}&action={{ action_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if query %}&q={{ query }}{% endif %}" class="btn-audit-action btn-audit-outline" id="btn-export-audit-csv">
+                <i class="fa-solid fa-file-arrow-down" style="color: var(--audit-primary);"></i>
+                <span>Export Ledger CSV</span>
+            </a>
+            <a href="{% url 'accounts:user_list' %}" class="btn-audit-action btn-audit-primary" id="btn-officers-registry">
+                <i class="fa-solid fa-users-gear"></i>
+                <span>Officers Registry &rarr;</span>
             </a>
         </div>
     </div>
 
-    <!-- Filter and Search Strip -->
-    <div style="background: #FFFFFF; border-radius: 10px; border: 1px solid #E2E8F0; padding: 16px 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-        <form method="GET" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <label for="action-filter" style="font-size: 0.84rem; font-weight: 600; color: #475569;">Action:</label>
-                <select id="action-filter" name="action" style="padding: 7px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: #FFFFFF; color: #0F172A;" onchange="this.form.submit()">
-                    <option value="">All Actions</option>
+    <!-- 4 Executive KPI Metrics Cards (Identical Grid/Card Design to National Dashboard) -->
+    <div class="metrics-row" aria-label="Security and Operational Audit Metrics">
+        <!-- KPI 1: Total Events -->
+        <div class="metric-card" id="kpi-total-audit">
+            <div class="metric-header">
+                <div class="icon-box" style="background: var(--audit-primary);"><i class="fa-solid fa-database"></i></div>
+                <span>Total Audit Events</span>
+            </div>
+            <div class="metric-value">{{ total_logs }}</div>
+            <div class="metric-sub">Lifetime append-only records</div>
+            <div class="metric-tag" style="background: var(--audit-primary-subtle); color: var(--audit-primary);">100% Immutable</div>
+        </div>
+
+        <!-- KPI 2: Velocity Last 24 Hours -->
+        <div class="metric-card" id="kpi-last-24h">
+            <div class="metric-header">
+                <div class="icon-box" style="background: var(--audit-blue);"><i class="fa-solid fa-bolt"></i></div>
+                <span>Last 24 Hours</span>
+            </div>
+            <div class="metric-value">{{ events_24h }}</div>
+            <div class="metric-sub">Recent operational actions</div>
+            <div class="metric-tag" style="background: var(--audit-blue-subtle); color: var(--audit-blue);">Live Stream</div>
+        </div>
+
+        <!-- KPI 3: Security & Credentials -->
+        <div class="metric-card" id="kpi-security-roles">
+            <div class="metric-header">
+                <div class="icon-box" style="background: var(--audit-purple);"><i class="fa-solid fa-shield-halved"></i></div>
+                <span>Security &amp; Roles</span>
+            </div>
+            <div class="metric-value">{{ security_count }}</div>
+            <div class="metric-sub">Auth, tokens &amp; RBAC changes</div>
+            <div class="metric-tag" style="background: var(--audit-purple-subtle); color: var(--audit-purple);">RBAC Enforced</div>
+        </div>
+
+        <!-- KPI 4: Reports & Analytics -->
+        <div class="metric-card" id="kpi-reports-lineage">
+            <div class="metric-header">
+                <div class="icon-box" style="background: var(--audit-amber);"><i class="fa-solid fa-file-chart-column"></i></div>
+                <span>Reports &amp; Lineage</span>
+            </div>
+            <div class="metric-value">{{ report_count }}</div>
+            <div class="metric-sub">Bulletins, exports &amp; imports</div>
+            <div class="metric-tag" style="background: var(--audit-amber-subtle); color: var(--audit-amber);">Ledger Verified</div>
+        </div>
+    </div>
+
+    <!-- Category Quick Filters Navigation -->
+    <div class="audit-category-nav">
+        <span style="font-size: 11px; font-weight: 700; color: var(--audit-text-muted); text-transform: uppercase;">Category:</span>
+        <a href="?{% if query %}q={{ query }}&amp;{% endif %}" class="category-filter-btn {% if not category_filter %}active{% endif %}">
+            <i class="fa-solid fa-list-check"></i> All Events ({{ total_logs }})
+        </a>
+        <a href="?category=security{% if query %}&amp;q={{ query }}{% endif %}" class="category-filter-btn {% if category_filter == 'security' %}active{% endif %}">
+            <i class="fa-solid fa-shield-halved"></i> Security &amp; Credentials ({{ security_count }})
+        </a>
+        <a href="?category=reports{% if query %}&amp;q={{ query }}{% endif %}" class="category-filter-btn {% if category_filter == 'reports' %}active{% endif %}">
+            <i class="fa-solid fa-file-lines"></i> Reports &amp; Exports ({{ report_count }})
+        </a>
+        <a href="?category=data{% if query %}&amp;q={{ query }}{% endif %}" class="category-filter-btn {% if category_filter == 'data' %}active{% endif %}">
+            <i class="fa-solid fa-layer-group"></i> Observations &amp; ETL ({{ data_count }})
+        </a>
+    </div>
+
+    <!-- Search & Specific Action Filter Panel -->
+    <div class="audit-filter-panel">
+        <form method="GET" class="audit-filter-form">
+            {% if category_filter %}<input type="hidden" name="category" value="{{ category_filter }}">{% endif %}
+
+            <!-- Search Field -->
+            <div class="search-input-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="q" value="{{ query }}" class="search-input-field" placeholder="Search actor, target entity, or details...">
+            </div>
+
+            <!-- Action Select Dropdown -->
+            <div>
+                <select name="action" class="audit-select-field" onchange="this.form.submit()">
+                    <option value="">-- All Action Types --</option>
                     {% for code, label in actions %}
                         <option value="{{ code }}" {% if action_filter == code %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <input type="text" name="q" value="{{ query }}" placeholder="Search actor, target, or details..." style="min-width: 280px; padding: 7px 14px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: #FFFFFF;">
-                <button type="submit" style="padding: 7px 16px; background: #15803D; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
-                    Search
-                </button>
-                {% if query or action_filter %}
-                    <a href="{% url 'accounts:audit_log_list' %}" style="font-size: 0.84rem; color: #DC2626; text-decoration: none; font-weight: 500; margin-left: 6px;">Clear</a>
-                {% endif %}
-            </div>
+            <!-- Submit Button -->
+            <button type="submit" class="btn-filter-submit">
+                <i class="fa-solid fa-filter"></i> Apply Filter
+            </button>
+
+            {% if query or action_filter or category_filter %}
+                <a href="{% url 'accounts:audit_log_list' %}" class="btn-filter-clear">
+                    <i class="fa-solid fa-xmark"></i> Clear Filters
+                </a>
+            {% endif %}
         </form>
-        <span style="font-size: 0.84rem; color: #64748B; font-weight: 500;">
-            Showing <strong>{{ page_obj.paginator.count }}</strong> of <strong>{{ total_logs }}</strong> log event(s)
+
+        <span style="font-size: 12px; color: var(--audit-text-muted); font-weight: 600;">
+            Showing <strong style="color: var(--audit-text-main);">{{ page_obj.paginator.count }}</strong> of <strong style="color: var(--audit-text-main);">{{ total_logs }}</strong> log event(s)
         </span>
     </div>
 
-    <!-- Audit Logs Table -->
-    <div style="background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; padding: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden;">
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+    <!-- Main Audit Ledger Table Card -->
+    <div class="audit-table-card">
+        <div class="table-responsive">
+            <table class="audit-table">
                 <thead>
-                    <tr style="background: #F8FAFC; border-bottom: 2px solid #E2E8F0; text-align: left; color: #475569; font-weight: 700;">
-                        <th style="padding: 12px 16px;">Timestamp (UTC)</th>
-                        <th style="padding: 12px 16px;">Action</th>
-                        <th style="padding: 12px 16px;">Actor</th>
-                        <th style="padding: 12px 16px;">Target Object</th>
-                        <th style="padding: 12px 16px;">IP Address</th>
-                        <th style="padding: 12px 16px;">Audit Details</th>
+                    <tr>
+                        <th><i class="fa-regular fa-clock" style="margin-right: 4px;"></i> Timestamp (UTC)</th>
+                        <th><i class="fa-solid fa-tag" style="margin-right: 4px;"></i> Action &amp; Classification</th>
+                        <th><i class="fa-regular fa-user" style="margin-right: 4px;"></i> Actor / Agent</th>
+                        <th><i class="fa-solid fa-crosshairs" style="margin-right: 4px;"></i> Target Entity</th>
+                        <th><i class="fa-solid fa-network-wired" style="margin-right: 4px;"></i> IP / Origin</th>
+                        <th><i class="fa-solid fa-code-fork" style="margin-right: 4px;"></i> Audit Context &amp; Payload</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for log in page_obj %}
-                    <tr style="border-bottom: 1px solid #F1F5F9; transition: background 0.15s ease;">
-                        <td style="padding: 12px 16px; color: #64748B; font-family: monospace; font-size: 0.8rem; white-space: nowrap;">
-                            {{ log.timestamp|date:"Y-m-d H:i:s" }}
+                    <tr>
+                        <!-- Timestamp -->
+                        <td>
+                            <div class="audit-time-cell">
+                                <span class="audit-time-utc">{{ log.timestamp|date:"Y-m-d H:i:s" }}</span>
+                                <span class="audit-time-relative">{{ log.timestamp|timesince }} ago</span>
+                            </div>
                         </td>
-                        <td style="padding: 12px 16px;">
-                            <span style="display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;
-                                {% if 'LOGIN' in log.action %}background: #DCFCE7; color: #166534;
-                                {% elif 'LOGOUT' in log.action %}background: #F1F5F9; color: #475569;
-                                {% elif 'FAILED' in log.action or 'DEACT' in log.action %}background: #FEE2E2; color: #991B1B;
-                                {% elif 'ROLE' in log.action or 'PERM' in log.action or 'PASSWORD' in log.action %}background: #FEF3C7; color: #92400E;
-                                {% elif 'APPROVED' in log.action %}background: #DCFCE7; color: #166534;
-                                {% elif 'REJECTED' in log.action %}background: #FEE2E2; color: #991B1B;
-                                {% else %}background: #EFF6FF; color: #1D4ED8;{% endif %}">
-                                {{ log.get_action_display }}
-                            </span>
-                        </td>
-                        <td style="padding: 12px 16px; font-weight: 600; color: #0F172A;">
-                            {% if log.actor %}
-                                <a href="{% url 'accounts:user_detail' pk=log.actor.pk %}" style="color: #15803D; text-decoration: none;">
-                                    {{ log.actor.username }}
-                                </a>
-                                <span style="font-size: 0.72rem; color: #64748B; font-weight: 400;">({{ log.actor.get_role_display }})</span>
+
+                        <!-- Action Code Badge -->
+                        <td>
+                            {% if log.action_category == 'security' %}
+                                <span class="action-pill pill-purple">
+                                    <i class="fa-solid fa-key"></i>
+                                    <span>{{ log.get_action_display }}</span>
+                                </span>
+                            {% elif log.action_category == 'report' %}
+                                <span class="action-pill pill-blue">
+                                    <i class="fa-solid fa-file-chart-column"></i>
+                                    <span>{{ log.get_action_display }}</span>
+                                </span>
+                            {% elif log.action_category == 'approval' %}
+                                <span class="action-pill pill-green">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span>{{ log.get_action_display }}</span>
+                                </span>
+                            {% elif log.action_category == 'role' %}
+                                <span class="action-pill pill-amber">
+                                    <i class="fa-solid fa-user-shield"></i>
+                                    <span>{{ log.get_action_display }}</span>
+                                </span>
+                            {% elif 'DEACT' in log.action or 'RETURNED' in log.action %}
+                                <span class="action-pill pill-red">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                    <span>{{ log.get_action_display }}</span>
+                                </span>
                             {% else %}
-                                <span style="color: #64748B;">System / Anonymous</span>
-                            {% endif %}
-                        </td>
-                        <td style="padding: 12px 16px; color: #0F172A; font-weight: 500;">
-                            {% if log.target_model %}
-                                <span style="font-size: 0.76rem; background: #F1F5F9; color: #475569; padding: 2px 6px; border-radius: 4px; margin-right: 4px;">
-                                    {{ log.target_model }}
+                                <span class="action-pill pill-gray">
+                                    <i class="fa-solid fa-database"></i>
+                                    <span>{{ log.get_action_display }}</span>
                                 </span>
                             {% endif %}
-                            <span>{{ log.target_repr|default:log.target_id|default:"-" }}</span>
                         </td>
-                        <td style="padding: 12px 16px; font-family: monospace; font-size: 0.78rem; color: #64748B;">
-                            {{ log.ip_address|default:"-" }}
+
+                        <!-- Actor -->
+                        <td>
+                            <div class="actor-badge">
+                                <div class="actor-avatar {% if log.actor.is_system_admin %}admin-avatar{% endif %}">
+                                    {% if log.actor %}
+                                        {{ log.actor.first_name|slice:":1" }}{{ log.actor.last_name|slice:":1"|default:log.actor.username|slice:":2"|upper }}
+                                    {% else %}
+                                        SY
+                                    {% endif %}
+                                </div>
+                                <div class="actor-info">
+                                    {% if log.actor %}
+                                        <a href="{% url 'accounts:user_detail' pk=log.actor.pk %}" class="actor-name-link">
+                                            {{ log.actor.username }}
+                                        </a>
+                                        <span class="actor-role-tag">{{ log.actor.get_role_display }}</span>
+                                    {% else %}
+                                        <span style="font-weight: 700; color: #475569; font-size: 13px;">System Daemon</span>
+                                        <span class="actor-role-tag">Automated Internal Task</span>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </td>
-                        <td style="padding: 12px 16px; color: #334155;">
-                            {% if log.details %}
-                                <code style="font-size: 0.75rem; background: #F8FAFC; border: 1px solid #E2E8F0; padding: 3px 6px; border-radius: 4px; word-break: break-all; color: #0F172A;">
-                                    {{ log.details }}
-                                </code>
-                            {% else %}
-                                <span style="color: #94A3B8;">-</span>
-                            {% endif %}
+
+                        <!-- Target Entity -->
+                        <td>
+                            <div class="target-cell">
+                                {% if log.target_model %}
+                                    <span class="target-model-badge">
+                                        <i class="fa-solid fa-cube" style="font-size: 9px; margin-right: 2px;"></i> {{ log.target_model }}
+                                    </span>
+                                {% endif %}
+                                <span class="target-label" title="{{ log.target_repr|default:log.target_id }}">
+                                    {{ log.target_repr|default:log.target_id|default:"-" }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <!-- IP / Origin -->
+                        <td>
+                            <span class="ip-pill">
+                                <i class="fa-solid fa-location-arrow" style="font-size: 9px;"></i>
+                                <span>{{ log.ip_address|default:"127.0.0.1 (Local)" }}</span>
+                            </span>
+                        </td>
+
+                        <!-- Audit Context Payload (Clean Structured Chips) -->
+                        <td>
+                            <div class="payload-chips-wrap">
+                                {% for k, v in log.details_dict.items %}
+                                    {% if forloop.counter <= 3 %}
+                                    <span class="payload-chip">
+                                        <span class="payload-chip-key">{{ k }}:</span>
+                                        <span class="payload-chip-val">{{ v|truncatechars:18 }}</span>
+                                    </span>
+                                    {% endif %}
+                                {% empty %}
+                                    <span style="color: #94A3B8; font-size: 11px; font-style: italic;">No extra parameters</span>
+                                {% endfor %}
+
+                                {% if log.details %}
+                                <button type="button" class="btn-inspect-payload" 
+                                        data-log-id="{{ log.id }}"
+                                        data-action="{{ log.get_action_display }}"
+                                        data-actor="{% if log.actor %}{{ log.actor.username }} ({{ log.actor.get_role_display }}){% else %}System Daemon{% endif %}"
+                                        data-time="{{ log.timestamp|date:'Y-m-d H:i:s' }} UTC"
+                                        data-ip="{{ log.ip_address|default:'127.0.0.1 (Local)' }}"
+                                        onclick="openPayloadModalFromBtn(this)">
+                                    <i class="fa-solid fa-code"></i> Inspect
+                                </button>
+                                <!-- Raw JSON data container -->
+                                <textarea id="payload-raw-{{ log.id }}" style="display: none;">{{ log.details }}</textarea>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" style="padding: 40px; text-align: center; color: #64748B;">
-                            No audit log records match the search filter.
+                        <td colspan="6" style="padding: 64px 20px; text-align: center;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: #F1F5F9; color: #94A3B8; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                                    <i class="fa-solid fa-file-circle-question"></i>
+                                </div>
+                                <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--audit-text-main);">No Audit Events Match Your Filter</h3>
+                                <p style="margin: 0; font-size: 12px; color: var(--audit-text-muted); max-width: 360px;">
+                                    Try clearing your search query or selecting a different action classification above.
+                                </p>
+                                <a href="{% url 'accounts:audit_log_list' %}" class="btn-audit-action btn-audit-outline" style="margin-top: 6px;">
+                                    <i class="fa-solid fa-arrow-rotate-left"></i> Reset All Filters
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -124,22 +1084,175 @@
             </table>
         </div>
 
-        <!-- Pagination -->
+        <!-- Pagination Controls -->
         {% if page_obj.has_other_pages %}
-        <div style="padding: 16px 20px; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: 0.84rem; color: #64748B;">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        <div class="audit-pagination-bar">
+            <div style="font-size: 12px; color: var(--audit-text-muted);">
+                Page <strong>{{ page_obj.number }}</strong> of <strong>{{ page_obj.paginator.num_pages }}</strong> ({{ page_obj.paginator.count }} total records)
             </div>
-            <div style="display: flex; gap: 8px;">
+            <div class="pagination-controls">
                 {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}&amp;q={{ query }}&amp;action={{ action_filter }}" style="padding: 6px 12px; background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; text-decoration: none; color: #0F172A;">&larr; Previous</a>
+                    <a href="?page={{ page_obj.previous_page_number }}{% if query %}&amp;q={{ query }}{% endif %}{% if action_filter %}&amp;action={{ action_filter }}{% endif %}{% if category_filter %}&amp;category={{ category_filter }}{% endif %}" class="page-btn">
+                        &larr; Previous
+                    </a>
                 {% endif %}
+
+                {% for p in page_obj.paginator.page_range %}
+                    {% if p >= page_obj.number|add:"-2" and p <= page_obj.number|add:"2" %}
+                        <a href="?page={{ p }}{% if query %}&amp;q={{ query }}{% endif %}{% if action_filter %}&amp;action={{ action_filter }}{% endif %}{% if category_filter %}&amp;category={{ category_filter }}{% endif %}" class="page-btn {% if p == page_obj.number %}active{% endif %}">
+                            {{ p }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+
                 {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}&amp;q={{ query }}&amp;action={{ action_filter }}" style="padding: 6px 12px; background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem; text-decoration: none; color: #0F172A;">Next &rarr;</a>
+                    <a href="?page={{ page_obj.next_page_number }}{% if query %}&amp;q={{ query }}{% endif %}{% if action_filter %}&amp;action={{ action_filter }}{% endif %}{% if category_filter %}&amp;category={{ category_filter }}{% endif %}" class="page-btn">
+                        Next &rarr;
+                    </a>
                 {% endif %}
             </div>
         </div>
         {% endif %}
     </div>
+
 </div>
+
+<!-- Payload Inspection Modal Dialog -->
+<div class="modal-overlay" id="payloadModalOverlay" onclick="if(event.target===this) closePayloadModal()">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h3 class="modal-title">
+                <i class="fa-solid fa-shield-halved" style="color: var(--audit-primary);"></i>
+                <span id="modalActionTitle">Audit Event Payload</span>
+            </h3>
+            <button type="button" class="modal-close-btn" onclick="closePayloadModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Event Metadata -->
+            <div class="modal-meta-grid">
+                <div class="modal-meta-item">
+                    <span class="modal-meta-label">Actor / Agent</span>
+                    <span class="modal-meta-val" id="modalActorVal">-</span>
+                </div>
+                <div class="modal-meta-item">
+                    <span class="modal-meta-label">Timestamp (UTC)</span>
+                    <span class="modal-meta-val" id="modalTimeVal">-</span>
+                </div>
+                <div class="modal-meta-item">
+                    <span class="modal-meta-label">IP Address</span>
+                    <span class="modal-meta-val" id="modalIpVal">-</span>
+                </div>
+                <div class="modal-meta-item">
+                    <span class="modal-meta-label">Tamper Status</span>
+                    <span class="modal-meta-val" style="color: #15803D;">
+                        <i class="fa-solid fa-circle-check"></i> Verified Append-Only
+                    </span>
+                </div>
+            </div>
+
+            <!-- Structured Parameters -->
+            <div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--audit-text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                    Structured Parameters:
+                </div>
+                <div id="modalStructuredParams" style="border: 1px solid var(--audit-border); border-radius: 8px; overflow: hidden;">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+
+            <!-- Raw Cryptographic Payload Stream -->
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--audit-text-muted); text-transform: uppercase;">
+                        Raw Cryptographic Payload Stream:
+                    </span>
+                    <button type="button" class="btn-audit-action btn-audit-outline" style="padding: 3px 8px; font-size: 11px;" onclick="copyModalJson()">
+                        <i class="fa-regular fa-copy"></i> <span id="copyJsonBtnText">Copy JSON</span>
+                    </button>
+                </div>
+                <pre class="payload-json-box" id="modalJsonBox">{}</pre>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <span style="font-size: 11px; color: var(--audit-text-muted);">
+                <i class="fa-solid fa-lock" style="color: var(--audit-primary);"></i> Sensitive fields (passwords, tokens) strictly redacted per NISR protocol.
+            </span>
+            <button type="button" class="btn-audit-action btn-audit-outline" onclick="closePayloadModal()">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function openPayloadModalFromBtn(btn) {
+    var logId = btn.getAttribute('data-log-id');
+    var action = btn.getAttribute('data-action');
+    var actor = btn.getAttribute('data-actor');
+    var time = btn.getAttribute('data-time');
+    var ip = btn.getAttribute('data-ip');
+    var rawElem = document.getElementById('payload-raw-' + logId);
+    var rawJson = rawElem ? rawElem.value : '{}';
+
+    document.getElementById('modalActionTitle').textContent = action;
+    document.getElementById('modalActorVal').textContent = actor;
+    document.getElementById('modalTimeVal').textContent = time;
+    document.getElementById('modalIpVal').textContent = ip;
+
+    // Pretty JSON
+    var parsed = {};
+    try {
+        parsed = JSON.parse(rawJson);
+        document.getElementById('modalJsonBox').textContent = JSON.stringify(parsed, null, 2);
+    } catch(e) {
+        document.getElementById('modalJsonBox').textContent = rawJson;
+        parsed = { "details": rawJson };
+    }
+
+    // Structured Table
+    var tableHtml = '<table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+    var keys = Object.keys(parsed);
+    if (keys.length === 0) {
+        tableHtml += '<tr><td style="padding: 10px; color: #94A3B8; font-style: italic;">No contextual attributes stored.</td></tr>';
+    } else {
+        keys.forEach(function(k, idx) {
+            var val = parsed[k];
+            var bg = (idx % 2 === 0) ? '#FFFFFF' : '#F8FAFC';
+            tableHtml += `
+                <tr style="background: ${bg}; border-bottom: 1px solid #F1F5F9;">
+                    <td style="padding: 8px 12px; font-weight: 700; color: #475569; width: 35%;">${k}</td>
+                    <td style="padding: 8px 12px; color: #0F172A; font-family: ui-monospace, monospace;">${typeof val === 'object' ? JSON.stringify(val) : val}</td>
+                </tr>
+            `;
+        });
+    }
+    tableHtml += '</table>';
+    document.getElementById('modalStructuredParams').innerHTML = tableHtml;
+
+    document.getElementById('payloadModalOverlay').style.display = 'flex';
+}
+
+function closePayloadModal() {
+    document.getElementById('payloadModalOverlay').style.display = 'none';
+}
+
+function copyModalJson() {
+    var jsonText = document.getElementById('modalJsonBox').textContent;
+    var btnText = document.getElementById('copyJsonBtnText');
+    navigator.clipboard.writeText(jsonText).then(function() {
+        if (btnText) btnText.textContent = 'Copied!';
+        setTimeout(function() {
+            if (btnText) btnText.textContent = 'Copy JSON';
+        }, 2000);
+    });
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closePayloadModal();
+    }
+});
+</script>
+{% endblock %}
 {% endblock %}

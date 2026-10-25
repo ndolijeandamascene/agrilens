@@ -1,0 +1,617 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Notification Center | AgriLens Rwanda{% endblock %}
+{% block page_heading %}Notification Center{% endblock %}
+{% block page_subheading %}Review approvals, field submissions, bulletins, and security communications{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ==========================================================================
+   AgriLens Enterprise Notification Center
+   Matches official GovTech and National Dashboard design standards
+   ========================================================================== */
+.notifications-container {
+    padding: 20px 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+/* Header Action & Metrics Bar */
+.notify-header-bar {
+    background: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.notify-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.notify-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid var(--border-color);
+    background: #FFFFFF;
+    color: var(--text-muted);
+    transition: all 0.15s ease;
+}
+
+.notify-tab-btn:hover {
+    background: #F8FAFC;
+    color: var(--text-main);
+    border-color: #CBD5E1;
+}
+
+.notify-tab-btn.active {
+    background: var(--primary-green);
+    color: #FFFFFF;
+    border-color: var(--primary-green);
+    box-shadow: 0 1px 3px rgba(21, 128, 61, 0.2);
+}
+
+.tab-badge {
+    background: rgba(0, 0, 0, 0.08);
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.notify-tab-btn.active .tab-badge {
+    background: rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
+}
+
+.notify-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-notify-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background: #FFFFFF;
+    color: var(--text-main);
+}
+
+.btn-notify-action:hover {
+    background: #F8FAFC;
+    border-color: #94A3B8;
+}
+
+.btn-notify-primary {
+    background: var(--primary-green);
+    color: #FFFFFF;
+    border-color: var(--primary-green);
+}
+
+.btn-notify-primary:hover {
+    background: var(--dark-green);
+}
+
+/* Category Filter Bar */
+.notify-filter-bar {
+    background: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.category-pills {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.cat-pill {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid var(--border-color);
+    background: #FFFFFF;
+    color: var(--text-muted);
+    transition: all 0.15s ease;
+}
+
+.cat-pill:hover {
+    background: #F8FAFC;
+    color: var(--text-main);
+    border-color: #CBD5E1;
+}
+
+.cat-pill.active {
+    background: #0F172A;
+    color: #FFFFFF;
+    border-color: #0F172A;
+}
+
+.filter-controls-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.notify-search-input {
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 12px;
+    outline: none;
+    width: 200px;
+    box-sizing: border-box;
+}
+
+.notify-search-input:focus {
+    border-color: var(--primary-green);
+}
+
+.notify-select {
+    padding: 6px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 11px;
+    background: #FFFFFF;
+    color: var(--text-main);
+    cursor: pointer;
+    outline: none;
+}
+
+/* Notification Items List */
+.notification-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.notification-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: all 0.15s ease;
+    position: relative;
+}
+
+.notification-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: #CBD5E1;
+}
+
+.notification-card.unread {
+    background: #FAFDFA;
+    border-left: 4px solid var(--primary-green);
+}
+
+.notification-card.priority-urgent {
+    border-left-color: #DC2626 !important;
+}
+
+.notification-card.priority-high {
+    border-left-color: #D97706 !important;
+}
+
+.notify-icon-circle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.notify-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notify-top-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.notify-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.notification-card.unread .notify-title {
+    color: #0F172A;
+}
+
+.notify-meta-badges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.priority-tag {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tag-urgent { background: #FEE2E2; color: #DC2626; }
+.tag-high { background: #FEF3C7; color: #D97706; }
+.tag-medium { background: #DBEAFE; color: #2563EB; }
+.tag-low { background: #F0FDF4; color: #15803D; }
+
+.notify-time {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.notify-message {
+    font-size: 12px;
+    color: #475569;
+    margin: 0 0 10px 0;
+    line-height: 1.5;
+}
+
+.notify-actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.notify-cta-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary-green);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.notify-cta-link:hover {
+    color: var(--dark-green);
+    text-decoration: underline;
+}
+
+.notify-item-ops {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-item-op {
+    background: transparent;
+    border: none;
+    font-size: 11px;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    transition: color 0.15s ease;
+}
+
+.btn-item-op:hover {
+    color: var(--text-main);
+}
+
+.btn-item-op.op-dismiss:hover {
+    color: #DC2626;
+}
+
+/* Pagination */
+.notify-pagination-bar {
+    background: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.page-btn {
+    padding: 5px 11px;
+    background: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-main);
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.page-btn:hover {
+    background: #F8FAFC;
+    border-color: #94A3B8;
+}
+
+.page-btn.active {
+    background: var(--primary-green);
+    color: #FFFFFF;
+    border-color: var(--primary-green);
+}
+
+/* Empty State */
+.empty-notify-box {
+    background: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 64px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.empty-notify-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: #F1F5F9;
+    color: #94A3B8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notifications-container">
+
+    <!-- Top Action & Tabs Bar -->
+    <div class="notify-header-bar">
+        <div class="notify-tabs">
+            <a href="?tab=all{% if category %}&amp;category={{ category }}{% endif %}{% if priority %}&amp;priority={{ priority }}{% endif %}{% if query %}&amp;q={{ query }}{% endif %}" class="notify-tab-btn {% if tab == 'all' %}active{% endif %}">
+                <i class="fa-solid fa-inbox"></i>
+                <span>All Alerts</span>
+                <span class="tab-badge">{{ total_count }}</span>
+            </a>
+            <a href="?tab=unread{% if category %}&amp;category={{ category }}{% endif %}{% if priority %}&amp;priority={{ priority }}{% endif %}{% if query %}&amp;q={{ query }}{% endif %}" class="notify-tab-btn {% if tab == 'unread' %}active{% endif %}">
+                <i class="fa-solid fa-envelope"></i>
+                <span>Unread</span>
+                <span class="tab-badge">{{ unread_count }}</span>
+            </a>
+            <a href="?tab=read{% if category %}&amp;category={{ category }}{% endif %}{% if priority %}&amp;priority={{ priority }}{% endif %}{% if query %}&amp;q={{ query }}{% endif %}" class="notify-tab-btn {% if tab == 'read' %}active{% endif %}">
+                <i class="fa-solid fa-envelope-open"></i>
+                <span>Read</span>
+                <span class="tab-badge">{{ read_count }}</span>
+            </a>
+        </div>
+
+        <div class="notify-header-actions">
+            {% if unread_count > 0 %}
+            <a href="{% url 'notifications:mark_all_read' %}?next={{ request.get_full_path|urlencode }}" class="btn-notify-action btn-notify-primary">
+                <i class="fa-solid fa-check-double"></i>
+                <span>Mark All as Read</span>
+            </a>
+            {% endif %}
+            <a href="{% url 'notifications:preferences' %}" class="btn-notify-action" title="Notification Preferences">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Preferences</span>
+            </a>
+            {% if request.user.is_system_admin %}
+            <a href="{% url 'notifications:admin_announcements' %}" class="btn-notify-action" title="System Announcements">
+                <i class="fa-solid fa-bullhorn" style="color: var(--primary-green);"></i>
+                <span>Broadcast Hub</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Category & Quick Search Bar -->
+    <div class="notify-filter-bar">
+        <div class="category-pills">
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-right: 4px;">Category:</span>
+            <a href="?tab={{ tab }}{% if priority %}&amp;priority={{ priority }}{% endif %}{% if query %}&amp;q={{ query }}{% endif %}" class="cat-pill {% if not category %}active{% endif %}">All</a>
+            <a href="?tab={{ tab }}&amp;category=data{% if priority %}&amp;priority={{ priority }}{% endif %}{% if query %}&amp;q={{ query }}{% endif %}" class="cat-pill {% if category == 'data' %}active{% endif %}"><i class="fa-solid fa-database"></i> Data &amp; Reviews</a>
+            <a href="?tab={{ tab }}&amp;category=market{% if priority %}&amp;priority={{ priority }}{% endif %}{% if query %}&amp;q={{ query }}{% endif %}" class="cat-pill {% if category == 'market' %}active{% endif %}"><i class="fa-solid fa-chart-line"></i> Markets &amp; Prices</a>
+            <a href="?tab={{ tab }}&amp;category=reports{% if priority %}&amp;priority={{ priority }}{% endif %}{% if query %}&amp;q={{ query }}{% endif %}" class="cat-pill {% if category == 'reports' %}active{% endif %}"><i class="fa-solid fa-file-chart-column"></i> Reports &amp; ML</a>
+            <a href="?tab={{ tab }}&amp;category=security{% if priority %}&amp;priority={{ priority }}{% endif %}{% if query %}&amp;q={{ query }}{% endif %}" class="cat-pill {% if category == 'security' %}active{% endif %}"><i class="fa-solid fa-shield-halved"></i> Security &amp; Access</a>
+            <a href="?tab={{ tab }}&amp;category=announcements{% if priority %}&amp;priority={{ priority }}{% endif %}{% if query %}&amp;q={{ query }}{% endif %}" class="cat-pill {% if category == 'announcements' %}active{% endif %}"><i class="fa-solid fa-bullhorn"></i> Announcements</a>
+        </div>
+
+        <form method="GET" class="filter-controls-right">
+            <input type="hidden" name="tab" value="{{ tab }}">
+            {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+
+            <input type="text" name="q" value="{{ query }}" placeholder="Search alerts..." class="notify-search-input">
+
+            <select name="priority" class="notify-select" onchange="this.form.submit()">
+                <option value="">Priority: All</option>
+                <option value="URGENT" {% if priority == 'URGENT' %}selected{% endif %}>Urgent</option>
+                <option value="HIGH" {% if priority == 'HIGH' %}selected{% endif %}>High</option>
+                <option value="MEDIUM" {% if priority == 'MEDIUM' %}selected{% endif %}>Medium</option>
+                <option value="LOW" {% if priority == 'LOW' %}selected{% endif %}>Low</option>
+            </select>
+
+            <select name="date" class="notify-select" onchange="this.form.submit()">
+                <option value="">Date: All Time</option>
+                <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Today</option>
+                <option value="7days" {% if date_filter == '7days' %}selected{% endif %}>Past 7 Days</option>
+                <option value="30days" {% if date_filter == '30days' %}selected{% endif %}>Past 30 Days</option>
+            </select>
+
+            {% if query or priority or date_filter or category %}
+            <a href="?tab={{ tab }}" class="btn-item-op op-dismiss" title="Reset Filters" style="font-size: 13px;">
+                <i class="fa-solid fa-xmark"></i>
+            </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Notification Cards List -->
+    <div class="notification-cards-list">
+        {% for n in page_obj %}
+        <div class="notification-card {% if not n.is_read %}unread{% endif %} priority-{{ n.priority|lower }}" id="notification-card-{{ n.id }}">
+            <div class="notify-icon-circle" style="background: {{ n.color_theme.bg }}; color: {{ n.color_theme.text }};">
+                <i class="{{ n.icon_class }}"></i>
+            </div>
+
+            <div class="notify-content">
+                <div class="notify-top-line">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h4 class="notify-title">{{ n.title }}</h4>
+                        {% if not n.is_read %}
+                        <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--primary-green);"></span>
+                        {% endif %}
+                    </div>
+                    <div class="notify-meta-badges">
+                        <span class="priority-tag tag-{{ n.priority|lower }}">{{ n.get_priority_display }}</span>
+                        <span class="notify-time">{{ n.created_at|timesince }} ago</span>
+                    </div>
+                </div>
+
+                <p class="notify-message">{{ n.message }}</p>
+
+                <div class="notify-actions-row">
+                    {% if n.action_url %}
+                    <a href="{{ n.action_url }}" class="notify-cta-link" onclick="fetch('{% url 'notifications:mark_read' n.id %}?format=json', {method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token }}', 'X-Requested-With': 'XMLHttpRequest'}});">
+                        <span>View Action Record</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    {% else %}
+                    <span></span>
+                    {% endif %}
+
+                    <div class="notify-item-ops">
+                        {% if n.is_read %}
+                        <a href="{% url 'notifications:mark_unread' n.id %}?next={{ request.get_full_path|urlencode }}" class="btn-item-op" title="Mark as unread">
+                            <i class="fa-regular fa-envelope"></i>
+                            <span>Mark unread</span>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'notifications:mark_read' n.id %}?next={{ request.get_full_path|urlencode }}" class="btn-item-op" title="Mark as read">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Mark read</span>
+                        </a>
+                        {% endif %}
+
+                        <a href="{% url 'notifications:dismiss' n.id %}?next={{ request.get_full_path|urlencode }}" class="btn-item-op op-dismiss" title="Dismiss notification">
+                            <i class="fa-solid fa-trash-can"></i>
+                            <span>Dismiss</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-notify-box">
+            <div class="empty-notify-icon">
+                <i class="fa-regular fa-bell-slash"></i>
+            </div>
+            <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--text-main);">No Notifications in This View</h3>
+            <p style="margin: 0; font-size: 12px; color: var(--text-muted); max-width: 360px;">
+                {% if query or category or priority %}
+                No notifications match your current filter criteria. Try resetting your search filters.
+                {% elif tab == 'unread' %}
+                You are all caught up! There are no unread notifications waiting for your attention.
+                {% else %}
+                Your inbox is currently empty. System alerts and operational updates will appear here automatically.
+                {% endif %}
+            </p>
+            {% if query or category or priority %}
+            <a href="?tab={{ tab }}" class="btn-notify-action" style="margin-top: 6px;">
+                <i class="fa-solid fa-arrow-rotate-left"></i>
+                <span>Reset Filters</span>
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination Controls -->
+    {% if page_obj.has_other_pages %}
+    <div class="notify-pagination-bar">
+        <div style="font-size: 12px; color: var(--text-muted);">
+            Page <strong>{{ page_obj.number }}</strong> of <strong>{{ page_obj.paginator.num_pages }}</strong> ({{ page_obj.paginator.count }} total notifications)
+        </div>
+        <div style="display: flex; gap: 6px;">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&amp;tab={{ tab }}{% if category %}&amp;category={{ category }}{% endif %}{% if priority %}&amp;priority={{ priority }}{% endif %}{% if query %}&amp;q={{ query }}{% endif %}" class="page-btn">
+                &larr; Previous
+            </a>
+            {% endif %}
+
+            {% for p in page_obj.paginator.page_range %}
+                {% if p >= page_obj.number|add:"-2" and p <= page_obj.number|add:"2" %}
+                <a href="?page={{ p }}&amp;tab={{ tab }}{% if category %}&amp;category={{ category }}{% endif %}{% if priority %}&amp;priority={{ priority }}{% endif %}{% if query %}&amp;q={{ query }}{% endif %}" class="page-btn {% if p == page_obj.number %}active{% endif %}">
+                    {{ p }}
+                </a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&amp;tab={{ tab }}{% if category %}&amp;category={{ category }}{% endif %}{% if priority %}&amp;priority={{ priority }}{% endif %}{% if query %}&amp;q={{ query }}{% endif %}" class="page-btn">
+                Next &rarr;
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

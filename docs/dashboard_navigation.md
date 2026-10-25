@@ -2,7 +2,7 @@
 
 **Platform:** AgriLens &bull; National Agricultural Intelligence Platform  
 **Event:** 2026 NISR Big Data Hackathon &bull; Track 1: Agricultural Productivity  
-**Document Version:** 2.0 &bull; Modular Menu Modernization & Role-Aware Navigation  
+**Document Version:** 2.1 &bull; Comprehensive Navigation (Notifications, ML, Reports & Governance)  
 **Architecture Source:** [`apps/accounts/menu_config.py`](file:///c:/Users/ndoli/Documents/WEBAPP/agrilens/apps/accounts/menu_config.py)
 
 ---
@@ -19,6 +19,7 @@ The AgriLens navigation system provides a decoupled, role-aware, accessible, and
 5. **Mobile Responsive Off-Canvas Drawer:** On screens $\le 992\text{px}$, the sidebar transforms into a touch-friendly off-canvas drawer with backdrop overlay blur and explicit close button.
 6. **Dynamic Top Navbar Utilities:**
    - **Breadcrumbs:** Auto-generated hierarchical navigation trail from URL path segments.
+   - **Notification Center Bell:** Real-time dropdown drawer showing unread notification counter badges, instant mark-as-read, and quick actions.
    - **Quick Command Palette (<kbd>Ctrl</kbd> + <kbd>K</kbd>):** Instant search across Rwanda's 30 districts and core reports.
    - **Review Queue Notification Badge:** Real-time indicator showing count of pending field observations awaiting verification.
    - **Geographic Jurisdiction Indicator:** Displays active district or provincial assignment for extension officers.
@@ -31,105 +32,85 @@ The AgriLens navigation system provides a decoupled, role-aware, accessible, and
 graph TD
     A[AgriLens Navigation] --> B[Core Intelligence]
     A --> C[Productivity & Yield Gap]
-    A --> D[Reports & Bulletins]
-    A --> E[Agricultural Domains]
-    A --> F[Data Governance]
-    A --> G[Administration]
-    A --> H[Account Actions]
+    A --> D[Decision & Impact]
+    A --> E[Reports & Bulletins]
+    A --> F[Agricultural Domains]
+    A --> G[Data Governance]
+    A --> H[Communication & Alerts]
+    A --> I[Administration]
+    A --> J[Account Actions]
 
     B --> B1["National Dashboard (/dashboard/)"]
     B --> B2["Public Portal & Map (/)"]
 
     C --> C1["Yield Gap Intelligence (/indicators/productivity/)"]
 
-    D --> D1["National Report (/dashboard/reports/national/)"]
-    D --> D2["District Dossier (/dashboard/reports/district/)"]
+    D --> D1["Decision Hub (/decision-support/)"]
+    D --> D2["Recommendations Queue (/decision-support/recommendations/)"]
+    D --> D3["Impact Tracking (/decision-support/impact/)"]
 
-    E --> E1["Crops & Seasons (/agriculture/crops/)"]
-    E --> E2["Districts & Mapping (/geography/districts/)"]
-    E --> E3["Seasonal Surveys (/surveys/)"]
-    E --> E4["Farmers & Cooperatives (/farmers/)"]
-    E --> E5["Inputs & Subsidies (/inputs/)"]
-    E --> E6["Commodity Markets (/markets/)"]
-    E --> E7["Developer Data API (/api/)"]
+    E --> E1["Report Center & Exports (/reports/)"]
+    E --> E2["National Seasonal Bulletin (/dashboard/reports/national/)"]
+    E --> E3["District Dossiers (/dashboard/reports/district/)"]
 
-    F --> F1["Data Lineage Hub (/data-management/)"]
-    F --> F2["Manual Registry (/data-management/manual/)"]
-    F --> F3["Submit Observation (/data-management/manual/new/)"]
-    F --> F4["Review Queue (/data-management/manual/?status=SUBMITTED)"]
+    F --> F1["Crops & Seasons (/agriculture/crops/)"]
+    F --> F2["Districts & Mapping (/geography/districts/)"]
+    F --> F3["Seasonal Surveys (/surveys/)"]
+    F --> F4["Farmers & Cooperatives (/farmers/)"]
+    F --> F5["Inputs & Subsidies (/inputs/)"]
+    F --> F6["Commodity Markets (/markets/)"]
+    F --> F7["Developer Data API (/api/)"]
 
-    G --> G1["Officers & Roles (/accounts/users/)"]
-    G --> G2["Register Officer (/accounts/users/new/)"]
-    G --> G3["Security Audit Trail (/accounts/audit-log/)"]
+    G --> G1["Data Lineage Hub (/data-management/)"]
+    G --> G2["Manual Observation Registry (/data-management/entries/)"]
+    G --> G3["Submit Observation (/data-management/entries/create/)"]
+    G --> G4["Review Queue (/data-management/entries/?status=SUBMITTED)"]
 
-    H --> H1["My Profile (/accounts/profile/)"]
-    H --> H2["Sign In / Sign Out (/accounts/login/ / /accounts/logout/)"]
+    H --> H1["Notification Center (/notifications/)"]
+    H --> H2["Notification Preferences (/notifications/preferences/)"]
+    H --> H3["Broadcast Announcements (/notifications/admin/)"]
+
+    I --> I1["Officers & Roles (/accounts/users/)"]
+    I --> I2["Register Officer (/accounts/users/new/)"]
+    I --> I3["Security Audit Trail (/accounts/audit-log/)"]
+
+    J --> J1["My Profile (/accounts/profile/)"]
+    J --> J2["Change Password (/accounts/password-change/)"]
+    J --> J3["Sign Out (/accounts/logout/)"]
 ```
 
 ---
 
 ## 3. Role-Aware Menu Visibility Policy
 
-Every role in AgriLens receives a strictly tailored menu configuration:
+Every institutional role in AgriLens receives a strictly tailored menu configuration:
 
 | Role Code | Institutional Clearance | Visible Navigation Sections |
 | :--- | :--- | :--- |
-| **`ADMIN`** | System Administrator | Core, Productivity, Reports (Full), Domains, Data Governance (Full), Administration |
-| **`NISR_DATA_MANAGER`** | NISR Ingestion Lead | Core, Productivity, Reports (Full), Domains, Data Governance (Lineage Hub, Registry, Submit) |
-| **`ANALYST`** | Agricultural Data Analyst | Core, Productivity, Reports (Full), Domains, Data Governance (Lineage Hub, Registry read-only) |
-| **`NATIONAL_OFFICER`** | MINAGRI National Officer | Core, Productivity, Reports (Full), Agricultural Domains |
-| **`DISTRICT_OFFICER`** | District Agriculture Officer | Core, Productivity, Reports (District Dossier), Domains, Data Governance (Registry, Submit) |
-| **`DATA_ENTRY_OFFICER`** | Field Data Enumerator | Core, Domains, Data Governance (Registry, Submit) |
-| **`REVIEWER`** | Observation Validator | Core, Reports (Full), Data Governance (Review Queue, Registry), Domains |
-| **`POLICY_MAKER`** | *Legacy Role* | Core, Productivity, Reports (Full), Domains |
-| **`EXTENSION_OFFICER`**| *Legacy Role* | Core, Productivity, Reports (District Dossier), Domains, Data Governance (Registry, Submit) |
-| **`PUBLIC`** | Unauthenticated Visitor | Recommended Public Navigation: Home, National Dashboard, Agricultural Map, Productivity & Yield Gaps, Published Reports only, Crops & Seasons, Seasonal Surveys, Commodity Markets, Developer API. *(Privacy Exclusions: Farmers & Cooperatives, Inputs & Subsidies, District Dossiers)* |
+| **`ADMIN`** | System Administrator | Core, Productivity, Decision Support, Reports (Full), Domains, Data Governance (Full), Notifications (Admin), Administration |
+| **`NISR_DATA_MANAGER`** | NISR Ingestion Lead | Core, Productivity, Decision Support, Reports (Full), Domains, Data Governance (Lineage Hub, Registry, Submit), Notifications |
+| **`ANALYST`** | Agricultural Data Analyst | Core, Productivity, Decision Support, Reports (Full), Domains, Data Governance (Read-only), Notifications |
+| **`NATIONAL_OFFICER`** | MINAGRI National Officer | Core, Productivity, Decision Support, Reports (Full), Agricultural Domains, Notifications |
+| **`DISTRICT_OFFICER`** | District Agriculture Officer | Core, Productivity, Decision Support (Scoped), Reports (District Dossier), Domains, Data Governance (Registry, Submit), Notifications |
+| **`DATA_ENTRY_OFFICER`** | Field Data Enumerator | Core, Domains, Data Governance (Registry, Submit), Notifications |
+| **`REVIEWER`** | Observation Validator | Core, Reports (Full), Decision Support, Data Governance (Review Queue, Registry), Domains, Notifications |
+| **`PUBLIC`** | Unauthenticated Visitor | Public Portal (`/`), National Dashboard (`/dashboard/`), Agricultural Map (`/geography/`), Productivity & Yield Gaps (`/indicators/productivity/`), Published Bulletins, Crops & Seasons, Seasonal Surveys, Commodity Markets, Developer API. |
 
 ---
 
-### Public Portal Navigation & Header Architecture
-For unauthenticated citizens, researchers, and public visitors, AgriLens delivers a streamlined public navigation system:
-- **Brand Tagline:** `"See Agriculture Through Data."`
-- **Role Indicator:** Distinct `Public` pill badge.
-- **Top Public Header & Navigation Links:**
-  1. `Home` (`/`)
-  2. `National Dashboard` (`/dashboard/`)
-  3. `Agricultural Map` (`/geography/`)
-  4. `Productivity & Yield Gaps` (`/indicators/productivity/`)
-  5. `Reports & Bulletins` (`/dashboard/reports/national/` &bull; *Published reports only*)
-  6. `Crops & Seasons` (`/agriculture/` &bull; *Public crop information*)
-  7. `Seasonal Surveys` (`/surveys/` &bull; *Published survey information*)
-  8. `Commodity Markets` (`/markets/` &bull; *Published market data*)
-  9. `Developer API` (`/api/`)
-- **Primary Header Action:** Prominent **Officer Sign In** (`/accounts/login/`) button for institutional users.
-- **Privacy Protections:** Smallholder farmer personal data, subsidy allocations, and localized internal dossiers remain strictly inaccessible to unauthenticated traffic.
+## ⚖️ Intellectual Property, License & Usage Policy
 
----
-
-## 4. Technical Implementation Architecture
-
-### A. Modular Python Configuration (`apps/accounts/menu_config.py`)
-- Reusable menu block dictionaries (`CORE_INTELLIGENCE_MENU`, `PRODUCTIVITY_MENU`, `REPORTS_MENU_FULL`, etc.).
-- Central mapping `MENU_CONFIG` for all 7 institutional roles + 3 legacy roles + public visitors.
-- Immutability guarantee function `get_user_menu(role, is_superuser=False)` utilizing `copy.deepcopy()`.
-
-### B. Global Context Processor (`apps/accounts/context_processors.py`)
-Registered in Django `TEMPLATES` configuration to inject:
-- `sidebar_menu`: Role-specific menu group list.
-- `user_geo_badge`: Assigned districts string or national jurisdiction status.
-- `pending_reviews_count`: Real-time count of pending field observations awaiting review.
-- `breadcrumbs`: Auto-generated hierarchical navigation crumb list.
-- `command_palette_districts`: Searchable catalog of Rwanda's 30 districts.
-
-### C. Safe Template Tags (`apps/accounts/templatetags/menu_tags.py`)
-- `{% resolve_menu_url item.url %}`: Safely reverses named Django routes and preserves query parameters (e.g. `?status=SUBMITTED`).
-- `{% is_menu_active request item.url %}`: Path matching and resolver view matching for active navigation states.
-- `{% is_group_active request group %}`: Checks if any sub-item in an accordion is active.
-- `{% render_menu_icon group.icon %}`: Renders inline SVG icons with scalable CSS classes.
-
-### D. Accessibility & Keyboard Navigation
-- Standard semantic `<nav role="navigation" aria-label="Main Application Navigation">`.
-- `aria-expanded` and `aria-controls` bindings on collapsible accordion buttons.
-- Tooltip labels via `title="..."` and `aria-label="..."` on collapsed icons.
-- Keyboard shortcut: <kbd>Ctrl</kbd> + <kbd>K</kbd> (or <kbd>Cmd</kbd> + <kbd>K</kbd>) to open the command palette from anywhere.
-- Focus-visible cyan outlines (`outline: 2px solid var(--nisr-cyan)`) for full keyboard navigation accessibility.
+> ### ⚠️ STRICT RESTRICTED USE NOTICE
+> **All Rights Reserved © 2026 AgriLens Development Team.**
+>
+> 1. **Non-Commercial & No Personal Profit:**  
+>    No individual, entity, or third party is permitted to use, copy, reproduce, monetize, sub-license, or exploit any portion of this codebase, architecture, machine learning models, algorithms, or visual designs for commercial purposes, revenue generation, or personal financial profit under any circumstances.
+>
+> 2. **Public Hackathon Visibility Disclaimer:**  
+>    Although this repository is publicly accessible solely for the purpose of evaluation, review, and judging during the **2026 NISR Big Data Hackathon (Track 1: Agricultural Productivity)**, public availability does **NOT** constitute an open-source license, public domain dedication, or waiver of intellectual property rights.
+>
+> 3. **Prohibition of Modifications & Derivative Works:**  
+>    Any unauthorized modification, alteration, redistribution, fork, decompilation, reverse-engineering, or derivation of this codebase or its underlying assets is strictly prohibited.
+>
+> 4. **Exclusive Authorization for NISR:**  
+>    Operational utilization, institutional adoption, data integration, and platform deployment are **exclusively and solely permitted for the National Institute of Statistics of Rwanda (NISR)** and its officially designated national agricultural partners.

@@ -125,6 +125,8 @@ class AuditLog(models.Model):
         GEOGRAPHY_ASSIGNED = 'GEOGRAPHY_ASSIGNED', 'Geographic Assignment Modified'
         PASSWORD_RESET_LINK = 'PASSWORD_RESET_LINK', 'Password Setup Link Issued'
         PASSWORD_CHANGED = 'PASSWORD_CHANGED', 'Password Changed'
+        LOGIN_SUCCESS = 'LOGIN_SUCCESS', 'User Logged In'
+        LOGIN_FAILED = 'LOGIN_FAILED', 'Failed Login Attempt'
         SUBMISSION_APPROVED = 'SUBMISSION_APPROVED', 'Manual Submission Approved'
         SUBMISSION_RETURNED = 'SUBMISSION_RETURNED', 'Manual Submission Returned'
         DATA_SOURCE_CREATED = 'DATA_SOURCE_CREATED', 'Data Source Registered'
@@ -151,6 +153,13 @@ class AuditLog(models.Model):
         REPORT_WITHDRAWN = 'REPORT_WITHDRAWN', 'Agricultural Report Withdrawn'
         SCHEDULE_MODIFIED = 'SCHEDULE_MODIFIED', 'Report Schedule Modified'
 
+        # Notification & Communication events
+        NOTIFICATION_CREATED = 'NOTIFICATION_CREATED', 'Notification Created'
+        EMAIL_SENT = 'EMAIL_SENT', 'Email Notification Sent'
+        EMAIL_FAILED = 'EMAIL_FAILED', 'Email Notification Failed'
+        NOTIFICATION_READ = 'NOTIFICATION_READ', 'Notification Read'
+        ANNOUNCEMENT_CREATED = 'ANNOUNCEMENT_CREATED', 'Announcement Broadcast Created'
+
     actor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -171,6 +180,36 @@ class AuditLog(models.Model):
         ordering = ['-timestamp']
         verbose_name = 'Security Audit Log'
         verbose_name_plural = 'Security Audit Logs'
+
+    @property
+    def details_dict(self):
+        """Returns details as a parsed dictionary if valid JSON, else wrapper dict."""
+        if not self.details:
+            return {}
+        try:
+            import json
+            data = json.loads(self.details)
+            if isinstance(data, dict):
+                return data
+            return {'info': str(data)}
+        except Exception:
+            return {'info': self.details}
+
+    @property
+    def action_category(self):
+        """Returns action grouping category: 'security', 'role', 'data', 'approval', 'report'."""
+        act = self.action or ''
+        if any(k in act for k in ['USER_', 'PASSWORD_']):
+            return 'security'
+        if any(k in act for k in ['ROLE_', 'GEOGRAPHY_']):
+            return 'role'
+        if any(k in act for k in ['DATA_', 'RECORD_CREATED', 'RECORD_UPDATED', 'RECORD_SUBMITTED']):
+            return 'data'
+        if any(k in act for k in ['APPROVED', 'RETURNED', 'SUPERSEDED']):
+            return 'approval'
+        if any(k in act for k in ['REPORT_', 'RECOMMENDATION', 'ACTION_', 'OUTCOME_', 'SCHEDULE_']):
+            return 'report'
+        return 'other'
 
     def __str__(self):
         actor_name = self.actor.username if self.actor else "System"

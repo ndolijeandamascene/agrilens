@@ -83,6 +83,43 @@ class ObservationWorkflowService:
             },
             request=request
         )
+
+        # Trigger In-App & Email Notifications to Authorized Reviewers
+        try:
+            from apps.notifications.services import NotificationService
+            from apps.notifications.models import Notification
+            review_url = f"/data-management/manual/{obs.id}/review/"
+            if obs.supersedes:
+                NotificationService.send_to_reviewers(
+                    district_id=obs.district_id,
+                    notification_type=Notification.NotificationType.CORRECTION_SUBMITTED,
+                    title=f"Correction Revision: {obs.crop.name} in {obs.district.name}",
+                    message=f"Officer {actor.username} submitted a correction revision for observation #{obs.supersedes_id} awaiting your verification.",
+                    related_object=obs,
+                    action_url=review_url,
+                    priority=Notification.Priority.HIGH,
+                    actor=actor,
+                    metadata={'district': obs.district.name, 'crop': obs.crop.name, 'yield': str(obs.calculated_yield_kg_per_ha)},
+                    exclude_user=actor,
+                    request=request
+                )
+            else:
+                NotificationService.send_to_reviewers(
+                    district_id=obs.district_id,
+                    notification_type=Notification.NotificationType.DATA_SUBMITTED,
+                    title=f"New Field Observation: {obs.crop.name} ({obs.district.name})",
+                    message=f"Officer {actor.username} submitted a field observation for {obs.crop.name} ({obs.calculated_yield_kg_per_ha} kg/ha) awaiting review.",
+                    related_object=obs,
+                    action_url=review_url,
+                    priority=Notification.Priority.HIGH,
+                    actor=actor,
+                    metadata={'district': obs.district.name, 'crop': obs.crop.name, 'yield': str(obs.calculated_yield_kg_per_ha)},
+                    exclude_user=actor,
+                    request=request
+                )
+        except Exception:
+            pass
+
         return obs
 
     @classmethod
@@ -150,6 +187,26 @@ class ObservationWorkflowService:
             },
             request=request
         )
+
+        # Trigger In-App & Email Notification to Submitting Officer
+        try:
+            from apps.notifications.services import NotificationService
+            from apps.notifications.models import Notification
+            NotificationService.send(
+                recipient=obs.created_by,
+                notification_type=Notification.NotificationType.DATA_APPROVED,
+                title=f"Submission Approved: {obs.crop.name} in {obs.district.name}",
+                message=f"Your field observation for {obs.crop.name} ({obs.calculated_yield_kg_per_ha} kg/ha) in {obs.district.name} has been approved by {reviewer.username}.{(' Comments: ' + comments) if comments else ''}",
+                related_object=obs,
+                action_url=f"/data-management/manual/{obs.id}/",
+                priority=Notification.Priority.MEDIUM,
+                actor=reviewer,
+                metadata={'district': obs.district.name, 'crop': obs.crop.name, 'comments': comments},
+                request=request
+            )
+        except Exception:
+            pass
+
         return obs
 
     @classmethod
@@ -195,6 +252,26 @@ class ObservationWorkflowService:
             },
             request=request
         )
+
+        # Trigger In-App & Email Notification to Submitting Officer with Rejection Reason
+        try:
+            from apps.notifications.services import NotificationService
+            from apps.notifications.models import Notification
+            NotificationService.send(
+                recipient=obs.created_by,
+                notification_type=Notification.NotificationType.DATA_RETURNED,
+                title=f"Corrections Required: {obs.crop.name} in {obs.district.name}",
+                message=f"Your field observation for {obs.crop.name} in {obs.district.name} was returned for correction by {reviewer.username}. Review reason: \"{reason.strip()}\".",
+                related_object=obs,
+                action_url=f"/data-management/manual/{obs.id}/edit/",
+                priority=Notification.Priority.HIGH,
+                actor=reviewer,
+                metadata={'district': obs.district.name, 'crop': obs.crop.name, 'reason': reason.strip()},
+                request=request
+            )
+        except Exception:
+            pass
+
         return obs
 
     @classmethod

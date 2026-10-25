@@ -213,6 +213,20 @@ class TrainModelsAPIView(APIView):
                     'status': c_model.status,
                 }
 
+            try:
+                from apps.notifications.services import NotificationService
+                from apps.notifications.models import Notification
+                NotificationService.send(
+                    recipient=request.user,
+                    notification_type=Notification.Type.ML_TRAINING_COMPLETED,
+                    title=f"ML Model Training Completed: {model_type}",
+                    message=f"Model training and registry update for '{model_type}' ({version}) completed successfully.",
+                    action_url="/indicators/models/",
+                    priority=Notification.Priority.LOW,
+                )
+            except Exception:
+                pass
+
             return Response({
                 'status': 'SUCCESS',
                 'message': 'Model training and registry update completed successfully.',
@@ -221,6 +235,21 @@ class TrainModelsAPIView(APIView):
 
         except Exception as exc:
             logger.error("TrainModelsAPIView failed: %s", exc)
+
+            try:
+                from apps.notifications.services import NotificationService
+                from apps.notifications.models import Notification
+                NotificationService.send(
+                    recipient=request.user,
+                    notification_type=Notification.Type.ML_TRAINING_FAILED,
+                    title=f"ML Model Training Failed: {model_type}",
+                    message=f"Model training for '{model_type}' ({version}) failed: {str(exc)}",
+                    action_url="/indicators/models/",
+                    priority=Notification.Priority.HIGH,
+                )
+            except Exception:
+                pass
+
             return Response(
                 {'status': 'FAILED', 'error': str(exc)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR

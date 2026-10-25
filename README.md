@@ -1,1536 +1,477 @@
-# AgriLens
+<div align="center">
 
-> **See Agriculture Through Data.**
+# 🌾 AgriLens
 
-AgriLens is a data-driven agricultural intelligence and decision-support platform developed for the **2026 NISR Big Data Hackathon – Track 1: Agricultural Productivity**.
+### *See Agriculture Through Data.*
 
-The platform uses official NISR agricultural data and other authorized open/public datasets to identify agricultural productivity gaps, analyze agricultural practices and risks, and provide practical insights through interactive maps, dashboards, analytics, and intelligent alerts.
+**Official Agricultural Intelligence & Decision-Support Platform for Rwanda**  
+Developed for the **2026 NISR Big Data Hackathon – Track 1: Agricultural Productivity**
 
----
-
-# 1. Hackathon Context
-
-AgriLens is designed specifically for:
-
-**NISR 2026 Big Data Hackathon – Track 1: Agricultural Productivity**
-
-### Track Challenge
-
-> Use data to develop innovative solutions that address real agricultural challenges facing Rwanda.
-
-The solution may address areas including:
-
-* Small-scale irrigation
-* Soil conservation and fertility management
-* Post-harvest collection and storage
-* Agricultural productivity
-* Processing and value addition
-* Export market opportunities
-
-The solution must be informed by NISR data and may use other open/public datasets related to:
-
-* Agriculture
-* Food security
-* Climate
-* Markets
-* Geography
-* Other relevant public information
-
-AgriLens should demonstrate practical value for:
-
-* Farmers
-* Agricultural planners
-* Policymakers
-* Government institutions
-* Development partners
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
+[![Django 5.2](https://img.shields.io/badge/Django-5.2-092E20.svg)](https://www.djangoproject.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-PostGIS-336791.svg)](https://www.postgresql.org/)
+[![Scikit-Learn](https://img.shields.io/badge/ML-Scikit--Learn-F7931E.svg)](https://scikit-learn.org/)
+[![Alpine.js](https://img.shields.io/badge/Frontend-Alpine.js%20%7C%20Vanilla%20CSS-77C1D2.svg)](https://alpinejs.dev/)
+[![Automated Tests](https://img.shields.io/badge/Tests-Passing-brightgreen.svg)]()
 
 ---
 
-# 2. Project Vision
+### 🚀 Live Hackathon Submission & Evaluation
 
-Rwanda produces large amounts of agricultural data, but raw data alone does not provide an easy way to understand where agricultural challenges exist and where opportunities may be available.
+| **Live Platform URL** | **Username** | **Password** | **Role** |
+| :--- | :--- | :--- | :--- |
+| **[https://agrilens.ndoli.dev](https://agrilens.ndoli.dev)** | `admin` | `AgriLens2026!` | `System Administrator (Full Superuser)` |
 
-AgriLens transforms agricultural data into understandable intelligence.
+*Full platform access enabled for the hackathon evaluation jury and reviewers.*
 
-The platform should help answer questions such as:
-
-* Where is agricultural productivity low?
-* Which crops perform better in different areas?
-* Where are irrigation opportunities?
-* Where are post-harvest losses high?
-* How widely are improved seeds being used?
-* Where is fertilizer being used?
-* Where is agricultural mechanization occurring?
-* Which areas have significant productivity gaps?
-* Where are processing and value-addition opportunities?
-* Which agricultural products show market opportunities?
+> 🔐 **Environment Configuration (`.env`):** To get the authorized `.env` configuration file, send a request to **[ndolijeandamascene@gmail.com](mailto:ndolijeandamascene@gmail.com)** or via WhatsApp message to **[+250 789 312 765](https://wa.me/250789312765)**.
 
 ---
 
-# 3. Core Concept
+[Live Demo](https://agrilens.ndoli.dev) •
+[Key Capabilities](#-key-capabilities) •
+[Architecture](#-system-architecture) •
+[Quickstart](#-quickstart--installation) •
+[Roles & RBAC](#-user-roles--access-control) •
+[API Reference](#-api-endpoints) •
+[Testing](#-testing--quality-assurance) •
+[Data Governance](#-data-governance--scientific-integrity) •
+[Usage Policy](#️-intellectual-property-license--usage-policy)
 
-AgriLens follows this architecture:
+</div>
+
+---
+
+## 📖 Executive Summary
+
+Rwanda generates rich agricultural datasets through the **National Institute of Statistics of Rwanda (NISR)**, notably the **Seasonal Agricultural Survey (SAS)** and **Agricultural Household Survey (AHS)**. However, raw survey microdata alone does not readily highlight where localized productivity bottlenecks exist, which farming practices drive yield variance, or where targeted policy interventions will yield maximum impact.
+
+**AgriLens** bridges the gap between raw statistical data and operational agricultural governance. Built specifically for **Track 1: Agricultural Productivity**, AgriLens transforms official microdata into actionable intelligence through:
+- **Interactive Geospatial Analytics** spanning all 5 Provinces and 30 Districts of Rwanda.
+- **Productivity Gap Intelligence** contrasting yield disparities alongside correlated input adoption rates without claiming unproven causal links.
+- **Predictive Machine Learning** (Random Forest yield modeling, K-Means district clustering, and what-if input policy simulations).
+- **Maker-Checker Data Governance** for official survey microdata ETL and validated field observations.
+- **Daily Commodity Market Surveillance** covering 30 districts with price dispersion analysis.
+- **Automated Multi-Channel Communication** delivering timely alerts, reports, and administrative notices to agricultural stakeholders.
+
+---
+
+## 🌟 Key Capabilities
+
+### 1. Executive Intelligence Dashboard & Geospatial Visualizations
+- **6 Core Productivity KPIs**: Live weighted calculations for Total Production, Average Yield (kg/ha), Cultivated Area, Post-Harvest Loss Rate, Irrigation Adoption, and Mineral Fertilizer Usage.
+- **Interactive District Choropleth Map**: Lightweight SVG and GeoJSON boundary rendering covering all 30 districts with instant metric filtering (Crop, Season, Province).
+- **Provincial Disparity Benchmarks**: Radar and bar visualizations comparing Eastern, Western, Northern, Southern, and Kigali performance against national baselines.
+
+### 2. Signature Feature: Productivity Gap Intelligence (Track 1)
+- **Granular Yield Contrast Engine**: Compare any two districts, seasons, or crops to quantify observed productivity deficits (e.g., *Maize yield: Nyagatare 4,100 kg/ha vs. Gatsibo 2,850 kg/ha — 30.5% gap*).
+- **Associative Indicator Breakdown**: Simultaneously contrasts 5 critical agronomic factors:
+  - Irrigation adoption rate
+  - Improved seed usage
+  - Inorganic/Organic fertilizer application
+  - Agricultural mechanization
+  - Post-harvest storage losses
+- **Strict Methodological Discipline**: Enforces non-causal language (*"associated indicator"*, *"observed difference"*) to uphold statistical integrity until controlled causal studies are conducted.
+
+### 3. Machine Learning & Policy Simulation Engine
+- **Yield Inference API (`/api/v1/ml/predict-yield/`)**: Trained `RandomForestRegressor` incorporating historical rainfall, soil pH, fertilizer intensity, seed type, and topography.
+- **What-If Agronomic Policy Simulator (`/api/v1/ml/simulate-scenario/`)**: Allows agronomists and policymakers to simulate the expected yield delta from increasing irrigation, fertilizer subsidies, or seed quality by $X\%$.
+- **District Typology Clustering (`/api/v1/ml/district-clusters/`)**: Unsupervised `K-Means` clustering categorizing Rwanda's 30 districts into distinct agro-ecological typologies (High Yield / High Input, Untapped Potential, Climate Vulnerable).
+- **Seasonal Harvest & Price Forecasting (`/api/v1/ml/forecast/`, `/api/v1/ml/price-forecast/`)**: Predictive forecasting models for forthcoming harvest tonnage and wholesale market price trends.
+- **Explainability & Model Transparency (`/api/v1/ml/explainability/`, `/api/v1/ml/models/`)**: Detailed feature importance weights, performance metrics (R², RMSE, MAE), and model version registry.
+- **Automated Re-training Pipeline (`/api/v1/ml/train/` / `python manage.py train_ml_models`)**: Automated retraining pipeline refreshing models with newly verified survey cycles.
+
+### 4. Agricultural Data Management & Maker-Checker QA Hub
+- **3-Tier Data Architecture**:
+  1. *Raw Ingestion Layer*: Preserves original NISR SPSS/SAV survey records with checksums and provenance tags.
+  2. *Normalized Operational Store*: Relational database mapping parcels, households, seasons, and crops to authoritative geographic codes.
+  3. *Aggregated Analytical Lineage*: Pre-aggregated indicator tables powering instant sub-second dashboards.
+- **Maker-Checker Field Observation Workflow**: Multi-stage validation lifecycle (`Draft` ➔ `Submitted` ➔ `Approved` / `Needs Correction` / `Rejected`) with full immutable audit logs.
+- **Automated SAS Importer**: Custom ETL pipeline leveraging `pyreadstat` to ingest official SAS microdata with automated survey sampling weight calculation.
+
+### 5. Commodity Markets & Daily Price Surveillance
+- **Wholesale & Retail Price Monitoring**: Real-time price tracking across 30 district markets for essential staple food crops (Maize, Beans, Irish Potato, Rice, Cassava).
+- **5-Stage Publication Workflow**: `Collect` ➔ `Validate` ➔ `Review` ➔ `Approve` ➔ `Publish`.
+- **Market Dispersion & Corridors**: Highlights supply bottlenecks and inter-district price arbitrage margins.
+
+### 6. Decision Support & Strategic Agronomic Policies
+- **Prescriptive Intervention Triggers**: Automated recommendation rules covering:
+  - Small-scale irrigation expansion in drought-prone Eastern lowlands.
+  - Soil acidity liming & NPK balance in Northern and Southern volcanic highlands.
+  - Post-harvest hermetic storage and drying infrastructure to curb storage losses.
+- **Actionable Policy Dossiers**: Quantified investment priorities and target beneficiary estimates per sector.
+
+### 7. Internal Report Center & Automated Schedules
+- **On-Demand Exports**: Clean PDF briefings and structured CSV data extracts for researchers and government planners.
+- **Automated Background Dispatch**: Background cron task (`run_scheduled_reports`) that compiles and delivers recurring intelligence briefs.
+
+### 8. Institutional Notifications & Communication Center
+- **In-App Notification Hub & Dropdown Drawer (`/notifications/`)**: Real-time dropdown drawer with unread counter badges, instant mark-as-read, unread toggle, and direct navigation links to relevant platform records.
+- **Asynchronous Email Worker (`apps.notifications.tasks`)**: Non-blocking background worker daemon with `transaction.on_commit` hooks, ensuring zero request lag, idempotency, and dual HTML/plain-text responsive email templates.
+- **Platform Administrative Announcements (`/notifications/admin/`)**: Platform-wide broadcasts with customizable priority banners (`Normal`, `High`, `Critical`), target role filtering, and email delivery audit log with retry triggers.
+- **User Preference Matrix (`/notifications/preferences/`)**: Granular multi-channel toggles allowing users to subscribe/unsubscribe from specific notification types (Data Approvals, Commodity Prices, System Alerts, Security).
+- **Workflow-Triggered Communications**: Automatic alerts dispatched when field observations are submitted, approved, or rejected; when price anomalies occur; when scheduled reports are generated; and during user account provisioning.
+
+### 9. Enterprise Authentication, RBAC & Security
+- **Institutional Access Tiers**: 7 role tiers enforcing strict role-based access control.
+- **Geographic Data Scoping**: Restricts regional agronomists and officers to their assigned Province, District, or Sector.
+- **Tokenized User Provisioning**: Secure, single-use tokenized setup links emailed to newly created users.
+- **Self-Service Password Management**: Secure Change Password with active session preservation and multi-step Forgot Password recovery.
+
+---
+
+## 🏗 System Architecture
 
 ```text
-                    NISR DATA
-                       |
-                       v
-              Data Ingestion
-                       |
-                       v
-          Cleaning & Validation
-                       |
-                       v
-              Data Processing
-                       |
-                       v
-             PostgreSQL Database
-                       |
-                       v
-            Agricultural Analytics
-                       |
-          +------------+------------+
-          |            |            |
-          v            v            v
-     Productivity    Risk        Market
-     Intelligence  Analysis   Intelligence
-          |            |            |
-          +------------+------------+
-                       |
-                       v
-                 AgriLens
-                  Platform
-                       |
-        +--------------+--------------+
-        |              |              |
-        v              v              v
-      Maps         Dashboard       Smart Insights
-```
-
----
-
-# 4. Main Objective
-
-Build a professional agricultural intelligence platform that converts official agricultural datasets into:
-
-* Agricultural indicators
-* Geographic insights
-* Productivity comparisons
-* Productivity gap analysis
-* Agricultural risk analysis
-* Market intelligence
-* Interactive visualizations
-* Practical decision-support information
-
-The project must prioritize **data accuracy and methodological correctness over visual appearance**.
-
----
-
-# 5. Signature Feature: Productivity Gap Intelligence
-
-The primary innovative feature of AgriLens should be **Productivity Gap Intelligence**.
-
-The system compares agricultural productivity between:
-
-* Provinces
-* Districts
-* Crops
-* Agricultural seasons
-* Years
-
-Example:
-
-```text
-MAIZE PRODUCTIVITY
-
-District A
-Yield: 4,200 kg/ha
-
-District B
-Yield: 2,700 kg/ha
-
-Observed productivity gap: 35.7%
-```
-
-The system can then display available contextual indicators:
-
-```text
-District A
--------------------------
-Irrigation        32%
-Improved seed     71%
-Fertilizer        64%
-Mechanization     28%
-Loss rate          7%
-
-District B
--------------------------
-Irrigation        14%
-Improved seed     49%
-Fertilizer        41%
-Mechanization     11%
-Loss rate         16%
-```
-
-The system must **not automatically claim causation**.
-
-Use terms such as:
-
-* Observed difference
-* Associated indicator
-* Potential factor
-* Area for investigation
-
-unless a statistically appropriate causal methodology has been implemented.
-
----
-
-# 6. Main Platform Modules
-
-## 6.1 Overview Dashboard
-
-The main dashboard should display:
-
-* Total production
-* Average yield
-* Agricultural area
-* Post-harvest loss rate
-* Irrigation adoption
-* Improved seed adoption
-* Fertilizer adoption
-* Mechanization
-* Quantity sold
-* Processing rate
-
-Filters:
-
-```text
-Year
-Season
-Province
-District
-Crop
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                             OFFICIAL DATA SOURCES                           │
+│     NISR SAS (Seasonal Agricultural Survey)  •  AHS  •  MINAGRI  •  RAB     │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                ETL PIPELINE                                 │
+│  pyreadstat Ingestion  •  Geographic Code Validation  •  Sampling Weights   │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          3-TIER POSTGRESQL STORE                            │
+│  ┌───────────────────────┐ ┌─────────────────────────┐ ┌──────────────────┐ │
+│  │ Tier 1: Raw Microdata │ │ Tier 2: Normalized DB   │ │ Tier 3: Insights │ │
+│  └───────────────────────┘ └─────────────────────────┘ └──────────────────┘ │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+                   ┌───────────────────┴───────────────────┐
+                   ▼                                       ▼
+┌─────────────────────────────────────┐ ┌─────────────────────────────────────┐
+│      ANALYTICS & ML ENGINE          │ │     WORKFLOW & SECURITY ENGINE      │
+│  • RandomForest Yield Predictor     │ │  • 7-Tier Institutional RBAC        │
+│  • K-Means District Clustering      │ │  • Maker-Checker Verification       │
+│  • What-If Policy Simulation        │ │  • Geographic Scoping Isolation     │
+│  • Productivity Gap Analysis        │ │  • Async Notifications & Broadcasts │
+└──────────────────┬──────────────────┘ └──────────────────┬──────────────────┘
+                   │                                       │
+                   └───────────────────┬───────────────────┘
+                                       │
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        AGRILENS PRESENTATION LAYER                          │
+│   Responsive Django Templates  •  Vanilla CSS Design Tokens  •  Alpine.js   │
+│   Interactive SVG / GeoJSON Maps  •  RESTful APIs  •  PDF & CSV Reports     │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 6.2 Productivity Intelligence
+## 🛠 Technology Stack
 
-Analyze:
-
-* Production
-* Yield
-* Cultivated area
-* Productivity trends
-* Crop comparisons
-* District comparisons
-* Province comparisons
-* Productivity gaps
-
-Charts:
-
-* Bar charts
-* Line charts
-* Ranking tables
-* Geographic maps
+| Layer | Technologies | Rationale & Specifications |
+| :--- | :--- | :--- |
+| **Backend Framework** | **Django 5.2 (Python 3.11+)** | High-security, enterprise-ready web platform with ORM, built-in auth, and transactional integrity. |
+| **API Layer** | **Django REST Framework (DRF)** | Clean RESTful endpoints for ML inference, notifications, and indicators. |
+| **Database** | **PostgreSQL / PostGIS** | ACID compliance, robust spatial support, and scalable relational querying. |
+| **Machine Learning** | **Scikit-Learn, NumPy, Pandas** | `RandomForestRegressor` for yield inference; `KMeans` for agro-ecological district clustering. |
+| **ETL & Data Science** | **pyreadstat, openpyxl** | Ingestion of official NISR SPSS/SAV microdata dictionaries and weights. |
+| **Frontend UI** | **Vanilla CSS + Alpine.js** | Ultra-fast, zero-build asset pipeline with modern dark/light styling and reactive components. |
+| **Geospatial** | **GeoJSON & Custom SVG** | High-performance district choropleths with zero external map library latency. |
+| **Task Dispatch** | **Async Threads / Celery Ready** | Non-blocking email dispatch and scheduled report execution. |
+| **Reporting** | **ReportLab & CSV** | Automated PDF briefing generation and structured data exports. |
+| **Testing** | **pytest, pytest-django** | Comprehensive automated test suite spanning unit, workflow, and security tests. |
 
 ---
 
-## 6.3 Crop Intelligence
-
-Each crop should have a dedicated analysis page.
-
-Example:
-
-```text
-Crop: Maize
-
-Production
-Yield
-Cultivated Area
-Average Selling Price
-Sales Rate
-Storage Rate
-Processing Rate
-Loss Rate
-
-Agricultural Practices
-- Irrigation
-- Fertilizer
-- Improved Seeds
-- Mechanization
-- Soil Conservation
-
-Geographic Distribution
-
-Historical Trend
-```
-
-Only display indicators that can actually be calculated from available data.
-
----
-
-# 7. Agricultural Practices
-
-Analyze adoption and distribution of:
-
-### Irrigation
-
-* Irrigation adoption
-* Irrigation technique
-* Water source
-* Irrigated area
-
-### Soil Conservation
-
-* Erosion level
-* Anti-erosion practices
-* Land consolidation
-* Related practices
-
-### Fertilizer
-
-* Organic fertilizer
-* Inorganic fertilizer
-* Fertilizer type
-* Quantity
-* Cost
-* Adoption
-
-### Seeds
-
-* Improved seed adoption
-* Seed source
-* Seed quantity
-* Seed cost
-
-### Mechanization
-
-* Ox plough
-* Tractor
-* Other machinery
-* Mechanization adoption
-
----
-
-# 8. Post-Harvest Intelligence
-
-Analyze:
-
-* Total crop losses
-* Harvesting losses
-* Transport losses
-* Storage losses
-* Processing losses
-* Packaging losses
-* Sales losses
-* Storage
-* Processing
-
-Core indicator:
-
-```text
-loss_rate_pct =
-total_crop_loss_kg / production_kg * 100
-```
-
-The system should identify areas and crops with relatively high observed losses.
-
----
-
-# 9. Market Intelligence
-
-Analyze available:
-
-* Quantity sold
-* Selling price
-* Market type
-* Storage
-* Processing
-* Value addition
-
-Possible features:
-
-```text
-Crop Market Overview
-Price Analysis
-Sales Analysis
-Processing Opportunities
-Storage Analysis
-Market Comparison
-```
-
-If sufficient authorized data becomes available, AgriLens may include an **Export Opportunity Explorer**.
-
-Do not create artificial export recommendations.
-
----
-
-# 10. Rwanda Agricultural Map
-
-Use an interactive Rwanda map.
-
-Users should be able to navigate:
-
-```text
-Rwanda
-   |
-   +-- Province
-          |
-          +-- District
-                  |
-                  +-- Sector
-```
-
-A selected district should display:
-
-* Production
-* Yield
-* Main crops
-* Irrigation
-* Fertilizer
-* Improved seeds
-* Mechanization
-* Soil conservation
-* Post-harvest losses
-* Market indicators
-
-Use **Leaflet** for map visualization.
-
-Use **PostGIS** when spatial database functionality is required.
-
----
-
-# 11. Smart Insights
-
-AgriLens should generate understandable data-driven insights.
-
-Example:
-
-```text
-Insight
-
-The selected district has a lower maize yield than the
-national/reference average.
-
-The district also shows a lower observed irrigation
-adoption rate and a higher post-harvest loss rate.
-
-These indicators may help identify areas for further
-agricultural investigation.
-```
-
-Insights must be generated from actual data.
-
-Never generate fake statistics.
-
-Never invent a conclusion when the data does not support it.
-
----
-
-# 12. Data Sources
-
-Primary source:
-
-## NISR Seasonal Agricultural Survey
-
-Priority:
-
-```text
-SAS 2025
-SAS 2024
-SAS 2023
-```
-
-Supporting source:
-
-```text
-Agriculture Household Survey 2024
-```
-
-Other public datasets may be integrated where useful, especially:
-
-* Climate
-* Rainfall
-* Satellite/open geospatial data
-* Agricultural market data
-* Public geographic boundaries
-
-All external datasets must be documented.
-
----
-
-# 13. NISR Data Rules
-
-NISR data is the foundation of AgriLens.
-
-The development team must:
-
-1. Use authorized datasets.
-2. Preserve source information.
-3. Keep dataset lineage.
-4. Validate variables before importing.
-5. Never invent NISR variables.
-6. Never fabricate missing values.
-7. Never hard-code NISR statistics.
-8. Document transformations.
-9. Document assumptions.
-10. Keep source data separate from processed data.
-
-If a variable name is uncertain, inspect the actual dataset or official metadata before implementing it.
-
----
-
-# 14. Data Pipeline
-
-The ETL pipeline should be:
-
-```text
-Official NISR Dataset
-        |
-        v
-     Extract
-        |
-        v
-      Validate
-        |
-        v
-      Clean
-        |
-        v
-    Transform
-        |
-        v
-     Normalize
-        |
-        v
-      Load
-        |
-        v
-   PostgreSQL
-        |
-        v
-   Indicators
-        |
-        v
-   Dashboard
-```
-
-Repository structure:
-
-```text
-etl/
-├── extract/
-├── transform/
-├── validation/
-└── load/
-```
-
----
-
-# 15. Data Storage
-
-Use:
-
-```text
-data/
-├── raw/
-├── interim/
-├── processed/
-└── reference/
-```
-
-### raw/
-
-Original datasets.
-
-Never modify these files.
-
-### interim/
-
-Cleaned intermediate files.
-
-### processed/
-
-Normalized data prepared for database loading.
-
-### reference/
-
-Reference data:
-
-* Province codes
-* District codes
-* Sector codes
-* Crop codes
-* Other lookup tables
-
-Do not commit restricted or confidential datasets to GitHub.
-
----
-
-# 16. Database
-
-Use:
-
-**PostgreSQL**
-
-Use PostGIS where spatial analysis is required.
-
-Core tables:
-
-```text
-provinces
-districts
-sectors
-
-survey_periods
-data_sources
-source_variables
-
-crops
-farmers
-households
-plots
-
-production_records
-
-seed_records
-fertilizer_records
-pesticide_records
-
-irrigation_records
-soil_conservation_records
-mechanization_records
-
-postharvest_loss_records
-market_records
-production_use_records
-
-land_tenure_records
-extension_records
-agricultural_tool_records
-sustainable_agriculture_records
-
-productivity_indicators
-risk_indicators
-```
-
----
-
-# 17. Core Production Record
-
-Conceptually, production data should support:
-
-```text
-year
-season
-
-province
-district
-sector
-
-segment
-farmer
-plot
-crop
-
-plot_area_sqm
-plot_area_ha
-
-production_kg
-harvested_quantity_kg
-
-quantity_sold_kg
-stored_quantity_kg
-processed_quantity_kg
-
-selling_price_rwf_per_kg
-
-improved_seed_used
-
-organic_fertilizer_used
-inorganic_fertilizer_used
-pesticide_used
-micronutrient_used
-
-irrigated
-irrigation_technique
-
-erosion_level
-anti_erosion
-
-mechanized
-ox_plough_used
-tractor_used
-
-total_loss_kg
-harvesting_loss_kg
-transport_loss_kg
-storage_loss_kg
-processing_loss_kg
-packaging_loss_kg
-sales_loss_kg
-
-survey_weight
-```
-
-The exact NISR variable-to-database mapping must always be validated against the actual source files.
-
----
-
-# 18. Important Indicators
-
-## Yield
-
-```text
-yield_kg_per_ha =
-production_kg / plot_area_ha
-```
-
-## Production Growth
-
-```text
-production_growth_pct =
-(current_production - previous_production)
-/
-previous_production
-* 100
-```
-
-## Yield Growth
-
-```text
-yield_growth_pct =
-(current_yield - previous_yield)
-/
-previous_yield
-* 100
-```
-
-## Loss Rate
-
-```text
-loss_rate_pct =
-total_crop_loss_kg
-/
-production_kg
-* 100
-```
-
-## Sales Rate
-
-```text
-sales_rate_pct =
-quantity_sold_kg
-/
-production_kg
-* 100
-```
-
-## Storage Rate
-
-```text
-storage_rate_pct =
-stored_quantity_kg
-/
-production_kg
-* 100
-```
-
-## Processing Rate
-
-```text
-processed_rate_pct =
-processed_quantity_kg
-/
-production_kg
-* 100
-```
-
-For survey-level statistics, use appropriate NISR survey weights when required.
-
----
-
-# 19. Survey Weights
-
-The analytics layer must support weighted calculations.
-
-Examples:
-
-```text
-weighted_sum()
-weighted_mean()
-weighted_percentage()
-```
-
-Do not automatically use simple averages for estimates where survey weights are required.
-
-Every weighted indicator should document:
-
-* Weight variable
-* Numerator
-* Denominator
-* Eligibility criteria
-* Aggregation level
-
----
-
-# 20. Technology Stack
-
-## Backend
-
-```text
-Python
-Django
-Django REST Framework
-PostgreSQL
-PostGIS
-```
-
-## Frontend
-
-```text
-Django Templates
-Tailwind CSS
-Alpine.js
-Chart.js
-Leaflet
-```
-
-Do **not** introduce React unless explicitly requested.
-
-The project should remain primarily Django server-rendered.
-
-## Data Science
-
-```text
-Pandas
-NumPy
-Scikit-learn
-```
-
-## Background Processing
-
-```text
-Celery
-Redis
-```
-
----
-
-# 21. Django Applications
-
-Use modular Django applications:
-
-```text
-apps/
-├── accounts/
-├── agriculture/
-├── api/
-├── dashboard/
-├── farmers/
-├── geography/
-├── indicators/
-├── inputs/
-├── markets/
-└── surveys/
-```
-
-### accounts
-
-Authentication, roles and permissions.
-
-### agriculture
-
-Crops, plots, production and agricultural practices.
-
-### farmers
-
-Farmers and households.
-
-### geography
-
-Province, district, sector and spatial information.
-
-### inputs
-
-Seeds, fertilizer, pesticides and micronutrients.
-
-### markets
-
-Sales, prices, markets, storage and processing.
-
-### surveys
-
-Survey metadata and data lineage.
-
-### indicators
-
-Agricultural calculations and analytical indicators.
-
-### dashboard
-
-User-facing dashboard and visualization.
-
-### api
-
-REST API.
-
----
-
-# 22. API
-
-Use Django REST Framework.
-
-Initial endpoints:
-
-```text
-/api/v1/overview/
-/api/v1/productivity/
-/api/v1/crops/
-/api/v1/crops/<id>/
-/api/v1/provinces/
-/api/v1/districts/
-/api/v1/districts/<id>/productivity/
-/api/v1/irrigation/
-/api/v1/fertilizer/
-/api/v1/mechanization/
-/api/v1/postharvest-loss/
-/api/v1/markets/
-/api/v1/trends/
-/api/v1/insights/
-```
-
-Support filters:
-
-```text
-?year=2025
-?season=A
-?province=01
-?district=0101
-?crop=maize
-```
-
----
-
-# 23. Data Lineage
-
-Every dataset must be traceable.
-
-Store:
-
-```text
-data_source
-survey_year
-season
-file_name
-import_date
-variable_name
-database_field
-mapping_version
-```
-
-Example:
-
-```text
-NISR SAS 2025
-      |
-      v
-Source Variable
-      |
-      v
-Database Field
-      |
-      v
-Indicator
-      |
-      v
-Dashboard Visualization
-```
-
-A developer should be able to determine where an important dashboard statistic came from.
-
----
-
-# 24. Repository Structure
-
-The repository should follow approximately:
+## 📁 Repository Structure
 
 ```text
 agrilens/
-│
-├── .github/
-│   └── workflows/
-│
 ├── apps/
-│   ├── accounts/
-│   ├── agriculture/
-│   ├── api/
-│   ├── dashboard/
-│   ├── farmers/
-│   ├── geography/
-│   ├── indicators/
-│   ├── inputs/
-│   ├── markets/
-│   └── surveys/
-│
-├── analytics/
-│   └── notebooks/
-│
-├── config/
-│   └── settings/
-│
-├── data/
-│   ├── raw/
-│   ├── interim/
-│   ├── processed/
-│   └── reference/
-│
-├── etl/
-│   ├── extract/
-│   ├── transform/
-│   ├── validation/
-│   └── load/
-│
-├── scripts/
-├── static/
-├── templates/
-├── tests/
-│
-├── requirements.txt
-│
-├── .env.example
-├── .gitignore
-├── manage.py
-└── README.md
+│   ├── accounts/             # Custom User model, RBAC, single-use token activation, security
+│   ├── agriculture/          # Crops, seasons, parcels, and production statistics
+│   ├── api/                  # Public and authenticated REST endpoints
+│   ├── dashboard/            # National overview, executive KPIs, map views, scheduled reports
+│   ├── data_management/      # 3-tier SAS ingestion, maker-checker manual observations, audit log
+│   ├── decision_support/     # Policy recommendation engine and actionable agronomic dossiers
+│   ├── geography/            # 5 Provinces, 30 Districts, 416 Sectors hierarchy & GeoJSON
+│   ├── indicators/           # Productivity gap intelligence and comparative analytics
+│   ├── markets/              # Daily commodity market prices and 5-stage publication workflow
+│   ├── ml/                   # ML inference (Random Forest), clustering (K-Means), simulation
+│   └── notifications/        # In-app alerts, user preferences, broadcast announcements, async email
+├── config/                   # Root Django configuration, settings, URL routing, WSGI/ASGI
+├── data/                     # Authoritative geographic GeoJSON and administrative hierarchy
+├── etl/                      # Standalone microdata extraction and transformation scripts
+├── scripts/                  # Seeding utilities (geography, dev bootstrap, audit reconciliation)
+├── static/                   # Global CSS design tokens, icons, and client-side JavaScript
+├── templates/                # Server-rendered HTML templates styled with Alpine.js & CSS
+├── tests/                    # Pytest automated test suites covering all platform modules
+├── manage.py                 # Django command-line utility
+└── requirements.txt          # Unified Python dependencies
 ```
 
 ---
 
-# 25. Security and Git Rules
+## 🚀 Quickstart & Installation
 
-Never commit:
+### Prerequisites
+- **Python 3.11+** installed
+- **PostgreSQL 14+** installed and running
+- **Git**
 
-```text
-.env
-*.sqlite3
-__pycache__/
-*.pyc
-data/raw/
-database dumps
-passwords
-API keys
-private credentials
-```
+### 1. Clone & Set Up Virtual Environment
 
-Use:
-
-```text
-.env.example
-```
-
-for configuration examples.
-
-Do not expose personal or confidential survey information.
-
----
-
-# 26. User Interface
-
-The design should be:
-
-* Modern
-* Professional
-* Clean
-* Responsive
-* Data-focused
-* Easy to understand
-
-Use a consistent visual language throughout the platform.
-
-Primary interface:
-
-```text
-AgriLens
-See Agriculture Through Data.
-```
-
-The dashboard should prioritize:
-
-1. Important numbers
-2. Rwanda map
-3. Trends
-4. Comparisons
-5. Agricultural practices
-6. Post-harvest losses
-7. Market intelligence
-8. Smart insights
-
-Avoid unnecessary animations and visual clutter.
-
----
-
-# 27. Innovation Requirements
-
-AgriLens should go beyond a basic dashboard.
-
-The system should progressively support:
-
-### Productivity Gap Detection
-
-Automatically identify significant observed productivity differences.
-
-### Smart Alerts
-
-Example:
-
-```text
-High Loss Alert
-
-The selected district has a post-harvest
-loss rate above the selected reference level.
-```
-
-### Geographic Intelligence
-
-Show agricultural indicators spatially.
-
-### Trend Detection
-
-Identify changes across years and seasons.
-
-### Multi-factor Analysis
-
-Allow users to compare productivity with:
-
-* Irrigation
-* Fertilizer
-* Seeds
-* Mechanization
-* Soil conservation
-* Post-harvest losses
-
-### Optional Predictive Analytics
-
-Where sufficient historical data exists, explore:
-
-* Yield prediction
-* Production forecasting
-* Risk identification
-
-Any prediction must clearly show that it is a model output, not an official NISR statistic.
-
----
-
-# 28. Impact
-
-AgriLens should demonstrate tangible practical impact.
-
-## Farmers
-
-Potentially provide information about:
-
-* Productivity
-* Agricultural practices
-* Local agricultural conditions
-* Post-harvest challenges
-* Market information
-
-## Agricultural Planners
-
-Support:
-
-* Geographic prioritization
-* Productivity analysis
-* Irrigation planning
-* Agricultural program monitoring
-* Post-harvest interventions
-
-## Policymakers
-
-Support:
-
-* Evidence-based planning
-* Agricultural policy analysis
-* Resource prioritization
-* Monitoring agricultural trends
-
-## Development Partners
-
-Support:
-
-* Identifying areas requiring intervention
-* Monitoring agricultural indicators
-* Understanding regional differences
-
----
-
-# 29. Hackathon Evaluation Alignment
-
-AgriLens must explicitly address all five evaluation criteria.
-
-## 1. Problem Understanding & Relevance — 20 points
-
-Clearly demonstrate a real agricultural productivity challenge and explain how the solution aligns with Rwanda's development priorities.
-
-## 2. Data Use & Methodology — 20 points
-
-Demonstrate:
-
-* NISR data usage
-* Data preprocessing
-* Statistical methodology
-* Survey weighting where required
-* Analytical methods
-* Data lineage
-
-## 3. Tech Innovation — 20 points
-
-Demonstrate:
-
-* Geospatial analysis
-* Productivity-gap intelligence
-* Smart alerts
-* Advanced analytics
-* Optional predictive modeling
-
-## 4. Usability & Design — 20 points
-
-Provide:
-
-* Simple navigation
-* Interactive maps
-* Clear charts
-* Useful filters
-* Responsive design
-* Understandable insights
-
-## 5. Tangible Impact — 20 points
-
-Demonstrate practical applications for:
-
-* Farmers
-* Agricultural planners
-* Policymakers
-* Government
-* Development partners
-
----
-
-# 30. Development Phases
-
-## Phase 1 — Foundation
-
-Build:
-
-* Django project
-* PostgreSQL
-* Environment configuration
-* Authentication
-* Base UI
-* Geography models
-* Survey metadata
-
-## Phase 2 — NISR Data Infrastructure
-
-Build:
-
-* Dataset ingestion
-* ETL framework
-* Validation
-* Data lineage
-* NISR 2025 import
-
-## Phase 3 — Agricultural Database
-
-Build:
-
-* Farmers
-* Plots
-* Crops
-* Production
-* Agricultural practices
-* Inputs
-* Markets
-* Losses
-
-## Phase 4 — Analytics
-
-Build:
-
-* Yield
-* Production
-* Growth
-* Productivity gaps
-* Irrigation
-* Fertilizer
-* Seeds
-* Mechanization
-* Soil conservation
-* Post-harvest losses
-* Market indicators
-
-## Phase 5 — Dashboard
-
-Build:
-
-* Overview
-* Rwanda map
-* Crop intelligence
-* District intelligence
-* Productivity comparison
-* Agricultural practices
-* Market intelligence
-
-## Phase 6 — Smart Intelligence
-
-Build:
-
-* Smart insights
-* Alerts
-* Productivity-gap detection
-* Multi-factor analysis
-* Optional predictive models
-
-## Phase 7 — API
-
-Build:
-
-* REST API
-* Filtering
-* Aggregation
-* Dashboard endpoints
-
-## Phase 8 — Testing and Deployment
-
-Complete:
-
-* Unit tests
-* ETL tests
-* API tests
-* UI testing
-* Security review
-* Performance optimization
-* Production deployment
-
----
-
-# 31. AI Developer Rules
-
-This repository will be developed with assistance from AI coding tools.
-
-The AI developer must follow these rules:
-
-### Rule 1
-
-Understand the existing code before modifying it.
-
-### Rule 2
-
-Do not create duplicate models, services, utilities, or business logic.
-
-### Rule 3
-
-Follow the existing architecture.
-
-### Rule 4
-
-Do not introduce React.
-
-### Rule 5
-
-Do not invent NISR variables.
-
-### Rule 6
-
-Inspect actual NISR datasets before implementing mappings.
-
-### Rule 7
-
-Never fabricate statistics.
-
-### Rule 8
-
-Never silently replace missing data with invented values.
-
-### Rule 9
-
-Write tests for important calculations.
-
-### Rule 10
-
-Use efficient database queries.
-
-Avoid N+1 queries.
-
-Use:
-
-```python
-select_related()
-prefetch_related()
-```
-
-where appropriate.
-
-### Rule 11
-
-Keep ETL logic separate from Django views.
-
-### Rule 12
-
-Keep analytical calculations separate from templates.
-
-### Rule 13
-
-Document statistical assumptions.
-
-### Rule 14
-
-Protect sensitive information.
-
-### Rule 15
-
-Do not commit confidential datasets or credentials.
-
-### Rule 16
-
-Do not break existing functionality when adding features.
-
-### Rule 17
-
-Prefer simple, maintainable solutions over unnecessary complexity.
-
-### Rule 18
-
-If source data is insufficient for a requested feature, do not fabricate a solution. Clearly identify what data is required.
-
----
-
-# 32. Definition of Done
-
-A feature is complete only when:
-
-* It works with real data.
-* It follows the project architecture.
-* Database migrations work.
-* Tests pass.
-* Validation exists where required.
-* Errors are handled.
-* The UI is responsive.
-* No fake data is used.
-* Important calculations are tested.
-* Data source information is traceable.
-* Existing functionality still works.
-
----
-
-# 33. Initial MVP
-
-The first working version should focus on:
-
-```text
-NISR SAS 2025
-      |
-      +-- Production
-      +-- Agricultural Practices
-      +-- Fertilizer/Pesticide
-      +-- Screening
-      |
-      v
-AgriLens Database
-      |
-      +-- Yield
-      +-- Production
-      +-- Irrigation
-      +-- Fertilizer
-      +-- Improved Seeds
-      +-- Mechanization
-      +-- Soil Conservation
-      +-- Post-Harvest Losses
-      |
-      v
-AgriLens Dashboard
-      |
-      +-- Rwanda Map
-      +-- Productivity Analysis
-      +-- Crop Analysis
-      +-- District Comparison
-      +-- Productivity Gap
-      +-- Smart Insights
-```
-
-SAS 2024, SAS 2023, AHS 2024, and additional public datasets should be integrated progressively after the core SAS 2025 pipeline is stable.
-
----
-
-# 34. Final Product Definition
-
-AgriLens is **not simply a dashboard**.
-
-It is an:
-
-> **Agricultural Intelligence and Decision-Support Platform**
-
-that transforms Rwanda's agricultural data into:
-
-```text
-DATA
-  ↓
-KNOWLEDGE
-  ↓
-INSIGHT
-  ↓
-DECISION SUPPORT
-```
-
-The final product should demonstrate that official agricultural data can be transformed into a practical technology solution that helps users understand agricultural productivity challenges and identify potential opportunities across Rwanda.
-
-**Project Name:** AgriLens
-
-**Tagline:** See Agriculture Through Data.
-
-**Repository:** `agrilens`
-
----
-
-# 35. Verified Data Architecture & Pipeline Execution Guide
-
-### 35.1 Environment Configuration & Database Setup
-AgriLens operates on a single unified configuration (`config/settings.py`) driven by `.env`:
 ```bash
-# 1. Activate virtual environment
-.\venv\Scripts\activate
+# Clone the repository
+git clone https://github.com/ndolijeandamascene/agrilens.git
+cd agrilens
 
-# 2. Configure .env with remote or local PostgreSQL
-DATABASE_URL=postgres://user:password@hostname:5439/agrilens?sslmode=disable
+# Create virtual environment
+python -m venv venv
 
-# 3. Apply all database migrations
+# Activate virtual environment
+# Windows (PowerShell):
+.\venv\Scripts\Activate.ps1
+# Linux / macOS:
+source venv/bin/activate
+```
+
+### 2. Install Dependencies
+
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### 3. Configure Environment Variables
+
+Copy the example environment configuration:
+
+```bash
+# Windows:
+copy .env.example .env
+# Linux / macOS:
+cp .env.example .env
+```
+
+> **Note:** To obtain the complete pre-configured `.env` file (including database credentials and API secrets), contact **[ndolijeandamascene@gmail.com](mailto:ndolijeandamascene@gmail.com)** or send a WhatsApp message to **[+250 789 312 765](https://wa.me/250789312765)**.
+
+Edit `.env` to configure your PostgreSQL credentials:
+
+```ini
+DEBUG=True
+SECRET_KEY=your-secure-secret-key-agrilens-2026
+ALLOWED_HOSTS=localhost,127.0.0.1
+DATABASE_URL=postgres://user:password@localhost:5432/agrilens_db
+TIME_ZONE=Africa/Kigali
+```
+
+### 4. Run Database Migrations
+
+```bash
 python manage.py migrate
+```
 
-# 4. Seed authoritative administrative geography (30 Districts, 416 Sectors, Crops, Seasons)
+### 5. Seed Authoritative Rwanda Geography
+
+Seeds the official NISR administrative hierarchy (5 Provinces, 30 Districts, 416 Sectors, Seasons, and Crops):
+
+```bash
 python scripts/seed_geography.py
 ```
 
-### 35.2 Official NISR Microdata ETL Ingestion
-The ETL pipeline ingests official SAS microdata into the 3-Tier storage architecture:
+### 6. Initialize Surveillance & Train ML Models
+
+Seed market surveillance datasets and train the yield prediction and district clustering models:
+
 ```bash
-# Ingest SAS 2025 Season A (Pilot or Full)
+# Seed commodity market prices
+python manage.py seed_market_surveillance
+
+# Train yield prediction & district clustering models
+python manage.py train_ml_models
+```
+
+### 7. (Optional) Ingest Official NISR SAS Microdata
+
+Ingest official SPSS/SAV microdata packages:
+
+```bash
+# Ingest SAS 2025 Season A
 python manage.py import_sas_production --file "Datasets/SAS 2025 catalog and data dictionary/Season A/Rwa_raw_SeasonA2025_Production.sav" --year 2025 --season A --limit 5000
 
-# Ingest SAS 2024 Season A (Multi-year comparison)
+# Ingest SAS 2024 Season A
 python manage.py import_sas_production --file "Datasets/SAS 2024 catalog and data dictionary/Season A/Rwa_raw_SeasonA2024_Production.sav" --year 2024 --season A --limit 5000
 ```
 
-### 35.3 Key Endpoints & Capabilities
-- **Public Intelligence Portal:** `/` (Interactive map, Track 1 context, productivity gap simulator)
-- **National Agricultural Dashboard:** `/dashboard/` (Survey-weighted KPIs, practice meters, live audited lineage log)
-- **Productivity Intelligence (Track 1):** `/indicators/productivity/` (Yield comparisons, district rankings, YoY growth)
-- **Data Governance Hub:** `/data-management/` (Ingestion batch registry, QA flags, review queues)
-- **Manual Data Entry Form:** `/data-management/entries/create/` (Dependent dropdowns `Province ➔ District ➔ Sector`, draft & approval workflow)
+### 8. Create Superuser & Run Development Server
 
-### 35.4 Automated Test Suite
-Run the full test suite covering data validation, weighting formulas, review workflow, and geographic constraints:
 ```bash
-python manage.py test tests
+# Create an administrator
+python manage.py createsuperuser
+
+# Start the server
+python manage.py runserver
 ```
 
+Open your browser and navigate to **`http://127.0.0.1:8000/`**.
+
+---
+
+## 👥 User Roles & Access Control
+
+AgriLens implements 7 institutional role tiers with geographic scoping to enforce data sovereignty and administrative accountability:
+
+| Institutional Role | Code | Scope | Primary Permissions & Responsibilities |
+| :--- | :--- | :--- | :--- |
+| **System Administrator** | `ADMIN` | Global | Full system access, user management, audit logs, and broadcast announcements. |
+| **NISR Data Manager** | `NISR_DATA_MANAGER` | National | SAS ETL ingestion, survey batch approval, methodology configuration, and report publishing. |
+| **Agricultural Data Analyst** | `ANALYST` | National | Indicator analytics, ML policy simulations, gap analysis, and draft report authoring. |
+| **National Agriculture Officer** | `NATIONAL_OFFICER` | National | Read access to all provincial data, decision support dashboards, and strategic reports. |
+| **District Agriculture Officer** | `DISTRICT_OFFICER` | District-scoped | Data review for assigned districts, validation of submitted field observations, market price checks. |
+| **Data Entry Officer** | `DATA_ENTRY_OFFICER` | Sector-scoped | Manual entry of field survey observations (`Draft` ➔ `Submitted`), local market price collection. |
+| **Reviewer / Approver** | `REVIEWER` | Scoped | QA gatekeeper authorized to review, approve, or reject pending manual data submissions. |
+
+---
+
+## 🌐 Primary Navigation & URL Endpoints
+
+### Web Portals
+
+| Route | View Name | Description |
+| :--- | :--- | :--- |
+| `/` | `dashboard:home` | Executive Landing Page with live Rwanda map, Track 1 overview, and key KPIs. |
+| `/dashboard/` | `dashboard:executive` | National Agricultural Executive Dashboard with multi-metric filters. |
+| `/indicators/productivity/` | `indicators:productivity` | Productivity Gap Intelligence engine and district ranking tables. |
+| `/data-management/` | `data_management:hub` | Data Ingestion Registry, ETL batches, QA queues, and audit trails. |
+| `/data-management/entries/create/` | `data_management:entry_create` | Cascading Manual Observation form (`Province ➔ District ➔ Sector`). |
+| `/markets/` | `markets:dashboard` | Daily Commodity Market surveillance, price dispersion, and 5-stage publishing. |
+| `/decision-support/` | `decision_support:index` | Agronomic policy recommendation dossiers and prioritized interventions. |
+| `/reports/` | `dashboard:report_center` | Internal Report Center for on-demand PDF and CSV export generation. |
+| `/notifications/` | `notifications:notification_center` | In-app notification center, unread alerts, and activity feed. |
+| `/notifications/preferences/` | `notifications:preferences` | User multi-channel notification settings & frequency matrix. |
+| `/notifications/admin/` | `notifications:admin_announcements` | System-wide broadcasts, announcement manager, and email delivery logs. |
+| `/accounts/login/` | `accounts:login` | Secure institutional login portal with password recovery and token activation. |
+
+---
+
+## 🔌 API Endpoints
+
+### Machine Learning APIs
+
+```http
+POST /api/v1/ml/predict-yield/
+Content-Type: application/json
+
+{
+  "district": "Nyagatare",
+  "crop": "Maize",
+  "season": "A",
+  "irrigation_adoption": 0.45,
+  "fertilizer_adoption": 0.70,
+  "improved_seed_adoption": 0.85,
+  "mechanization_rate": 0.30
+}
+```
+
+```json
+{
+  "status": "success",
+  "predicted_yield_kg_per_ha": 4350.2,
+  "confidence_interval_95": [4120.0, 4580.4],
+  "benchmark_district_average": 3150.0,
+  "expected_yield_delta_percent": "+38.1%"
+}
+```
+
+- **`POST /api/v1/ml/predict-yield/`**: Predicts crop yield (kg/ha) based on district inputs, soil factors, and practices.
+- **`POST /api/v1/ml/simulate-scenario/`**: Simulates the yield impact of input subsidy or irrigation expansion policy scenarios.
+- **`GET /api/v1/ml/district-clusters/`**: Returns agro-ecological district clusters based on yield and input adoption.
+- **`GET /api/v1/ml/forecast/`**: Harvest volume forecasting for upcoming seasons.
+- **`GET /api/v1/ml/price-forecast/`**: Predictive wholesale commodity price projections.
+- **`GET /api/v1/ml/explainability/`**: Returns feature importance weights for transparent model interpretability.
+- **`GET /api/v1/ml/models/`**: Returns trained model registry, evaluation metrics (R², RMSE, MAE), and training timestamps.
+- **`POST /api/v1/ml/train/`**: Triggers ML model retraining on verified data (Admin/Staff only).
+
+### Notification & Communication APIs
+
+- **`GET /api/v1/notifications/`**: List user notifications (with optional `unread_only=true` filter).
+- **`GET /api/v1/notifications/unread_count/`**: Returns badge count of unread notifications.
+- **`POST /api/v1/notifications/{id}/mark-read/`**: Mark individual notification as read.
+- **`POST /api/v1/notifications/{id}/mark-unread/`**: Mark individual notification as unread.
+- **`POST /api/v1/notifications/{id}/dismiss/`**: Dismiss/archive notification.
+- **`POST /api/v1/notifications/mark-all-read/`**: Mark all user notifications as read.
+- **`GET /api/v1/notifications/preferences/`**: View and update email/in-app notification preferences.
+
+---
+
+## 🧪 Testing & Quality Assurance
+
+AgriLens is verified by an extensive automated test suite covering unit calculations, workflow state machines, role permissions, and REST APIs:
+
+```bash
+# Run the complete test suite
+.\venv\Scripts\python.exe -m pytest -v
+
+# Run specific functional test suites:
+# 1. Notifications & Background Dispatch
+.\venv\Scripts\python.exe -m pytest tests/test_apps/test_notifications.py -v
+
+# 2. RBAC, Tokenized Activation & Security
+.\venv\Scripts\python.exe -m pytest tests/test_apps/test_rbac_and_user_management.py -v
+
+# 3. Maker-Checker Data Entry Workflow
+.\venv\Scripts\python.exe -m pytest tests/test_apps/test_manual_entry_workflow.py -v
+
+# 4. Commodity Market Surveillance
+.\venv\Scripts\python.exe -m pytest tests/test_apps/test_commodity_prices.py -v
+
+# 5. Machine Learning & Predictors
+.\venv\Scripts\python.exe -m pytest tests/test_ml/ -v
+```
+
+---
+
+## 🔒 Data Governance & Scientific Integrity
+
+### 1. Data Provenance & Lineage
+Every agricultural metric in AgriLens maintains an immutable audit trail linking it to its source dataset (e.g., `SAS 2025 Season A`, `SAS 2024 Season A`, or manual field observations), including the collector ID, verification timestamp, and validation status.
+
+### 2. Survey Sampling Weighting
+All aggregated district and provincial yields are computed using official NISR household and parcel survey weights ($W_i$) to prevent sample distribution bias:
+$$\bar{Y} = \frac{\sum (W_i \times P_i)}{\sum (W_i \times A_i)}$$
+where $P_i$ represents weighted harvest production (kg) and $A_i$ represents parcel area (ha).
+
+### 3. Non-Causal Reporting Framework
+In adherence to statistical best practices, AgriLens explicitly distinguishes **correlation** from **causation**. Yield differences observed between districts with differing input adoption rates are classified as *"associated indicators"* and *"observed disparities"*. Causal claims are prohibited unless backed by randomized control trials (RCT) or econometric instrumental variable models.
+
+---
+
+## 📜 Acknowledgments & Data Attribution
+
+- **National Institute of Statistics of Rwanda (NISR)**: Authoritative Seasonal Agricultural Survey (SAS) microdata, sampling frames, and administrative boundary standards.
+- **Ministry of Agriculture and Animal Resources (MINAGRI)**: Strategic agricultural priorities, PSTA-4 guidelines, and crop value-chain standards.
+- **Rwanda Agriculture and Animal Resources Development Board (RAB)**: Agro-ecological extension guidelines and input adoption benchmarks.
+
+---
+
+## ⚖️ Intellectual Property, License & Usage Policy
+
+> ### ⚠️ STRICT RESTRICTED USE NOTICE
+> **All Rights Reserved © 2026 AgriLens Development Team.**
+>
+> 1. **Non-Commercial & No Personal Profit:**  
+>    No individual, entity, or third party is permitted to use, copy, reproduce, monetize, sub-license, or exploit any portion of this codebase, architecture, machine learning models, algorithms, or visual designs for commercial purposes, revenue generation, or personal financial profit under any circumstances.
+>
+> 2. **Public Hackathon Visibility Disclaimer:**  
+>    Although this repository is publicly accessible solely for the purpose of evaluation, review, and judging during the **2026 NISR Big Data Hackathon (Track 1: Agricultural Productivity)**, public availability does **NOT** constitute an open-source license, public domain dedication, or waiver of intellectual property rights.
+>
+> 3. **Prohibition of Modifications & Derivative Works:**  
+>    Any unauthorized modification, alteration, redistribution, fork, decompilation, reverse-engineering, or derivation of this codebase or its underlying assets is strictly prohibited.
+>
+> 4. **Exclusive Authorization for NISR:**  
+>    Operational utilization, institutional adoption, data integration, and platform deployment are **exclusively and solely permitted for the National Institute of Statistics of Rwanda (NISR)** and its officially designated national agricultural partners.
+
+---
+
+<div align="center">
+  <sub>Developed with pride for the <b>2026 NISR Big Data Hackathon</b> • Kigali, Rwanda 🇷🇼</sub>
+</div>

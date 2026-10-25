@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Notification Preferences | AgriLens Rwanda{% endblock %}
+{% block page_heading %}Notification Preferences{% endblock %}
+{% block page_subheading %}Configure email and in-app communications per NISR data governance standards{% endblock %}
+
+{% block extra_css %}
+<style>
+.pref-container {
+    padding: 20px 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 860px;
+    box-sizing: border-box;
+}
+
+.pref-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.pref-card-header {
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.pref-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pref-card-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.pref-toggle-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pref-toggle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 6px;
+    background: #F8FAFC;
+    border: 1px solid #F1F5F9;
+    transition: background 0.15s ease;
+}
+
+.pref-toggle-item:hover {
+    background: #F1F5F9;
+}
+
+.pref-toggle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    max-width: 70%;
+}
+
+.pref-toggle-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.pref-toggle-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Switch UI */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #CBD5E1;
+    transition: .2s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .2s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+input:checked + .slider {
+    background-color: var(--primary-green);
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* Mandatory Note Box */
+.mandatory-note-box {
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-radius: 8px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.mandatory-note-box i {
+    font-size: 18px;
+    color: #2563EB;
+    margin-top: 2px;
+}
+
+.mandatory-note-text {
+    font-size: 12px;
+    color: #1E3A8A;
+    line-height: 1.5;
+}
+
+.pref-actions-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-pref-save {
+    padding: 10px 24px;
+    background: var(--primary-green);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(21, 128, 61, 0.2);
+    transition: background 0.15s ease;
+}
+
+.btn-pref-save:hover {
+    background: var(--dark-green);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pref-container">
+
+    <!-- Messages -->
+    {% if messages %}
+    <div>
+        {% for message in messages %}
+        <div style="padding: 12px 18px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; font-weight: 600; {% if message.tags == 'success' %}background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0;{% else %}background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA;{% endif %}">
+            <i class="fa-solid fa-circle-check" style="margin-right: 6px;"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Card 1: Master Communication Channels -->
+        <div class="pref-card">
+            <div class="pref-card-header">
+                <h3 class="pref-card-title">
+                    <i class="fa-solid fa-tower-broadcast" style="color: var(--primary-green);"></i>
+                    Communication Channels
+                </h3>
+                <p class="pref-card-subtitle">Choose how you wish to receive operational alerts and system communications.</p>
+            </div>
+
+            <div class="pref-toggle-list">
+                <div class="pref-toggle-item">
+                    <div class="pref-toggle-info">
+                        <label class="pref-toggle-label" for="in_app_enabled">In-App Notification Center</label>
+                        <p class="pref-toggle-desc">Show interactive notification alerts in the topbar bell and notification center.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="in_app_enabled" id="in_app_enabled" {% if pref.in_app_enabled %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="pref-toggle-item">
+                    <div class="pref-toggle-info">
+                        <label class="pref-toggle-label" for="email_enabled">Email Dispatch to Inbox</label>
+                        <p class="pref-toggle-desc">Send automated email notifications directly to <strong>{{ request.user.email|default:"your registered email" }}</strong>.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="email_enabled" id="email_enabled" {% if pref.email_enabled %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Optional Business Categories -->
+        <div class="pref-card" style="margin-top: 16px;">
+            <div class="pref-card-header">
+                <h3 class="pref-card-title">
+                    <i class="fa-solid fa-filter" style="color: #2563EB;"></i>
+                    Workflow Subscriptions
+                </h3>
+                <p class="pref-card-subtitle">Select which operational event types you would like to be alerted on.</p>
+            </div>
+
+            <div class="pref-toggle-list">
+                <div class="pref-toggle-item">
+                    <div class="pref-toggle-info">
+                        <label class="pref-toggle-label" for="notify_data_submissions">Field Observations &amp; Data Submissions</label>
+                        <p class="pref-toggle-desc">Notifications when new observations are entered, submitted for review, or corrected.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="notify_data_submissions" id="notify_data_submissions" {% if pref.notify_data_submissions %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="pref-toggle-item">
+                    <div class="pref-toggle-info">
+                        <label class="pref-toggle-label" for="notify_approvals">Approvals &amp; Supervisory Decisions</label>
+                        <p class="pref-toggle-desc">Alerts when your submissions are approved, rejected, or returned with review comments.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="notify_approvals" id="notify_approvals" {% if pref.notify_approvals %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="pref-toggle-item">
+                    <div class="pref-toggle-info">
+                        <label class="pref-toggle-label" for="notify_market_prices">Commodity Price Surveillance</label>
+                        <p class="pref-toggle-desc">Updates on commodity price collections, validations, price alerts, and market bulletins.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="notify_market_prices" id="notify_market_prices" {% if pref.notify_market_prices %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="pref-toggle-item">
+                    <div class="pref-toggle-info">
+                        <label class="pref-toggle-label" for="notify_reports">Reports, Bulletins &amp; ML Models</label>
+                        <p class="pref-toggle-desc">Alerts upon completion of on-demand reports, scheduled digests, and machine learning updates.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="notify_reports" id="notify_reports" {% if pref.notify_reports %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="pref-toggle-item">
+                    <div class="pref-toggle-info">
+                        <label class="pref-toggle-label" for="notify_announcements">Institutional Announcements</label>
+                        <p class="pref-toggle-desc">General platform announcements, maintenance notices, and national survey advisories.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="notify_announcements" id="notify_announcements" {% if pref.notify_announcements %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mandatory Security Box -->
+        <div class="mandatory-note-box" style="margin-top: 16px;">
+            <i class="fa-solid fa-shield-halved"></i>
+            <div class="mandatory-note-text">
+                <strong>Mandatory Security &amp; Administrative Alerts:</strong>
+                Per NISR data governance and cyber-security protocol, security-critical notifications (such as password setup links, role changes, account status modifications, and urgent system alerts) are always delivered and cannot be disabled.
+            </div>
+        </div>
+
+        <div class="pref-actions-bar" style="margin-top: 20px;">
+            <a href="{% url 'notifications:notification_center' %}" style="display: inline-flex; align-items: center; padding: 10px 18px; color: var(--text-muted); font-size: 13px; font-weight: 600; text-decoration: none;">
+                Cancel
+            </a>
+            <button type="submit" class="btn-pref-save">
+                <i class="fa-solid fa-floppy-disk" style="margin-right: 6px;"></i>
+                Save Preferences
+            </button>
+        </div>
+    </form>
+
+</div>
+{% endblock %}

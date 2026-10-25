@@ -205,10 +205,23 @@ def menu_context(request):
             except Exception:
                 pending_reviews_count = 0
 
+        # Notifications context for header bell
+        unread_notifications_count = 0
+        recent_notifications = []
+        try:
+            from apps.notifications.services import NotificationService
+            unread_notifications_count = NotificationService.get_unread_count(request.user)
+            recent_notifications = NotificationService.get_recent_notifications(request.user, limit=5)
+        except Exception:
+            unread_notifications_count = 0
+            recent_notifications = []
+
         res = {
             "sidebar_menu": sidebar,
             "user_geo_badge": geo_badge,
             "pending_reviews_count": pending_reviews_count,
+            "unread_notifications_count": unread_notifications_count,
+            "recent_notifications": recent_notifications,
             "breadcrumbs": breadcrumbs,
             "command_palette_districts": _RWANDA_DISTRICTS,
         }
@@ -220,6 +233,8 @@ def menu_context(request):
         "sidebar_menu": get_user_menu("PUBLIC").get("sidebar", []),
         "user_geo_badge": None,
         "pending_reviews_count": 0,
+        "unread_notifications_count": 0,
+        "recent_notifications": [],
         "breadcrumbs": breadcrumbs,
         "command_palette_districts": _RWANDA_DISTRICTS,
     }

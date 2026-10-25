@@ -1,0 +1,39 @@
+{% extends "notifications/emails/base_email.html" %}
+
+{% block content %}
+    <div>
+        <span class="notification-badge {% if notification.priority == 'URGENT' %}badge-urgent{% elif notification.priority == 'HIGH' %}badge-high{% elif notification.priority == 'LOW' %}badge-low{% else %}badge-medium{% endif %}">
+            {{ notification.get_priority_display }} Priority &bull; {{ notification.get_notification_type_display }}
+        </span>
+    </div>
+
+    <h1 class="email-heading">{{ notification.title }}</h1>
+
+    <div class="email-message">
+        <p>{{ notification.message|linebreaksbr }}</p>
+    </div>
+
+    {% if details %}
+    <div class="details-card">
+        {% for k, v in details.items %}
+        <div class="details-row">
+            <span class="details-label">{{ k|title }}:</span>
+            <span class="details-value">{{ v }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if action_url %}
+    <div class="action-button-wrap">
+        <a href="{{ action_url }}" class="action-button" target="_blank">
+            {{ action_label|default:"View in AgriLens &rarr;" }}
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="security-note">
+        <strong>Security & Data Governance:</strong>
+        This communication was delivered per NISR official protocols. Confidential credentials, passwords, and private tokens are never transmitted via email. If you did not initiate or expect this alert, please contact your system administrator immediately.
+    </div>
+{% endblock %}

@@ -26,6 +26,8 @@ from apps.markets.models import (
     PricePublicNotice,
     PriceAuditLog,
 )
+from apps.notifications.services import NotificationService
+from apps.notifications.models import Notification
 from apps.agriculture.models import Crop
 from apps.geography.models import District, Province
 from apps.markets.forms import (
@@ -577,6 +579,21 @@ def internal_record_create(request):
 
             price_record.save()
 
+            if price_record.status == CommodityPrice.Status.SUBMITTED:
+                try:
+                    NotificationService.send_to_reviewers(
+                        district_id=price_record.market.district_id,
+                        notification_type=Notification.NotificationType.PRICE_SUBMITTED,
+                        title=f"New Commodity Price: {price_record.crop.name} in {price_record.market.name}",
+                        message=f"{request.user.get_full_name() or request.user.username} submitted a price of {price_record.price_per_kg_rwf} RWF/kg for {price_record.crop.name} at {price_record.market.name}.",
+                        action_url="/markets/internal/approvals/",
+                        related_object=price_record,
+                        actor=request.user,
+                        priority=Notification.Priority.MEDIUM,
+                    )
+                except Exception:
+                    pass
+
             # Immutable audit trail
             PriceAuditLog.objects.create(
                 price_record=price_record,
@@ -629,6 +646,20 @@ def internal_record_edit(request, pk):
                     updated_record.status = CommodityPrice.Status.SUBMITTED
 
             updated_record.save()
+
+            if updated_record.status == CommodityPrice.Status.SUBMITTED:
+                try:
+                    NotificationService.send_to_reviewers(
+                        notification_type=Notification.Type.DATA_CORRECTION_SUBMITTED,
+                        title=f"Price Correction Submitted: #{updated_record.id} {updated_record.crop.name}",
+                        message=f"{request.user.get_full_name() or request.user.username} corrected and resubmitted price record #{updated_record.id} for {updated_record.crop.name}.",
+                        action_url="/markets/internal/approvals/",
+                        related_object=updated_record,
+                        actor=request.user,
+                        priority=Notification.Priority.MEDIUM,
+                    )
+                except Exception:
+                    pass
 
             # Record in audit log
             PriceAuditLog.objects.create(
@@ -995,6 +1026,56 @@ def internal_approval_action(request, pk):
             'market': record.market.name,
         }
     )
+
+    # Workflow Notifications
+    if record.collected_by and record.collected_by != request.user:
+        try:
+            if action == 'approve':
+                NotificationService.send(
+                    recipient=record.collected_by,
+                    notification_type=Notification.Type.PRICE_APPROVED,
+                    title=f"Price Approved: {record.crop.name} ({record.market.name})",
+                    message=f"Your submitted price observation #{record.id} for {record.crop.name} has been approved by {request.user.get_full_name() or request.user.username}.",
+                    action_url="/markets/internal/records/",
+                    related_object=record,
+                    actor=request.user,
+                    priority=Notification.Priority.MEDIUM,
+                )
+            elif action == 'publish':
+                NotificationService.send(
+                    recipient=record.collected_by,
+                    notification_type=Notification.Type.PRICE_PUBLISHED,
+                    title=f"Price Published: {record.crop.name} ({record.market.name})",
+                    message=f"Price observation #{record.id} for {record.crop.name} at {record.market.name} is now published to the public portal.",
+                    action_url="/markets/internal/records/",
+                    related_object=record,
+                    actor=request.user,
+                    priority=Notification.Priority.LOW,
+                )
+            elif action == 'return_for_correction':
+                NotificationService.send(
+                    recipient=record.collected_by,
+                    notification_type=Notification.Type.DATA_CORRECTION_REQUESTED,
+                    title=f"Corrections Required: #{record.id} {record.crop.name}",
+                    message=f"Reviewer requested corrections on your price submission: {reason}",
+                    action_url=f"/markets/internal/records/{record.id}/edit/",
+                    related_object=record,
+                    actor=request.user,
+                    priority=Notification.Priority.HIGH,
+                )
+            elif action == 'reject':
+                NotificationService.send(
+                    recipient=record.collected_by,
+                    notification_type=Notification.Type.PRICE_REJECTED,
+                    title=f"Price Rejected: #{record.id} {record.crop.name}",
+                    message=f"Your price observation #{record.id} was rejected. Reason: {reason or 'Supervisory review reject.'}",
+                    action_url="/markets/internal/records/",
+                    related_object=record,
+                    actor=request.user,
+                    priority=Notification.Priority.HIGH,
+                )
+        except Exception:
+            pass
 
     messages.success(request, msg)
     return redirect('markets:internal_approvals')
