@@ -38,11 +38,14 @@ ALLOWED_HOSTS = env.list(
         'localhost',
         '127.0.0.1',
         '[::1]',
+        'testserver',
         'agrilens.ndoli.dev',
         'www.agrilens.ndoli.dev',
         '62.171.182.99',
     ]
 )
+if 'testserver' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('testserver')
 
 # CSRF Trusted Origins (Mandatory for Django 4/5 form submissions over HTTPS)
 CSRF_TRUSTED_ORIGINS = env.list(
@@ -96,9 +99,17 @@ LOCAL_APPS = [
     'apps.api.apps.ApiConfig',
     'apps.data_management.apps.DataManagementConfig',
     'apps.decision_support.apps.DecisionSupportConfig',
+    'apps.ml.apps.MlConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+# ------------------------------------------------------------------------------
+# Machine Learning & Model Registry Configuration
+# ------------------------------------------------------------------------------
+ML_MODEL_DIR = BASE_DIR / 'data' / 'models'
+ML_MODEL_DIR.mkdir(parents=True, exist_ok=True)
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

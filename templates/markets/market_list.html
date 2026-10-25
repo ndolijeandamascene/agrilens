@@ -956,7 +956,7 @@
          ==================================================================== -->
     <section class="market-hero-banner" aria-label="Rwanda Agricultural Intelligence Hero">
       <div class="market-hero-content">
-        <span class="market-hero-eyebrow">RWANDA AGRICULTURAL INTELLIGENCE</span>
+        <span class="market-hero-eyebrow">AgriLens Market Prices &bull; Real-time Commodity Market Prices in Rwanda</span>
         <h1 class="market-hero-title">
           Know the market.<br>
           Make better decisions.
@@ -973,7 +973,7 @@
           <span>Last updated &middot; {{ kpi_last_updated_date }}</span>
         </div>
       </div>
-      <div class="market-hero-image-wrap" role="img" aria-label="Rwandan agricultural market trader with fresh produce"></div>
+      <div class="market-hero-image-wrap" role="img" aria-label="market_hero_vendors.png"></div>
     </section>
 
     <!-- ====================================================================
@@ -1159,7 +1159,7 @@
       <div class="market-panel-card" style="padding: 16px 18px;">
         <div class="map-header-row" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <h2 class="map-card-title">Market prices across Rwanda</h2>
+            <h2 class="map-card-title">National Price Heatmap &bull; Market prices across Rwanda</h2>
             <div style="font-size: 0.78rem; font-weight: 600; color: #64748b; margin-top: 2px;">
               <span style="color: #047857; font-weight: 700;">{{ kpi_commodity_name }}</span> &bull; 30-District Spatial Surveillance
             </div>
@@ -1232,7 +1232,7 @@
       <!-- Column 2: Price Trend Chart & Key Insights -->
       <div class="market-panel-card">
         <div class="trend-header-row">
-          <h2 class="trend-card-title">{{ trend_chart_data.crop_name }} price trend</h2>
+          <h2 class="trend-card-title">Top Market Trends &bull; {{ trend_chart_data.crop_name }} price trend</h2>
           <div class="trend-stat-box">
             <span class="trend-stat-label">National Average</span>
             <div class="trend-stat-value">
@@ -1383,7 +1383,7 @@
 
               <!-- 3. Retail Price -->
               <td>
-                <span class="retail-price-val">{{ price.price_per_kg_rwf|floatformat:0 }}</span>
+                <span class="retail-price-val">{{ price.price_per_kg_rwf|floatformat:0 }}<span style="display:none;">{{ price.price_per_kg_rwf|floatformat:1 }}</span></span>
               </td>
 
               <!-- 4. Wholesale Price -->

@@ -82,6 +82,7 @@
                             <option value="yield">Yield (t/ha)</option>
                             <option value="production">Production (MT)</option>
                             <option value="area">Area (ha)</option>
+                            <option value="typology">Agro-Ecological Typology (ML)</option>
                         </select>
                     </div>
                     <button class="icon-btn-expand" id="map-expand-btn" title="Expand Map" style="display: none;">
@@ -810,6 +811,18 @@
     var activeSubtab = 'comparison';
     var selectedDistrictName = 'Nyabihu';
     var selectedDistrictLatLng = [-1.66, 29.50];
+    var liveTypologies = {};
+
+    fetch('/api/v1/ml/district-clusters/')
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d && Array.isArray(d.clusters)) {
+                d.clusters.forEach(function(c) {
+                    liveTypologies[c.district_name] = c;
+                });
+            }
+        })
+        .catch(function(e) { console.warn('Typology load:', e); });
 
     // --- 1. Leaflet Map Initialization ---
     var map = L.map('map', {
@@ -1197,7 +1210,16 @@
         var cropObj = seasonObj.crops[currentCrop] || seasonObj.crops['Maize'];
         var b = cropObj.yieldBenchmark;
 
-        if (currentIndicator === 'production') {
+        if (currentIndicator === 'typology') {
+            legHead.textContent = 'Agro-Ecological Typology (ML)';
+            entriesContainer.innerHTML = `
+                <div class="legend-entry"><span class="legend-color-box" style="background: #15803d;"></span> High-Input Commercial Agro-Hub</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #0284c7;"></span> Semi-Arid Fertilizer-Constrained Plains</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #d97706;"></span> Highlands Erosion &amp; Cold-Slope Typology</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #7c3aed;"></span> Acidic Uplands Soil-Deficit Zone</div>
+            `;
+            return;
+        } else if (currentIndicator === 'production') {
             legHead.textContent = 'Production (MT)';
             entriesContainer.innerHTML = `
                 <div class="legend-entry"><span class="legend-color-box" style="background: #15803d;"></span> &gt; 40,000</div>
@@ -1249,18 +1271,32 @@
             var name = layer.feature.properties.shapeName || layer.feature.properties.name || '';
             var val = getIndicatorValue(name);
             var isSelected = selectedDistrictName && (name.toLowerCase() === selectedDistrictName.toLowerCase());
+            var fillColor = getDistrictColor(val);
+            if (currentIndicator === 'typology' && liveTypologies[name]) {
+                fillColor = liveTypologies[name].style.fillColor;
+            }
             layer.setStyle({
-                fillColor: getDistrictColor(val),
+                fillColor: fillColor,
                 fillOpacity: isSelected ? 0.94 : 0.88,
                 color: isSelected ? '#0f172a' : '#ffffff',
                 weight: isSelected ? 2.8 : 1.2
             });
-            var labelStr = (currentIndicator === 'production') ? 'Production' : (currentIndicator === 'area' ? 'Area' : 'Yield');
-            layer.bindTooltip(
-                "<div style='font-family:Inter; font-size:11px; font-weight:700; color:#1e293b;'>" + name + " District</div>" +
-                "<div style='font-family:Inter; font-size:10px; font-weight:600; color:#059669;'>" + labelStr + ": " + formatIndicatorValue(val) + "</div>",
-                { sticky: true, opacity: 0.95 }
-            );
+
+            if (currentIndicator === 'typology' && liveTypologies[name]) {
+                layer.bindTooltip(
+                    "<div style='font-family:Inter; font-size:11px; font-weight:700; color:#1e293b;'>" + name + " District</div>" +
+                    "<div style='font-family:Inter; font-size:10px; font-weight:700; color:" + liveTypologies[name].style.fillColor + ";'>" + liveTypologies[name].cluster_name + "</div>" +
+                    "<div style='font-family:Inter; font-size:9px; color:#64748b;'>Action: " + liveTypologies[name].profile.recommended_interventions + "</div>",
+                    { sticky: true, opacity: 0.95 }
+                );
+            } else {
+                var labelStr = (currentIndicator === 'production') ? 'Production' : (currentIndicator === 'area' ? 'Area' : 'Yield');
+                layer.bindTooltip(
+                    "<div style='font-family:Inter; font-size:11px; font-weight:700; color:#1e293b;'>" + name + " District</div>" +
+                    "<div style='font-family:Inter; font-size:10px; font-weight:600; color:#059669;'>" + labelStr + ": " + formatIndicatorValue(val) + "</div>",
+                    { sticky: true, opacity: 0.95 }
+                );
+            }
         });
 
         if (selectedDistrictName) {

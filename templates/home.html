@@ -99,11 +99,11 @@
                         <label for="map-select-crop" class="selector-label">Crop</label>
                         <div class="custom-select-wrap">
                             <select id="map-select-crop" class="map-toolbar-select">
+                                {% for c in priority_crops %}
+                                <option value="{{ c.name }}" {% if forloop.first or c.name == 'Maize' %}selected{% endif %}>{{ c.name }}</option>
+                                {% empty %}
                                 <option value="Maize" selected>Maize</option>
-                                <option value="Beans">Beans</option>
-                                <option value="Irish Potato">Irish Potato</option>
-                                <option value="Rice">Rice</option>
-                                <option value="Cassava">Cassava</option>
+                                {% endfor %}
                             </select>
                             <svg class="select-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
@@ -113,8 +113,11 @@
                         <label for="map-select-season" class="selector-label">Season</label>
                         <div class="custom-select-wrap">
                             <select id="map-select-season" class="map-toolbar-select">
-                                <option value="2025A" selected>SAS 2024 - 2025</option>
-                                <option value="2024A">SAS 2023 - 2024</option>
+                                {% for s in available_seasons %}
+                                <option value="{{ s.code }}" {% if forloop.first %}selected{% endif %}>{{ s.name }}</option>
+                                {% empty %}
+                                <option value="2025A" selected>SAS 2024 – 2025</option>
+                                {% endfor %}
                             </select>
                             <svg class="select-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
@@ -124,9 +127,13 @@
                         <label for="map-select-indicator" class="selector-label">Indicator</label>
                         <div class="custom-select-wrap">
                             <select id="map-select-indicator" class="map-toolbar-select">
+                                {% for ind in available_indicators %}
+                                <option value="{{ ind.id }}" {% if forloop.first %}selected{% endif %}>{{ ind.name }}</option>
+                                {% empty %}
                                 <option value="yield" selected>Yield (t/ha)</option>
                                 <option value="production">Production (t)</option>
                                 <option value="area">Planted Area (ha)</option>
+                                {% endfor %}
                             </select>
                             <svg class="select-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
@@ -228,7 +235,7 @@
                 </div>
                 <div class="kpi-content">
                     <span class="kpi-label" id="kpi-records-label">Validated Records</span>
-                    <strong class="kpi-value" id="kpi-records">10,000</strong>
+                    <strong class="kpi-value" id="kpi-records">{{ verified_observations_count|default:"0" }}</strong>
                     <span class="kpi-subtext" id="kpi-records-sub">Verified observations</span>
                 </div>
             </div>
@@ -387,66 +394,24 @@
                 </div>
 
                 <div class="insights-list">
-                    <!-- Insight 1: Maize production -->
+                    {% for ins in latest_insights %}
                     <div class="insight-row-item">
                         <div class="insight-icon-circle insight-green">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
                             </svg>
                         </div>
                         <div class="insight-text-col">
-                            <h4 class="insight-headline">Maize production shows improvement in the Eastern Province</h4>
-                            <span class="insight-date">Apr 24, 2025</span>
+                            <a href="{{ ins.url }}" style="text-decoration:none; color:inherit;">
+                                <h4 class="insight-headline">{{ ins.title }}</h4>
+                            </a>
+                            <span class="insight-date">{{ ins.date }}</span>
                         </div>
                     </div>
-
-                    <!-- Insight 2: Beans price -->
-                    <div class="insight-row-item">
-                        <div class="insight-icon-circle insight-orange">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M2 20h20"></path>
-                                <path d="M4 20V9l4-4 4 4v11"></path>
-                                <path d="M14 20v-8l4-3 4 3v8"></path>
-                                <line x1="8" y1="9" x2="8" y2="20"></line>
-                                <line x1="18" y1="12" x2="18" y2="20"></line>
-                            </svg>
-                        </div>
-                        <div class="insight-text-col">
-                            <h4 class="insight-headline">Beans price increased by 12% in Kigali market</h4>
-                            <span class="insight-date">Apr 22, 2025</span>
-                        </div>
-                    </div>
-
-                    <!-- Insight 3: Agricultural survey data -->
-                    <div class="insight-row-item">
-                        <div class="insight-icon-circle insight-blue">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
-                                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
-                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
-                            </svg>
-                        </div>
-                        <div class="insight-text-col">
-                            <h4 class="insight-headline">New agricultural survey data available (SAS 2024 - 2025)</h4>
-                            <span class="insight-date">Apr 18, 2025</span>
-                        </div>
-                    </div>
-
-                    <!-- Insight 4: Digital agriculture platform -->
-                    <div class="insight-row-item">
-                        <div class="insight-icon-circle insight-purple">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                                <polyline points="2 17 12 22 22 17"></polyline>
-                                <polyline points="2 12 12 17 22 12"></polyline>
-                            </svg>
-                        </div>
-                        <div class="insight-text-col">
-                            <h4 class="insight-headline">Rwanda launches digital agriculture platform for farmers</h4>
-                            <span class="insight-date">Apr 15, 2025</span>
-                        </div>
-                    </div>
+                    {% empty %}
+                    <p style="padding: 12px; color: #64748b; font-size: 0.88rem;">No official reports published yet.</p>
+                    {% endfor %}
                 </div>
             </div>
 

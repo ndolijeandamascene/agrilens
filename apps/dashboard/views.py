@@ -22,39 +22,84 @@ def public_home(request):
     Presents official NISR survey metrics, interactive Rwanda choropleth map,
     national productivity indicators, and market intelligence access.
     """
-    cache_key = 'agrilens_public_home_context_v2'
+    cache_key = 'agrilens_public_home_context_v3'
     context = cache.get(cache_key)
 
     if context is None:
-        summary = IndicatorService.get_national_summary(year=2025, season_code='A', source_policy='official')
-        priority_crops = list(Crop.objects.filter(is_priority_crop=True).order_by('name'))
+        from apps.geography.models import Province, District, Sector
+        from apps.dashboard.models import PublishedReport
+        from apps.data_management.models import DataQualityIssue
+
+        districts_count = District.objects.count()
+        provinces_count = Province.objects.count()
+        sectors_count = Sector.objects.count()
         total_obs = ValidatedObservation.objects.count()
+        qa_issues_count = DataQualityIssue.objects.count()
+
+        if total_obs > 0:
+            data_quality_pct = f"{round((total_obs / (total_obs + qa_issues_count)) * 100)}%"
+        else:
+            data_quality_pct = "N/A"
+
+        # Determine latest season available with verified observations
+        latest_season_obj = AgriculturalSeason.objects.filter(observations__isnull=False).order_by('-year', 'season').first()
+        active_year = latest_season_obj.year if latest_season_obj else 2025
+        active_season_code = latest_season_obj.season if latest_season_obj else 'A'
+
+        summary = IndicatorService.get_national_summary(year=active_year, season_code=active_season_code, source_policy='official')
+        priority_crops = list(Crop.objects.filter(is_priority_crop=True).order_by('name'))
+        priority_crops_count = len(priority_crops) if priority_crops else Crop.objects.count()
+
+        total_prod_mt = summary.get('total_production_mt', 0.0)
+        if total_prod_mt >= 1000000:
+            total_production_display = f"{round(total_prod_mt / 1000000.0, 2)}M t"
+        elif total_prod_mt > 0:
+            total_production_display = f"{round(total_prod_mt / 1000.0, 1)}K t"
+        else:
+            total_production_display = "Data unavailable"
+
+        weighted_yield_kg = summary.get('weighted_yield_kg_per_ha', 0.0)
+        if weighted_yield_kg > 0:
+            avg_yield_display = f"{round(weighted_yield_kg / 1000.0, 1)} t/ha"
+        else:
+            avg_yield_display = "Data unavailable"
+
+        seasons_qs = AgriculturalSeason.objects.filter(observations__isnull=False).distinct().order_by('-year', 'season')
+        available_seasons = []
+        for s in seasons_qs:
+            code = f"{s.year}{s.season}"
+            name = f"SAS {s.year - 1} – {s.year}" if s.season == 'A' else f"SAS {s.year} Season {s.season}"
+            available_seasons.append({'code': code, 'name': name, 'year': s.year, 'season': s.season})
+
+        recent_reports = PublishedReport.objects.filter(is_published=True).order_by('-publication_date')[:4]
+        latest_insights = []
+        for r in recent_reports:
+            latest_insights.append({
+                'title': r.title,
+                'subtitle': r.subtitle or r.report_type_label,
+                'date': r.publication_date.strftime('%b %d, %Y'),
+                'url': f"/reports/{r.slug}/pdf/" if r.slug else "/dashboard/reports/national/",
+            })
 
         context = {
             'page_title': 'AgriLens • Rwanda Agricultural Intelligence Platform',
             'is_public_page': True,
             'summary': summary,
-            'districts_count': 30,
-            'provinces_count': 5,
-            'sectors_count': 416,
-            'priority_crops_count': len(priority_crops) or 10,
+            'districts_count': districts_count,
+            'provinces_count': provinces_count,
+            'sectors_count': sectors_count,
+            'priority_crops_count': priority_crops_count,
             'priority_crops': priority_crops,
-            'verified_observations_count': total_obs or 10000,
-            'total_production_display': '1.24M t',
-            'avg_yield_display': '2.8 t/ha',
-            'data_quality_pct': '98%',
-            'available_seasons': [
-                {'code': '2025_A', 'name': 'SAS 2024 - 2025'},
-                {'code': '2025_B', 'name': 'SAS 2025 Season B'},
-                {'code': '2024_A', 'name': 'SAS 2024 Season A'},
-            ],
+            'verified_observations_count': total_obs,
+            'total_production_display': total_production_display,
+            'avg_yield_display': avg_yield_display,
+            'data_quality_pct': data_quality_pct,
+            'available_seasons': available_seasons,
+            'latest_insights': latest_insights,
             'available_indicators': [
                 {'id': 'yield', 'name': 'Yield (t/ha)'},
                 {'id': 'production', 'name': 'Production (t)'},
                 {'id': 'area', 'name': 'Planted Area (ha)'},
-                {'id': 'fertilizer', 'name': 'Fertilizer Adoption (%)'},
-                {'id': 'irrigation', 'name': 'Irrigation (%)'},
-                {'id': 'loss', 'name': 'Loss Rate (%)'},
             ]
         }
         cache.set(cache_key, context, timeout=900)
@@ -158,8 +203,10 @@ def dashboard_overview(request):
     for obs in recent_observations:
         if obs.calculated_yield_kg_per_ha:
             obs.yield_t_ha = round(float(obs.calculated_yield_kg_per_ha) / 1000.0, 1)
+        elif obs.total_production_kg and obs.plot_area_ha and float(obs.plot_area_ha) > 0:
+            obs.yield_t_ha = round(float(obs.total_production_kg) / float(obs.plot_area_ha) / 1000.0, 1)
         else:
-            obs.yield_t_ha = 3.6 if year_filter == 2025 else 3.3
+            obs.yield_t_ha = None
         
         prov_lower = (obs.provenance or '').lower()
         if 'survey' in prov_lower or 'sas' in prov_lower:
@@ -172,26 +219,28 @@ def dashboard_overview(request):
             obs.source_display = 'Enumerator'
 
     # Data Quality Metric
-    total_obs_count = obs_qs.count() if obs_qs.count() > 0 else (5000 if year_filter == 2024 else 10000)
+    total_obs_count = obs_qs.count()
     qa_issues_count = DataQualityIssue.objects.count()
-    if total_obs_count > 0:
+    if (total_obs_count + qa_issues_count) > 0:
         data_quality_pct = round((total_obs_count / (total_obs_count + qa_issues_count)) * 100)
     else:
-        data_quality_pct = 96 if year_filter == 2024 else 98
+        data_quality_pct = None
 
     # Formatted yields and production for KPI cards
     weighted_yield_kg = summary.get('weighted_yield_kg_per_ha', 0.0)
     if weighted_yield_kg > 0:
         yield_t_ha = round(weighted_yield_kg / 1000.0, 1)
     else:
-        yield_t_ha = 2.6 if year_filter == 2024 else 2.8
+        yield_t_ha = None
 
     # Estimated national production (sample MT vs annualized total)
     total_prod_mt = summary.get('total_production_mt', 0.0)
-    if total_prod_mt > 500000:
+    if total_prod_mt >= 1000000:
         prod_display = f"{round(total_prod_mt / 1000000.0, 2)}M t"
+    elif total_prod_mt > 0:
+        prod_display = f"{round(total_prod_mt / 1000.0, 1)}K t"
     else:
-        prod_display = "1.18M t" if year_filter == 2024 else "1.24M t"
+        prod_display = "Data unavailable"
 
     selected_season_display = f"SAS {year_filter - 1} – {year_filter}" if season_filter == 'A' else f"SAS {year_filter} Season {season_filter}"
 
@@ -227,7 +276,7 @@ def dashboard_overview(request):
         if latest_batch and latest_batch.completed_at:
             last_updated_display = f"Last updated: {latest_batch.completed_at.strftime('%b %d, %Y %H:%M')}"
         else:
-            last_updated_display = "Last updated: Apr 24, 2025 10:32" if year_filter == 2025 else "Last updated: Oct 18, 2024 14:15"
+            last_updated_display = "No updates recorded"
 
     context = {
         'page_title': 'National Agricultural Intelligence & Decision Support | AgriLens Rwanda',
@@ -341,8 +390,8 @@ def reports_national(request):
         'crop_summaries': crop_summaries,
         'total_districts': District.objects.count(),
         'total_observations': ValidatedObservation.objects.count(),
-        'market_data_available': False,
-        'market_note': "Market price monitoring data is currently unavailable for the selected period. National and district agricultural intelligence reflects seasonal production survey microdata.",
+        'market_data_available': CommodityPrice.objects.filter(crop__name__iexact=crop_filter, status=CommodityPrice.Status.PUBLISHED).exists(),
+        'market_note': f"Market price surveillance reflects official quotes for {crop_filter} across monitored hubs." if CommodityPrice.objects.filter(crop__name__iexact=crop_filter, status=CommodityPrice.Status.PUBLISHED).exists() else f"Market price monitoring data is currently unavailable for {crop_filter} in the selected period.",
     }
     return render(request, 'dashboard/reports_national.html', context)
 
@@ -447,7 +496,8 @@ def reports_district(request, district_id=None):
         'national_summary': national_summary,
         'sectors': sectors,
         'priority_crops': priority_crops,
-        'market_data_available': False,
+        'market_data_available': CommodityPrice.objects.filter(crop__name__iexact=crop_filter, market__district=target_district, status=CommodityPrice.Status.PUBLISHED).exists(),
+        'market_note': f"Market prices reflect verified quotes in {target_district.name} for {crop_filter}." if CommodityPrice.objects.filter(crop__name__iexact=crop_filter, market__district=target_district, status=CommodityPrice.Status.PUBLISHED).exists() else f"No verified commodity price records published for {crop_filter} in {target_district.name} District.",
     }
     return render(request, 'dashboard/reports_district.html', context)
 
@@ -791,9 +841,9 @@ def public_data_api(request):
     observations_count = ValidatedObservation.objects.count()
 
     # 2. Geographic Data
-    provinces_count = Province.objects.count() or 5
-    districts_count = District.objects.count() or 30
-    sectors_count = Sector.objects.count() or 416
+    provinces_count = Province.objects.count()
+    districts_count = District.objects.count()
+    sectors_count = Sector.objects.count()
 
     # 3. Market Data
     markets_count = MarketLocation.objects.count()
@@ -847,7 +897,7 @@ def public_data_api(request):
                 {"name": "province", "type": "string / int", "example": "Eastern", "desc": "Filter districts by province name or ID"},
             ],
             "sample_response": json.dumps({
-                "count": 30,
+                "count": districts_count,
                 "results": [
                     {"id": 1, "name": "Nyarugenge", "code": "01", "province": 1, "province_name": "Kigali City"},
                     {"id": 2, "name": "Gasabo", "code": "02", "province": 1, "province_name": "Kigali City"},
@@ -862,7 +912,7 @@ def public_data_api(request):
             "desc": "List the 5 provincial administrative territories of Rwanda (Kigali City, Southern, Western, Northern, Eastern).",
             "params": [],
             "sample_response": json.dumps({
-                "count": 5,
+                "count": provinces_count,
                 "results": [
                     {"id": 1, "name": "Kigali City", "code": "KGL"},
                     {"id": 2, "name": "Southern Province", "code": "SOU"},
@@ -880,7 +930,7 @@ def public_data_api(request):
                 {"name": "market", "type": "string / int", "example": "Kimironko", "desc": "Filter by market location name or ID"},
             ],
             "sample_response": json.dumps({
-                "count": 28,
+                "count": prices_count,
                 "results": [
                     {
                         "id": 1,

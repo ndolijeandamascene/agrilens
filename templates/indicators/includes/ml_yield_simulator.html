@@ -1,0 +1,248 @@
+<!-- =========================================================================
+     AgriLens Machine Learning • Crop Yield What-If Simulator & Scenario Comparison
+     Powered by scikit-learn RandomForestRegressor trained on official NISR microdata
+     ========================================================================= -->
+<div class="card ml-simulator-card" id="ml-yield-simulator-section" style="border: 2px solid #A7F3D0; background: linear-gradient(180deg, #FFFFFF 0%, #F0FDF4 100%);">
+    
+    <!-- Card Header -->
+    <div class="card-header" style="justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid #BBF7D0; padding-bottom: 14px;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="background: #047857; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-brain"></i> Machine Learning
+                </span>
+                <span class="live-badge-pill" style="background: #DCFCE7; color: #166534; border-color: #86EFAC;">
+                    <span class="pulse-dot"></span>
+                    <span>Model v1.0 Active &bull; R&sup2; = 0.65</span>
+                </span>
+            </div>
+            <h3 style="font-size: 17px; font-weight: 800; color: #064E3B; margin: 6px 0 2px 0;">
+                Crop Yield What-If Simulator &amp; Management Scenario Modeler
+            </h3>
+            <p style="font-size: 12px; color: #047857; margin: 0;">
+                Simulate anticipated farm-level yield uplifts and production gains under alternative agronomic input adoption combinations.
+            </p>
+        </div>
+
+        <!-- Mode Toggle: Single Prediction vs Dual Scenario Comparison -->
+        <div style="display: flex; align-items: center; background: #E2E8F0; border-radius: 8px; padding: 3px; gap: 4px;">
+            <button type="button" id="mlModeSingleBtn" class="subtab-item active" onclick="switchSimulatorMode('single')" style="border: none; cursor: pointer;">
+                <i class="fa-solid fa-sliders"></i> Single Farm Simulation
+            </button>
+            <button type="button" id="mlModeScenarioBtn" class="subtab-item" onclick="switchSimulatorMode('scenario')" style="border: none; cursor: pointer;">
+                <i class="fa-solid fa-code-compare"></i> Scenario Comparison
+            </button>
+        </div>
+    </div>
+
+    <!-- Simulator Body Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1.25fr; gap: 20px; padding: 18px 0;" id="simulatorLayoutGrid">
+        
+        <!-- Left Column: Input Form -->
+        <div style="background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+            <div style="font-size: 13px; font-weight: 700; color: #0F172A; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-location-dot" style="color: #059669;"></i>
+                <span>Farm Location &amp; Plot Parameters</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                <!-- District -->
+                <div>
+                    <label for="mlSimDistrict" style="display: block; font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 4px;">District</label>
+                    <select id="mlSimDistrict" class="filter-select" style="width: 100%; height: 34px; font-weight: 600;" onchange="triggerMLPrediction()">
+                        {% for d in districts %}
+                        <option value="{{ d.name }}" {% if d.name == 'Musanze' or forloop.first %}selected{% endif %}>{{ d.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Crop -->
+                <div>
+                    <label for="mlSimCrop" style="display: block; font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 4px;">Crop Taxonomy</label>
+                    <select id="mlSimCrop" class="filter-select" style="width: 100%; height: 34px; font-weight: 600;" onchange="triggerMLPrediction()">
+                        <option value="Maize" selected>Maize (Ibigori)</option>
+                        <option value="Bush Beans">Bush Beans (Ibihyimbo)</option>
+                        <option value="Cassava">Cassava (Imyumbati)</option>
+                        <option value="Irish Potato">Irish Potato (Ibirayi)</option>
+                        <option value="Marshland Rice">Marshland Rice (Umuceri)</option>
+                        <option value="Cooking Banana">Cooking Banana (Igitoki)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Plot Area (Hectares) with Interactive Slider -->
+            <div style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <label for="mlSimPlotArea" style="font-size: 11px; font-weight: 700; color: #334155;">Cultivated Plot Area (ha)</label>
+                    <span id="mlSimPlotAreaBadge" style="background: #E0F2FE; color: #0369A1; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px;">0.50 ha</span>
+                </div>
+                <input type="range" id="mlSimPlotArea" min="0.05" max="5.0" step="0.05" value="0.5" style="width: 100%; accent-color: #059669; cursor: pointer;" oninput="updatePlotAreaDisplay(this.value)">
+                <div style="display: flex; justify-content: space-between; font-size: 10px; color: #94A3B8; margin-top: 2px;">
+                    <span>Smallholder (0.05 ha)</span>
+                    <span>Median (0.50 ha)</span>
+                    <span>Commercial (5.0 ha)</span>
+                </div>
+            </div>
+
+            <!-- Practices Toggles Header -->
+            <div style="font-size: 12px; font-weight: 700; color: #0F172A; margin: 16px 0 8px 0; border-top: 1px solid #F1F5F9; padding-top: 12px; display: flex; align-items: center; justify-content: space-between;">
+                <span>Agronomic Practices &amp; Input Adoption</span>
+                <span style="font-size: 10px; color: #64748B;">Supported by SAS Model</span>
+            </div>
+
+            <!-- Primary Simulation Practices (Single Mode) -->
+            <div id="mlSinglePracticesContainer" style="display: flex; flex-direction: column; gap: 8px;">
+                <label class="ml-toggle-label" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 6px; background: #F8FAFC; border: 1px solid #E2E8F0; cursor: pointer;">
+                    <span style="display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 600; color: #1E293B;">
+                        <i class="fa-solid fa-seedling" style="color: #10B981;"></i> Certified Improved Seeds
+                    </span>
+                    <input type="checkbox" id="mlSimSeed" checked onchange="triggerMLPrediction()" style="width: 16px; height: 16px; accent-color: #059669;">
+                </label>
+
+                <label class="ml-toggle-label" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 6px; background: #F8FAFC; border: 1px solid #E2E8F0; cursor: pointer;">
+                    <span style="display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 600; color: #1E293B;">
+                        <i class="fa-solid fa-flask" style="color: #2563EB;"></i> Mineral Fertilizer (Inorganic / NPK / Urea)
+                    </span>
+                    <input type="checkbox" id="mlSimInorgFert" checked onchange="triggerMLPrediction()" style="width: 16px; height: 16px; accent-color: #059669;">
+                </label>
+
+                <label class="ml-toggle-label" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 6px; background: #F8FAFC; border: 1px solid #E2E8F0; cursor: pointer;">
+                    <span style="display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 600; color: #1E293B;">
+                        <i class="fa-solid fa-recycle" style="color: #15803D;"></i> Organic Compost / Farmyard Manure
+                    </span>
+                    <input type="checkbox" id="mlSimOrgFert" checked onchange="triggerMLPrediction()" style="width: 16px; height: 16px; accent-color: #059669;">
+                </label>
+
+                <label class="ml-toggle-label" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 6px; background: #F8FAFC; border: 1px solid #E2E8F0; cursor: pointer;">
+                    <span style="display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 600; color: #1E293B;">
+                        <i class="fa-solid fa-shield-virus" style="color: #9333EA;"></i> Crop Protection / Pesticides
+                    </span>
+                    <input type="checkbox" id="mlSimPesticide" onchange="triggerMLPrediction()" style="width: 16px; height: 16px; accent-color: #059669;">
+                </label>
+
+                <label class="ml-toggle-label" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 6px; background: #F8FAFC; border: 1px solid #E2E8F0; cursor: pointer;">
+                    <span style="display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 600; color: #1E293B;">
+                        <i class="fa-solid fa-droplet" style="color: #0284C7;"></i> Small-Scale Irrigation Infrastructure
+                    </span>
+                    <input type="checkbox" id="mlSimIrrig" onchange="triggerMLPrediction()" style="width: 16px; height: 16px; accent-color: #059669;">
+                </label>
+            </div>
+
+            <!-- Scenario Mode Dual Panels (Hidden by default) -->
+            <div id="mlScenarioPracticesContainer" style="display: none; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <!-- Scenario A: Current Baseline -->
+                <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 10px;">
+                    <div style="font-size: 11px; font-weight: 800; color: #475569; margin-bottom: 6px; text-transform: uppercase;">
+                        Current Baseline
+                    </div>
+                    <label style="display: block; font-size: 10.5px; margin-bottom: 4px;"><input type="checkbox" id="scenCurrSeed"> Improved Seed</label>
+                    <label style="display: block; font-size: 10.5px; margin-bottom: 4px;"><input type="checkbox" id="scenCurrInorg"> Mineral Fertilizer</label>
+                    <label style="display: block; font-size: 10.5px; margin-bottom: 4px;"><input type="checkbox" id="scenCurrOrg" checked> Organic Compost</label>
+                    <label style="display: block; font-size: 10.5px; margin-bottom: 4px;"><input type="checkbox" id="scenCurrPest"> Pesticides</label>
+                </div>
+
+                <!-- Scenario B: Modern Recommended -->
+                <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 6px; padding: 10px;">
+                    <div style="font-size: 11px; font-weight: 800; color: #047857; margin-bottom: 6px; text-transform: uppercase;">
+                        Modern Recommended
+                    </div>
+                    <label style="display: block; font-size: 10.5px; margin-bottom: 4px; color: #064E3B;"><input type="checkbox" id="scenRecSeed" checked> Improved Seed</label>
+                    <label style="display: block; font-size: 10.5px; margin-bottom: 4px; color: #064E3B;"><input type="checkbox" id="scenRecInorg" checked> Mineral Fertilizer</label>
+                    <label style="display: block; font-size: 10.5px; margin-bottom: 4px; color: #064E3B;"><input type="checkbox" id="scenRecOrg" checked> Organic Compost</label>
+                    <label style="display: block; font-size: 10.5px; margin-bottom: 4px; color: #064E3B;"><input type="checkbox" id="scenRecPest" checked> Pesticides</label>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div style="margin-top: 14px;">
+                <button type="button" id="mlRunPredictionBtn" onclick="triggerMLPrediction()" style="width: 100%; height: 38px; background: #047857; color: #FFFFFF; font-size: 12.5px; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s;">
+                    <i class="fa-solid fa-play"></i> Run Real-Time ML Simulation
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Column: Live Prediction Results & Uplift Analytics -->
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            
+            <!-- Output KPI Highlights Row -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                <!-- 1. Predicted Yield -->
+                <div style="background: #FFFFFF; border: 1px solid #A7F3D0; border-radius: 8px; padding: 12px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                    <div style="font-size: 10px; font-weight: 800; color: #047857; text-transform: uppercase;">PREDICTED YIELD</div>
+                    <div style="font-size: 24px; font-weight: 900; color: #064E3B; margin: 4px 0;" id="mlOutputYieldVal">
+                        -- <small style="font-size: 12px;">t/ha</small>
+                    </div>
+                    <div style="font-size: 10.5px; color: #64748B;" id="mlOutputYieldKg">-- kg/ha</div>
+                </div>
+
+                <!-- 2. Predicted Total Production -->
+                <div style="background: #FFFFFF; border: 1px solid #BAE0FB; border-radius: 8px; padding: 12px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                    <div style="font-size: 10px; font-weight: 800; color: #005CAB; text-transform: uppercase;">PLOT PRODUCTION</div>
+                    <div style="font-size: 24px; font-weight: 900; color: #0F172A; margin: 4px 0;" id="mlOutputProdVal">
+                        -- <small style="font-size: 12px;">t</small>
+                    </div>
+                    <div style="font-size: 10.5px; color: #64748B;" id="mlOutputProdKg">-- kg harvest</div>
+                </div>
+
+                <!-- 3. Uplift vs Baseline -->
+                <div style="background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 8px; padding: 12px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                    <div style="font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase;">BASELINE COMPARISON</div>
+                    <div style="font-size: 22px; font-weight: 900; color: #16A34A; margin: 4px 0;" id="mlOutputUpliftVal">
+                        --
+                    </div>
+                    <div style="font-size: 10.5px; color: #64748B;" id="mlOutputBaselineSub">vs district average</div>
+                </div>
+            </div>
+
+            <!-- Scenario Comparison Card (Visible in Scenario Mode) -->
+            <div id="mlScenarioResultCard" style="display: none; background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 8px; padding: 14px;">
+                <div style="font-size: 12px; font-weight: 800; color: #0F172A; margin-bottom: 8px; display: flex; justify-content: space-between;">
+                    <span>Management Uplift &amp; Indicative Returns</span>
+                    <span id="mlRevenueGainBadge" style="background: #ECFDF5; color: #047857; font-weight: 800; padding: 2px 8px; border-radius: 4px; font-size: 11px;">+0 RWF</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; font-size: 11.5px;">
+                    <div style="background: #F8FAFC; padding: 8px; border-radius: 6px;">
+                        <span style="color: #64748B;">Current Yield:</span>
+                        <div style="font-size: 14px; font-weight: 800; color: #334155;" id="scenResCurrYield">--</div>
+                    </div>
+                    <div style="background: #ECFDF5; padding: 8px; border-radius: 6px;">
+                        <span style="color: #047857;">Modern Yield:</span>
+                        <div style="font-size: 14px; font-weight: 800; color: #064E3B;" id="scenResRecYield">--</div>
+                    </div>
+                    <div style="background: #F0FDF4; padding: 8px; border-radius: 6px; border: 1px solid #86EFAC;">
+                        <span style="color: #15803D;">Net Uplift:</span>
+                        <div style="font-size: 14px; font-weight: 900; color: #15803D;" id="scenResNetUplift">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Lineage & Validation Metric Strip -->
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 11px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="color: #475569;">
+                        <strong>Model:</strong> <span id="mlModelAlgBadge">RandomForestRegressor v1.0</span>
+                    </span>
+                    <span style="color: #CBD5E1;">&bull;</span>
+                    <span style="color: #475569;">
+                        <strong>Validation R&sup2;:</strong> <span id="mlModelR2Badge" style="font-weight: 700; color: #047857;">0.65</span>
+                    </span>
+                    <span style="color: #CBD5E1;">&bull;</span>
+                    <span style="color: #475569;">
+                        <strong>MAE:</strong> <span id="mlModelMaeBadge" style="font-weight: 700;">814 kg/ha</span>
+                    </span>
+                </div>
+                <div>
+                    <span id="mlInferenceLatencyBadge" style="color: #94A3B8; font-size: 10.5px;">Latency: 12ms</span>
+                </div>
+            </div>
+
+            <!-- Mandatory Non-Causal Legal & Statistical Disclaimer -->
+            <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 6px; padding: 8px 12px; display: flex; align-items: flex-start; gap: 8px;">
+                <i class="fa-solid fa-triangle-exclamation" style="color: #D97706; margin-top: 2px; font-size: 12px;"></i>
+                <div style="font-size: 10.5px; color: #92400E; line-height: 1.4;">
+                    <strong>Mandatory Methodology Notice:</strong> These results are statistical model predictions based on historical agricultural survey data. They are not official NISR statistics and do not guarantee actual farm outcomes. Predicted differences reflect cross-sectional survey associations and should not be interpreted as guaranteed causal effects.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,163 @@
+<!-- =========================================================================
+     AgriLens Machine Learning • Model Transparency, Explainability & Provenance
+     Section 8 Deliverable: Auditable validation benchmarks & non-causal disclosures
+     ========================================================================= -->
+<div class="card ml-transparency-card" style="margin-top: 16px; border: 1px solid #E2E8F0; background: #FFFFFF;">
+    <div class="card-header" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div>
+            <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-file-contract" style="color: #005CAB;"></i>
+                <span>Model Transparency, Explainability &amp; Feature Importance</span>
+            </div>
+            <div class="card-subtitle">
+                Inspect underlying machine learning architectures, statistical validation metrics, and feature importance distributions.
+            </div>
+        </div>
+        <a href="/api/v1/ml/explainability/" target="_blank" class="btn-view-pill" style="font-size: 11px; font-weight: 700; color: #005CAB; border-color: #BAE0FB;">
+            <i class="fa-solid fa-code"></i> JSON Explainability API
+        </a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 14px 0;">
+        <!-- Left: Model Lineage & Metrics Breakdown -->
+        <div>
+            <h4 style="font-size: 12px; font-weight: 800; color: #1E293B; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                1. Algorithmic Architecture &amp; Lineage
+            </h4>
+            <div class="table-responsive">
+                <table class="obs-table" style="font-size: 11.5px;">
+                    <tbody>
+                        <tr>
+                            <td style="font-weight: 700; color: #475569; width: 150px;">Algorithm</td>
+                            <td><strong>Random Forest Regressor (100 estimators, max_depth=14)</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #475569;">Target Variable</td>
+                            <td><code>calculated_yield_kg_per_ha</code> (Biological Bounds: 10 &ndash; 25,000 kg/ha)</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #475569;">Training Data</td>
+                            <td>Official NISR Seasonal Agricultural Survey Microdata (SAS 2024A &amp; 2025A)</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #475569;">Sample Size</td>
+                            <td><strong>4,301 validated plots</strong> (with expansion sampling weights)</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #475569;">Validation Scheme</td>
+                            <td>Temporal Hold-out: Train on SAS 2024 Season A &rarr; Evaluate on SAS 2025 Season A</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700; color: #475569;">Evaluation Metrics</td>
+                            <td>
+                                <strong>Weighted R&sup2;: 0.6577</strong> &bull; MAE: <strong>1,298 kg/ha</strong>
+                                <span style="color: #059669; font-weight: 700;">(+38.5% improvement vs baseline)</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Model Limitations Callout -->
+            <div style="margin-top: 12px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 10px 12px;">
+                <div style="font-size: 11px; font-weight: 700; color: #0F172A; margin-bottom: 4px;">
+                    <i class="fa-solid fa-circle-exclamation" style="color: #64748B;"></i> Documented Model Limitations
+                </div>
+                <ul style="font-size: 10.5px; color: #475569; margin: 0; padding-left: 16px; line-height: 1.4;">
+                    <li><strong>Observational Microdata:</strong> Reflects farmer-reported survey associations rather than randomized agronomic trials.</li>
+                    <li><strong>Unobserved Factors:</strong> Soil acidity (pH), local slope gradient, and micro-climate rainfall variations are not recorded on every survey plot.</li>
+                    <li><strong>Non-Causal Interpretability:</strong> Fertilizer and certified seeds correlate with higher yield, but management skills and soil quality are unmeasured co-factors.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Right: Feature Importance Breakdown (Dynamic Bar Chart) -->
+        <div>
+            <h4 style="font-size: 12px; font-weight: 800; color: #1E293B; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                2. Empirical Feature Importance Ranking
+            </h4>
+            <p style="font-size: 11px; color: #64748B; margin-bottom: 12px;">
+                Relative contribution of agricultural variables in explaining smallholder crop yield variances across Rwanda:
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 8px;" id="mlFeatureImportanceBars">
+                <!-- Crop Variety -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                        <span style="font-weight: 600; color: #1E293B;">Crop Variety / Taxonomy</span>
+                        <span style="font-weight: 700; color: #047857;">38.4%</span>
+                    </div>
+                    <div style="height: 7px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
+                        <div style="height: 100%; width: 38.4%; background: #047857; border-radius: 4px;"></div>
+                    </div>
+                </div>
+
+                <!-- Geographic District -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                        <span style="font-weight: 600; color: #1E293B;">Agro-Ecological District</span>
+                        <span style="font-weight: 700; color: #005CAB;">21.6%</span>
+                    </div>
+                    <div style="height: 7px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
+                        <div style="height: 100%; width: 21.6%; background: #005CAB; border-radius: 4px;"></div>
+                    </div>
+                </div>
+
+                <!-- Plot Cultivated Area -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                        <span style="font-weight: 600; color: #1E293B;">Plot Cultivated Area (ha)</span>
+                        <span style="font-weight: 700; color: #0284C7;">14.2%</span>
+                    </div>
+                    <div style="height: 7px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
+                        <div style="height: 100%; width: 14.2%; background: #0284C7; border-radius: 4px;"></div>
+                    </div>
+                </div>
+
+                <!-- Mineral Fertilizer -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                        <span style="font-weight: 600; color: #1E293B;">Mineral Fertilizer (Inorganic)</span>
+                        <span style="font-weight: 700; color: #10B981;">11.8%</span>
+                    </div>
+                    <div style="height: 7px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
+                        <div style="height: 100%; width: 11.8%; background: #10B981; border-radius: 4px;"></div>
+                    </div>
+                </div>
+
+                <!-- Certified Seeds -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                        <span style="font-weight: 600; color: #1E293B;">Certified Improved Seeds</span>
+                        <span style="font-weight: 700; color: #8B5CF6;">8.1%</span>
+                    </div>
+                    <div style="height: 7px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
+                        <div style="height: 100%; width: 8.1%; background: #8B5CF6; border-radius: 4px;"></div>
+                    </div>
+                </div>
+
+                <!-- Organic Compost -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                        <span style="font-weight: 600; color: #1E293B;">Organic Manure / Compost</span>
+                        <span style="font-weight: 700; color: #F59E0B;">3.9%</span>
+                    </div>
+                    <div style="height: 7px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
+                        <div style="height: 100%; width: 3.9%; background: #F59E0B; border-radius: 4px;"></div>
+                    </div>
+                </div>
+
+                <!-- Pesticides / Protection -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                        <span style="font-weight: 600; color: #1E293B;">Pesticides &amp; Protection</span>
+                        <span style="font-weight: 700; color: #64748B;">2.0%</span>
+                    </div>
+                    <div style="height: 7px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
+                        <div style="height: 100%; width: 2.0%; background: #64748B; border-radius: 4px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

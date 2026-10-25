@@ -39,6 +39,10 @@ data/interim/*
 data/processed/*
 !data/processed/.gitkeep
 !data/processed/README.md
+data/models/*
+!data/models/.gitkeep
+*.joblib
+
 
 # IDEs & OS
 .idea/
