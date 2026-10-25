@@ -8,12 +8,12 @@
     <!-- Print / Export Header Strip -->
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
         <div>
-            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #166534; background: #F0FDF4; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">
                 <span>Official Agricultural Intelligence Report</span>
                 <span>&bull;</span>
                 <span>NISR Validated Microdata &bull; NST2 Aligned</span>
             </div>
-            <h1 style="margin: 0; font-size: 1.6rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+            <h1 style="margin: 0; font-size: 1.6rem; color: #0F172A; font-weight: 800; letter-spacing: -0.02em;">
                 National Agricultural Productivity &amp; Survey Bulletin
             </h1>
             <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #64748B;">
@@ -21,7 +21,7 @@
             </p>
         </div>
         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <a href="{% url 'dashboard:reports_district' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
+            <a href="{% url 'dashboard:reports_district' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #15803D; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
                 <span>District Dossier &rarr;</span>
             </a>
             <a href="{% url 'dashboard:reports_national_export_csv' %}?year={{ selected_year }}&amp;season={{ selected_season }}&amp;crop={{ selected_crop }}&amp;source={{ selected_source }}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; background: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
@@ -32,7 +32,7 @@
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
                 <span>Export Excel</span>
             </a>
-            <button onclick="window.print()" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 8px; font-size: 0.86rem; font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(0, 92, 171, 0.25);">
+            <button onclick="window.print()" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; background: #15803D; color: #FFFFFF; border: none; border-radius: 8px; font-size: 0.86rem; font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(21, 128, 61, 0.22);">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                 <span>Print Bulletin</span>
             </button>
@@ -61,8 +61,8 @@
     </style>
 
     {% if not market_data_available %}
-    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-left: 4px solid #005CAB; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.84rem; color: #334155; display: flex; align-items: center; gap: 10px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#005CAB" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-left: 4px solid #2563EB; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.84rem; color: #334155; display: flex; align-items: center; gap: 10px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
         <span>{{ market_note }}</span>
     </div>
     {% endif %}
@@ -113,41 +113,41 @@
 
     <!-- Executive KPI Summary Cards -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #005CAB;">
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #166534;">
             <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
                 {{ selected_crop }} Production
             </div>
-            <div style="font-size: 1.55rem; font-weight: 800; color: #001F3B;">
+            <div style="font-size: 1.55rem; font-weight: 800; color: #0F172A;">
                 {{ summary.total_production_mt|floatformat:1 }} <span style="font-size: 0.9rem; font-weight: 600; color: #64748B;">MT</span>
             </div>
             <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">Weighted National Estimate</div>
         </div>
 
-        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #00AEEF;">
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #15803D;">
             <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
                 Cultivated Area
             </div>
-            <div style="font-size: 1.55rem; font-weight: 800; color: #001F3B;">
+            <div style="font-size: 1.55rem; font-weight: 800; color: #0F172A;">
                 {{ summary.total_area_ha|floatformat:1 }} <span style="font-size: 0.9rem; font-weight: 600; color: #64748B;">ha</span>
             </div>
             <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">Survey-weighted expansion</div>
         </div>
 
-        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #46962B;">
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #84CC16;">
             <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
                 Weighted Yield
             </div>
-            <div style="font-size: 1.55rem; font-weight: 800; color: #46962B;">
+            <div style="font-size: 1.55rem; font-weight: 800; color: #166534;">
                 {{ summary.weighted_yield_kg_per_ha|floatformat:0 }} <span style="font-size: 0.9rem; font-weight: 600; color: #64748B;">kg/ha</span>
             </div>
             <div style="font-size: 0.74rem; color: #166534; margin-top: 4px;">Ratio: &sum;(W&middot;P) / &sum;(W&middot;A)</div>
         </div>
 
-        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #B28200;">
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #FACC15;">
             <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
                 Plots Sampled
             </div>
-            <div style="font-size: 1.55rem; font-weight: 800; color: #001F3B;">
+            <div style="font-size: 1.55rem; font-weight: 800; color: #0F172A;">
                 {{ summary.total_plots }}
             </div>
             <div style="font-size: 0.74rem; color: #64748B; margin-top: 4px;">Microdata observation plots</div>
@@ -193,8 +193,8 @@
                 <tbody>
                     {% for item in crop_summaries %}
                     <tr style="border-bottom: 1px solid #F1F5F9;">
-                        <td style="padding: 12px 14px; font-weight: 700; color: #001F3B;">
-                            <a href="?year={{ selected_year }}&amp;season={{ selected_season }}&amp;crop={{ item.crop.name }}&amp;source={{ selected_source }}" style="color: #005CAB; text-decoration: none;">
+                        <td style="padding: 12px 14px; font-weight: 700; color: #0F172A;">
+                            <a href="?year={{ selected_year }}&amp;season={{ selected_season }}&amp;crop={{ item.crop.name }}&amp;source={{ selected_source }}" style="color: #15803D; font-weight: 700; text-decoration: none;">
                                 {{ item.crop.name }}
                             </a>
                         </td>
@@ -239,10 +239,10 @@
             <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                     <span style="font-size: 0.82rem; font-weight: 700; color: #0F172A;">Improved Seed</span>
-                    <span style="font-size: 0.85rem; font-weight: 800; color: #005CAB;">{{ summary.adoption_rates.improved_seed|floatformat:1 }}%</span>
+                    <span style="font-size: 0.85rem; font-weight: 800; color: #166534;">{{ summary.adoption_rates.improved_seed|floatformat:1 }}%</span>
                 </div>
                 <div style="height: 8px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
-                    <div style="width: {{ summary.adoption_rates.improved_seed }}%; height: 100%; background: #005CAB;"></div>
+                    <div style="width: {{ summary.adoption_rates.improved_seed }}%; height: 100%; background: #166534;"></div>
                 </div>
                 <div style="font-size: 0.72rem; color: #64748B; margin-top: 6px;">Area weighted: {{ summary.weighted_adoption_rates.improved_seed|floatformat:1 }}%</div>
             </div>
@@ -250,10 +250,10 @@
             <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                     <span style="font-size: 0.82rem; font-weight: 700; color: #0F172A;">Inorganic Fertilizer</span>
-                    <span style="font-size: 0.85rem; font-weight: 800; color: #00AEEF;">{{ summary.adoption_rates.inorganic_fertilizer|floatformat:1 }}%</span>
+                    <span style="font-size: 0.85rem; font-weight: 800; color: #2563EB;">{{ summary.adoption_rates.inorganic_fertilizer|floatformat:1 }}%</span>
                 </div>
                 <div style="height: 8px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
-                    <div style="width: {{ summary.adoption_rates.inorganic_fertilizer }}%; height: 100%; background: #00AEEF;"></div>
+                    <div style="width: {{ summary.adoption_rates.inorganic_fertilizer }}%; height: 100%; background: #2563EB;"></div>
                 </div>
                 <div style="font-size: 0.72rem; color: #64748B; margin-top: 6px;">Area weighted: {{ summary.weighted_adoption_rates.inorganic_fertilizer|floatformat:1 }}%</div>
             </div>
@@ -261,10 +261,10 @@
             <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                     <span style="font-size: 0.82rem; font-weight: 700; color: #0F172A;">Organic Fertilizer</span>
-                    <span style="font-size: 0.85rem; font-weight: 800; color: #46962B;">{{ summary.adoption_rates.organic_fertilizer|floatformat:1 }}%</span>
+                    <span style="font-size: 0.85rem; font-weight: 800; color: #84CC16;">{{ summary.adoption_rates.organic_fertilizer|floatformat:1 }}%</span>
                 </div>
                 <div style="height: 8px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
-                    <div style="width: {{ summary.adoption_rates.organic_fertilizer }}%; height: 100%; background: #46962B;"></div>
+                    <div style="width: {{ summary.adoption_rates.organic_fertilizer }}%; height: 100%; background: #84CC16;"></div>
                 </div>
                 <div style="font-size: 0.72rem; color: #64748B; margin-top: 6px;">Area weighted: {{ summary.weighted_adoption_rates.organic_fertilizer|floatformat:1 }}%</div>
             </div>
@@ -273,14 +273,14 @@
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                     <span style="font-size: 0.82rem; font-weight: 700; color: #0F172A;">Irrigation Access</span>
                     {% if summary.practice_availability.irrigation == 'AVAILABLE' %}
-                        <span style="font-size: 0.85rem; font-weight: 800; color: #B28200;">{{ summary.adoption_rates.irrigation|floatformat:1 }}%</span>
+                        <span style="font-size: 0.85rem; font-weight: 800; color: #D97706;">{{ summary.adoption_rates.irrigation|floatformat:1 }}%</span>
                     {% else %}
                         <span style="font-size: 0.72rem; font-weight: 700; color: #94A3B8; background: #F1F5F9; padding: 2px 6px; border-radius: 4px;">Not recorded in SAS</span>
                     {% endif %}
                 </div>
                 {% if summary.practice_availability.irrigation == 'AVAILABLE' %}
                 <div style="height: 8px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
-                    <div style="width: {{ summary.adoption_rates.irrigation }}%; height: 100%; background: #B28200;"></div>
+                    <div style="width: {{ summary.adoption_rates.irrigation }}%; height: 100%; background: #D97706;"></div>
                 </div>
                 <div style="font-size: 0.72rem; color: #64748B; margin-top: 6px;">Area weighted: {{ summary.weighted_adoption_rates.irrigation|floatformat:1 }}%</div>
                 {% else %}
@@ -292,14 +292,14 @@
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                     <span style="font-size: 0.82rem; font-weight: 700; color: #0F172A;">Anti-Erosion Terracing</span>
                     {% if summary.practice_availability.anti_erosion == 'AVAILABLE' %}
-                        <span style="font-size: 0.85rem; font-weight: 800; color: #0284C7;">{{ summary.adoption_rates.anti_erosion|floatformat:1 }}%</span>
+                        <span style="font-size: 0.85rem; font-weight: 800; color: #7C3AED;">{{ summary.adoption_rates.anti_erosion|floatformat:1 }}%</span>
                     {% else %}
                         <span style="font-size: 0.72rem; font-weight: 700; color: #94A3B8; background: #F1F5F9; padding: 2px 6px; border-radius: 4px;">Not recorded in SAS</span>
                     {% endif %}
                 </div>
                 {% if summary.practice_availability.anti_erosion == 'AVAILABLE' %}
                 <div style="height: 8px; background: #E2E8F0; border-radius: 4px; overflow: hidden;">
-                    <div style="width: {{ summary.adoption_rates.anti_erosion }}%; height: 100%; background: #0284C7;"></div>
+                    <div style="width: {{ summary.adoption_rates.anti_erosion }}%; height: 100%; background: #7C3AED;"></div>
                 </div>
                 <div style="font-size: 0.72rem; color: #64748B; margin-top: 6px;">Area weighted: {{ summary.weighted_adoption_rates.anti_erosion|floatformat:1 }}%</div>
                 {% else %}

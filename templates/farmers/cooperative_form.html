@@ -1,0 +1,67 @@
+{% extends request.user.is_authenticated|yesno:"base.html,public_base.html" %}
+
+{% block title %}{{ page_title }} | AgriLens Rwanda{% endblock %}
+{% block section_title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="content-container" style="max-width: 700px; margin: 30px auto;">
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'farmers:farmer_list' %}" style="color: #15803D; font-weight: 600; text-decoration: none; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 6px;">
+            &larr; Back to Cooperatives &amp; Farmers Registry
+        </a>
+    </div>
+
+    <div class="panel-card">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <h3>{% if is_edit %}Edit Cooperative Details{% else %}Register New Agricultural Cooperative{% endif %}</h3>
+                <p class="panel-subtitle">Rwanda Cooperative Agency (RCA) Framework</p>
+            </div>
+            <span class="panel-badge blue">Producer Org</span>
+        </div>
+        <div class="panel-body" style="padding: 28px;">
+            <form method="POST">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                <div style="padding: 12px; background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 8px; color: #991B1B; margin-bottom: 18px; font-size: 0.88rem;">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <div style="display: flex; flex-direction: column; gap: 18px;">
+                    <div>
+                        <label style="display: block; font-weight: 700; color: #0F172A; font-size: 0.85rem; margin-bottom: 6px;">Cooperative Name *</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}<div style="color: #DC2626; font-size: 0.8rem; margin-top: 4px;">{{ form.name.errors }}</div>{% endif %}
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-weight: 700; color: #0F172A; font-size: 0.85rem; margin-bottom: 6px;">RCA Registration Number</label>
+                        {{ form.registration_number }}
+                        {% if form.registration_number.errors %}<div style="color: #DC2626; font-size: 0.8rem; margin-top: 4px;">{{ form.registration_number.errors }}</div>{% endif %}
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-weight: 700; color: #0F172A; font-size: 0.85rem; margin-bottom: 6px;">Administrative Sector</label>
+                        {{ form.sector }}
+                        {% if form.sector.errors %}<div style="color: #DC2626; font-size: 0.8rem; margin-top: 4px;">{{ form.sector.errors }}</div>{% endif %}
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-weight: 700; color: #0F172A; font-size: 0.85rem; margin-bottom: 6px;">Contact Phone</label>
+                        {{ form.contact_phone }}
+                        {% if form.contact_phone.errors %}<div style="color: #DC2626; font-size: 0.8rem; margin-top: 4px;">{{ form.contact_phone.errors }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div style="margin-top: 28px; display: flex; justify-content: flex-end; gap: 12px;">
+                    <a href="{% url 'farmers:farmer_list' %}" class="btn-action" style="padding: 10px 18px; background: #F1F5F9; color: #475569; text-decoration: none; border-radius: 8px; font-weight: 600;">Cancel</a>
+                    <button type="submit" class="btn-action primary" style="padding: 10px 22px; background: #15803D; color: #FFFFFF; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">
+                        {% if is_edit %}Save Changes{% else %}Register Cooperative{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

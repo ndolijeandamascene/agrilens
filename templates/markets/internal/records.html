@@ -100,10 +100,16 @@
                         <div style="color: #059669;">Approved: <strong>{{ r.approved_by.username }}</strong></div>
                         {% endif %}
                     </td>
-                    <td style="padding: 12px 14px; text-align: right;">
-                        <a href="{% url 'markets:internal_record_edit' r.id %}" style="padding: 4px 10px; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 4px; color: #1E293B; font-weight: 600; text-decoration: none; font-size: 0.78rem;">
+                    <td style="padding: 12px 14px; text-align: right; white-space: nowrap;">
+                        <a href="{% url 'markets:internal_record_edit' r.id %}" style="padding: 4px 10px; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 4px; color: #1E293B; font-weight: 600; text-decoration: none; font-size: 0.78rem; margin-right: 6px;">
                             Edit
                         </a>
+                        <form method="POST" action="{% url 'markets:internal_record_delete' r.id %}" style="display: inline;" onsubmit="return confirm('Delete price record #{{ r.id }} ({{ r.crop.name }} - {{ r.price_per_kg_rwf }} RWF)?');">
+                            {% csrf_token %}
+                            <button type="submit" style="padding: 4px 10px; background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 4px; color: #DC2626; font-weight: 600; font-size: 0.78rem; cursor: pointer;">
+                                Delete
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 {% empty %}

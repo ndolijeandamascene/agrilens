@@ -7,6 +7,7 @@ from apps.agriculture.models import Crop, AgriculturalSeason
 from apps.geography.models import District, Sector
 from apps.data_management.models import ValidatedObservation, ImportBatch, ManualObservation
 from apps.indicators.services import IndicatorService
+from apps.markets.models import CommodityPrice
 
 VALID_YEARS = [2024, 2025]
 VALID_SEASONS = ['A', 'B', 'C']

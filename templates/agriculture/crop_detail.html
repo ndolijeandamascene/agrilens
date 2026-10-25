@@ -6,7 +6,7 @@
 {% block content %}
 <div class="content-container">
     <div style="margin-bottom: 16px;">
-        <a href="{% url 'agriculture:crop_list' %}" style="color: #005CAB; font-weight: 600; text-decoration: none; font-size: 0.875rem;">
+        <a href="{% url 'agriculture:crop_list' %}" style="color: #15803D; font-weight: 600; text-decoration: none; font-size: 0.875rem;">
             &larr; Back to Crops Registry
         </a>
     </div>
@@ -18,11 +18,22 @@
                 <h3>{{ crop.name }} {% if crop.kinyarwanda_name %}({{ crop.kinyarwanda_name }}){% endif %}</h3>
                 <p class="panel-subtitle">Category: <strong>{{ crop.category.name }}</strong> &bull; Scientific Name: <em>{{ crop.scientific_name|default:"Not specified" }}</em></p>
             </div>
-            <div>
+            <div style="display: flex; gap: 10px; align-items: center;">
                 {% if crop.is_priority_crop %}
-                <span class="panel-badge blue" style="background: #E8F7FE; color: #005CAB; font-weight: 700; padding: 6px 14px; border-radius: 6px;">
+                <span class="panel-badge blue" style="background: #EFF6FF; color: #2563EB; font-weight: 700; padding: 6px 14px; border-radius: 6px;">
                     NST2 Strategic Priority Crop
                 </span>
+                {% endif %}
+                {% if request.user.is_authenticated %}
+                <a href="{% url 'agriculture:crop_edit' pk=crop.pk %}" class="btn-action" style="padding: 6px 14px; background: #15803D; color: #FFFFFF; text-decoration: none; border-radius: 6px; font-size: 0.82rem; font-weight: 700;">
+                    Edit Crop
+                </a>
+                <form method="POST" action="{% url 'agriculture:crop_delete' pk=crop.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete crop \'{{ crop.name|escapejs }}\'?');">
+                    {% csrf_token %}
+                    <button type="submit" style="padding: 6px 14px; background: #DC2626; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.82rem; font-weight: 700; cursor: pointer;">
+                        Delete
+                    </button>
+                </form>
                 {% endif %}
             </div>
         </div>
@@ -30,14 +41,14 @@
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;">
                 <div style="padding: 16px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
                     <div style="font-size: 0.8rem; color: #64748B;">Total Validated Observations</div>
-                    <div style="font-size: 1.5rem; font-weight: 800; color: #001F3B; margin-top: 4px;">{{ total_obs }}</div>
-                    <div style="font-size: 0.75rem; color: #46962B; margin-top: 2px;">NISR SAS Survey Plots</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: #0F172A; margin-top: 4px;">{{ total_obs }}</div>
+                    <div style="font-size: 0.75rem; color: #166534; margin-top: 2px;">NISR SAS Survey Plots</div>
                 </div>
 
                 <div style="padding: 16px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
                     <div style="font-size: 0.8rem; color: #64748B;">Yield Gap Analytics</div>
                     <div style="margin-top: 8px;">
-                        <a href="{% url 'indicators:productivity' %}?crop={{ crop.name }}" style="color: #005CAB; font-weight: 700; text-decoration: none; font-size: 0.9rem;">
+                        <a href="{% url 'indicators:productivity' %}?crop={{ crop.name }}" style="color: #15803D; font-weight: 700; text-decoration: none; font-size: 0.9rem;">
                             View Benchmark Gap &rarr;
                         </a>
                     </div>
@@ -46,7 +57,7 @@
                 <div style="padding: 16px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
                     <div style="font-size: 0.8rem; color: #64748B;">Market Price Monitoring</div>
                     <div style="margin-top: 8px;">
-                        <a href="{% url 'markets:market_list' %}" style="color: #005CAB; font-weight: 700; text-decoration: none; font-size: 0.9rem;">
+                        <a href="{% url 'markets:market_list' %}" style="color: #15803D; font-weight: 700; text-decoration: none; font-size: 0.9rem;">
                             View Commodity Prices &rarr;
                         </a>
                     </div>
@@ -86,7 +97,7 @@
                             <td><strong>{{ obs.district.name }}</strong></td>
                             <td>{{ obs.season }}</td>
                             <td>{{ obs.plot_area_ha }} ha</td>
-                            <td><strong style="color: #005CAB;">{{ obs.calculated_yield_kg_per_ha }} kg/ha</strong></td>
+                            <td><strong style="color: #166534;">{{ obs.calculated_yield_kg_per_ha }} kg/ha</strong></td>
                             <td>{{ obs.is_irrigated|yesno:"Yes,No" }}</td>
                             <td>{{ obs.uses_inorganic_fertilizer|yesno:"Yes,No" }}</td>
                             <td>{{ obs.is_improved_seed|yesno:"Yes,No" }}</td>

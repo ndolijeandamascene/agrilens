@@ -85,16 +85,22 @@ def decision_hub(request):
         ],
     }
 
-    # Theme breakdown for Donut Chart
+    # Theme breakdown for Donut Chart derived dynamically from recommendation rules
+    rule_counts = list(
+        scoped_recs.values('rule__title')
+        .annotate(total=Count('id'))
+        .order_by('-total')
+    )
+    theme_labels = []
+    theme_values = []
+    for item in rule_counts:
+        title = item['rule__title'] or 'General Advisory'
+        theme_labels.append(title)
+        theme_values.append(item['total'])
+
     theme_chart_data = {
-        'labels': ['CIP Inputs & Subsidies', 'Soil Acidity & Liming', 'Post-Harvest Losses', 'Area-Yield Volatility', 'Supply Deficits'],
-        'values': [
-            max(gov_count - 10, 24),
-            14,
-            max(bank_count, 12),
-            max(insurer_count, 18),
-            max(agribus_count, 4)
-        ]
+        'labels': theme_labels if theme_labels else ['No Active Themes'],
+        'values': theme_values if theme_values else [0]
     }
 
     # Spatial Decision Map Data (All 30 Districts)
@@ -195,11 +201,35 @@ def decision_hub(request):
     # Empirical Outcomes
     outcomes = OutcomeMeasurement.objects.select_related('district', 'crop', 'action_plan').all()[:4]
 
-    # Aggregate Macro Indicators
-    recoverable_yield_mt = "248,500 MT"
-    gap_land_area_ha = "142,600 ha"
-    economic_value_rwf = "102.4B RWF"
-    verified_gain_pct = "+14.5%"
+    # Aggregate Macro Indicators dynamically derived from validated indicators and outcomes
+    from apps.indicators.services import IndicatorService
+    from apps.markets.models import CommodityPrice
+    gap = IndicatorService.get_productivity_gap(crop_name='Maize', year=2025, season_code='A')
+    if gap and gap.get('is_sufficient_data') and gap.get('indicative_opportunity_tonnes'):
+        rec_tonnes = gap['indicative_opportunity_tonnes']
+        recoverable_yield_mt = f"{rec_tonnes:,.0f} MT"
+        gap_area = gap.get('harvested_area_ha')
+        gap_land_area_ha = f"{gap_area:,.0f} ha" if gap_area else "Data unavailable"
+
+        maize_price_avg = CommodityPrice.objects.filter(
+            status=CommodityPrice.Status.PUBLISHED,
+            crop__name__iexact='Maize'
+        ).aggregate(avg=Avg('price_per_kg_rwf'))['avg']
+        if maize_price_avg:
+            econ_val = rec_tonnes * 1000 * float(maize_price_avg)
+            economic_value_rwf = f"{econ_val / 1e9:.1f}B RWF"
+        else:
+            economic_value_rwf = "Data unavailable"
+    else:
+        recoverable_yield_mt = "Data unavailable"
+        gap_land_area_ha = "Data unavailable"
+        economic_value_rwf = "Data unavailable"
+
+    avg_gain = OutcomeMeasurement.objects.aggregate(avg=Avg('observed_yield_change_pct'))['avg']
+    if avg_gain is not None:
+        verified_gain_pct = f"+{float(avg_gain):.1f}%" if avg_gain >= 0 else f"{float(avg_gain):.1f}%"
+    else:
+        verified_gain_pct = "Data unavailable"
 
     context = {
         'page_title': 'Agricultural Decision Support & Stakeholder Intelligence Hub',
@@ -441,6 +471,32 @@ def action_plan_update(request, pk):
             messages.success(request, f"Action plan updated to '{action.get_status_display()}'.")
         return redirect('decision_support:recommendation_detail', pk=rec.id)
 
+    return redirect('decision_support:recommendation_detail', pk=rec.id)
+
+
+@login_required
+def action_plan_delete(request, pk):
+    """Delete an action plan."""
+    action = get_object_or_404(ActionPlan.objects.select_related('recommendation'), pk=pk)
+    rec = action.recommendation
+
+    if rec.district and not can_access_district(request.user, rec.district.id):
+        return render(request, '403.html', {'reason': 'Geographic clearance required.'}, status=403)
+
+    if request.method == 'POST':
+        title = action.title
+        action_id = action.id
+        action.delete()
+        AuditLog.objects.create(
+            actor=request.user,
+            action=AuditLog.Action.ACTION_UPDATED,
+            target_model='ActionPlan',
+            target_id=str(action_id),
+            target_repr=title[:150],
+            details=json.dumps({'deleted': True}),
+            ip_address=request.META.get('REMOTE_ADDR')
+        )
+        messages.success(request, f"Action plan '{title}' has been deleted.")
     return redirect('decision_support:recommendation_detail', pk=rec.id)
 
 

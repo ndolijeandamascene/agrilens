@@ -15,21 +15,25 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+    <!-- Master AgriLens Design System -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=20261025_v1">
+
     <style>
         :root {
-            --bg-body: #f3f6f8;
-            --bg-sidebar: #0f2e24;
-            --bg-card: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --primary-green: #10b981;
-            --dark-green: #047857;
-            --border-color: #e2e8f0;
-            --blue: #3b82f6;
-            --orange: #f59e0b;
-            --purple: #8b5cf6;
-            --teal: #14b8a6;
-            --gray: #64748b;
+            --bg-body: #F8FAFC;
+            --bg-sidebar: #0F2E24;
+            --bg-card: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --primary-green: #166534;
+            --dark-green: #15803D;
+            --border-color: #E2E8F0;
+            --blue: #2563EB;
+            --orange: #D97706;
+            --purple: #7C3AED;
+            --lime: #84CC16;
+            --yellow: #FACC15;
+            --gray: #64748B;
         }
 
         * {
@@ -47,15 +51,16 @@
             overflow: hidden;
         }
 
-        /* --- Sidebar --- */
+        /* --- Sidebar (AgriLens Dark Forest Green Brand Navigation) --- */
         .sidebar {
             width: 260px;
             background-color: var(--bg-sidebar);
-            color: #fff;
+            color: #FFFFFF;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
             flex-shrink: 0;
+            border-right: 1px solid rgba(0, 0, 0, 0.12);
             transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
             will-change: margin-left;
         }
@@ -65,62 +70,69 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: #0F2E24;
         }
         
-        .logo-area i { font-size: 24px; color: var(--primary-green); }
-        .logo-text h1 { font-size: 18px; font-weight: 600; color: #fff; }
-        .logo-text p { font-size: 10px; color: #a7f3d0; }
+        .logo-area i { font-size: 24px; color: #34D399; }
+        .logo-text h1 { font-size: 18px; font-weight: 700; color: #FFFFFF; }
+        .logo-text p { font-size: 11px; color: #34D399; font-weight: 600; }
 
         .nav-section {
-            padding: 15px 0;
+            padding: 12px 0 6px 0;
         }
 
         .nav-title {
             font-size: 10px;
             text-transform: uppercase;
-            color: #94a3b8;
+            color: #10B981;
             padding: 0 20px;
-            margin-bottom: 10px;
-            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            letter-spacing: 0.6px;
             font-weight: 700;
         }
 
         .nav-item {
-            padding: 10px 20px;
+            margin: 2px 10px;
+            padding: 9px 12px;
             display: flex;
             align-items: center;
             gap: 12px;
             font-size: 13px;
-            color: #cbd5e1;
+            color: #E2E8F0;
             cursor: pointer;
-            transition: 0.2s;
+            border-radius: 6px;
+            transition: background-color 0.15s ease, color 0.15s ease;
             text-decoration: none;
         }
 
         .nav-item:hover {
             background-color: rgba(255, 255, 255, 0.08);
-            color: #fff;
+            color: #FFFFFF;
+        }
+
+        .nav-item:hover i {
+            color: #FFFFFF;
         }
 
         .nav-item.active {
             background-color: #059669 !important;
-            color: #ffffff !important;
-            font-weight: 600;
-            border-left: 3.5px solid #10b981 !important;
-            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35);
+            color: #FFFFFF !important;
+            font-weight: 700;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
         .nav-item.active i {
-            color: #ffffff !important;
+            color: #FFFFFF !important;
         }
 
         .nav-section.active .nav-title,
         .nav-section:has(.nav-item.active) .nav-title {
-            color: var(--primary-green) !important;
+            color: #10B981 !important;
         }
 
-        .nav-item i { width: 16px; text-align: center; }
+        .nav-item i { width: 16px; text-align: center; color: #A7F3D0; }
 
         /* --- Main Content --- */
         .main-content {
@@ -269,7 +281,7 @@
         .metric-sub { font-size: 11px; color: var(--text-muted); }
         .metric-tag {
             font-size: 10px; padding: 2px 8px; border-radius: 12px;
-            background: #ecfdf5; color: var(--dark-green); width: fit-content;
+            background: #F0FDF4; color: var(--primary-green); width: fit-content;
             font-weight: 600;
         }
 
@@ -971,7 +983,7 @@
             display: none;
             background: transparent;
             border: none;
-            color: #94a3b8;
+            color: rgba(255, 255, 255, 0.7);
             font-size: 18px;
             cursor: pointer;
             padding: 4px 6px;
@@ -980,7 +992,7 @@
             transition: color 0.15s ease;
         }
         .sidebar-close-btn:hover {
-            color: #ffffff;
+            color: #FFFFFF;
         }
 
         /* Table Responsive Container Utility */

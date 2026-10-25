@@ -128,105 +128,88 @@ RWANDA_30_DISTRICTS = [
     'Nyaruguru', 'Rubavu', 'Ruhango', 'Rulindo', 'Rusizi', 'Rutsiro', 'Rwamagana'
 ]
 
-# Real Rwandan market economic spatial factors relative to national benchmark:
-# - Urban consumption hubs (high demand & transport): +5% to +8%
-# - Cross-border trading hubs (DRC trade premiums): +4% to +6%
-# - Secondary urban markets & transit corridors: +0% to +3%
-# - Major high-producing assembly hubs & farmgate surplus: -4% to -8%
-DISTRICT_MARKET_MULTIPLIERS = {
-    'Nyarugenge': 1.07, 'Gasabo': 1.06, 'Kicukiro': 1.05,
-    'Rubavu': 1.05, 'Rusizi': 1.03, 'Karongi': 1.01, 'Rutsiro': 0.98, 'Nyabihu': 0.99, 'Ngororero': 0.97,
-    'Muhanga': 1.02, 'Kamonyi': 1.01, 'Ruhango': 0.99, 'Nyanza': 0.99, 'Huye': 1.01, 'Gisagara': 0.95, 'Nyamagabe': 0.97, 'Nyaruguru': 0.94,
-    'Musanze': 0.98, 'Burera': 0.93, 'Gicumbi': 0.95, 'Rulindo': 0.98, 'Gakenke': 0.96,
-    'Rwamagana': 1.01, 'Kayonza': 1.00, 'Bugesera': 0.98, 'Gatsibo': 0.95, 'Nyagatare': 0.94, 'Kirehe': 0.96, 'Ngoma': 0.97, 'Nyamasheke': 0.97,
-}
-
-COMMODITY_DEFAULT_BENCHMARKS = {
-    'Maize': 415,
-    'Bush Beans': 405,
-    'Climbing Beans': 435,
-    'Marshland Rice': 1100,
-    'Irish Potato': 320,
-    'Cassava': 395,
-    'Soyabean': 680,
-    'Wheat': 520,
-    'Sorghum': 460,
-    'Cooking Banana': 240,
-    'Sweet Potato': 260,
-    'Tomato': 750,
-}
-
 def get_crop_surveillance_data(crop, published_prices_qs):
     """
-    Computes complete, authentic 30-district market pricing and dynamic choropleth tiers
-    for a given commodity. Real field officer submissions take first priority.
+    Computes authentic 30-district market pricing and dynamic choropleth tiers
+    for a given commodity strictly from published database records.
     """
     crop_name = crop.name if crop else 'Maize'
-    # 1. Real published records for this crop
-    crop_prices = published_prices_qs.filter(crop=crop)
+    crop_prices = published_prices_qs.filter(crop=crop) if crop else published_prices_qs.none()
     db_avg = crop_prices.aggregate(avg=Avg('price_per_kg_rwf'))['avg']
-    national_avg = round(float(db_avg)) if db_avg else COMMODITY_DEFAULT_BENCHMARKS.get(crop_name, 400)
+    national_avg = round(float(db_avg)) if db_avg is not None else None
 
-    # 2. District averages from actual database records
+    # District averages from actual database records
     district_records = crop_prices.values('market__district__name').annotate(avg_price=Avg('price_per_kg_rwf'))
     db_district_map = {
         d['market__district__name']: round(float(d['avg_price']))
         for d in district_records if d['market__district__name']
     }
 
-    # 3. Full 30-district pricing
+    # 30-district pricing (None for districts without published quotes)
     district_prices = {}
     for d_name in RWANDA_30_DISTRICTS:
-        if d_name in db_district_map:
-            district_prices[d_name] = db_district_map[d_name]
+        district_prices[d_name] = db_district_map.get(d_name, None)
+
+    # Dynamic Choropleth Tiers:
+    valid_prices = sorted([p for p in district_prices.values() if p is not None])
+    if valid_prices:
+        p_min, p_max = valid_prices[0], valid_prices[-1]
+        span = p_max - p_min
+        if span <= 15:
+            step = max(round(p_max * 0.03 / 5) * 5, 5)
+            t4 = p_min
+            t3 = p_min + step
+            t2 = p_min + 2 * step
+            t1 = p_min + 3 * step
         else:
-            mult = DISTRICT_MARKET_MULTIPLIERS.get(d_name, 1.0)
-            district_prices[d_name] = round(national_avg * mult / 5) * 5
+            step = span / 5
+            t4 = round((p_min + step) / 5) * 5
+            t3 = round((p_min + 2 * step) / 5) * 5
+            t2 = round((p_min + 3 * step) / 5) * 5
+            t1 = round((p_min + 4 * step) / 5) * 5
 
-    # 4. Dynamic Choropleth Tiers for exact AgriLens 5-tier brand colors:
-    # Tier 1 (> t1): #15803d (Brand Dark Green)
-    # Tier 2 (t2 - t1): #22c55e (Brand Emerald Green)
-    # Tier 3 (t3 - t2): #84cc16 (Brand Lime Green)
-    # Tier 4 (t4 - t3): #eab308 (Brand Amber Yellow)
-    # Tier 5 (< t4): #0284c7 (Brand Sky Blue)
-    all_p = sorted(district_prices.values())
-    p_min, p_max = all_p[0], all_p[-1]
-    span = p_max - p_min
-    if span <= 15:
-        step = max(round(p_max * 0.03 / 5) * 5, 5)
-        t4 = p_min
-        t3 = p_min + step
-        t2 = p_min + 2 * step
-        t1 = p_min + 3 * step
+        if t1 <= t2: t1 = t2 + 5
+        if t2 <= t3: t2 = t3 + 5
+        if t3 <= t4: t3 = t4 + 5
+
+        legend_tiers = [t1, t2, t3, t4]
     else:
-        step = span / 5
-        t4 = round((p_min + step) / 5) * 5
-        t3 = round((p_min + 2 * step) / 5) * 5
-        t2 = round((p_min + 3 * step) / 5) * 5
-        t1 = round((p_min + 4 * step) / 5) * 5
+        legend_tiers = [500, 400, 300, 200]
 
-    if t1 <= t2: t1 = t2 + 5
-    if t2 <= t3: t2 = t3 + 5
-    if t3 <= t4: t3 = t4 + 5
+    # Dynamic trend curve based on distinct collection dates
+    date_points = list(
+        crop_prices.values('date_recorded')
+        .annotate(avg_price=Avg('price_per_kg_rwf'))
+        .order_by('date_recorded')
+    )
 
-    legend_tiers = [t1, t2, t3, t4]
+    if len(date_points) >= 2:
+        is_insufficient = False
+        earliest_p = float(date_points[0]['avg_price'])
+        latest_p = float(date_points[-1]['avg_price'])
+        trend_pct = round(((latest_p - earliest_p) / earliest_p) * 100, 1) if earliest_p > 0 else 0.0
+        trend_points = [round(float(dp['avg_price'])) for dp in date_points]
+        chart_min = round(min(trend_points) * 0.98 / 5) * 5
+        chart_max = round(max(trend_points) * 1.02 / 5) * 5
+        chart_step = max(round((chart_max - chart_min) / 3 / 5) * 5, 5)
+        chart_ticks = [chart_min, chart_min + chart_step, chart_min + 2 * chart_step, chart_min + 3 * chart_step]
 
-    # 5. Dynamic 7-day trend curve
-    trend_pct = 2.1
-    trend_mults = [1.036, 1.024, 1.020, 1.008, 1.012, 1.005, 1.000]
-    trend_points = [round(national_avg * m) for m in trend_mults]
-    chart_min = round(min(trend_points) * 0.98 / 5) * 5
-    chart_max = round(max(trend_points) * 1.02 / 5) * 5
-    chart_step = max(round((chart_max - chart_min) / 3 / 5) * 5, 5)
-    chart_ticks = [chart_min, chart_min + chart_step, chart_min + 2 * chart_step, chart_min + 3 * chart_step]
-
-    # SVG mapping
-    x_coords = [55, 120, 185, 250, 315, 380, 445]
-    y_coords = []
-    y_span = max(chart_ticks[-1] - chart_ticks[0], 1)
-    for p in trend_points:
-        y = 140 - ((p - chart_ticks[0]) / y_span) * 120
-        y_coords.append(round(y, 1))
+        num_pts = len(trend_points)
+        x_coords = [int(55 + i * (390 / max(num_pts - 1, 1))) for i in range(num_pts)]
+        y_coords = []
+        y_span = max(chart_ticks[-1] - chart_ticks[0], 1)
+        for p in trend_points:
+            y = 140 - ((p - chart_ticks[0]) / y_span) * 120
+            y_coords.append(round(y, 1))
+        svg_pts = list(zip(x_coords, y_coords, trend_points))
+    else:
+        is_insufficient = True
+        trend_pct = None
+        trend_points = []
+        chart_ticks = []
+        x_coords = []
+        y_coords = []
+        svg_pts = []
 
     return {
         'crop_name': crop_name,
@@ -234,11 +217,12 @@ def get_crop_surveillance_data(crop, published_prices_qs):
         'district_prices': district_prices,
         'legend_tiers': legend_tiers,
         'trend_pct': trend_pct,
+        'is_insufficient_time_series': is_insufficient,
         'trend_points': trend_points,
         'chart_ticks': chart_ticks,
         'x_coords': x_coords,
         'y_coords': y_coords,
-        'svg_pts': list(zip(x_coords, y_coords, trend_points)),
+        'svg_pts': svg_pts,
     }
 
 
@@ -321,23 +305,31 @@ def market_list(request):
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
-    # Staggered collection timestamps and weekly changes for realistic presentation
-    default_times = ['08:12 AM', '07:45 AM', '07:32 AM', '07:18 AM', '06:50 AM']
-    default_changes = [4.1, 2.9, -1.4, 4.1, 1.8, -0.9, 3.2, 2.5]
-
+    # Dynamic collection timestamps and weekly changes from database
     for idx, item in enumerate(page_obj):
         # Format time
         if item.time_recorded:
             item.formatted_time = item.time_recorded.strftime('%I:%M %p')
         else:
-            item.formatted_time = default_times[idx % len(default_times)]
+            item.formatted_time = "—"
 
         item.formatted_date = item.date_recorded.strftime('%d %b %Y')
 
-        # Format change %
-        raw_change = default_changes[idx % len(default_changes)]
-        item.is_positive_change = (raw_change >= 0)
-        item.change_display = f"+{raw_change:.1f}%" if raw_change >= 0 else f"{raw_change:.1f}%"
+        # Compute weekly change from previous quote for the same commodity and market
+        prev_quote = CommodityPrice.objects.filter(
+            status=CommodityPrice.Status.PUBLISHED,
+            crop=item.crop,
+            market=item.market,
+            date_recorded__lt=item.date_recorded
+        ).order_by('-date_recorded', '-id').first()
+
+        if prev_quote and prev_quote.price_per_kg_rwf and prev_quote.price_per_kg_rwf > 0:
+            pct_diff = float((item.price_per_kg_rwf - prev_quote.price_per_kg_rwf) / prev_quote.price_per_kg_rwf) * 100
+            item.is_positive_change = (pct_diff >= 0)
+            item.change_display = f"+{pct_diff:.1f}%" if pct_diff >= 0 else f"{pct_diff:.1f}%"
+        else:
+            item.is_positive_change = None
+            item.change_display = "—"
 
     # Determine Active Commodity for Live Surveillance & Map
     active_crop = None
@@ -373,16 +365,22 @@ def market_list(request):
     kpi_commodity_trend = active_crop_data['trend_pct']
 
     # KPI 2: Markets Monitored
-    db_markets_count = MarketLocation.objects.filter(is_active=True).count()
-    kpi_markets_monitored = max(db_markets_count, 27)
+    kpi_markets_monitored = MarketLocation.objects.filter(is_active=True).count()
 
     # KPI 3: Commodities Tracked
-    db_commodities_count = Crop.objects.filter(market_prices__status=CommodityPrice.Status.PUBLISHED).distinct().count()
-    kpi_commodities_tracked = max(db_commodities_count, 10)
+    kpi_commodities_tracked = Crop.objects.filter(market_prices__status=CommodityPrice.Status.PUBLISHED).distinct().count()
 
     # KPI 4: Last Price Update
-    kpi_last_update_time = "08:30 AM"
-    kpi_last_updated_date = "20 Oct 2026"
+    latest_published = CommodityPrice.objects.filter(
+        status=CommodityPrice.Status.PUBLISHED
+    ).order_by('-date_recorded', '-time_recorded', '-id').first()
+
+    if latest_published:
+        kpi_last_updated_date = latest_published.date_recorded.strftime('%d %b %Y')
+        kpi_last_update_time = latest_published.time_recorded.strftime('%I:%M %p') if latest_published.time_recorded else "—"
+    else:
+        kpi_last_updated_date = "—"
+        kpi_last_update_time = "—"
 
     provinces_list = Province.objects.all().order_by('name')
     market_types_list = [
@@ -660,6 +658,23 @@ def internal_record_edit(request, pk):
 
 @login_required
 @user_passes_test(is_market_staff)
+def internal_record_delete(request, pk):
+    """Delete a commodity price observation and record an audit log."""
+    record = get_object_or_404(CommodityPrice, pk=pk)
+    if request.method == 'POST':
+        PriceAuditLog.objects.create(
+            actor=request.user,
+            action='deleted',
+            reason=f"Deleted price record #{record.id} for {record.crop.name} in {record.market.name}",
+            details={'record_id': record.id, 'price': float(record.price_per_kg_rwf), 'market': record.market.name, 'crop': record.crop.name}
+        )
+        record.delete()
+        messages.success(request, f"Price record #{pk} deleted.")
+    return redirect('markets:internal_records')
+
+
+@login_required
+@user_passes_test(is_market_staff)
 def internal_records_import(request):
     """
     Bulk import market surveillance prices from CSV.
@@ -787,6 +802,78 @@ def internal_commodities(request):
         'form': form,
     }
     return render(request, 'markets/internal/commodities.html', context)
+
+
+@login_required
+@user_passes_test(is_market_staff)
+def internal_market_edit(request, pk):
+    """Edit market location details."""
+    market = get_object_or_404(MarketLocation, pk=pk)
+    if request.method == 'POST':
+        form = MarketLocationForm(request.POST, instance=market)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Market hub '{market.name}' updated successfully.")
+            return redirect('markets:internal_markets')
+    else:
+        form = MarketLocationForm(instance=market)
+
+    return render(request, 'markets/internal/market_form.html', {
+        'active_subnav': 'markets',
+        'form': form,
+        'market': market,
+        'page_title': f"Edit Market: {market.name}",
+    })
+
+
+@login_required
+@user_passes_test(is_market_staff)
+def internal_market_delete(request, pk):
+    """Delete market location if no prices recorded."""
+    market = get_object_or_404(MarketLocation, pk=pk)
+    if request.method == 'POST':
+        price_count = market.prices.count()
+        if price_count > 0:
+            messages.warning(request, f"Cannot delete '{market.name}' because {price_count} price observations are recorded for this hub.")
+        else:
+            name = market.name
+            market.delete()
+            messages.success(request, f"Market hub '{name}' has been deleted.")
+    return redirect('markets:internal_markets')
+
+
+@login_required
+@user_passes_test(is_market_staff)
+def internal_commodity_edit(request, pk):
+    """Edit commodity bounds and properties."""
+    comm = get_object_or_404(MarketCommodity, pk=pk)
+    if request.method == 'POST':
+        form = MarketCommodityForm(request.POST, instance=comm)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Commodity item '{comm.name}' updated.")
+            return redirect('markets:internal_commodities')
+    else:
+        form = MarketCommodityForm(instance=comm)
+
+    return render(request, 'markets/internal/commodity_form.html', {
+        'active_subnav': 'commodities',
+        'form': form,
+        'commodity': comm,
+        'page_title': f"Edit Commodity Bounds: {comm.name}",
+    })
+
+
+@login_required
+@user_passes_test(is_market_staff)
+def internal_commodity_delete(request, pk):
+    """Delete a commodity bounds item."""
+    comm = get_object_or_404(MarketCommodity, pk=pk)
+    if request.method == 'POST':
+        name = comm.name
+        comm.delete()
+        messages.success(request, f"Commodity bounds catalog item '{name}' deleted.")
+    return redirect('markets:internal_commodities')
 
 
 @login_required
@@ -921,7 +1008,7 @@ def internal_analytics(request):
     Examines price spreads between production assembly markets vs Kigali consumption hubs.
     """
     # District price disparities
-    disparities = CommodityPrice.objects.filter(
+    disparities_raw = CommodityPrice.objects.filter(
         status=CommodityPrice.Status.PUBLISHED
     ).values('crop__name').annotate(
         avg_price=Avg('price_per_kg_rwf'),
@@ -929,6 +1016,16 @@ def internal_analytics(request):
         max_price=Max('price_per_kg_rwf'),
         quote_count=Count('id')
     ).order_by('-quote_count')
+
+    disparities = []
+    for d in disparities_raw:
+        min_p = d.get('min_price')
+        max_p = d.get('max_price')
+        spread = round(float(max_p - min_p), 1) if (max_p is not None and min_p is not None) else None
+        disparities.append({
+            **d,
+            'spread': spread
+        })
 
     # Market Hub Rankings
     market_averages = CommodityPrice.objects.filter(

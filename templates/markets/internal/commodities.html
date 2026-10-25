@@ -13,7 +13,7 @@
     <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;">
         <div style="padding: 16px 20px; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
             <h3 style="font-size: 1rem; font-weight: 700; color: #0F172A; margin: 0;">Commodity Specifications ({{ commodities.count }})</h3>
-            <span style="font-size: 0.74rem; color: #0369A1; font-weight: 700; background: #E0F2FE; padding: 3px 8px; border-radius: 9999px;">Standard Catalog</span>
+            <span style="font-size: 0.74rem; color: #2563EB; font-weight: 700; background: #EFF6FF; padding: 3px 8px; border-radius: 9999px;">Standard Catalog</span>
         </div>
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
@@ -25,6 +25,7 @@
                         <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Min Expected</th>
                         <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Max Expected</th>
                         <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Active</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569; text-align: right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,16 +33,27 @@
                     <tr style="border-bottom: 1px solid #F1F5F9;">
                         <td style="padding: 12px 14px; font-weight: 700; color: #0F172A;">{{ c.name }}</td>
                         <td style="padding: 12px 14px; color: #475569;">{{ c.get_category_display }}</td>
-                        <td style="padding: 12px 14px; font-weight: 600; color: #0284C7;">{{ c.standard_unit }}</td>
+                        <td style="padding: 12px 14px; font-weight: 600; color: #2563EB;">{{ c.standard_unit }}</td>
                         <td style="padding: 12px 14px; color: #059669; font-weight: 600;">{{ c.min_expected_price }} RWF</td>
                         <td style="padding: 12px 14px; color: #DC2626; font-weight: 600;">{{ c.max_expected_price }} RWF</td>
                         <td style="padding: 12px 14px;">
                             {% if c.is_active %}<span style="color: #059669; font-weight: 700;">✓ Active</span>{% else %}<span style="color: #94A3B8;">Inactive</span>{% endif %}
                         </td>
+                        <td style="padding: 12px 14px; text-align: right; white-space: nowrap;">
+                            <a href="{% url 'markets:internal_commodity_edit' c.id %}" style="padding: 3px 8px; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 4px; color: #1E293B; font-weight: 600; text-decoration: none; font-size: 0.78rem; margin-right: 6px;">
+                                Edit
+                            </a>
+                            <form method="POST" action="{% url 'markets:internal_commodity_delete' c.id %}" style="display: inline;" onsubmit="return confirm('Delete commodity bounds for \'{{ c.name|escapejs }}\'?');">
+                                {% csrf_token %}
+                                <button type="submit" style="padding: 3px 8px; background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 4px; color: #DC2626; font-weight: 600; font-size: 0.78rem; cursor: pointer;">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" style="text-align: center; padding: 30px; color: #64748B;">No commodities configured yet.</td>
+                        <td colspan="7" style="text-align: center; padding: 30px; color: #64748B;">No commodities configured yet.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

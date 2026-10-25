@@ -16,13 +16,13 @@
             </p>
         </div>
         <div style="display: flex; gap: 12px; align-items: center;">
-            <a href="{% url 'accounts:audit_log_list' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-weight: 600; font-size: 0.86rem; text-decoration: none;">
+            <a href="{% url 'accounts:audit_log_list' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #15803D; border: 1px solid #BBF7D0; border-radius: 8px; font-weight: 600; font-size: 0.86rem; text-decoration: none;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                 </svg>
                 <span>Audit Trail</span>
             </a>
-            <a href="{% url 'accounts:user_create' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; background: #005CAB; color: #FFFFFF; border-radius: 8px; font-weight: 700; font-size: 0.86rem; text-decoration: none; box-shadow: 0 2px 6px rgba(0, 92, 171, 0.25);">
+            <a href="{% url 'accounts:user_create' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; background: #15803D; color: #FFFFFF; border-radius: 8px; font-weight: 700; font-size: 0.86rem; text-decoration: none; box-shadow: 0 2px 6px rgba(21, 128, 61, 0.25);">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -65,7 +65,7 @@
 
             <div style="display: flex; align-items: center; gap: 8px;">
                 <input type="text" name="q" value="{{ query }}" placeholder="Search username, email, organization..." style="min-width: 260px; padding: 7px 14px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: #FFFFFF;">
-                <button type="submit" style="padding: 7px 16px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                <button type="submit" style="padding: 7px 16px; background: #15803D; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
                     Search
                 </button>
                 {% if query or role_filter or status_filter %}
@@ -98,11 +98,11 @@
                     <tr style="border-bottom: 1px solid #F1F5F9; transition: background 0.15s ease;">
                         <td style="padding: 14px 18px;">
                             <div style="display: flex; align-items: center; gap: 12px;">
-                                <div style="width: 36px; height: 36px; border-radius: 8px; background: #E8F7FE; color: #005CAB; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem; flex-shrink: 0; border: 1px solid #BAE0FB;">
+                                <div style="width: 36px; height: 36px; border-radius: 8px; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem; flex-shrink: 0; border: 1px solid #BFDBFE;">
                                     {{ officer.username|slice:":2"|upper }}
                                 </div>
                                 <div>
-                                    <a href="{% url 'accounts:user_detail' pk=officer.pk %}" style="font-weight: 700; color: #001F3B; text-decoration: none; font-size: 0.92rem;">
+                                    <a href="{% url 'accounts:user_detail' pk=officer.pk %}" style="font-weight: 700; color: #0F172A; text-decoration: none; font-size: 0.92rem;">
                                         {{ officer.get_full_name|default:officer.username }}
                                     </a>
                                     <div style="font-size: 0.76rem; color: #64748B;">@{{ officer.username }} &bull; {{ officer.email }}</div>
@@ -122,7 +122,7 @@
                         </td>
                         <td style="padding: 14px 18px;">
                             {% if officer.is_national_scope %}
-                                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; font-weight: 600; color: #005CAB; background: #E8F7FE; padding: 3px 8px; border-radius: 4px;">
+                                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; font-weight: 600; color: #2563EB; background: #EFF6FF; padding: 3px 8px; border-radius: 4px;">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
                                     National Scope (All 30 Districts)
                                 </span>
@@ -166,14 +166,22 @@
                         <td style="padding: 14px 18px; font-size: 0.8rem; color: #64748B;">
                             {{ officer.date_joined|date:"M d, Y" }}
                         </td>
-                        <td style="padding: 14px 18px; text-align: right;">
+                        <td style="padding: 14px 18px; text-align: right; white-space: nowrap;">
                             <div style="display: inline-flex; gap: 8px; align-items: center;">
-                                <a href="{% url 'accounts:user_detail' pk=officer.pk %}" style="padding: 5px 10px; background: #F1F5F9; color: #001F3B; text-decoration: none; border-radius: 6px; font-size: 0.78rem; font-weight: 600;">
+                                <a href="{% url 'accounts:user_detail' pk=officer.pk %}" style="padding: 5px 10px; background: #F1F5F9; color: #0F172A; text-decoration: none; border-radius: 6px; font-size: 0.78rem; font-weight: 600;">
                                     Dossier
                                 </a>
-                                <a href="{% url 'accounts:user_edit' pk=officer.pk %}" style="padding: 5px 10px; background: #E8F7FE; color: #005CAB; text-decoration: none; border-radius: 6px; font-size: 0.78rem; font-weight: 600;">
+                                <a href="{% url 'accounts:user_edit' pk=officer.pk %}" style="padding: 5px 10px; background: #F0FDF4; color: #15803D; text-decoration: none; border-radius: 6px; font-size: 0.78rem; font-weight: 600;">
                                     Edit
                                 </a>
+                                {% if request.user.pk != officer.pk %}
+                                <form method="POST" action="{% url 'accounts:user_delete' pk=officer.pk %}" style="display: inline;" onsubmit="return confirm('Delete officer account \'{{ officer.username|escapejs }}\'? This action is permanent.');">
+                                    {% csrf_token %}
+                                    <button type="submit" style="padding: 5px 10px; background: #FEF2F2; color: #DC2626; border: 1px solid #FCA5A5; border-radius: 6px; font-size: 0.78rem; font-weight: 600; cursor: pointer;">
+                                        Delete
+                                    </button>
+                                </form>
+                                {% endif %}
                             </div>
                         </td>
                     </tr>

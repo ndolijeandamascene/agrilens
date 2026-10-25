@@ -74,11 +74,21 @@ class CommodityPriceViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CommodityPriceSerializer
 
     def get_queryset(self):
-        qs = CommodityPrice.objects.select_related('market__district', 'crop').all().order_by('-date_recorded')
+        user = self.request.user
+        is_staff = user.is_authenticated and (
+            user.is_staff or user.is_superuser or
+            (hasattr(user, 'groups') and user.groups.filter(name__icontains='officer').exists())
+        )
+        if not is_staff:
+            qs = CommodityPrice.objects.filter(status=CommodityPrice.Status.PUBLISHED)
+        else:
+            qs = CommodityPrice.objects.all()
+
+        qs = qs.select_related('market__district', 'crop').order_by('-date_recorded', '-id')
 
         # Geographic scoping for District Officers
-        if self.request.user.is_authenticated:
-            qs = scope_queryset_by_geography(qs, self.request.user, district_field='market__district')
+        if user.is_authenticated:
+            qs = scope_queryset_by_geography(qs, user, district_field='market__district')
 
         crop = self.request.query_params.get('crop')
         if crop:

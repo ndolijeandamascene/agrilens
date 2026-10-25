@@ -12,9 +12,12 @@ urlpatterns = [
     path('manual/<int:pk>/submit/', views.manual_entry_submit, name='manual_entry_submit'),
     path('manual/<int:pk>/review/', views.manual_entry_review, name='manual_entry_review'),
     path('manual/<int:pk>/correct/', views.manual_entry_correction, name='manual_entry_correction'),
+    path('manual/<int:pk>/delete/', views.manual_entry_delete, name='manual_entry_delete'),
     
     # Dynamic Data Source Registration
     path('sources/new/', views.data_source_create, name='data_source_create'),
+    path('sources/<int:pk>/edit/', views.data_source_edit, name='data_source_edit'),
+    path('sources/<int:pk>/delete/', views.data_source_delete, name='data_source_delete'),
     
     # Dependent Dropdown APIs
     path('api/provinces/<int:province_id>/districts/', views.api_districts_by_province, name='api_districts'),

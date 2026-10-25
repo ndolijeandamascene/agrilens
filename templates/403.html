@@ -1,39 +1,64 @@
 {% extends request.user.is_authenticated|yesno:"base.html,public_base.html" %}
 
-{% block title %}403 Forbidden | Access Restricted | AgriLens{% endblock %}
-{% block section_title %}Access Restricted (HTTP 403){% endblock %}
+{% block title %}403 Forbidden | Access Restricted | AgriLens Rwanda{% endblock %}
+{% block section_title %}Institutional Access Restricted (HTTP 403){% endblock %}
 
 {% block content %}
-<div class="dashboard-container" style="max-width: 680px; margin: 40px auto; text-align: center;">
-    <div style="background: white; border-radius: 16px; border: 1px solid #E2E8F0; padding: 48px 36px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-        <div style="width: 64px; height: 64px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 20px;">
-            🛡️
+<div class="content-container" style="max-width: 660px; margin: 48px auto; text-align: center;">
+    <div class="panel-card" style="box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08); border: 1px solid #E2E8F0;">
+        <!-- Official AgriLens Brand 4-Color Stripe -->
+        <div style="display: flex; height: 5px; width: 100%;">
+            <span style="flex: 1; background: #166534;"></span>
+            <span style="flex: 1; background: #15803D;"></span>
+            <span style="flex: 1; background: #84CC16;"></span>
+            <span style="flex: 1; background: #FACC15;"></span>
         </div>
-        <h2 style="font-size: 1.6rem; font-weight: 800; color: #0F172A; margin: 0 0 12px;">
-            Institutional Access Restricted
-        </h2>
-        <p style="font-size: 0.95rem; color: #64748B; line-height: 1.6; margin: 0 0 24px;">
-            Your account role (<strong>{{ user_role|default:user.get_role_display }}</strong>) does not hold the necessary security clearance to view or execute actions on this resource.
-        </p>
 
-        {% if required_roles %}
-        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 18px; margin-bottom: 28px; text-align: left; font-size: 0.85rem;">
-            <div style="color: #475569; font-weight: 600; margin-bottom: 6px;">Authorized Role Clearance Required:</div>
-            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                {% for r in required_roles %}
-                    <span style="background: #E0F2FE; color: #0369A1; padding: 3px 8px; border-radius: 4px; font-weight: 600; font-family: monospace;">{{ r }}</span>
-                {% endfor %}
+        <div class="panel-body" style="padding: 48px 36px;">
+            <!-- Security Shield Icon -->
+            <div style="width: 72px; height: 72px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <rect x="9" y="10" width="6" height="5" rx="1"></rect>
+                    <path d="M10 10V8a2 2 0 1 1 4 0v2"></path>
+                </svg>
             </div>
-        </div>
-        {% endif %}
 
-        <div style="display: flex; justify-content: center; gap: 12px;">
-            <a href="javascript:history.back()" class="btn-portal-return">
-                <span>&larr; Return to Previous Page</span>
-            </a>
-            <a href="{% url 'dashboard:overview' %}" class="btn-portal-return" style="background: #005CAB; color: white;">
-                <span>National Dashboard &rarr;</span>
-            </a>
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #DC2626; background: #FEF2F2; padding: 4px 12px; border-radius: 9999px; margin-bottom: 12px; border: 1px solid #FCA5A5;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #DC2626;"></span>
+                <span>SECURITY ACCESS RESTRICTION</span>
+            </div>
+
+            <h2 style="font-size: 1.55rem; font-weight: 800; color: #0F172A; margin: 0 0 12px; letter-spacing: -0.02em;">
+                Institutional Clearance Required
+            </h2>
+
+            <p style="font-size: 0.92rem; color: #64748B; line-height: 1.6; margin: 0 0 24px;">
+                Your current account role (<strong>{{ user_role|default:user.get_role_display|default:"Unauthenticated Visitor" }}</strong>) does not hold the necessary security clearance to view or execute operations on this resource.
+            </p>
+
+            {% if required_roles %}
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px 20px; margin-bottom: 28px; text-align: left; font-size: 0.85rem;">
+                <div style="color: #475569; font-weight: 700; margin-bottom: 8px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em;">
+                    Authorized Institutional Clearance:
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    {% for r in required_roles %}
+                        <span class="panel-badge blue" style="font-family: monospace; font-size: 0.78rem;">{{ r }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                <a href="javascript:history.back()" class="btn-action">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    <span>Return to Previous Page</span>
+                </a>
+                <a href="{% url 'dashboard:overview' %}" class="btn-action primary">
+                    <span>National Dashboard &rarr;</span>
+                </a>
+            </div>
         </div>
     </div>
 </div>

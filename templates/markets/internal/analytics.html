@@ -32,7 +32,7 @@
                         <td style="padding: 10px; color: #475569;">{{ d.min_price }} RWF</td>
                         <td style="padding: 10px; color: #475569;">{{ d.max_price }} RWF</td>
                         <td style="padding: 10px; font-weight: 700; color: #DC2626;">
-                            {{ d.max_price|add:"-d.min_price"|default:"40" }} RWF
+                            {% if d.spread is not None %}{{ d.spread }} RWF{% else %}—{% endif %}
                         </td>
                     </tr>
                     {% empty %}
@@ -64,7 +64,7 @@
                     <tr style="border-bottom: 1px solid #F1F5F9;">
                         <td style="padding: 10px; font-weight: 700; color: #0F172A;">{{ m.market__name }}</td>
                         <td style="padding: 10px; color: #475569;">{{ m.market__district__name }}</td>
-                        <td style="padding: 10px; font-weight: 700; color: #0284C7;">{{ m.avg_retail|floatformat:1 }} RWF/kg</td>
+                        <td style="padding: 10px; font-weight: 700; color: #2563EB;">{{ m.avg_retail|floatformat:1 }} RWF/kg</td>
                         <td style="padding: 10px; color: #64748B;">{{ m.total_quotes }}</td>
                     </tr>
                     {% empty %}
@@ -82,7 +82,7 @@
 <div style="margin-top: 24px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
         <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="background: #0284C7; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">
+            <span style="background: #2563EB; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">
                 <i class="fa-solid fa-chart-line"></i> Machine Learning
             </span>
             <h3 style="font-size: 1.05rem; font-weight: 700; color: #0F172A; margin: 0;">
@@ -112,9 +112,9 @@
         </div>
 
         <div style="background: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 8px; padding: 12px 14px;">
-            <div style="font-size: 11px; font-weight: 700; color: #0369A1; text-transform: uppercase;">Active Market Hubs</div>
+            <div style="font-size: 11px; font-weight: 700; color: #2563EB; text-transform: uppercase;">Active Market Hubs</div>
             <div style="font-size: 20px; font-weight: 800; color: #0C4A6E; margin-top: 4px;">10 Districts</div>
-            <div style="font-size: 10.5px; color: #0284C7;">Kigali, Northern, Eastern, Southern</div>
+            <div style="font-size: 10.5px; color: #2563EB;">Kigali, Northern, Eastern, Southern</div>
         </div>
 
         <div style="background: #FEF3C7; border: 1px solid #FDE68A; border-radius: 8px; padding: 12px 14px;">

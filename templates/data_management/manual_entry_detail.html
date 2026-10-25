@@ -9,8 +9,8 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <div>
             <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 4px;">
-                <a href="{% url 'data_management:hub' %}" style="color: #005CAB; text-decoration: none;">Data Management</a> &bull; 
-                <a href="{% url 'data_management:manual_entry_list' %}" style="color: #005CAB; text-decoration: none;">Manual Registry</a> &bull; 
+                <a href="{% url 'data_management:hub' %}" style="color: #15803D; text-decoration: none;">Data Management</a> &bull; 
+                <a href="{% url 'data_management:manual_entry_list' %}" style="color: #15803D; text-decoration: none;">Manual Registry</a> &bull; 
                 <span>Record #{{ entry.id }}</span>
             </div>
             <h2 style="margin: 0; font-size: 1.5rem; color: #0F172A; font-weight: 800;">
@@ -18,23 +18,30 @@
             </h2>
         </div>
         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <a href="{% url 'data_management:manual_entry_list' %}" class="btn-portal-return">
-                <span>&larr; Registry</span>
+            <a href="{% url 'data_management:manual_entry_list' %}" class="btn-action">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                <span>Registry</span>
             </a>
             {% if entry.review_status != 'APPROVED' %}
-                <a href="{% url 'data_management:manual_entry_edit' pk=entry.pk %}" class="btn-portal-return" style="background: #005CAB; color: white;">
+                <a href="{% url 'data_management:manual_entry_edit' pk=entry.pk %}" class="btn-action primary">
                     <span>Edit Record</span>
                 </a>
                 <form method="POST" action="{% url 'data_management:manual_entry_submit' pk=entry.pk %}" style="display: inline;">
                     {% csrf_token %}
-                    <button type="submit" style="padding: 8px 16px; border-radius: 8px; border: none; background: #0284C7; color: white; font-weight: 700; cursor: pointer;">
+                    <button type="submit" class="btn-action" style="background: #15803D; color: #FFFFFF; border-color: #15803D;">
                         Submit for Review &rarr;
+                    </button>
+                </form>
+                <form method="POST" action="{% url 'data_management:manual_entry_delete' pk=entry.pk %}" style="display: inline;" onsubmit="return confirm('Delete manual observation #{{ entry.id }}?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-action danger">
+                        Delete
                     </button>
                 </form>
             {% elif can_correct %}
                 <form method="POST" action="{% url 'data_management:manual_entry_correction' pk=entry.pk %}" style="display: inline;">
                     {% csrf_token %}
-                    <button type="submit" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #BAE0FB; background: #E8F7FE; color: #005CAB; font-weight: 700; cursor: pointer;">
+                    <button type="submit" class="btn-action" style="border: 1px solid #BFDBFE; background: #EFF6FF; color: #2563EB;">
                         + Propose Correction Revision
                     </button>
                 </form>
@@ -80,10 +87,10 @@
         </div>
         <div style="text-align: right;">
             <span style="font-size: 0.8rem; color: #64748B;">Data Provenance &amp; Source</span>
-            <div style="font-family: monospace; font-weight: 700; color: #005CAB; font-size: 0.9rem; margin-top: 2px;">
+            <div style="font-family: monospace; font-weight: 700; color: #2563EB; font-size: 0.9rem; margin-top: 2px;">
                 {% if entry.data_source %}{{ entry.data_source.source_type }}{% else %}MANUAL_ENTRY{% endif %}
             </div>
-            <div style="font-size: 0.75rem; color: #0284C7; font-weight: 600;">{{ entry.get_data_kind_display }}</div>
+            <div style="font-size: 0.75rem; color: #2563EB; font-weight: 600;">{{ entry.get_data_kind_display }}</div>
         </div>
     </div>
 
@@ -107,7 +114,7 @@
         </div>
         <div style="background: white; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px;">
             <div style="font-size: 0.8rem; color: #64748B;">Harvested Area</div>
-            <div style="font-size: 1.6rem; font-weight: 800; color: #005CAB; margin-top: 4px;">{{ entry.plot_area_ha }}</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #166534; margin-top: 4px;">{{ entry.plot_area_ha }}</div>
             <div style="font-size: 0.75rem; color: #64748B;">hectares ({{ entry.plot_area_ha|floatformat:2 }} ha)</div>
         </div>
         <div style="background: white; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px;">
@@ -258,7 +265,7 @@
                 <span style="font-weight: 600; color: #334155;">Review Authorization Notice:</span>
                 This record is currently <strong>{{ entry.get_review_status_display }}</strong>. Official review and approval actions are restricted to verified Administrators, Agricultural Analysts, and MINAGRI Policy Makers.
                 {% if not user.is_authenticated %}
-                <a href="{% url 'accounts:login' %}?next={{ request.path }}" style="color: #005CAB; font-weight: 600; margin-left: 6px;">Sign in with authorized officer credentials &rarr;</a>
+                <a href="{% url 'accounts:login' %}?next={{ request.path }}" style="color: #15803D; font-weight: 600; margin-left: 6px;">Sign in with authorized officer credentials &rarr;</a>
                 {% endif %}
             </div>
             {% endif %}

@@ -296,6 +296,34 @@ def user_toggle_status(request, pk):
 
 @role_required(User.Role.ADMIN)
 @require_POST
+def user_delete(request, pk):
+    """Safely delete an officer account with self-deletion and superuser protection."""
+    officer = get_object_or_404(User, pk=pk)
+
+    if request.user.pk == officer.pk:
+        messages.error(request, "Security Guard: You cannot delete your own administrator account.")
+        return redirect('accounts:user_list')
+
+    if officer.is_superuser and User.objects.filter(is_superuser=True).count() <= 1:
+        messages.error(request, "Security Guard: Cannot delete the sole superuser account.")
+        return redirect('accounts:user_list')
+
+    username = officer.username
+    officer_id = officer.id
+    AuditService.log(
+        action=AuditLog.Action.USER_DEACTIVATED,
+        actor=request.user,
+        target=officer,
+        details={'deleted': True, 'username': username, 'user_id': officer_id},
+        request=request
+    )
+    officer.delete()
+    messages.success(request, f"Officer account '{username}' has been deleted.")
+    return redirect('accounts:user_list')
+
+
+@role_required(User.Role.ADMIN)
+@require_POST
 def user_generate_setup_link(request, pk):
     """Issues a fresh single-use password activation link for an officer."""
     officer = get_object_or_404(User, pk=pk)

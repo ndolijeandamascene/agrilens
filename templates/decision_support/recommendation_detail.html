@@ -8,7 +8,7 @@
     <!-- Header Strip -->
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
         <div>
-            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #166534; background: #F0FDF4; border: 1px solid #BBF7D0; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">
                 <span>Decision Dossier #{{ rec.id }}</span>
                 <span>&bull;</span>
                 <span>{{ rec.get_target_stakeholder_display }}</span>
@@ -17,7 +17,7 @@
                 <span>{{ rec.district.name }} District ({{ rec.district.province.name }} Province)</span>
                 {% endif %}
             </div>
-            <h1 style="margin: 0; font-size: 1.5rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+            <h1 style="margin: 0; font-size: 1.5rem; color: #0F172A; font-weight: 800; letter-spacing: -0.02em;">
                 {{ rec.title }}
             </h1>
             <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #64748B;">
@@ -25,7 +25,7 @@
             </p>
         </div>
         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <a href="{% url 'decision_support:recommendation_list' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
+            <a href="{% url 'decision_support:recommendation_list' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #166534; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
                 <span>&larr; All Recommendations</span>
             </a>
             {% if rec.district %}
@@ -43,9 +43,9 @@
             {% if rec.priority == 'CRITICAL' %}
                 <span style="background: #DC2626; color: #FFFFFF; font-size: 0.76rem; font-weight: 800; padding: 4px 10px; border-radius: 4px;">CRITICAL PRIORITY</span>
             {% elif rec.priority == 'HIGH' %}
-                <span style="background: #F59E0B; color: #FFFFFF; font-size: 0.76rem; font-weight: 800; padding: 4px 10px; border-radius: 4px;">HIGH PRIORITY</span>
+                <span style="background: #D97706; color: #FFFFFF; font-size: 0.76rem; font-weight: 800; padding: 4px 10px; border-radius: 4px;">HIGH PRIORITY</span>
             {% elif rec.priority == 'MEDIUM' %}
-                <span style="background: #0284C7; color: #FFFFFF; font-size: 0.76rem; font-weight: 800; padding: 4px 10px; border-radius: 4px;">MEDIUM PRIORITY</span>
+                <span style="background: #2563EB; color: #FFFFFF; font-size: 0.76rem; font-weight: 800; padding: 4px 10px; border-radius: 4px;">MEDIUM PRIORITY</span>
             {% else %}
                 <span style="background: #64748B; color: #FFFFFF; font-size: 0.76rem; font-weight: 800; padding: 4px 10px; border-radius: 4px;">LOW PRIORITY</span>
             {% endif %}
@@ -72,7 +72,7 @@
         <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-top: 4px solid #DC2626; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                <h3 style="margin: 0; font-size: 1rem; font-weight: 800; color: #001F3B;">
+                <h3 style="margin: 0; font-size: 1rem; font-weight: 800; color: #0F172A;">
                     Empirical Problem Statement
                 </h3>
             </div>
@@ -85,7 +85,7 @@
         <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-top: 4px solid #166534; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-                <h3 style="margin: 0; font-size: 1rem; font-weight: 800; color: #001F3B;">
+                <h3 style="margin: 0; font-size: 1rem; font-weight: 800; color: #0F172A;">
                     Targeted Advisory Action
                 </h3>
             </div>
@@ -98,10 +98,10 @@
     <!-- Statistical Evidence & Provenance Audit Grid -->
     <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 12px;">
-            <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #001F3B;">
+            <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #0F172A;">
                 Structured Statistical Evidence &amp; Survey Provenance
             </h3>
-            <span style="font-size: 0.74rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 3px 8px; border-radius: 4px;">
+            <span style="font-size: 0.74rem; font-weight: 700; color: #166534; background: #F0FDF4; border: 1px solid #BBF7D0; padding: 3px 8px; border-radius: 4px;">
                 NISR Microdata Lineage
             </span>
         </div>
@@ -111,7 +111,7 @@
             {% if rec.evidence_json.actual_yield_kg_ha %}
             <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 14px;">
                 <div style="font-size: 0.74rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Observed Yield</div>
-                <div style="font-size: 1.3rem; font-weight: 800; color: #001F3B; margin-top: 4px;">
+                <div style="font-size: 1.3rem; font-weight: 800; color: #15803D; margin-top: 4px;">
                     {{ rec.evidence_json.actual_yield_kg_ha|floatformat:1 }} <span style="font-size: 0.76rem; font-weight: 600; color: #64748B;">kg/ha</span>
                 </div>
             </div>
@@ -147,7 +147,7 @@
             {% if rec.evidence_json.sample_size %}
             <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 14px;">
                 <div style="font-size: 0.74rem; color: #64748B; font-weight: 600; text-transform: uppercase;">Sample Size</div>
-                <div style="font-size: 1.3rem; font-weight: 800; color: #0284C7; margin-top: 4px;">
+                <div style="font-size: 1.3rem; font-weight: 800; color: #2563EB; margin-top: 4px;">
                     {{ rec.evidence_json.sample_size }} <span style="font-size: 0.76rem; font-weight: 600; color: #64748B;">plots</span>
                 </div>
             </div>
@@ -156,10 +156,10 @@
 
         <!-- Full Evidence Payload Accordion -->
         <details style="font-size: 0.8rem; color: #64748B; border-top: 1px solid #F1F5F9; padding-top: 10px;">
-            <summary style="cursor: pointer; font-weight: 700; color: #005CAB; margin-bottom: 8px;">
+            <summary style="cursor: pointer; font-weight: 700; color: #166534; margin-bottom: 8px;">
                 View Raw JSON Evidence Payload &amp; Parameter Keys
             </summary>
-            <pre style="background: #F1F5F9; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 0.76rem; color: #001F3B;">{{ rec.evidence_json|pprint }}</pre>
+            <pre style="background: #F1F5F9; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 0.76rem; color: #0F172A;">{{ rec.evidence_json|pprint }}</pre>
         </details>
         {% endif %}
 
@@ -172,7 +172,7 @@
     <!-- Review Workflow Transition Box (Visible to Reviewers / Authority) -->
     {% if can_review %}
     <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-        <h3 style="margin: 0 0 12px 0; font-size: 1.05rem; font-weight: 800; color: #001F3B;">
+        <h3 style="margin: 0 0 12px 0; font-size: 1.05rem; font-weight: 800; color: #0F172A;">
             Institutional Review &amp; Approval Action
         </h3>
         <form method="POST" action="{% url 'decision_support:recommendation_transition' rec.id %}">
@@ -191,7 +191,7 @@
                     <input type="text" name="review_notes" value="{{ rec.review_notes }}" placeholder="Enter operational notes or verification comments..." style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.84rem;">
                 </div>
                 <div>
-                    <button type="submit" style="padding: 9px 20px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.84rem; font-weight: 700; cursor: pointer;">
+                    <button type="submit" style="padding: 9px 20px; background: #15803D; color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.84rem; font-weight: 700; cursor: pointer; transition: background 0.15s ease;" onmouseover="this.style.background='#166534'" onmouseout="this.style.background='#15803D'">
                         Save Transition
                     </button>
                 </div>
@@ -204,12 +204,12 @@
     <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 12px;">
             <div>
-                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #001F3B;">
+                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #0F172A;">
                     Attached Operational Action Plans ({{ action_plans|length }})
                 </h3>
                 <span style="font-size: 0.78rem; color: #64748B;">Track 1 implementation commitments linked to this advisory</span>
             </div>
-            <a href="{% url 'decision_support:action_plan_create' rec.id %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #166534; color: #FFFFFF; border-radius: 6px; font-size: 0.82rem; font-weight: 700; text-decoration: none;">
+            <a href="{% url 'decision_support:action_plan_create' rec.id %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #15803D; color: #FFFFFF; border-radius: 6px; font-size: 0.82rem; font-weight: 700; text-decoration: none; transition: background 0.15s ease;" onmouseover="this.style.background='#166534'" onmouseout="this.style.background='#15803D'">
                 <span>+ Attach Operational Action Plan</span>
             </a>
         </div>
@@ -245,15 +245,23 @@
                             </span>
                         </td>
                         <td style="padding: 12px 14px; text-align: right;">
-                            <form method="POST" action="{% url 'decision_support:action_plan_update' a.id %}" style="display: inline-flex; gap: 6px; align-items: center;">
-                                {% csrf_token %}
-                                <select name="status" style="padding: 4px 8px; border: 1px solid #CBD5E1; border-radius: 4px; font-size: 0.78rem;" onchange="this.form.submit()">
-                                    <option value="PLANNED" {% if a.status == 'PLANNED' %}selected{% endif %}>Planned</option>
-                                    <option value="ONGOING" {% if a.status == 'ONGOING' %}selected{% endif %}>Ongoing</option>
-                                    <option value="COMPLETED" {% if a.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
-                                    <option value="CANCELLED" {% if a.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
-                                </select>
-                            </form>
+                            <div style="display: inline-flex; gap: 8px; align-items: center;">
+                                <form method="POST" action="{% url 'decision_support:action_plan_update' a.id %}" style="display: inline-flex; gap: 6px; align-items: center;">
+                                    {% csrf_token %}
+                                    <select name="status" style="padding: 4px 8px; border: 1px solid #CBD5E1; border-radius: 4px; font-size: 0.78rem;" onchange="this.form.submit()">
+                                        <option value="PLANNED" {% if a.status == 'PLANNED' %}selected{% endif %}>Planned</option>
+                                        <option value="ONGOING" {% if a.status == 'ONGOING' %}selected{% endif %}>Ongoing</option>
+                                        <option value="COMPLETED" {% if a.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                                        <option value="CANCELLED" {% if a.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+                                    </select>
+                                </form>
+                                <form method="POST" action="{% url 'decision_support:action_plan_delete' a.id %}" style="display: inline;" onsubmit="return confirm('Delete action plan \'{{ a.title|escapejs }}\'?');">
+                                    {% csrf_token %}
+                                    <button type="submit" style="padding: 3px 8px; background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 4px; color: #DC2626; font-size: 0.76rem; font-weight: 600; cursor: pointer;">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}

@@ -1,8 +1,143 @@
 {% extends request.user.is_authenticated|yesno:"base.html,public_base.html" %}
-{% block section_title %}Crops & Seasonal Production{% endblock %}
+
+{% block title %}Crops &amp; Seasonal Production | AgriLens Rwanda{% endblock %}
+{% block section_title %}Crops Taxonomy &amp; Seasonal Production Intelligence{% endblock %}
+
 {% block content %}
-<div class="panel-card">
-    <div class="panel-header"><h3>Priority Crops & Seasonal Calendars</h3></div>
-    <div class="panel-body"><p>Catalog of crops (Maize, Beans, Irish Potato, Rice, Cassava) and seasonal cycles.</p></div>
+<div class="content-container">
+    <!-- Header Strip -->
+    <div class="dashboard-header-strip">
+        <div class="header-left-meta">
+            <span class="live-stream-badge">
+                <span class="pulse-dot"></span>
+                <span>MINAGRI &bull; NISR Taxonomy Standard</span>
+            </span>
+            <span class="header-coverage-tag">NST2 &bull; PSTA4 Agricultural Framework</span>
+        </div>
+        {% if request.user.is_authenticated %}
+        <div class="header-right-tools">
+            <a href="{% url 'agriculture:category_create' %}" class="btn-action secondary">
+                <span>+ Add Category</span>
+            </a>
+            <a href="{% url 'agriculture:crop_create' %}" class="btn-action primary">
+                <span>+ Register Crop</span>
+            </a>
+            <a href="{% url 'agriculture:crop_list' %}" class="btn-action">
+                <span>Browse Registry &rarr;</span>
+            </a>
+        </div>
+        {% else %}
+        <div class="header-right-tools">
+            <a href="{% url 'agriculture:crop_list' %}" class="btn-action primary">
+                <span>Explore Crop Taxonomy &rarr;</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Executive Overview Hero Card -->
+    <div class="panel-card" style="margin-bottom: 24px;">
+        <div style="display: flex; height: 5px; width: 100%;">
+            <span style="flex: 1; background: #166534;"></span>
+            <span style="flex: 1; background: #15803D;"></span>
+            <span style="flex: 1; background: #84CC16;"></span>
+            <span style="flex: 1; background: #FACC15;"></span>
+        </div>
+        <div class="panel-body" style="padding: 28px 32px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+                <div style="max-width: 780px;">
+                    <span class="panel-badge green" style="margin-bottom: 12px;">Strategic Value Chains</span>
+                    <h2 style="font-size: 1.6rem; font-weight: 800; color: #001F3B; margin: 0 0 10px; letter-spacing: -0.02em;">
+                        Priority Crops &amp; Seasonal Production Framework
+                    </h2>
+                    <p style="font-size: 0.92rem; color: #475569; line-height: 1.6; margin: 0 0 18px;">
+                        Rwanda’s official agricultural crop taxonomy provides standard classifications across cereals, legumes, roots &amp; tubers, bananas, and horticultural produce. Under the <strong>NST2 (2024–2029)</strong> national roadmap, five staple value chains are prioritized for targeted seed subsidies, lime application, and irrigation investments.
+                    </p>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <a href="{% url 'agriculture:crop_list' %}" class="btn-action primary">
+                            View Crop Catalog
+                        </a>
+                        <a href="{% url 'indicators:productivity' %}" class="btn-action">
+                            Productivity Gap Analysis &rarr;
+                        </a>
+                    </div>
+                </div>
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px 24px; min-width: 240px;">
+                    <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 8px;">Key Framework Metrics</div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div>
+                            <span style="font-size: 1.4rem; font-weight: 800; color: #166534;">5</span>
+                            <span style="font-size: 0.8rem; color: #334155; margin-left: 6px;">Strategic Staple Crops</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 1.4rem; font-weight: 800; color: #15803D;">3</span>
+                            <span style="font-size: 0.8rem; color: #334155; margin-left: 6px;">Annual Growing Seasons (A, B, C)</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 1.4rem; font-weight: 800; color: #0F172A;">30</span>
+                            <span style="font-size: 0.8rem; color: #334155; margin-left: 6px;">Districts Monitored</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation Modules -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        <div class="panel-card" style="margin-bottom: 0;">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <h3>National Crop Taxonomy</h3>
+                    <p class="panel-subtitle">Official biological &amp; Kinyarwanda nomenclature</p>
+                </div>
+                <span class="panel-badge blue">Catalog</span>
+            </div>
+            <div class="panel-body">
+                <p style="font-size: 0.86rem; color: #64748B; line-height: 1.5; margin-bottom: 18px;">
+                    Explore verified crop varieties, botanical classifications, local names, and agro-ecological suitability guidelines.
+                </p>
+                <a href="{% url 'agriculture:crop_list' %}" class="btn-action primary" style="width: 100%; box-sizing: border-box; text-align: center;">
+                    Browse Crop Taxonomy &rarr;
+                </a>
+            </div>
+        </div>
+
+        <div class="panel-card" style="margin-bottom: 0;">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <h3>Yield Gap Intelligence</h3>
+                    <p class="panel-subtitle">Benchmark vs. observed harvest analytics</p>
+                </div>
+                <span class="panel-badge green">Analytics</span>
+            </div>
+            <div class="panel-body">
+                <p style="font-size: 0.86rem; color: #64748B; line-height: 1.5; margin-bottom: 18px;">
+                    Inspect spatial yield gaps across Rwanda's 30 districts, model adoption dividends, and identify high-potential sectors.
+                </p>
+                <a href="{% url 'indicators:productivity' %}" class="btn-action" style="width: 100%; box-sizing: border-box; text-align: center; color: #15803D; border-color: #BBF7D0;">
+                    Launch Yield Simulator &rarr;
+                </a>
+            </div>
+        </div>
+
+        <div class="panel-card" style="margin-bottom: 0;">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <h3>Commodity Markets Board</h3>
+                    <p class="panel-subtitle">Farmgate &amp; retail price surveillance</p>
+                </div>
+                <span class="panel-badge yellow">Surveillance</span>
+            </div>
+            <div class="panel-body">
+                <p style="font-size: 0.86rem; color: #64748B; line-height: 1.5; margin-bottom: 18px;">
+                    Daily agricultural commodity pricing across major urban and border aggregation markets in Rwanda.
+                </p>
+                <a href="{% url 'markets:market_list' %}" class="btn-action" style="width: 100%; box-sizing: border-box; text-align: center;">
+                    Explore Market Prices &rarr;
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

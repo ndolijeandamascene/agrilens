@@ -43,51 +43,79 @@ def district_list(request):
             'report_url': f"/dashboard/reports/district/{d.id}/",
         }
 
-    # Available dynamic filters
-    crops_catalog = [
-        {'code': 'Maize', 'name': 'Maize'},
-        {'code': 'Beans', 'name': 'Beans'},
-        {'code': 'Irish Potato', 'name': 'Irish Potato'},
-        {'code': 'Rice', 'name': 'Rice'},
-        {'code': 'Cassava', 'name': 'Cassava'},
-    ]
+    from apps.agriculture.models import Crop, AgriculturalSeason
+    from apps.indicators.services import IndicatorService
+
+    # Available dynamic filters queried directly from database
+    p_crops = Crop.objects.filter(is_priority_crop=True).order_by('name')
+    if not p_crops.exists():
+        p_crops = Crop.objects.all().order_by('name')
+    crops_catalog = [{'code': c.name, 'name': c.name} for c in p_crops]
+
+    db_seasons = AgriculturalSeason.objects.filter(observations__isnull=False).distinct().order_by('-year', 'season')
+    if not db_seasons.exists():
+        db_seasons = AgriculturalSeason.objects.all().order_by('-year', 'season')
     seasons_catalog = [
-        {'code': '2025A', 'label': 'SAS 2024 – 2025'},
-        {'code': '2024A', 'label': 'SAS 2023 – 2024'},
+        {
+            'code': f"{s.year}{s.season}",
+            'label': f"SAS {s.year - 1} – {s.year}" if s.season == 'A' else f"SAS {s.year} Season {s.season}"
+        }
+        for s in db_seasons
     ]
+
     indicators_catalog = [
         {'code': 'yield', 'label': 'Yield (t/ha)'},
         {'code': 'production', 'label': 'Production (t)'},
         {'code': 'area', 'label': 'Cultivated Area (ha)'},
     ]
 
-    selected_crop = request.GET.get('crop', 'Maize')
-    selected_season = request.GET.get('season', '2025A')
+    selected_crop = request.GET.get('crop', crops_catalog[0]['code'] if crops_catalog else 'Maize')
+    selected_season = request.GET.get('season', seasons_catalog[0]['code'] if seasons_catalog else '2025A')
     selected_indicator = request.GET.get('indicator', 'yield')
-    selected_district_name = request.GET.get('district', 'Nyabihu')
-    default_dist = district_data.get(selected_district_name, district_data.get('Nyabihu', {'id': 15, 'name': 'Nyabihu', 'province': 'Western Province'}))
+    selected_district_name = request.GET.get('district')
+    default_dist = district_data.get(selected_district_name) if selected_district_name else next(iter(district_data.values()), None)
+
+    # Dynamic KPI computation from IndicatorService
+    try:
+        filter_year = int(selected_season[:4])
+        filter_season_code = selected_season[4:]
+    except (ValueError, IndexError):
+        filter_year = 2025
+        filter_season_code = 'A'
+
+    nat_summary = IndicatorService.get_national_summary(
+        year=filter_year, season_code=filter_season_code, crop_name=selected_crop
+    )
+    obs_count = nat_summary.get('observation_count', 0)
+    total_prod = nat_summary.get('total_production_mt', 0.0)
+    if total_prod >= 1e6:
+        prod_display = f"{round(total_prod / 1e6, 2)}M t"
+    elif total_prod > 0:
+        prod_display = f"{round(total_prod / 1e3, 1)}K t"
+    else:
+        prod_display = "Data unavailable"
 
     context = {
         'page_title': 'Agricultural Map | AgriLens Rwanda',
         'provinces': provinces,
         'districts': districts,
         'selected_province': province_id,
-        'total_districts': districts.count() or 30,
-        'total_sectors': Sector.objects.count() or 416,
+        'total_districts': districts.count(),
+        'total_sectors': Sector.objects.count(),
         'crops': crops_catalog,
         'seasons': seasons_catalog,
         'indicators': indicators_catalog,
         'selected_crop': selected_crop,
         'selected_season': selected_season,
         'selected_indicator': selected_indicator,
-        'selected_district_name': default_dist['name'],
-        'selected_district_id': default_dist.get('id', 15),
-        'selected_province_name': default_dist.get('province', 'Western Province'),
+        'selected_district_name': default_dist['name'] if default_dist else None,
+        'selected_district_id': default_dist.get('id') if default_dist else None,
+        'selected_province_name': default_dist.get('province') if default_dist else None,
         'district_data_json': json.dumps(district_data),
-        'kpi_tracked_crops': '10',
-        'kpi_validated_records': '10,000' if selected_season == '2025A' else '5,000',
-        'kpi_geographic_coverage': '30',
-        'kpi_total_production': '1.24M t' if selected_season == '2025A' else '1.18M t',
+        'kpi_tracked_crops': str(p_crops.count()),
+        'kpi_validated_records': f"{obs_count:,}" if obs_count else "0",
+        'kpi_geographic_coverage': str(District.objects.count()),
+        'kpi_total_production': prod_display,
     }
     return render(request, 'geography/district_list.html', context)
 

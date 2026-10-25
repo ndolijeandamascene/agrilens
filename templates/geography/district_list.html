@@ -146,8 +146,8 @@
                         </svg>
                     </div>
                     <div class="location-names">
-                        <h4 class="district-name-heading" id="card-district-name">{{ selected_district_name }} District</h4>
-                        <p class="province-name-sub" id="card-province-name">{{ selected_province_name }}</p>
+                        <h4 class="district-name-heading" id="card-district-name">{% if selected_district_name %}{{ selected_district_name }} District{% else %}Select a District{% endif %}</h4>
+                        <p class="province-name-sub" id="card-province-name">{{ selected_province_name|default:"Rwanda" }}</p>
                     </div>
                 </div>
 
@@ -195,7 +195,7 @@
                         </div>
                         <div class="metric-row-content">
                             <span class="metric-row-label">Yield</span>
-                            <span class="metric-row-value" id="card-yield-val">3.6 t/ha</span>
+                            <span class="metric-row-value" id="card-yield-val">—</span>
                         </div>
                     </div>
 
@@ -211,7 +211,7 @@
                         </div>
                         <div class="metric-row-content">
                             <span class="metric-row-label">Cultivated Area</span>
-                            <span class="metric-row-value" id="card-area-val">1,240 ha</span>
+                            <span class="metric-row-value" id="card-area-val">—</span>
                         </div>
                     </div>
 
@@ -226,7 +226,7 @@
                         </div>
                         <div class="metric-row-content">
                             <span class="metric-row-label">Production</span>
-                            <span class="metric-row-value" id="card-prod-val">4,464 t</span>
+                            <span class="metric-row-value" id="card-prod-val">—</span>
                         </div>
                     </div>
                 </div>
@@ -356,11 +356,11 @@
             <div class="modal-kpi-grid">
                 <div class="modal-kpi-card green-accent">
                     <div class="kpi-card-header">
-                        <span class="kpi-card-title">Average Yield (<span class="modal-active-crop-text">Maize</span>)</span>
-                        <span class="kpi-chip-pill" id="modal-yield-badge">+44% vs Nat'l Avg</span>
+                        <span class="kpi-card-title">Average Yield (<span class="modal-active-crop-text">{{ selected_crop }}</span>)</span>
+                        <span class="kpi-chip-pill" id="modal-yield-badge" style="display: none;">—</span>
                     </div>
-                    <div class="kpi-card-val" id="modal-kpi-yield">3.6 <span class="unit">t/ha</span></div>
-                    <div class="kpi-card-footnote">National Benchmark: ~2.5 t/ha</div>
+                    <div class="kpi-card-val" id="modal-kpi-yield">— <span class="unit">t/ha</span></div>
+                    <div class="kpi-card-footnote">Official SAS Survey Observation</div>
                 </div>
 
                 <div class="modal-kpi-card blue-accent">
@@ -368,7 +368,7 @@
                         <span class="kpi-card-title">Cultivated Area</span>
                         <span class="kpi-icon-small">📍</span>
                     </div>
-                    <div class="kpi-card-val" id="modal-kpi-area">1,240 <span class="unit">ha</span></div>
+                    <div class="kpi-card-val" id="modal-kpi-area">— <span class="unit">ha</span></div>
                     <div class="kpi-card-footnote">Farmland area dedicated to crop</div>
                 </div>
 
@@ -377,7 +377,7 @@
                         <span class="kpi-card-title">Total Production</span>
                         <span class="kpi-icon-small">📦</span>
                     </div>
-                    <div class="kpi-card-val" id="modal-kpi-prod">4,464 <span class="unit">t</span></div>
+                    <div class="kpi-card-val" id="modal-kpi-prod">— <span class="unit">t</span></div>
                     <div class="kpi-card-footnote">Total estimated season harvest</div>
                 </div>
 
@@ -386,8 +386,8 @@
                         <span class="kpi-card-title">National Rank</span>
                         <span class="kpi-icon-small">🏆</span>
                     </div>
-                    <div class="kpi-card-val" id="modal-kpi-rank">#4 <span class="unit">/ 30</span></div>
-                    <div class="kpi-card-footnote" id="modal-rank-sub">Top tier productivity in Rwanda</div>
+                    <div class="kpi-card-val" id="modal-kpi-rank">— <span class="unit">/ 30</span></div>
+                    <div class="kpi-card-footnote" id="modal-rank-sub">Productivity ranking</div>
                 </div>
             </div>
 

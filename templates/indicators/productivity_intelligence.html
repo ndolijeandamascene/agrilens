@@ -13,23 +13,23 @@
    ========================================================================== */
 
 :root {
-    --agri-dark: #062319;
-    --agri-green: #10B981;
-    --agri-green-dark: #047857;
-    --agri-green-subtle: #ECFDF5;
-    --agri-green-border: #A7F3D0;
+    --agri-dark: #0F172A;
+    --agri-green: #15803D;
+    --agri-green-dark: #166534;
+    --agri-green-subtle: #F0FDF4;
+    --agri-green-border: #BBF7D0;
 
-    --nisr-blue: #005CAB;
-    --nisr-blue-subtle: #F0F7FD;
-    --nisr-blue-border: #BAE0FB;
+    --nisr-blue: #2563EB;
+    --nisr-blue-subtle: #EFF6FF;
+    --nisr-blue-border: #BFDBFE;
 
-    --nisr-cyan: #00AEEF;
-    --nisr-cyan-subtle: #E8F7FE;
+    --nisr-cyan: #15803D;
+    --nisr-cyan-subtle: #F0FDF4;
 
-    --brand-purple: #8B5CF6;
-    --brand-purple-subtle: #F5F3FF;
+    --brand-purple: #7C3AED;
+    --brand-purple-subtle: #FAF5FF;
 
-    --brand-orange: #F59E0B;
+    --brand-orange: #D97706;
     --brand-orange-subtle: #FFFBEB;
 
     --brand-red: #DC2626;
@@ -204,7 +204,7 @@
     font-size: 13px;
 }
 .kpi-circle-icon.green  { background: #10B981; color: #FFFFFF; }
-.kpi-circle-icon.blue   { background: #005CAB; color: #FFFFFF; }
+.kpi-circle-icon.blue   { background: #2563EB; color: #FFFFFF; }
 .kpi-circle-icon.orange { background: #F59E0B; color: #FFFFFF; }
 .kpi-circle-icon.purple { background: #8B5CF6; color: #FFFFFF; }
 .kpi-circle-icon.teal   { background: #14B8A6; color: #FFFFFF; }
@@ -246,7 +246,7 @@
     width: fit-content;
 }
 .kpi-card-pill.green  { background: #ECFDF5; color: #047857; }
-.kpi-card-pill.blue   { background: #F0F7FD; color: #005CAB; }
+.kpi-card-pill.blue   { background: #EFF6FF; color: #2563EB; }
 .kpi-card-pill.orange { background: #FFFBEB; color: #B45309; }
 .kpi-card-pill.purple { background: #F5F3FF; color: #6D28D9; }
 .kpi-card-pill.teal   { background: #F0FDFA; color: #0F766E; }
@@ -519,13 +519,14 @@
     white-space: nowrap;
 }
 
-/* Custom Dark Tooltip Popup for Leaflet Map */
+/* Custom Clean Tooltip Popup for Leaflet Map */
 .custom-dark-popup .leaflet-popup-content-wrapper {
-    background: #1e293b !important;
-    color: #ffffff !important;
+    background: #FFFFFF !important;
+    color: #0F172A !important;
     padding: 8px 14px !important;
     border-radius: 6px !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
 }
 
 .custom-dark-popup .leaflet-popup-content {
@@ -534,7 +535,7 @@
 }
 
 .custom-dark-popup .leaflet-popup-tip {
-    background: #1e293b !important;
+    background: #FFFFFF !important;
     box-shadow: none !important;
 }
 
@@ -545,14 +546,14 @@
 .nyabihu-badge-title {
     font-size: 11px;
     font-weight: 700;
-    color: #ffffff;
+    color: #0F172A;
     white-space: nowrap;
 }
 
 .nyabihu-badge-yield {
     font-size: 10px;
     font-weight: 600;
-    color: #86efac;
+    color: #166534;
     white-space: nowrap;
     margin-top: 2px;
 }
@@ -1162,11 +1163,11 @@
                 </div>
                 <div>
                     <div class="kpi-card-label">Validated Records</div>
-                    <div class="kpi-card-val">{{ summary.total_plots|default:"10,000" }}</div>
+                    <div class="kpi-card-val">{{ summary.total_plots|default:"—" }}</div>
                 </div>
             </div>
             <div class="kpi-card-sub">Verified observations</div>
-            <span class="kpi-card-pill blue">From 30 districts</span>
+            <span class="kpi-card-pill blue">{% if summary.districts_covered %}From {{ summary.districts_covered }} districts{% else %}District coverage unavailable{% endif %}</span>
         </div>
 
         <!-- 3. Geographic Coverage -->
@@ -1177,10 +1178,10 @@
                 </div>
                 <div>
                     <div class="kpi-card-label">Geographic Coverage</div>
-                    <div class="kpi-card-val">30</div>
+                    <div class="kpi-card-val">{{ summary.districts_covered|default:"—" }}</div>
                 </div>
             </div>
-            <div class="kpi-card-sub">Districts, 5 provinces</div>
+            <div class="kpi-card-sub">Districts{% if summary.provinces_covered %}, {{ summary.provinces_covered }} provinces{% endif %}</div>
             <span class="kpi-card-pill orange">Rwanda</span>
         </div>
 
@@ -1196,13 +1197,13 @@
                         {% if summary.total_production_mt %}
                             {{ summary.total_production_mt|floatformat:0 }} <small>t</small>
                         {% else %}
-                            1.24M <small>t</small>
+                            —
                         {% endif %}
                     </div>
                 </div>
             </div>
             <div class="kpi-card-sub">(estimated, all crops)</div>
-            <span class="kpi-card-pill purple">SAS 2024 &ndash; 2025</span>
+            <span class="kpi-card-pill purple">SAS {{ selected_year }} {{ selected_season }}</span>
         </div>
 
         <!-- 5. Average Yield / Yield Gap -->
@@ -1214,16 +1215,16 @@
                 <div>
                     <div class="kpi-card-label">Average Yield</div>
                     <div class="kpi-card-val">
-                        {% if gap.is_sufficient_data %}
+                        {% if gap.is_sufficient_data and gap.observed_yield_tha %}
                             {{ gap.observed_yield_tha|floatformat:1 }} <small>t/ha</small>
                         {% else %}
-                            2.8 <small>t/ha</small>
+                            —
                         {% endif %}
                     </div>
                 </div>
             </div>
-            <div class="kpi-card-sub">Yield Gap: <strong style="color: var(--brand-red);">{{ gap.relative_gap_percentage|default:"34" }}%</strong></div>
-            <span class="kpi-card-pill teal">SAS 2024 &ndash; 2025</span>
+            <div class="kpi-card-sub">Yield Gap: <strong style="color: var(--brand-red);">{% if gap.relative_gap_percentage %}{{ gap.relative_gap_percentage|floatformat:1 }}%{% else %}—{% endif %}</strong></div>
+            <span class="kpi-card-pill teal">SAS {{ selected_year }} {{ selected_season }}</span>
         </div>
 
         <!-- 6. Data Quality -->
@@ -1234,7 +1235,7 @@
                 </div>
                 <div>
                     <div class="kpi-card-label">Data Quality</div>
-                    <div class="kpi-card-val">98%</div>
+                    <div class="kpi-card-val">{% if data_quality_pct %}{{ data_quality_pct }}%{% else %}—{% endif %}</div>
                 </div>
             </div>
             <div class="kpi-card-sub">Validated &amp; consistent</div>
@@ -1292,18 +1293,18 @@
                 <div class="map-floating-legend">
                     <div class="legend-head">Yield (t/ha)</div>
                     <div id="dashboard-legend-entries">
-                        <div class="legend-entry"><span class="legend-color-box" style="background: #15803d;"></span> &gt; 4.0</div>
-                        <div class="legend-entry"><span class="legend-color-box" style="background: #22c55e;"></span> 3.0 &ndash; 4.0</div>
-                        <div class="legend-entry"><span class="legend-color-box" style="background: #84cc16;"></span> 2.0 &ndash; 3.0</div>
-                        <div class="legend-entry"><span class="legend-color-box" style="background: #eab308;"></span> 1.0 &ndash; 2.0</div>
-                        <div class="legend-entry"><span class="legend-color-box" style="background: #0284c7;"></span> &lt; 1.0</div>
-                        <div class="legend-entry"><span class="legend-color-box" style="background: #cbd5e1;"></span> No data</div>
+                        <div class="legend-entry"><span class="legend-color-box" style="background: #166534;"></span> &gt; 4.0</div>
+                        <div class="legend-entry"><span class="legend-color-box" style="background: #15803D;"></span> 3.0 &ndash; 4.0</div>
+                        <div class="legend-entry"><span class="legend-color-box" style="background: #84CC16;"></span> 2.0 &ndash; 3.0</div>
+                        <div class="legend-entry"><span class="legend-color-box" style="background: #FACC15;"></span> 1.0 &ndash; 2.0</div>
+                        <div class="legend-entry"><span class="legend-color-box" style="background: #2563EB;"></span> &lt; 1.0</div>
+                        <div class="legend-entry"><span class="legend-color-box" style="background: #CBD5E1;"></span> No data</div>
                     </div>
                     <div id="dashboard-typology-legend-entries" style="display: none;">
-                        <div class="legend-entry"><span class="legend-color-box" style="background: #15803d;"></span> High-Input Commercial Agro-Hub</div>
-                        <div class="legend-entry"><span class="legend-color-box" style="background: #0284c7;"></span> Semi-Arid Fertilizer-Constrained Plains</div>
-                        <div class="legend-entry"><span class="legend-color-box" style="background: #d97706;"></span> Highlands Erosion &amp; Cold-Slope Typology</div>
-                        <div class="legend-entry"><span class="legend-color-box" style="background: #7c3aed;"></span> Acidic Uplands Soil-Deficit Zone</div>
+                        <div class="legend-entry"><span class="legend-color-box" style="background: #15803D;"></span> High-Input Commercial Agro-Hub</div>
+                        <div class="legend-entry"><span class="legend-color-box" style="background: #2563EB;"></span> Semi-Arid Fertilizer-Constrained Plains</div>
+                        <div class="legend-entry"><span class="legend-color-box" style="background: #D97706;"></span> Highlands Erosion &amp; Cold-Slope Typology</div>
+                        <div class="legend-entry"><span class="legend-color-box" style="background: #7C3AED;"></span> Acidic Uplands Soil-Deficit Zone</div>
                     </div>
                 </div>
 
@@ -1414,22 +1415,22 @@
                                 <tr>
                                     <td>Observed yield (Y<sub>b</sub>)</td>
                                     <td>2.0 t/ha</td>
-                                    <td><strong>{{ gap.observed_yield_tha|floatformat:1 }} t/ha</strong></td>
+                                    <td><strong>{% if gap.observed_yield_tha is not None %}{{ gap.observed_yield_tha|floatformat:1 }} t/ha{% else %}—{% endif %}</strong></td>
                                 </tr>
                                 <tr>
                                     <td>Reference yield (Y<sub>r</sub>)</td>
                                     <td>4.0 t/ha</td>
-                                    <td><strong>{{ gap.reference_yield_tha|floatformat:1 }} t/ha</strong></td>
+                                    <td><strong>{% if gap.reference_yield_tha is not None %}{{ gap.reference_yield_tha|floatformat:1 }} t/ha{% else %}—{% endif %}</strong></td>
                                 </tr>
                                 <tr>
                                     <td>Harvested area (A)</td>
                                     <td>100 ha</td>
-                                    <td><strong>{{ gap.harvested_area_ha|floatformat:0 }} ha</strong></td>
+                                    <td><strong>{% if gap.harvested_area_ha is not None %}{{ gap.harvested_area_ha|floatformat:0 }} ha{% else %}—{% endif %}</strong></td>
                                 </tr>
                                 <tr>
                                     <td>Production opportunity</td>
                                     <td>200 tonnes</td>
-                                    <td><strong style="color: var(--agri-green-dark);">{{ gap.indicative_opportunity_tonnes|floatformat:0 }} tonnes</strong></td>
+                                    <td><strong style="color: var(--agri-green-dark);">{% if gap.indicative_opportunity_tonnes is not None %}{{ gap.indicative_opportunity_tonnes|floatformat:0 }} tonnes{% else %}—{% endif %}</strong></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1455,14 +1456,18 @@
                                 <tr>
                                     <td><strong>#{{ forloop.counter }}</strong></td>
                                     <td><strong>{{ r.district_name }}</strong></td>
-                                    <td>{{ r.yield_tha|floatformat:1 }} t/ha</td>
-                                    <td>{{ r.reference_yield_tha|floatformat:1 }} t/ha</td>
+                                    <td>{% if r.yield_tha is not None %}{{ r.yield_tha|floatformat:1 }} t/ha{% else %}—{% endif %}</td>
+                                    <td>{% if r.reference_yield_tha is not None %}{{ r.reference_yield_tha|floatformat:1 }} t/ha{% else %}—{% endif %}</td>
                                     <td>
+                                        {% if r.relative_gap_percentage is not None %}
                                         <span style="font-weight: 700; color: {% if r.relative_gap_percentage >= 40 %}var(--brand-red){% elif r.relative_gap_percentage >= 25 %}var(--brand-orange){% else %}var(--agri-green-dark){% endif %};">
                                             {{ r.relative_gap_percentage|floatformat:0 }}%
                                         </span>
+                                        {% else %}
+                                        <span style="color: var(--text-muted);">—</span>
+                                        {% endif %}
                                     </td>
-                                    <td><strong style="color: var(--nisr-blue);">{{ r.opportunity_tonnes|floatformat:0 }} t</strong></td>
+                                    <td>{% if r.opportunity_tonnes is not None %}<strong style="color: var(--nisr-blue);">{{ r.opportunity_tonnes|floatformat:0 }} t</strong>{% else %}—{% endif %}</td>
                                 </tr>
                                 {% empty %}
                                 <tr>
@@ -1542,10 +1547,10 @@
                     <div class="adoption-details">
                         <div class="adoption-meta">
                             <span class="adoption-name">Improved Seeds</span>
-                            <span class="adoption-val">{{ summary.adoption_rates.improved_seed|default:"62" }}%</span>
+                            <span class="adoption-val">{% if summary.adoption_rates.improved_seed is not None %}{{ summary.adoption_rates.improved_seed }}%{% else %}—{% endif %}</span>
                         </div>
                         <div class="adoption-track">
-                            <div class="adoption-bar seed" style="width: {{ summary.adoption_rates.improved_seed|default:'62' }}%;"></div>
+                            <div class="adoption-bar seed" style="width: {{ summary.adoption_rates.improved_seed|default:'0' }}%;"></div>
                         </div>
                     </div>
                 </div>
@@ -1558,10 +1563,10 @@
                     <div class="adoption-details">
                         <div class="adoption-meta">
                             <span class="adoption-name">Fertilizer Use</span>
-                            <span class="adoption-val">{{ summary.adoption_rates.inorganic_fertilizer|default:"48" }}%</span>
+                            <span class="adoption-val">{% if summary.adoption_rates.inorganic_fertilizer is not None %}{{ summary.adoption_rates.inorganic_fertilizer }}%{% else %}—{% endif %}</span>
                         </div>
                         <div class="adoption-track">
-                            <div class="adoption-bar fert" style="width: {{ summary.adoption_rates.inorganic_fertilizer|default:'48' }}%;"></div>
+                            <div class="adoption-bar fert" style="width: {{ summary.adoption_rates.inorganic_fertilizer|default:'0' }}%;"></div>
                         </div>
                     </div>
                 </div>
@@ -1574,10 +1579,10 @@
                     <div class="adoption-details">
                         <div class="adoption-meta">
                             <span class="adoption-name">Irrigation</span>
-                            <span class="adoption-val">{{ summary.adoption_rates.irrigation|default:"22" }}%</span>
+                            <span class="adoption-val">{% if summary.adoption_rates.irrigation is not None %}{{ summary.adoption_rates.irrigation }}%{% else %}—{% endif %}</span>
                         </div>
                         <div class="adoption-track">
-                            <div class="adoption-bar irrig" style="width: {{ summary.adoption_rates.irrigation|default:'22' }}%;"></div>
+                            <div class="adoption-bar irrig" style="width: {{ summary.adoption_rates.irrigation|default:'0' }}%;"></div>
                         </div>
                     </div>
                 </div>
@@ -1590,10 +1595,10 @@
                     <div class="adoption-details">
                         <div class="adoption-meta">
                             <span class="adoption-name">Mechanization</span>
-                            <span class="adoption-val">{{ summary.adoption_rates.mechanization|default:"15" }}%</span>
+                            <span class="adoption-val">{% if summary.adoption_rates.mechanization is not None %}{{ summary.adoption_rates.mechanization }}%{% else %}—{% endif %}</span>
                         </div>
                         <div class="adoption-track">
-                            <div class="adoption-bar mech" style="width: {{ summary.adoption_rates.mechanization|default:'15' }}%;"></div>
+                            <div class="adoption-bar mech" style="width: {{ summary.adoption_rates.mechanization|default:'0' }}%;"></div>
                         </div>
                     </div>
                 </div>
@@ -1606,10 +1611,10 @@
                     <div class="adoption-details">
                         <div class="adoption-meta">
                             <span class="adoption-name">Soil Conservation</span>
-                            <span class="adoption-val">{{ summary.adoption_rates.anti_erosion|default:"37" }}%</span>
+                            <span class="adoption-val">{% if summary.adoption_rates.anti_erosion is not None %}{{ summary.adoption_rates.anti_erosion }}%{% else %}—{% endif %}</span>
                         </div>
                         <div class="adoption-track">
-                            <div class="adoption-bar soil" style="width: {{ summary.adoption_rates.anti_erosion|default:'37' }}%;"></div>
+                            <div class="adoption-bar soil" style="width: {{ summary.adoption_rates.anti_erosion|default:'0' }}%;"></div>
                         </div>
                     </div>
                 </div>
@@ -1638,15 +1643,15 @@
                     <div class="doughnut-center">
                         <span>Post-harvest</span>
                         <span>Losses</span>
-                        <strong>12.4%</strong>
+                        <strong>{% if summary.loss_rate_percentage is not None %}{{ summary.loss_rate_percentage|floatformat:1 }}%{% else %}—{% endif %}</strong>
                     </div>
                 </div>
                 <div class="legend-list">
-                    <div class="legend-item"><div class="legend-label"><span class="legend-color" style="background: #059669;"></span> Storage</div> <span>42.1%</span></div>
-                    <div class="legend-item"><div class="legend-label"><span class="legend-color" style="background: #2563EB;"></span> Processing</div> <span>21.7%</span></div>
-                    <div class="legend-item"><div class="legend-label"><span class="legend-color" style="background: #F59E0B;"></span> Losses</div> <span>12.4%</span></div>
-                    <div class="legend-item"><div class="legend-label"><span class="legend-color" style="background: #0284C7;"></span> Marketing</div> <span>13.6%</span></div>
-                    <div class="legend-item"><div class="legend-label"><span class="legend-color" style="background: #8B5CF6;"></span> Other</div> <span>10.2%</span></div>
+                    {% for item in postharvest_chart_data.breakdown %}
+                    <div class="legend-item"><div class="legend-label"><span class="legend-color" style="background: {{ item.color }};"></span> {{ item.label }}</div> <span>{{ item.pct }}%</span></div>
+                    {% empty %}
+                    <div style="font-size: 11px; color: var(--text-muted); padding: 10px 0;">Cause breakdown unavailable</div>
+                    {% endfor %}
                 </div>
             </div>
             <div class="card-footnote">
@@ -1728,7 +1733,7 @@
                 <a href="{% url 'decision_support:hub' %}" class="btn-view-pill" style="font-weight: 700; color: #047857; border-color: #A7F3D0; background: #ECFDF5;">
                     <i class="fas fa-compass"></i> Decision Support Hub
                 </a>
-                <a href="{% url 'decision_support:impact_dashboard' %}" class="btn-view-pill" style="font-weight: 700; color: #005CAB; border-color: #BAE0FB; background: #F0F7FD;">
+                <a href="{% url 'decision_support:impact_dashboard' %}" class="btn-view-pill" style="font-weight: 700; color: #2563EB; border-color: #BFDBFE; background: #EFF6FF;">
                     <i class="fas fa-chart-line"></i> Impact Monitoring
                 </a>
             </div>
@@ -1812,15 +1817,19 @@
                             <td><strong style="color: #0F172A;">{{ selected_crop }}</strong></td>
                             <td><strong style="color: #0F172A;">{{ r.district_name }}</strong></td>
                             <td><span style="color: var(--text-muted);">{{ r.province_name }}</span></td>
-                            <td>{{ r.area_ha|floatformat:0 }} ha</td>
-                            <td><strong>{{ r.yield_tha|floatformat:1 }} t/ha</strong></td>
-                            <td>{{ r.reference_yield_tha|floatformat:1 }} t/ha</td>
+                            <td>{% if r.area_ha is not None %}{{ r.area_ha|floatformat:0 }} ha{% else %}—{% endif %}</td>
+                            <td>{% if r.yield_tha is not None %}<strong>{{ r.yield_tha|floatformat:1 }} t/ha</strong>{% else %}—{% endif %}</td>
+                            <td>{% if r.reference_yield_tha is not None %}{{ r.reference_yield_tha|floatformat:1 }} t/ha{% else %}—{% endif %}</td>
                             <td>
+                                {% if r.relative_gap_percentage is not None and r.absolute_gap_tha is not None %}
                                 <span style="font-weight: 700; color: {% if r.relative_gap_percentage >= 40 %}var(--brand-red){% elif r.relative_gap_percentage >= 25 %}var(--brand-orange){% else %}var(--agri-green-dark){% endif %};">
                                     {{ r.absolute_gap_tha|floatformat:1 }} t/ha ({{ r.relative_gap_percentage|floatformat:0 }}%)
                                 </span>
+                                {% else %}
+                                <span style="color: var(--text-muted);">—</span>
+                                {% endif %}
                             </td>
-                            <td><strong style="color: var(--nisr-blue);">{{ r.opportunity_tonnes|floatformat:0 }} t</strong></td>
+                            <td>{% if r.opportunity_tonnes is not None %}<strong style="color: var(--nisr-blue);">{{ r.opportunity_tonnes|floatformat:0 }} t</strong>{% else %}—{% endif %}</td>
                             <td>Field Survey</td>
                             <td>
                                 <span class="status-pill-green">Validated</span>
@@ -1853,7 +1862,7 @@
     <div class="reference-footer-bar">
         <span>
             <i class="fas fa-shield-alt" style="color: #10B981;"></i>
-            Data from NISR &ndash; National Agricultural Survey (SAS 2024 &ndash; 2025) &bull; 30 districts &bull; 5 provinces &bull; 10,000+ verified observations
+            Data from NISR &ndash; National Agricultural Survey (SAS {{ selected_year }} &ndash; {{ selected_season }}){% if summary.districts_covered %} &bull; {{ summary.districts_covered }} districts{% endif %}{% if summary.provinces_covered %} &bull; {{ summary.provinces_covered }} provinces{% endif %}{% if summary.total_plots %} &bull; {{ summary.total_plots }} verified observations{% endif %}
         </span>
         <span style="font-weight: 600; color: #334155;">
             Better Data. Better Decisions. A Stronger Rwanda. &#127793;
@@ -1871,11 +1880,11 @@ const MAP_DISTRICT_DATA = {
     "{{ r.district_name|escapejs }}": {
         name: "{{ r.district_name|escapejs }}",
         province: "{{ r.province_name|escapejs }}",
-        yieldTha: {{ r.yield_tha|default:0 }},
-        benchTha: {{ gap.reference_yield_tha|default:0 }},
+        yieldTha: {% if r.yield_tha is not None %}{{ r.yield_tha }}{% else %}null{% endif %},
+        benchTha: {% if gap.reference_yield_tha is not None %}{{ gap.reference_yield_tha }}{% else %}null{% endif %},
         plots: {{ r.plots_sampled|default:0 }},
-        areaHa: {{ r.area_ha|default:0 }},
-        prodMt: {{ r.production_mt|default:0 }}
+        areaHa: {% if r.area_ha is not None %}{{ r.area_ha }}{% else %}null{% endif %},
+        prodMt: {% if r.production_mt is not None %}{{ r.production_mt }}{% else %}null{% endif %}
     },
     {% endfor %}
 };
@@ -1903,7 +1912,7 @@ const DISTRICT_PROVINCE_MAP = {
 
 let rwandaMap = null;
 let geojsonLayer = null;
-let selectedDistrictName = 'Nyabihu';
+let selectedDistrictName = '{{ selected_district|default:""|escapejs }}';
 let hoverDarkMarker = null;
 let hoverDarkPopup = null;
 
@@ -1924,9 +1933,8 @@ document.addEventListener("DOMContentLoaded", function() {
 // No data: #CBD5E1 (Slate)
 function getDistrictChoroplethColor(dName) {
     const d = MAP_DISTRICT_DATA[dName];
-    if (dName === 'Nyabihu') return '#22C55E'; // 3.6 t/ha
-    if (!d || d.plots === 0 || d.yieldTha <= 0) {
-        return '#CBD5E1'; // No data
+    if (!d || d.plots === 0 || d.yieldTha === null || d.yieldTha <= 0) {
+        return '#CBD5E1'; // No data / unavailable
     }
     const y = d.yieldTha;
     if (y >= 4.0) return '#15803D';
@@ -2161,7 +2169,13 @@ function resetDistrictSelection() {
     const curCrop = document.getElementById('map-crop-select')?.value || '{{ selected_crop }}';
     const insightEl = document.getElementById('insight-text');
     if (insightEl) {
-        insightEl.innerHTML = `The average yield gap is <strong>{{ gap.relative_gap_percentage|default:"34" }}%</strong> nationally, with the largest gap in the Eastern Province.`;
+        {% if gap.target_district %}
+        insightEl.innerHTML = `<strong>{{ gap.target_district.district_name|escapejs }} District</strong> ({{ gap.target_district.province_name|escapejs }}) records an average {{ selected_crop|escapejs }} yield of <strong>{% if gap.observed_yield_tha is not None %}{{ gap.observed_yield_tha|floatformat:1 }} t/ha{% else %}—{% endif %}</strong> against benchmark potential of <strong>{% if gap.reference_yield_tha is not None %}{{ gap.reference_yield_tha|floatformat:1 }} t/ha{% else %}—{% endif %}</strong> (Yield gap: <strong>{% if gap.relative_gap_percentage is not None %}{{ gap.relative_gap_percentage|floatformat:0 }}%{% else %}—{% endif %}</strong>).`;
+        {% elif gap.is_sufficient_data %}
+        insightEl.innerHTML = `The national yield gap is <strong>{{ gap.relative_gap_percentage|floatformat:0 }}%</strong> for {{ selected_crop|escapejs }} (observed: {{ gap.observed_yield_tha|floatformat:1 }} t/ha vs benchmark: {{ gap.reference_yield_tha|floatformat:1 }} t/ha).`;
+        {% else %}
+        insightEl.innerHTML = `Insufficient observation data to calculate national yield gap for {{ selected_crop|escapejs }}.`;
+        {% endif %}
     }
 
     const searchInput = document.getElementById("districtSearchInput");
@@ -2242,19 +2256,20 @@ const barTopLabelsPlugin = {
     }
 };
 
-// Chart 1: Provincial Actual vs Potential Yield Bar Chart (Matching Screenshot 2)
+// Chart 1: Provincial Actual vs Potential Yield Bar Chart
 function initProvincialYieldChart() {
     const ctx = document.getElementById('provincialYieldChart');
     if (!ctx || typeof Chart === 'undefined') return;
 
+    const provData = {{ provincial_chart_json|safe }};
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Northern', 'Eastern', 'Southern', 'Western', 'Kigali'],
+            labels: provData.labels || ['Northern', 'Eastern', 'Southern', 'Western', 'Kigali'],
             datasets: [
                 {
                     label: 'Actual Yield',
-                    data: [2.3, 2.9, 2.7, 2.5, 3.2],
+                    data: provData.actual,
                     backgroundColor: '#15803d',
                     borderRadius: { topLeft: 3, topRight: 3, bottomLeft: 0, bottomRight: 0 },
                     barPercentage: 0.65,
@@ -2262,7 +2277,7 @@ function initProvincialYieldChart() {
                 },
                 {
                     label: 'Potential Yield',
-                    data: [4.1, 4.5, 4.2, 3.8, 4.3],
+                    data: provData.potential,
                     backgroundColor: '#2563eb',
                     borderRadius: { topLeft: 3, topRight: 3, bottomLeft: 0, bottomRight: 0 },
                     barPercentage: 0.65,
@@ -2278,7 +2293,7 @@ function initProvincialYieldChart() {
                 tooltip: {
                     callbacks: {
                         label: function(c) {
-                            return " " + c.dataset.label + ": " + c.raw + " t/ha";
+                            return " " + c.dataset.label + ": " + (c.raw !== null ? c.raw + " t/ha" : "No Data");
                         }
                     }
                 }
@@ -2286,7 +2301,6 @@ function initProvincialYieldChart() {
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 5,
                     ticks: {
                         stepSize: 1,
                         font: { size: 10, family: 'Inter' },
@@ -2318,13 +2332,17 @@ function initSeasonalTrendChart() {
     const ctx = document.getElementById('seasonalTrendChart');
     if (!ctx || typeof Chart === 'undefined') return;
 
+    const trendsData = {{ seasonal_trends_json|safe }};
+    const trendLabels = trendsData.map(t => t.label);
+    const trendGaps = trendsData.map(t => t.gap_pct);
+
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['SAS 2024A', 'SAS 2024B', 'SAS 2025A', 'SAS 2025B'],
+            labels: trendLabels.length ? trendLabels : ['No Data'],
             datasets: [{
                 label: 'National Yield Gap %',
-                data: [38, 36, 34, 31],
+                data: trendGaps.length ? trendGaps : [null],
                 borderColor: '#DC2626',
                 backgroundColor: 'rgba(220, 38, 38, 0.08)',
                 fill: true,
@@ -2355,33 +2373,33 @@ function initSeasonalTrendChart() {
     });
 }
 
-// Chart 3: Commodity Market Prices Line Chart (Matching Image 1)
+// Chart 3: Commodity Market Prices Line Chart
 function initCommodityMarketPriceChart() {
     const ctx = document.getElementById('commodityMarketPriceChart');
     if (!ctx || typeof Chart === 'undefined') return;
 
+    const marketData = {{ market_price_chart_json|safe }};
+    if (!marketData.has_data) {
+        new Chart(ctx, {
+            type: 'line',
+            data: { labels: ['No Data'], datasets: [] },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'No published market price surveillance quotes for this crop', font: { size: 11, family: 'Inter' }, color: '#64748B' }
+                }
+            }
+        });
+        return;
+    }
+
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Nov 2024', 'Dec 2024', 'Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025'],
-            datasets: [
-                {
-                    label: 'Kigali',
-                    data: [1050, 1120, 1180, 1150, 1160, 1190],
-                    borderColor: '#10B981',
-                    pointBackgroundColor: '#10B981',
-                    tension: 0.3,
-                    pointRadius: 3
-                },
-                {
-                    label: 'Rwamagana',
-                    data: [820, 890, 950, 930, 940, 960],
-                    borderColor: '#2563EB',
-                    pointBackgroundColor: '#2563EB',
-                    tension: 0.3,
-                    pointRadius: 3
-                }
-            ]
+            labels: marketData.labels,
+            datasets: marketData.datasets
         },
         options: {
             responsive: true,
@@ -2402,10 +2420,7 @@ function initCommodityMarketPriceChart() {
             scales: {
                 y: {
                     beginAtZero: true,
-                    min: 0,
-                    max: 1600,
                     ticks: {
-                        stepSize: 400,
                         font: { size: 9.5, family: 'Inter' },
                         color: '#64748B'
                     },
@@ -2427,33 +2442,46 @@ function initCommodityMarketPriceChart() {
 }
 
 function updateCommodityCrop(cropName) {
-    const priceChart = Chart.getChart('commodityMarketPriceChart');
-    if (!priceChart) return;
-    const cropMultipliers = {
-        'Maize': 1.0,
-        'Beans': 0.85,
-        'Cassava': 0.5,
-        'Irish Potato': 0.45,
-        'Rice': 1.35
-    };
-    const mult = cropMultipliers[cropName] || 1.0;
-    priceChart.data.datasets[0].data = [1050, 1120, 1180, 1150, 1160, 1190].map(v => Math.round(v * mult));
-    priceChart.data.datasets[1].data = [820, 890, 950, 930, 940, 960].map(v => Math.round(v * mult));
-    priceChart.update();
+    const url = new URL(window.location);
+    url.searchParams.set('crop', cropName);
+    window.location.href = url.toString();
 }
 
-// Chart 4: Post-Harvest Analysis Donut Chart (Matching Image 1)
+// Chart 4: Post-Harvest Analysis Donut Chart
 function initPostHarvestDonutChart() {
     const ctx = document.getElementById('postHarvestDonutChart');
     if (!ctx || typeof Chart === 'undefined') return;
 
+    const phData = {{ postharvest_chart_json|safe }};
+    if (!phData.has_data) {
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['No Data'],
+                datasets: [{
+                    data: [1],
+                    backgroundColor: ['#E2E8F0'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '72%',
+                plugins: { legend: { display: false }, tooltip: { enabled: false } }
+            }
+        });
+        return;
+    }
+
+    const lossColors = ['#059669', '#2563EB', '#F59E0B', '#0284C7', '#8B5CF6', '#EC4899', '#64748B'];
     new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['Storage', 'Processing', 'Field Loss', 'Marketing', 'Other'],
+            labels: phData.labels,
             datasets: [{
-                data: [42.1, 21.7, 12.4, 13.6, 10.2],
-                backgroundColor: ['#059669', '#2563EB', '#F59E0B', '#0284C7', '#8B5CF6'],
+                data: phData.data,
+                backgroundColor: lossColors.slice(0, phData.labels.length),
                 borderWidth: 2,
                 borderColor: '#FFFFFF'
             }]
@@ -2463,7 +2491,14 @@ function initPostHarvestDonutChart() {
             maintainAspectRatio: false,
             cutout: '72%',
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(c) {
+                            return ' ' + c.label + ': ' + c.raw + '%';
+                        }
+                    }
+                }
             }
         }
     });

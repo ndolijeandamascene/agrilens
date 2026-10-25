@@ -1,141 +1,155 @@
 {% extends "base.html" %}
 
-{% block title %}Manual Agricultural Records Registry | AgriLens{% endblock %}
+{% block title %}Manual Agricultural Records Registry | AgriLens Rwanda{% endblock %}
 {% block section_title %}Authorized Manual Agricultural Registry{% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
+<div class="content-container">
     <!-- Header & Action Strip -->
     <div class="dashboard-header-strip">
         <div>
-            <h2 style="margin: 0; font-size: 1.4rem; color: #0F172A; font-weight: 800;">Manual Agricultural Observations</h2>
-            <div style="font-size: 0.85rem; color: #64748B; margin-top: 4px;">
+            <h2 style="margin: 0; font-size: 1.4rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">Manual Agricultural Observations</h2>
+            <div style="font-size: 0.82rem; color: #64748B; margin-top: 4px;">
                 Quarantined manual submissions vetted through the administrative review lifecycle
             </div>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <a href="{% url 'data_management:hub' %}" class="btn-portal-return">
-                <span>&larr; Data Hub</span>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a href="{% url 'data_management:hub' %}" class="btn-action">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                <span>Data Hub</span>
             </a>
-            <a href="{% url 'data_management:manual_entry_create' %}" class="btn-portal-return" style="background: #005CAB; color: white;">
-                <span>+ Submit New Record</span>
+            <a href="{% url 'data_management:manual_entry_create' %}" class="btn-action primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Submit New Record</span>
             </a>
         </div>
     </div>
 
     <!-- Filter and Search Strip -->
-    <div style="background: white; border-radius: 10px; border: 1px solid #E2E8F0; padding: 16px 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
-        <form method="GET" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <label for="status-filter" style="font-size: 0.85rem; font-weight: 600; color: #475569;">Status:</label>
-                <select id="status-filter" name="status" class="dash-compact-select" onchange="this.form.submit()">
-                    <option value="">All Statuses</option>
-                    {% for code, label in statuses %}
-                        <option value="{{ code }}" {% if status_filter == code %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+    <div class="panel-card" style="margin-bottom: 20px;">
+        <div class="panel-body" style="padding: 16px 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                <form method="GET" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <label for="status-filter" style="font-size: 0.84rem; font-weight: 700; color: #475569;">Status:</label>
+                        <select id="status-filter" name="status" class="dash-compact-select" onchange="this.form.submit()">
+                            <option value="">All Statuses</option>
+                            {% for code, label in statuses %}
+                                <option value="{{ code }}" {% if status_filter == code %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <label for="kind-filter" style="font-size: 0.85rem; font-weight: 600; color: #475569;">Data Kind:</label>
-                <select id="kind-filter" name="kind" class="dash-compact-select" onchange="this.form.submit()">
-                    <option value="">All Kinds of Data</option>
-                    {% for code, label in kinds %}
-                        <option value="{{ code }}" {% if kind_filter == code %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <label for="kind-filter" style="font-size: 0.84rem; font-weight: 700; color: #475569;">Data Kind:</label>
+                        <select id="kind-filter" name="kind" class="dash-compact-select" onchange="this.form.submit()">
+                            <option value="">All Kinds of Data</option>
+                            {% for code, label in kinds %}
+                                <option value="{{ code }}" {% if kind_filter == code %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <input type="text" name="q" value="{{ query }}" placeholder="Search crop, district, reference..." class="dash-compact-select" style="min-width: 240px; padding: 6px 12px;">
-                <button type="submit" style="padding: 6px 14px; background: #005CAB; color: white; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
-                    Search
-                </button>
-                {% if query or status_filter or kind_filter %}
-                    <a href="{% url 'data_management:manual_entry_list' %}" style="font-size: 0.85rem; color: #DC2626; text-decoration: none; margin-left: 8px;">Clear</a>
-                {% endif %}
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="text" name="q" value="{{ query }}" placeholder="Search crop, district, reference..." class="dash-compact-select" style="min-width: 240px; padding: 6px 12px;">
+                        <button type="submit" class="btn-action primary" style="padding: 6px 16px;">
+                            Search
+                        </button>
+                        {% if query or status_filter or kind_filter %}
+                            <a href="{% url 'data_management:manual_entry_list' %}" style="font-size: 0.84rem; color: #DC2626; text-decoration: none; font-weight: 600; margin-left: 6px;">Clear</a>
+                        {% endif %}
+                    </div>
+                </form>
+                <span class="panel-badge blue">Showing {{ page_obj.paginator.count }} record(s)</span>
             </div>
-        </form>
-        <span style="font-size: 0.85rem; color: #64748B;">Showing {{ page_obj.paginator.count }} record(s)</span>
+        </div>
     </div>
 
     <!-- Records Table -->
-    <div style="background: white; border-radius: 12px; border: 1px solid #E2E8F0; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
-                <thead>
-                    <tr style="border-bottom: 2px solid #E2E8F0; text-align: left; color: #64748B;">
-                        <th style="padding: 10px 12px;">ID</th>
-                        <th style="padding: 10px 12px;">Kind of Data</th>
-                        <th style="padding: 10px 12px;">Season</th>
-                        <th style="padding: 10px 12px;">Date</th>
-                        <th style="padding: 10px 12px;">Crop</th>
-                        <th style="padding: 10px 12px;">Location</th>
-                        <th style="padding: 10px 12px;">Area (ha)</th>
-                        <th style="padding: 10px 12px;">Production</th>
-                        <th style="padding: 10px 12px;">Yield (kg/ha)</th>
-                        <th style="padding: 10px 12px;">Review Status</th>
-                        <th style="padding: 10px 12px; text-align: right;">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in page_obj %}
-                    <tr style="border-bottom: 1px solid #F1F5F9;">
-                        <td style="padding: 12px; font-weight: 700; color: #005CAB;">#{{ item.id }}</td>
-                        <td style="padding: 12px;"><span style="background: #E0F2FE; color: #0369A1; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">{{ item.get_data_kind_display }}</span></td>
-                        <td style="padding: 12px; font-weight: 600; color: #1E293B;">{{ item.season.year }} {{ item.season.get_season_display }}</td>
-                        <td style="padding: 12px; color: #64748B;">{{ item.observation_date|date:"Y-m-d" }}</td>
-                        <td style="padding: 12px; font-weight: 600; color: #0F172A;">{{ item.crop.name }}</td>
-                        <td style="padding: 12px;">{{ item.district.name }}, {{ item.sector.name }}</td>
-                        <td style="padding: 12px;">{{ item.plot_area_ha }} ha</td>
-                        <td style="padding: 12px;">{{ item.total_production_kg }} kg</td>
-                        <td style="padding: 12px; font-weight: 700; color: #16A34A;">{{ item.calculated_yield_kg_per_ha }}</td>
-                        <td style="padding: 12px;">
-                            {% if item.is_irrigated %}<span style="background: #E0F2FE; color: #0369A1; padding: 1px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-right: 2px;">Irrig</span>{% endif %}
-                            {% if item.is_improved_seed %}<span style="background: #DCFCE7; color: #15803D; padding: 1px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-right: 2px;">Seed</span>{% endif %}
-                            {% if item.uses_inorganic_fertilizer %}<span style="background: #FEF9C3; color: #A16207; padding: 1px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">Fert</span>{% endif %}
-                        </td>
-                        <td style="padding: 12px;">
-                            {% if item.review_status == 'APPROVED' %}
-                                <span style="background: #DCFCE7; color: #166534; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">APPROVED</span>
-                            {% elif item.review_status == 'SUBMITTED' %}
-                                <span style="background: #FEF3C7; color: #92400E; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">IN REVIEW</span>
-                            {% elif item.review_status == 'REJECTED' %}
-                                <span style="background: #FEE2E2; color: #991B1B; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">REJECTED</span>
-                            {% else %}
-                                <span style="background: #F1F5F9; color: #475569; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">DRAFT</span>
-                            {% endif %}
-                        </td>
-                        <td style="padding: 12px; text-align: right;">
-                            <a href="{% url 'data_management:manual_entry_detail' pk=item.pk %}" style="color: #005CAB; font-weight: 600; text-decoration: none; margin-right: 8px;">View</a>
-                            {% if item.review_status != 'APPROVED' %}
-                                <a href="{% url 'data_management:manual_entry_edit' pk=item.pk %}" style="color: #64748B; font-weight: 600; text-decoration: none;">Edit</a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="10" style="padding: 32px; text-align: center; color: #94A3B8;">
-                            No manual agricultural records found matching your filters.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="panel-card">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <h3>Manual Field Observations Registry</h3>
+                <p class="panel-subtitle">Auditable record submissions subject to authority validation</p>
+            </div>
+            <span class="panel-badge green">Vetting Queue</span>
         </div>
+        <div class="panel-body no-padding">
+            <div class="table-responsive">
+                <table class="lineage-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Kind of Data</th>
+                            <th>Season</th>
+                            <th>Date</th>
+                            <th>Crop</th>
+                            <th>Location</th>
+                            <th>Area (ha)</th>
+                            <th>Production</th>
+                            <th>Yield (kg/ha)</th>
+                            <th>Review Status</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in page_obj %}
+                        <tr>
+                            <td style="font-weight: 700; color: #2563EB;">#{{ item.id }}</td>
+                            <td><span class="panel-badge cyan">{{ item.get_data_kind_display }}</span></td>
+                            <td style="font-weight: 600; color: #1E293B;">{{ item.season.year }} {{ item.season.get_season_display }}</td>
+                            <td style="color: #64748B; font-size: 0.82rem;">{{ item.observation_date|date:"Y-m-d" }}</td>
+                            <td style="font-weight: 700; color: #0F172A;">{{ item.crop.name }}</td>
+                            <td>{{ item.district.name }}, {{ item.sector.name }}</td>
+                            <td>{{ item.plot_area_ha }} ha</td>
+                            <td>{{ item.total_production_kg }} kg</td>
+                            <td style="font-weight: 700; color: #16A34A;">{{ item.calculated_yield_kg_per_ha }}</td>
+                            <td>
+                                {% if item.review_status == 'APPROVED' %}
+                                    <span class="status-pill approved">APPROVED</span>
+                                {% elif item.review_status == 'SUBMITTED' %}
+                                    <span class="status-pill pending">IN REVIEW</span>
+                                {% elif item.review_status == 'REJECTED' %}
+                                    <span class="status-pill rejected">REJECTED</span>
+                                {% else %}
+                                    <span class="status-pill draft">DRAFT</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right; white-space: nowrap;">
+                                <a href="{% url 'data_management:manual_entry_detail' pk=item.pk %}" class="btn-action" style="padding: 4px 10px; font-size: 0.78rem; color: #2563EB;">View</a>
+                                {% if item.review_status != 'APPROVED' %}
+                                    <a href="{% url 'data_management:manual_entry_edit' pk=item.pk %}" class="btn-action" style="padding: 4px 10px; font-size: 0.78rem;">Edit</a>
+                                    <form method="POST" action="{% url 'data_management:manual_entry_delete' pk=item.pk %}" style="display: inline;" onsubmit="return confirm('Delete observation #{{ item.id }}?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-action danger" style="padding: 4px 10px; font-size: 0.78rem;">Delete</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="11" style="padding: 36px; text-align: center; color: #94A3B8;">
+                                No manual agricultural records found matching your filters.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-        <!-- Pagination -->
-        {% if page_obj.has_other_pages %}
-        <div style="display: flex; justify-content: center; gap: 8px; margin-top: 20px;">
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if query %}&q={{ query }}{% endif %}" class="dash-compact-select" style="text-decoration: none;">&larr; Previous</a>
-            {% endif %}
-            <span style="padding: 6px 12px; font-size: 0.85rem; color: #64748B;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if query %}&q={{ query }}{% endif %}" class="dash-compact-select" style="text-decoration: none;">Next &rarr;</a>
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div style="display: flex; justify-content: center; gap: 8px; padding: 20px; border-top: 1px solid #F1F5F9;">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if query %}&q={{ query }}{% endif %}" class="btn-action" style="font-size: 0.8rem;">&larr; Previous</a>
+                {% endif %}
+                <span style="padding: 6px 12px; font-size: 0.85rem; color: #64748B; font-weight: 600;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if query %}&q={{ query }}{% endif %}" class="btn-action" style="font-size: 0.8rem;">Next &rarr;</a>
+                {% endif %}
+            </div>
             {% endif %}
         </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

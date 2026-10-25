@@ -1,64 +1,76 @@
 /* ==========================================================================
    AgriLens Public Stylesheet & Design System
-   Brand Identity: Official National Institute of Statistics of Rwanda (NISR)
-   Hackathon: 2026 NISR Big Data Hackathon – Track 1: Agricultural Productivity
+   Official Palette: Agriculture, Trust, Data Intelligence & Professionalism
    ========================================================================== */
 
 :root {
-    /* -------------------------------------------------------------------------
-       OFFICIAL NISR BRAND PALETTE (From NISR Brand Guidelines & Slide Specs)
-       1. PANTONE 2728 C: CMYK: 96 69 0 0    | RGB: 0 92 171   | HEX: #005CAB
-       2. PANTONE CYAN:   CMYK: 100 0 0 0    | RGB: 0 174 239  | HEX: #00AEEF
-       3. PANTONE 362 C:  CMYK: 70 0 100 9   | RGB: 70 155 45  | HEX: #46962B
-       4. PANTONE 3965 C: CMYK: 8 0 100 0    | RGB: 243 234 0  | HEX: #F3EA00
-       ------------------------------------------------------------------------- */
-    --nisr-blue: #005CAB;
-    --nisr-blue-hover: #004B8C;
-    --nisr-blue-dark: #003E73;
-    --nisr-blue-deep: #002244;
-    --nisr-blue-subtle: #F0F7FD;
-    --nisr-blue-border: #BAE0FB;
+    /* Brand Colors */
+    --brand-primary: #166534;        /* Primary Green: Brand & Primary Navigation */
+    --brand-primary-hover: #14532D;  /* Darker Primary Green */
+    --brand-action: #15803D;         /* Action Green: Submit, Approve, Publish */
+    --brand-action-hover: #166534;   /* Action Green Hover State */
+    --brand-lime: #84CC16;           /* Agriculture Lime: Accent */
+    --brand-yellow: #FACC15;         /* Harvest Yellow: Accent */
 
-    --nisr-cyan: #00AEEF;
-    --nisr-cyan-hover: #22BEF6;
-    --nisr-cyan-dark: #0088BC;
-    --nisr-cyan-subtle: #E8F7FE;
-    --nisr-cyan-border: #BCE7FC;
-
-    --nisr-green: #46962B;
-    --nisr-green-hover: #3A8023;
-    --nisr-green-dark: #2F6A1B;
-    --nisr-green-subtle: #F0F8EE;
-    --nisr-green-border: #CEE8C6;
-
-    --nisr-yellow: #F3EA00;
-    --nisr-yellow-dark: #C69500;
-    --nisr-yellow-accent: #D4A000;
-    --nisr-yellow-subtle: #FEFEEA;
-    --nisr-yellow-border: #F7F18A;
-
-    /* Semantic Aliases */
-    --brand-primary: var(--nisr-blue);
-    --brand-primary-hover: var(--nisr-blue-hover);
-    --brand-secondary: var(--nisr-cyan);
-    --brand-accent: var(--nisr-green);
-    --brand-highlight: var(--nisr-yellow);
-    --brand-forest: var(--nisr-blue-deep);
-    --brand-amber: #D97706;
-    --brand-red: #DC2626;
-
-    /* Neutral Scale */
-    --bg-page: #F8FAFC;
-    --bg-surface: #FFFFFF;
-    --bg-subtle: #F1F5F9;
-    --bg-alt: #F4F7FB;
-
-    --border-subtle: #E2E8F0;
+    /* Background and Surface Colors */
+    --bg-page: #F8FAFC;              /* Main Background */
+    --bg-main: #F8FAFC;
+    --bg-surface: #FFFFFF;           /* Card and Surface Background */
+    --bg-card: #FFFFFF;
+    --bg-subtle: #F1F5F9;            /* Subtle Background */
+    --bg-alt: #F8FAFC;
+    --border-subtle: #E2E8F0;        /* Standard Border */
+    --border-color: #E2E8F0;
     --border-medium: #CBD5E1;
 
-    --text-main: #0F172A;
-    --text-muted: #475569;
-    --text-sub: #64748B;
+    /* Text Colors */
+    --text-main: #0F172A;            /* Primary Text */
+    --text-primary: #0F172A;
+    --text-muted: #94A3B8;           /* Muted Text */
+    --text-sub: #64748B;             /* Secondary Text */
+    --text-secondary: #64748B;
+    --text-on-dark: #FFFFFF;         /* Text on Dark Background */
+
+    /* Semantic Colors */
+    --semantic-success: #16A34A;     /* Success */
+    --semantic-warning: #D97706;     /* Warning */
+    --semantic-error: #DC2626;       /* Error */
+    --semantic-info: #2563EB;        /* Information */
+    --semantic-purple: #7C3AED;      /* Purple Highlight */
+
+    /* Semantic Aliases */
+    --success: var(--semantic-success);
+    --warning: var(--semantic-warning);
+    --error: var(--semantic-error);
+    --info: var(--semantic-info);
+    --purple: var(--semantic-purple);
+    --brand-secondary: var(--semantic-info);
+    --brand-accent: var(--brand-lime);
+    --brand-highlight: var(--brand-yellow);
+    --brand-forest: #0F172A;
+    --brand-amber: var(--semantic-warning);
+    --brand-red: var(--semantic-error);
+
+    /* Accessible Semantic Backgrounds & Borders */
+    --success-bg: #F0FDF4;
+    --success-border: #BBF7D0;
+    --success-text: #166534;
+
+    --warning-bg: #FFFBEB;
+    --warning-border: #FDE68A;
+    --warning-text: #92400E;
+
+    --error-bg: #FEF2F2;
+    --error-border: #FCA5A5;
+    --error-text: #991B1B;
+
+    --info-bg: #EFF6FF;
+    --info-border: #BFDBFE;
+    --info-text: #1D4ED8;
+
+    --purple-bg: #FAF5FF;
+    --purple-border: #E9D5FF;
+    --purple-text: #6B21A8;
 
     --radius-sm: 6px;
     --radius-md: 10px;
@@ -248,15 +260,15 @@ body.public-body {
 }
 
 .public-nav-link:hover {
-    color: #16A34A;
-    background: #F0FDF4;
+    color: var(--brand-primary);
+    background: var(--success-bg);
 }
 
 .public-nav-link.active {
-    color: #16A34A;
+    color: var(--brand-primary);
     font-weight: 600;
     background: transparent;
-    border: 1.5px solid #16A34A;
+    border: 1.5px solid var(--brand-primary);
     border-radius: 6px;
     padding: 5px 11px;
 }
@@ -287,8 +299,8 @@ body.public-body {
 
 .header-search-pill:focus-within {
     background: #FFFFFF;
-    border-color: #16A34A;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+    border-color: var(--brand-action);
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
 }
 
 .header-search-pill input {
@@ -304,9 +316,9 @@ body.public-body {
     color: #94A3B8;
 }
 
-/* Dark Green Sign In Pill Button */
+/* Action Green Sign In Pill Button */
 .btn-signin-pill {
-    background: #064E3B;
+    background: var(--brand-action);
     color: #FFFFFF;
     text-decoration: none;
     padding: 7px 16px;
@@ -316,6 +328,14 @@ body.public-body {
     display: inline-flex;
     align-items: center;
     gap: 7px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.btn-signin-pill:hover {
+    background: var(--brand-action-hover);
+    color: #FFFFFF;
+}
     transition: all 0.2s ease;
     border: 1px solid transparent;
     white-space: nowrap;
@@ -2282,7 +2302,7 @@ body.public-body {
 .btn-officer-signin {
     width: 100%;
     padding: 13px 20px;
-    background: #065F46;
+    background: var(--brand-action);
     color: #FFFFFF;
     font-size: 0.95rem;
     font-weight: 700;
@@ -2294,14 +2314,14 @@ body.public-body {
     justify-content: center;
     gap: 10px;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 14px rgba(6, 95, 70, 0.35);
+    box-shadow: 0 4px 14px rgba(21, 128, 61, 0.35);
     font-family: inherit;
 }
 
 .btn-officer-signin:hover {
-    background: #047857;
+    background: var(--brand-action-hover);
     transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(6, 95, 70, 0.45);
+    box-shadow: 0 6px 18px rgba(21, 128, 61, 0.45);
 }
 
 .btn-officer-signin:active {

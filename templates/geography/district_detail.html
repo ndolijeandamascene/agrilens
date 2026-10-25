@@ -1,63 +1,76 @@
 {% extends request.user.is_authenticated|yesno:"base.html,public_base.html" %}
 
-{% block title %}{{ district.name }} District | AgriLens Rwanda{% endblock %}
+{% block title %}{{ district.name }} District | Geographic Intelligence | AgriLens Rwanda{% endblock %}
 {% block section_title %}{{ district.name }} District &bull; Geographic Intelligence{% endblock %}
 
 {% block content %}
 <div class="content-container">
-    <div style="margin-bottom: 16px;">
-        <a href="{% url 'geography:district_list' %}" style="color: #005CAB; font-weight: 600; text-decoration: none; font-size: 0.875rem;">
-            &larr; Back to Districts Registry
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'geography:district_list' %}" class="btn-action">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Back to Districts Map</span>
         </a>
     </div>
 
+    <!-- District Overview Header Card -->
     <div class="panel-card" style="margin-bottom: 24px;">
+        <div style="display: flex; height: 5px; width: 100%;">
+            <span style="flex: 1; background: #166534;"></span>
+            <span style="flex: 1; background: #15803D;"></span>
+            <span style="flex: 1; background: #84CC16;"></span>
+            <span style="flex: 1; background: #FACC15;"></span>
+        </div>
         <div class="panel-header">
             <div class="panel-title-group">
                 <h3>{{ district.name }} District</h3>
-                <p class="panel-subtitle">Province: <strong>{{ district.province.name }}</strong> &bull; Administrative Code: <code>{{ district.code }}</code></p>
+                <p class="panel-subtitle">Province: <strong>{{ district.province.name }}</strong> &bull; Administrative Code: <code style="font-family: monospace; color: #2563EB; font-weight: 700; background: #EFF6FF; padding: 2px 6px; border-radius: 4px;">{{ district.code }}</code></p>
             </div>
-            <div style="display: flex; gap: 8px;">
-                <a href="{% url 'indicators:productivity' %}?district={{ district.name }}" class="btn-action primary" style="padding: 8px 16px; background: #005CAB; color: white; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 0.85rem;">
-                    Productivity Analytics &rarr;
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span class="panel-badge blue">{{ district.province.name }} Province</span>
+                <a href="{% url 'indicators:productivity' %}?district={{ district.name }}" class="btn-action primary">
+                    <span>Productivity Analytics &rarr;</span>
                 </a>
             </div>
         </div>
         <div class="panel-body" style="padding: 24px;">
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;">
-                <div style="padding: 16px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
-                    <div style="font-size: 0.8rem; color: #64748B;">Total Sectors</div>
-                    <div style="font-size: 1.5rem; font-weight: 800; color: #001F3B; margin-top: 4px;">{{ sectors|length }}</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px;">
+                <div style="padding: 18px 20px; background: #F8FAFC; border-radius: 10px; border: 1px solid #E2E8F0;">
+                    <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Administrative Sectors</div>
+                    <div style="font-size: 1.7rem; font-weight: 800; color: #0F172A; margin-top: 4px;">{{ sectors|length }}</div>
+                    <div style="font-size: 0.76rem; color: #64748B; margin-top: 2px;">Sub-district administrative units</div>
                 </div>
-                <div style="padding: 16px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
-                    <div style="font-size: 0.8rem; color: #64748B;">Verified Microdata Plots</div>
-                    <div style="font-size: 1.5rem; font-weight: 800; color: #005CAB; margin-top: 4px;">{{ total_obs }}</div>
+                <div style="padding: 18px 20px; background: #EFF6FF; border-radius: 10px; border: 1px solid #BFDBFE;">
+                    <div style="font-size: 0.78rem; font-weight: 700; color: #2563EB; text-transform: uppercase;">Verified Microdata Plots</div>
+                    <div style="font-size: 1.7rem; font-weight: 800; color: #2563EB; margin-top: 4px;">{{ total_obs }}</div>
+                    <div style="font-size: 0.76rem; color: #1E40AF; margin-top: 2px;">NISR SAS GPS-measured plot sample</div>
                 </div>
-                <div style="padding: 16px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
-                    <div style="font-size: 0.8rem; color: #64748B;">Province Jurisdiction</div>
-                    <div style="font-size: 1.1rem; font-weight: 700; color: #001F3B; margin-top: 8px;">{{ district.province.name }}</div>
+                <div style="padding: 18px 20px; background: #F8FAFC; border-radius: 10px; border: 1px solid #E2E8F0;">
+                    <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Provincial Jurisdiction</div>
+                    <div style="font-size: 1.3rem; font-weight: 800; color: #0F172A; margin-top: 8px;">{{ district.province.name }} Province</div>
+                    <div style="font-size: 0.76rem; color: #166534; margin-top: 2px;">Agro-ecological cluster</div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Administrative Sectors List -->
-    <div class="panel-card" style="margin-bottom: 24px;">
+    <div class="panel-card">
         <div class="panel-header">
             <div class="panel-title-group">
-                <h3>Administrative Sectors ({{ sectors|length }})</h3>
-                <p class="panel-subtitle">Official administrative sub-divisions for {{ district.name }}</p>
+                <h3>Administrative Sectors in {{ district.name }}</h3>
+                <p class="panel-subtitle">{{ sectors|length }} cataloged sectors under MINALOC / NISR administrative registry</p>
             </div>
+            <span class="panel-badge cyan">{{ sectors|length }} Sectors</span>
         </div>
         <div class="panel-body" style="padding: 24px;">
             <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                 {% for sector in sectors %}
-                <div style="padding: 8px 14px; background: #F1F5F9; border-radius: 6px; font-size: 0.85rem; color: #1E293B; display: flex; align-items: center; gap: 8px;">
-                    <span style="font-weight: 600;">{{ sector.name }}</span>
-                    <code style="font-size: 0.75rem; color: #64748B;">{{ sector.code }}</code>
+                <div style="padding: 8px 14px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.85rem; color: #1E293B; display: flex; align-items: center; gap: 8px; transition: border-color 0.15s ease;">
+                    <span style="font-weight: 700; color: #0F172A;">{{ sector.name }}</span>
+                    <code style="font-size: 0.75rem; color: #2563EB; background: #EFF6FF; padding: 2px 6px; border-radius: 4px;">{{ sector.code }}</code>
                 </div>
                 {% empty %}
-                <p style="color: #64748B;">No sectors cataloged for this district.</p>
+                <p style="color: #64748B; font-size: 0.88rem;">No administrative sectors cataloged for this district.</p>
                 {% endfor %}
             </div>
         </div>

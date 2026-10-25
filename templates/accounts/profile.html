@@ -5,13 +5,13 @@
 
 {% block content %}
 <div class="profile-container" style="max-width: 760px; margin: 30px auto; padding: 0 16px;">
-    <div class="panel-card" style="box-shadow: 0 4px 12px -2px rgba(0, 31, 59, 0.05); border: 1px solid #BAE0FB;">
+    <div class="panel-card" style="box-shadow: 0 4px 12px -2px rgba(0, 31, 59, 0.05); border: 1px solid #E2E8F0;">
         <div class="panel-header" style="border-bottom: 1px solid #E2E8F0; padding-bottom: 16px;">
             <div class="panel-title-group">
                 <h3>{{ user.get_full_name|default:user.username }}</h3>
                 <p class="panel-subtitle">{{ user.get_role_display }} &bull; {{ user.organization|default:"Ministry of Agriculture and Animal Resources (MINAGRI)" }}</p>
             </div>
-            <span class="panel-badge blue" style="background: #E8F7FE; color: #005CAB; font-weight: 700; padding: 6px 12px; border-radius: 6px;">
+            <span class="panel-badge blue" style="background: #EFF6FF; color: #2563EB; font-weight: 700; padding: 6px 12px; border-radius: 6px;">
                 {{ user.role }}
             </span>
         </div>
@@ -55,11 +55,11 @@
                     </div>
                 </div>
 
-                <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                    <a href="{% url 'accounts:logout' %}" style="padding: 10px 18px; background: #F1F5F9; color: #475569; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.9rem;">
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 18px; border-top: 1px solid #F1F5F9;">
+                    <a href="{% url 'accounts:logout' %}" class="btn-action">
                         Sign Out
                     </a>
-                    <button type="submit" style="padding: 10px 22px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer;">
+                    <button type="submit" class="btn-action primary">
                         Save Profile Changes
                     </button>
                 </div>

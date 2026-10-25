@@ -1,72 +1,90 @@
 /* ==========================================================================
    AgriLens Master Dashboard Design System & Layout
-   Brand Identity: Official National Institute of Statistics of Rwanda (NISR)
-   Colors Specification:
-     1. PANTONE 2728 C: CMYK: 96 69 0 0    | RGB: 0 92 171   | HEX: #005CAB
-     2. PANTONE CYAN:   CMYK: 100 0 0 0    | RGB: 0 174 239  | HEX: #00AEEF
-     3. PANTONE 362 C:  CMYK: 70 0 100 9   | RGB: 70 155 45  | HEX: #46962B
-     4. PANTONE 3965 C: CMYK: 8 0 100 0    | RGB: 243 234 0  | HEX: #F3EA00
+   Official Palette: Agriculture, Trust, Data Intelligence & Professionalism
    ========================================================================== */
 
 :root {
-    /* Official NISR Brand Identity */
-    --nisr-blue: #005CAB;
-    --nisr-blue-hover: #004B8C;
-    --nisr-blue-dark: #003E73;
-    --nisr-blue-deep: #001F3B;
-    --nisr-blue-subtle: #F0F7FD;
-    --nisr-blue-border: #BAE0FB;
+    /* Brand Colors */
+    --brand-primary: #166534;        /* Primary Green: Brand & Primary Navigation */
+    --brand-primary-hover: #14532D;  /* Darker Primary Green */
+    --brand-action: #15803D;         /* Action Green: Submit, Approve, Publish */
+    --brand-action-hover: #166534;   /* Action Green Hover State */
+    --brand-lime: #84CC16;           /* Agriculture Lime: Accent */
+    --brand-yellow: #FACC15;         /* Harvest Yellow: Accent */
 
-    --nisr-cyan: #00AEEF;
-    --nisr-cyan-hover: #22BEF6;
-    --nisr-cyan-dark: #0088BC;
-    --nisr-cyan-subtle: #E8F7FE;
-    --nisr-cyan-border: #BCE7FC;
+    /* Background and Surface Colors */
+    --bg-main: #F8FAFC;              /* Main Background */
+    --bg-page: #F8FAFC;
+    --bg-surface: #FFFFFF;           /* Card and Surface Background */
+    --bg-card: #FFFFFF;
+    --bg-subtle: #F1F5F9;            /* Subtle Background */
+    --bg-sidebar: #0F2E24;           /* Dark Forest Green Sidemenu */
+    --sidebar-bg: #0F2E24;
+    --border-color: #E2E8F0;         /* Standard Border */
+    --border-subtle: #E2E8F0;
+    --border-medium: #CBD5E1;
 
-    --nisr-green: #46962B;
-    --nisr-green-hover: #3A8023;
-    --nisr-green-dark: #2F6A1B;
-    --nisr-green-subtle: #F0F8EE;
-    --nisr-green-border: #CEE8C6;
+    /* Text Colors */
+    --text-primary: #0F172A;         /* Primary Text */
+    --text-main: #0F172A;
+    --text-secondary: #64748B;       /* Secondary Text */
+    --text-muted: #94A3B8;           /* Muted Text */
+    --text-on-dark: #FFFFFF;         /* Text on Dark Background */
 
-    --nisr-yellow: #F3EA00;
-    --nisr-yellow-dark: #B28200;
-    --nisr-yellow-accent: #D4A000;
-    --nisr-yellow-subtle: #FEFEEA;
-    --nisr-yellow-border: #F7F18A;
+    /* Semantic Colors */
+    --semantic-success: #16A34A;     /* Success */
+    --semantic-warning: #D97706;     /* Warning */
+    --semantic-error: #DC2626;       /* Error */
+    --semantic-info: #2563EB;        /* Information */
+    --semantic-purple: #7C3AED;      /* Purple Highlight */
 
-    /* Semantic Dashboard Tokens */
-    --primary: var(--nisr-blue);
-    --primary-light: var(--nisr-blue-hover);
-    --primary-dark: var(--nisr-blue-dark);
-    --accent: var(--nisr-cyan);
-    --accent-light: var(--nisr-cyan-hover);
+    /* Semantic Aliases */
+    --success: var(--semantic-success);
+    --warning: var(--semantic-warning);
+    --error: var(--semantic-error);
+    --info: var(--semantic-info);
+    --purple: var(--semantic-purple);
+    --primary: var(--brand-primary);
+    --primary-light: var(--brand-action);
+    --primary-dark: var(--brand-primary-hover);
+    --accent: var(--brand-lime);
+    --accent-light: var(--brand-yellow);
 
-    --bg-main: #F4F7FB;
-    --bg-surface: #FFFFFF;
-    --border-color: #E2E8F0;
-    --text-primary: #0F172A;
-    --text-secondary: #64748B;
-    /* Deep Agricultural Green Brand Identity */
-    --primary-green: #059669;
-    --primary-green-dark: #064E3B;
-    --primary-green-deep: #062319;
-    --primary-green-light: #10B981;
-    --primary-green-subtle: #ECFDF5;
+    /* Accessible Semantic Backgrounds & Borders */
+    --success-bg: #F0FDF4;
+    --success-border: #BBF7D0;
+    --success-text: #166534;
 
-    /* Deep Forest Green Sidebar */
-    --sidebar-bg: #062319;
+    --warning-bg: #FFFBEB;
+    --warning-border: #FDE68A;
+    --warning-text: #92400E;
+
+    --error-bg: #FEF2F2;
+    --error-border: #FCA5A5;
+    --error-text: #991B1B;
+
+    --info-bg: #EFF6FF;
+    --info-border: #BFDBFE;
+    --info-text: #1D4ED8;
+
+    --purple-bg: #FAF5FF;
+    --purple-border: #E9D5FF;
+    --purple-text: #6B21A8;
+
+    /* Primary Navigation & Sidebar - Dark Forest Green Reference */
+    --sidebar-bg: #064E3B;           /* Dark Forest Green */
     --sidebar-border: rgba(255, 255, 255, 0.08);
-    --sidebar-text: #94A3B8;
+    --sidebar-text: #E2E8F0;
     --sidebar-text-hover: #FFFFFF;
-    --sidebar-active-bg: #059669;
+    --sidebar-active-bg: #059669;    /* Action Emerald */
     --sidebar-active-text: #FFFFFF;
-    --sidebar-active-border: #10B981;
+    --sidebar-active-border: transparent;
 
-    --success: var(--primary-green);
-    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-    --radius-md: 12px;
-    --radius-lg: 16px;
+    /* General Layout */
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
 }
 
 * {
@@ -89,7 +107,7 @@ body.agrilens-body {
 }
 
 /* ==========================================================================
-   SIDEBAR (NISR Deep Institutional Navy & Cyan Accents)
+   SIDEBAR (AgriLens Dark Forest Green Brand Navigation)
    ========================================================================== */
 .sidebar {
     width: 260px;
@@ -109,18 +127,19 @@ body.agrilens-body {
     padding: 22px 20px;
     border-bottom: 1px solid var(--sidebar-border);
     text-decoration: none;
+    background: #043828;
 }
 
 .brand-logo-icon {
     width: 38px;
     height: 38px;
-    background: linear-gradient(135deg, var(--nisr-blue) 0%, var(--nisr-cyan) 100%);
+    background: linear-gradient(135deg, #059669 0%, #34D399 100%);
     color: #FFFFFF;
     border-radius: 9px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0, 92, 171, 0.35);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     flex-shrink: 0;
 }
 
@@ -140,7 +159,7 @@ body.agrilens-body {
 
 .brand-tagline {
     font-size: 0.68rem;
-    color: var(--nisr-cyan);
+    color: #34D399;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-weight: 700;
@@ -149,8 +168,8 @@ body.agrilens-body {
 .sidebar-nav {
     display: flex;
     flex-direction: column;
-    padding: 16px 12px;
-    gap: 4px;
+    padding: 12px 8px;
+    gap: 2px;
     flex: 1;
 }
 
@@ -159,7 +178,7 @@ body.agrilens-body {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #64748B;
+    color: #34D399;
     padding: 12px 14px 4px 14px;
 }
 
@@ -167,14 +186,14 @@ body.agrilens-body {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 14px;
-    color: #CBD5E1;
+    margin: 2px 6px;
+    padding: 9px 12px;
+    color: #E2E8F0;
     text-decoration: none;
     font-size: 0.88rem;
     font-weight: 500;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    border-left: 3px solid transparent;
+    border-radius: 6px;
+    transition: all 0.15s ease;
 }
 
 .nav-item:hover {
@@ -183,11 +202,11 @@ body.agrilens-body {
 }
 
 .nav-item.active {
-    background-color: #059669;
+    background-color: var(--sidebar-active-bg);
     color: #FFFFFF;
-    font-weight: 600;
-    border-left: 3px solid #10B981;
-    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35);
+    font-weight: 700;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .nav-svg {
@@ -195,20 +214,27 @@ body.agrilens-body {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    color: #A7F3D0;
+}
+
+.nav-item:hover .nav-svg,
+.nav-item.active .nav-svg {
+    color: #FFFFFF;
 }
 
 .sidebar-footer {
     padding: 16px 20px;
     border-top: 1px solid var(--sidebar-border);
     font-size: 0.74rem;
-    color: #64748B;
+    color: rgba(255, 255, 255, 0.65);
+    background: #043828;
 }
 
 .sidebar-nisr-tag {
     display: flex;
     align-items: center;
     gap: 6px;
-    color: var(--nisr-cyan);
+    color: #34D399;
     font-weight: 700;
     margin-bottom: 2px;
 }
@@ -218,7 +244,7 @@ body.agrilens-body {
 .nav-section-header:focus-visible,
 .btn-sidebar-toggle:focus-visible,
 .btn-desktop-collapse:focus-visible {
-    outline: 2px solid var(--nisr-cyan);
+    outline: 2px solid var(--brand-lime);
     outline-offset: 2px;
 }
 
@@ -1159,5 +1185,495 @@ body.agrilens-body {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================================================
+   OFFICIAL AGRILENS / NISR UNIFIED COMPONENT DESIGN SYSTEM
+   Brand Specification:
+     --nisr-blue:   #005CAB | Pantone 2728 C (Primary)
+     --nisr-cyan:   #00AEEF | Pantone Cyan (Accent)
+     --nisr-green:  #46962B | Pantone 362 C / #059669 (Agriculture / Success)
+     --nisr-yellow: #F3EA00 | Pantone 3965 C (Warning / Rwanda Sun)
+     --nisr-navy:   #001F3B (Deep Institutional Navy)
+   ========================================================================== */
+
+/* 1. Page Content Containers */
+.content-container {
+    padding: 24px 32px;
+    max-width: 1440px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .content-container {
+        padding: 16px 14px;
+    }
+}
+
+/* 2. Structured Panel Cards */
+.panel-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-sizing: border-box;
+}
+
+.panel-header {
+    padding: 16px 22px;
+    border-bottom: 1px solid #F1F5F9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    background: #FFFFFF;
+}
+
+.panel-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.panel-title-group h2,
+.panel-title-group h3 {
+    font-size: 1.08rem;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+}
+
+.panel-subtitle,
+.panel-title-group p {
+    font-size: 0.8rem;
+    color: #64748B;
+    margin: 3px 0 0 0;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.panel-body {
+    padding: 22px 24px;
+    box-sizing: border-box;
+}
+
+.panel-body.no-padding {
+    padding: 0;
+}
+
+/* 3. Institutional Badges */
+.panel-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.panel-badge.blue,
+.panel-badge.info {
+    background: var(--info-bg);
+    color: var(--info-text);
+    border: 1px solid var(--info-border);
+}
+
+.panel-badge.green,
+.panel-badge.brand {
+    background: var(--success-bg);
+    color: var(--brand-primary);
+    border: 1px solid var(--success-border);
+}
+
+.panel-badge.yellow,
+.panel-badge.warning {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+    border: 1px solid var(--warning-border);
+}
+
+.panel-badge.lime {
+    background: #F7FEE7;
+    color: #3F6212;
+    border: 1px solid #D9F99D;
+}
+
+.panel-badge.cyan {
+    background: var(--info-bg);
+    color: var(--info-text);
+    border: 1px solid var(--info-border);
+}
+
+.panel-badge.red,
+.panel-badge.error {
+    background: var(--error-bg);
+    color: var(--error-text);
+    border: 1px solid var(--error-border);
+}
+
+.panel-badge.purple {
+    background: var(--purple-bg);
+    color: var(--purple-text);
+    border: 1px solid var(--purple-border);
+}
+
+.panel-badge.slate {
+    background: var(--bg-subtle);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+/* 4. Lineage Data Tables */
+.lineage-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+    text-align: left;
+}
+
+.lineage-table th {
+    background: var(--bg-subtle);
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 12px 18px;
+    border-bottom: 1.5px solid var(--border-color);
+    white-space: nowrap;
+}
+
+.lineage-table td {
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+.lineage-table tr:hover td {
+    background: rgba(248, 250, 252, 0.9);
+}
+
+.lineage-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* 5. Institutional Action Buttons */
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1px solid var(--border-medium);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.btn-action:hover {
+    background: var(--bg-subtle);
+    border-color: var(--text-muted);
+    color: var(--text-primary);
+}
+
+.btn-action.primary,
+.btn-action.action-green,
+.btn-action.action {
+    background: var(--brand-action);
+    color: #FFFFFF;
+    border-color: var(--brand-action);
+    box-shadow: 0 2px 6px rgba(21, 128, 61, 0.22);
+}
+
+.btn-action.primary:hover,
+.btn-action.action-green:hover,
+.btn-action.action:hover {
+    background: var(--brand-action-hover);
+    border-color: var(--brand-action-hover);
+    color: #FFFFFF;
+    box-shadow: 0 4px 10px rgba(21, 128, 61, 0.32);
+}
+
+.btn-action.secondary {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.btn-action.secondary:hover {
+    background: var(--bg-subtle);
+    border-color: var(--border-medium);
+    color: var(--text-primary);
+}
+
+.btn-action.brand {
+    background: var(--brand-primary);
+    color: #FFFFFF;
+    border-color: var(--brand-primary);
+}
+
+.btn-action.brand:hover {
+    background: var(--brand-primary-hover);
+    border-color: var(--brand-primary-hover);
+    color: #FFFFFF;
+}
+
+.btn-action.danger {
+    background: var(--semantic-error);
+    color: #FFFFFF;
+    border-color: var(--semantic-error);
+}
+
+.btn-action.danger:hover {
+    background: #B91C1C;
+    border-color: #B91C1C;
+    color: #FFFFFF;
+}
+
+.btn-portal-return {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--success-bg);
+    color: var(--brand-primary);
+    border: 1px solid var(--success-border);
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.btn-portal-return:hover {
+    background: var(--brand-action);
+    color: #FFFFFF;
+    border-color: var(--brand-action);
+}
+
+/* 6. Form Controls & Inputs */
+.dash-text-input,
+.dash-select-input,
+.dash-textarea-input,
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 9px 13px;
+    border-radius: 8px;
+    border: 1px solid #CBD5E1;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: #0F172A;
+    background-color: #FFFFFF;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.dash-text-input:focus,
+.dash-select-input:focus,
+.dash-textarea-input:focus,
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    border-color: var(--brand-action);
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
+}
+
+.dash-text-input::placeholder,
+.dash-textarea-input::placeholder,
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: var(--text-muted);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-label {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.form-help {
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+    margin-top: 3px;
+    line-height: 1.35;
+}
+
+.error-text {
+    color: var(--semantic-error);
+    font-size: 0.8rem;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+/* 7. KPI Metrics Grid for Governance & Lineage Hub */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 1024px) {
+    .metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.metrics-grid .metric-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    min-height: 140px;
+    box-sizing: border-box;
+}
+
+.metrics-grid .metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    border-color: var(--border-medium);
+}
+
+.card-brand-green, .card-nisr-green { border-top: 4px solid var(--brand-primary) !important; }
+.card-brand-action, .card-nisr-blue { border-top: 4px solid var(--brand-action) !important; }
+.card-brand-lime, .card-nisr-cyan { border-top: 4px solid var(--brand-lime) !important; }
+.card-brand-yellow, .card-nisr-yellow { border-top: 4px solid var(--brand-yellow) !important; }
+
+.metric-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.metric-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.badge-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.metric-footer {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.metric-status {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 9999px;
+}
+
+.metric-status.blue { background: var(--info-bg); color: var(--info-text); }
+.metric-status.yellow { background: var(--warning-bg); color: var(--warning-text); }
+.metric-status.green { background: var(--success-bg); color: var(--brand-primary); }
+.metric-status.lime { background: #F7FEE7; color: #3F6212; }
+.metric-status.cyan { background: var(--info-bg); color: var(--info-text); }
+
+/* 8. Status Pills */
+.status-pill {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.status-pill.verified,
+.status-pill.approved {
+    background: var(--success-bg);
+    color: var(--brand-action);
+    border: 1px solid var(--success-border);
+}
+
+.status-pill.pending,
+.status-pill.under_review {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+    border: 1px solid var(--warning-border);
+}
+
+.status-pill.draft {
+    background: var(--bg-subtle);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-medium);
+}
+
+.status-pill.rejected,
+.status-pill.needs_correction {
+    background: var(--error-bg);
+    color: var(--error-text);
+    border: 1px solid var(--error-border);
+}
+
+.status-pill.published {
+    background: var(--brand-primary);
+    color: #FFFFFF;
+    border: 1px solid var(--brand-primary);
+}
+
 
 

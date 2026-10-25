@@ -18,13 +18,13 @@
     <!-- Header Strip -->
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
         <div>
-            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;">
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #2563EB; background: #EFF6FF; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;">
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 <span>Automated Reporting Infrastructure</span>
                 <span>&bull;</span>
                 <span>Africa/Kigali (RST) Scheduling</span>
             </div>
-            <h1 style="margin: 0; font-size: 1.75rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+            <h1 style="margin: 0; font-size: 1.75rem; color: #0F172A; font-weight: 800; letter-spacing: -0.02em;">
                 Scheduled Reports &amp; Recurring Schedulers
             </h1>
             <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #64748B;">
@@ -33,7 +33,7 @@
         </div>
 
         <div style="display: flex; gap: 10px; align-items: center;">
-            <a href="{% url 'dashboard:internal_report_center' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
+            <a href="{% url 'dashboard:internal_report_center' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; background: #FFFFFF; color: #15803D; border: 1px solid #BBF7D0; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
                 <i class="fa-solid fa-house"></i> Overview
             </a>
             <a href="{% url 'dashboard:internal_report_history' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; background: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
@@ -213,7 +213,7 @@
                         <div style="display: flex; gap: 8px;">
                             <form method="POST" action="{% url 'dashboard:internal_report_schedule_run_now' s.id %}" style="display: inline;">
                                 {% csrf_token %}
-                                <button type="submit" style="padding: 5px 12px; background: #005CAB; color: #FFF; border: none; border-radius: 4px; font-size: 0.76rem; font-weight: 600; cursor: pointer;">
+                                <button type="submit" style="padding: 5px 12px; background: #15803D; color: #FFF; border: none; border-radius: 4px; font-size: 0.76rem; font-weight: 600; cursor: pointer;">
                                     <i class="fa-solid fa-play"></i> Run Now
                                 </button>
                             </form>

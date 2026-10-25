@@ -18,11 +18,11 @@
     <!-- Header Strip -->
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
         <div>
-            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;">
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #166534; background: #F0FDF4; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;">
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
                 <span>On-Demand Statistical Report Engine</span>
             </div>
-            <h1 style="margin: 0; font-size: 1.75rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+            <h1 style="margin: 0; font-size: 1.75rem; color: #0F172A; font-weight: 800; letter-spacing: -0.02em;">
                 Generate Agricultural Report
             </h1>
             <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #64748B;">
@@ -34,7 +34,7 @@
             <a href="{% url 'dashboard:internal_report_history' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; background: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
                 <i class="fa-solid fa-clock-rotate-left"></i> Report History
             </a>
-            <a href="{% url 'dashboard:internal_report_center' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
+            <a href="{% url 'dashboard:internal_report_center' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; background: #FFFFFF; color: #15803D; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none;">
                 <i class="fa-solid fa-house"></i> Overview
             </a>
         </div>
@@ -182,7 +182,7 @@
                 <a href="{% url 'dashboard:internal_report_center' %}" style="padding: 10px 20px; font-size: 0.9rem; font-weight: 600; color: #64748B; text-decoration: none;">
                     Cancel
                 </a>
-                <button type="submit" id="generateSubmitBtn" style="padding: 11px 26px; background: #10B981; color: #FFFFFF; border: none; border-radius: 8px; font-size: 0.92rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25);">
+                <button type="submit" id="generateSubmitBtn" style="padding: 11px 26px; background: #15803D; color: #FFFFFF; border: none; border-radius: 8px; font-size: 0.92rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(21, 128, 61, 0.22);">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                     <span>Execute Report Generation</span>
                 </button>
@@ -192,7 +192,7 @@
 
     <!-- Methodology & Security Callout -->
     <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px 22px; font-size: 0.84rem; color: #475569; display: flex; gap: 14px; align-items: flex-start;">
-        <i class="fa-solid fa-circle-info" style="color: #005CAB; font-size: 1.2rem; margin-top: 2px;"></i>
+        <i class="fa-solid fa-circle-info" style="color: #2563EB; font-size: 1.2rem; margin-top: 2px;"></i>
         <div>
             <strong style="color: #0F172A;">Statistical Integrity &amp; Security Guarantee:</strong>
             All statistics generated through AgriLens rely on verified database records. Output files are sanitized against formula injection (CWE-1236), and files remain private inside role-protected internal storage until formal review and publication approval.
@@ -206,7 +206,7 @@ function highlightFormatCards() {
     radios.forEach(function(r) {
         var card = r.closest('.format-card');
         if (r.checked) {
-            card.style.borderColor = '#10B981';
+            card.style.borderColor = '#15803D';
             card.style.background = '#F0FDF4';
         } else {
             card.style.borderColor = '#E2E8F0';

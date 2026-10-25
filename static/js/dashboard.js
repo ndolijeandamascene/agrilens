@@ -593,10 +593,10 @@ function initMarketPriceChart() {
                 {
                     label: 'Kigali',
                     data: initial.kigali,
-                    borderColor: '#059669',
-                    backgroundColor: 'rgba(5, 150, 105, 0.08)',
+                    borderColor: '#15803D',
+                    backgroundColor: 'rgba(21, 128, 61, 0.08)',
                     borderWidth: 2.2,
-                    pointBackgroundColor: '#059669',
+                    pointBackgroundColor: '#15803D',
                     pointRadius: 3.5,
                     fill: false,
                     tension: 0.3
@@ -604,10 +604,10 @@ function initMarketPriceChart() {
                 {
                     label: 'Rwamagana',
                     data: initial.rwamagana,
-                    borderColor: '#0EA5E9',
+                    borderColor: '#2563EB',
                     backgroundColor: 'transparent',
                     borderWidth: 2.2,
-                    pointBackgroundColor: '#0EA5E9',
+                    pointBackgroundColor: '#2563EB',
                     pointRadius: 3.5,
                     tension: 0.3
                 }
@@ -677,11 +677,11 @@ function initLossStageChart() {
             datasets: [{
                 data: [42.1, 21.7, 12.4, 13.6, 10.2],
                 backgroundColor: [
-                    '#047857', // Storage (emerald)
-                    '#0D9488', // Processing (teal)
-                    '#F59E0B', // Losses (amber)
-                    '#3B82F6', // Marketing (blue)
-                    '#8B5CF6'  // Other (purple)
+                    '#166534', // Storage (Primary Green)
+                    '#15803D', // Processing (Action Green)
+                    '#D97706', // Losses (Warning)
+                    '#2563EB', // Marketing (Info Blue)
+                    '#7C3AED'  // Other (Purple)
                 ],
                 borderWidth: 2.5,
                 borderColor: '#FFFFFF',

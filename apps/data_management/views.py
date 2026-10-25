@@ -80,6 +80,44 @@ def data_source_create(request):
 
 
 @login_required(login_url='accounts:login')
+@role_required(User.Role.ADMIN, User.Role.NISR_DATA_MANAGER, User.Role.ANALYST, User.Role.RESEARCHER)
+def data_source_edit(request, pk):
+    """Edit an existing data source registration."""
+    ds = get_object_or_404(DataSource, pk=pk)
+    if request.method == 'POST':
+        form = DataSourceForm(request.POST, instance=ds)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Data Source '{ds.name}' updated successfully.")
+            return redirect('data_management:hub')
+    else:
+        form = DataSourceForm(instance=ds)
+
+    return render(request, 'data_management/data_source_form.html', {
+        'page_title': f"Edit Data Source: {ds.name}",
+        'form': form,
+        'ds': ds,
+        'is_edit': True,
+    })
+
+
+@login_required(login_url='accounts:login')
+@role_required(User.Role.ADMIN, User.Role.NISR_DATA_MANAGER)
+def data_source_delete(request, pk):
+    """Delete a data source if no ingestion batches or validated observations depend on it."""
+    ds = get_object_or_404(DataSource, pk=pk)
+    if request.method == 'POST':
+        name = ds.name
+        batches_count = ds.batches.count()
+        if batches_count > 0:
+            messages.warning(request, f"Cannot delete '{name}' because {batches_count} ingestion batches depend on it.")
+        else:
+            ds.delete()
+            messages.success(request, f"Data source '{name}' deleted.")
+    return redirect('data_management:hub')
+
+
+@login_required(login_url='accounts:login')
 def manual_entry_list(request):
     """List manual agricultural entries with status filtering, kind filtering, search, and geographic scoping."""
     status_filter = request.GET.get('status', '')
@@ -340,6 +378,26 @@ def manual_entry_correction(request, pk):
     except (WorkflowError, PermissionDenied) as e:
         messages.error(request, str(e))
         return redirect('data_management:manual_entry_detail', pk=pk)
+
+
+@login_required(login_url='accounts:login')
+def manual_entry_delete(request, pk):
+    """Delete a manual observation draft or unapproved observation record."""
+    entry = get_object_or_404(ManualObservation, pk=pk)
+    if request.method == 'POST':
+        if entry.review_status == ManualObservation.ReviewStatus.APPROVED:
+            messages.warning(request, f"Approved manual observation #{pk} cannot be deleted directly. Use the correction revision workflow instead.")
+            return redirect('data_management:manual_entry_detail', pk=pk)
+
+        if not (request.user.is_superuser or getattr(request.user, 'role', '') in [User.Role.ADMIN, User.Role.NISR_DATA_MANAGER] or entry.created_by == request.user):
+            messages.error(request, "Permission Denied: You cannot delete this observation.")
+            return redirect('data_management:manual_entry_detail', pk=pk)
+
+        entry_id = entry.id
+        entry.delete()
+        messages.success(request, f"Manual observation #{entry_id} has been deleted.")
+        return redirect('data_management:manual_entry_list')
+    return redirect('data_management:manual_entry_detail', pk=pk)
 
 
 

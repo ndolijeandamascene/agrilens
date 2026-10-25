@@ -9,37 +9,37 @@
     <div class="metrics-row" aria-label="National Agricultural Key Performance Indicators">
         <div class="metric-card" id="kpi-tracked-crops">
             <div class="metric-header"><div class="icon-box" style="background: var(--primary-green);"><i class="fa-solid fa-leaf"></i></div> Tracked Crops</div>
-            <div class="metric-value">10</div>
+            <div class="metric-value">{{ priority_crops_count|default:"—" }}</div>
             <div class="metric-sub">Crop types in the national dataset</div>
-            <div class="metric-tag">SAS 2024 – 2025</div>
+            <div class="metric-tag">{{ selected_season_display|default:"SAS 2024 – 2025" }}</div>
         </div>
         <div class="metric-card" id="kpi-validated-records">
             <div class="metric-header"><div class="icon-box" style="background: var(--blue);"><i class="fa-solid fa-database"></i></div> Validated Records</div>
-            <div class="metric-value">10,000</div>
+            <div class="metric-value">{{ total_observations_formatted|default:"—" }}</div>
             <div class="metric-sub">Verified observations</div>
-            <div class="metric-tag" style="background:#eff6ff; color:var(--blue);">From 30 districts</div>
+            <div class="metric-tag" style="background:#eff6ff; color:var(--blue);">{% if districts_count %}From {{ districts_count }} districts{% else %}District coverage unavailable{% endif %}</div>
         </div>
         <div class="metric-card" id="kpi-geographic-coverage">
             <div class="metric-header"><div class="icon-box" style="background: var(--orange);"><i class="fa-solid fa-location-dot"></i></div> Geographic Coverage</div>
-            <div class="metric-value">30</div>
-            <div class="metric-sub">Districts, 5 provinces</div>
+            <div class="metric-value">{{ districts_count|default:"—" }}</div>
+            <div class="metric-sub">Districts{% if provinces_count %}, {{ provinces_count }} provinces{% endif %}</div>
             <div class="metric-tag">Rwanda</div>
         </div>
         <div class="metric-card" id="kpi-total-production">
             <div class="metric-header"><div class="icon-box" style="background: var(--purple);"><i class="fa-solid fa-wheat-awn"></i></div> Total Production</div>
-            <div class="metric-value">1.24M t</div>
+            <div class="metric-value">{{ prod_display|default:"Data unavailable" }}</div>
             <div class="metric-sub">(estimated, all crops)</div>
-            <div class="metric-tag" style="background:#f3e8ff; color:var(--purple);">SAS 2024 – 2025</div>
+            <div class="metric-tag" style="background:#f3e8ff; color:var(--purple);">{{ selected_season_display|default:"SAS 2024 – 2025" }}</div>
         </div>
         <div class="metric-card" id="kpi-average-yield">
             <div class="metric-header"><div class="icon-box" style="background: var(--teal);"><i class="fa-solid fa-chart-simple"></i></div> Average Yield</div>
-            <div class="metric-value">2.8 t/ha</div>
+            <div class="metric-value">{% if yield_t_ha %}{{ yield_t_ha }} t/ha{% else %}Data unavailable{% endif %}</div>
             <div class="metric-sub">(national average)</div>
-            <div class="metric-tag">SAS 2024 – 2025</div>
+            <div class="metric-tag">{{ selected_season_display|default:"SAS 2024 – 2025" }}</div>
         </div>
         <div class="metric-card" id="kpi-data-quality">
             <div class="metric-header"><div class="icon-box" style="background: var(--gray);"><i class="fa-solid fa-shield-check"></i></div> Data Quality</div>
-            <div class="metric-value">98%</div>
+            <div class="metric-value">{% if data_quality_pct %}{{ data_quality_pct }}%{% else %}Data unavailable{% endif %}</div>
             <div class="metric-sub">Validated & consistent</div>
             <div class="metric-tag">High confidence</div>
         </div>
@@ -58,11 +58,11 @@
                     <div class="filter-field">
                         <span class="filter-field-label">Crop</span>
                         <select class="filter-select" id="map-crop-select">
+                            {% for c in priority_crops %}
+                            <option value="{{ c.name }}" {% if c.name == active_crop_name %}selected{% endif %}>{{ c.name }}</option>
+                            {% empty %}
                             <option value="Maize">Maize</option>
-                            <option value="Beans">Beans</option>
-                            <option value="Cassava">Cassava</option>
-                            <option value="Irish Potato">Irish Potato</option>
-                            <option value="Rice">Rice</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="filter-field">
@@ -132,11 +132,11 @@
                 </div>
                 <div class="filter-field">
                     <select class="filter-select" id="chart-crop-select">
+                        {% for c in priority_crops %}
+                        <option value="{{ c.name }}" {% if c.name == active_crop_name %}selected{% endif %}>{{ c.name }}</option>
+                        {% empty %}
                         <option value="Maize">Maize</option>
-                        <option value="Beans">Beans</option>
-                        <option value="Cassava">Cassava</option>
-                        <option value="Irish Potato">Irish Potato</option>
-                        <option value="Rice">Rice</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -172,7 +172,7 @@
                     <i class="fa-solid fa-shield-check"></i>
                     <div class="key-insight-content">
                         <div class="key-insight-title"><strong>Key Insight:</strong></div>
-                        <div class="key-insight-text" id="insight-text">{{ key_insight|default:"The average yield gap is 34% nationally, with the largest gap in the Eastern Province." }}</div>
+                        <div class="key-insight-text" id="insight-text">{{ key_insight|default:"National agricultural surveillance data overview." }}</div>
                     </div>
                 </div>
                 <i class="fa-regular fa-circle-xmark key-insight-info" id="insight-reset-btn" title="Reset to National Overview" onclick="resetDistrictSelection();" style="cursor: pointer;"></i>
@@ -189,11 +189,11 @@
             </div>
             <div class="filters" style="margin-bottom: 15px;">
                 <select class="filter-select" id="price-crop-select">
+                    {% for c in priority_crops %}
+                    <option value="{{ c.name }}" {% if c.name == active_crop_name %}selected{% endif %}>{{ c.name }}</option>
+                    {% empty %}
                     <option value="Maize">Maize</option>
-                    <option value="Beans">Beans</option>
-                    <option value="Cassava">Cassava</option>
-                    <option value="Irish Potato">Irish Potato</option>
-                    <option value="Rice">Rice</option>
+                    {% endfor %}
                 </select>
                 <select class="filter-select" id="price-market-select">
                     <option value="kigali">Kigali Market</option>
@@ -218,32 +218,32 @@
             <div class="progress-list">
                 <div class="progress-item">
                     <i class="fa-solid fa-seedling" style="color: var(--primary-green);"></i> <span>Improved Seeds</span>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="adopt-seed-bar" style="width: 62%; background: var(--primary-green);"></div></div>
-                    <span class="progress-val" id="adopt-seed-val">62%</span>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="adopt-seed-bar" style="width: {{ summary.adoption_rates.improved_seed|default:'0' }}%; background: var(--primary-green);"></div></div>
+                    <span class="progress-val" id="adopt-seed-val">{% if summary.adoption_rates.improved_seed %}{{ summary.adoption_rates.improved_seed }}%{% else %}—{% endif %}</span>
                 </div>
                 <div class="progress-item">
                     <i class="fa-solid fa-flask" style="color: var(--primary-green);"></i> <span>Fertilizer Use</span>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="adopt-fert-bar" style="width: 48%; background: var(--primary-green);"></div></div>
-                    <span class="progress-val" id="adopt-fert-val">48%</span>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="adopt-fert-bar" style="width: {{ summary.adoption_rates.inorganic_fertilizer|default:'0' }}%; background: var(--primary-green);"></div></div>
+                    <span class="progress-val" id="adopt-fert-val">{% if summary.adoption_rates.inorganic_fertilizer %}{{ summary.adoption_rates.inorganic_fertilizer }}%{% else %}—{% endif %}</span>
                 </div>
                 <div class="progress-item">
                     <i class="fa-solid fa-droplet" style="color: var(--blue);"></i> <span>Irrigation</span>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="adopt-irrig-bar" style="width: 22%; background: var(--blue);"></div></div>
-                    <span class="progress-val" id="adopt-irrig-val">22%</span>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="adopt-irrig-bar" style="width: {{ summary.adoption_rates.irrigation|default:'0' }}%; background: var(--blue);"></div></div>
+                    <span class="progress-val" id="adopt-irrig-val">{% if summary.adoption_rates.irrigation %}{{ summary.adoption_rates.irrigation }}%{% else %}—{% endif %}</span>
                 </div>
                 <div class="progress-item">
                     <i class="fa-solid fa-tractor" style="color: var(--orange);"></i> <span>Mechanization</span>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="adopt-mech-bar" style="width: 15%; background: var(--orange);"></div></div>
-                    <span class="progress-val" id="adopt-mech-val">15%</span>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="adopt-mech-bar" style="width: {{ summary.adoption_rates.mechanization|default:'0' }}%; background: var(--orange);"></div></div>
+                    <span class="progress-val" id="adopt-mech-val">{% if summary.adoption_rates.mechanization %}{{ summary.adoption_rates.mechanization }}%{% else %}—{% endif %}</span>
                 </div>
                 <div class="progress-item">
                     <i class="fa-solid fa-mountain" style="color: var(--purple);"></i> <span>Soil Conservation</span>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="adopt-soil-bar" style="width: 37%; background: var(--purple);"></div></div>
-                    <span class="progress-val" id="adopt-soil-val">37%</span>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="adopt-soil-bar" style="width: {{ summary.adoption_rates.anti_erosion|default:'0' }}%; background: var(--purple);"></div></div>
+                    <span class="progress-val" id="adopt-soil-val">{% if summary.adoption_rates.anti_erosion %}{{ summary.adoption_rates.anti_erosion }}%{% else %}—{% endif %}</span>
                 </div>
             </div>
             <div id="adopt-survey-sub" style="font-size: 10px; color: var(--text-muted); margin-top: 15px;">
-                <i class="fa-solid fa-circle-info"></i> % of surveyed farms ({{ selected_season_display|default:"SAS 2024 - 2025" }})
+                <i class="fa-solid fa-circle-info"></i> % of surveyed farms ({{ selected_season_display|default:"SAS 2024 – 2025" }})
             </div>
         </div>
 
@@ -253,11 +253,11 @@
                 <div class="card-title">Post-Harvest Analysis</div>
                 <select class="filter-select" id="postharvest-crop-select">
                     <option value="all">All Crops</option>
+                    {% for c in priority_crops %}
+                    <option value="{{ c.name }}" {% if c.name == active_crop_name %}selected{% endif %}>{{ c.name }}</option>
+                    {% empty %}
                     <option value="Maize">Maize</option>
-                    <option value="Beans">Beans</option>
-                    <option value="Cassava">Cassava</option>
-                    <option value="Irish Potato">Irish Potato</option>
-                    <option value="Rice">Rice</option>
+                    {% endfor %}
                 </select>
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
@@ -323,78 +323,30 @@
             </thead>
             <tbody id="obs-table-body">
                 {% for obs in recent_observations %}
-                <tr>
-                    <td class="obs-date-cell">{{ obs.created_at|date:"M d, Y"|default:"Apr 15, 2025" }}</td>
+                <tr data-record-id="{{ obs.source_record_id|default:obs.id }}"
+                    data-source="{{ obs.source_display|default:'Field Survey' }}"
+                    data-crop="{{ obs.crop.name }}"
+                    data-season="{{ selected_season_display|default:'SAS 2024 – 2025' }}"
+                    data-location="{{ obs.district.name }}, {{ obs.district.province.name }}"
+                    data-area="{% if obs.plot_area_ha %}{{ obs.plot_area_ha }} ha{% else %}—{% endif %}"
+                    data-prod="{% if obs.total_production_kg %}{{ obs.total_production_kg|floatformat:0 }} kg{% else %}—{% endif %}"
+                    data-yield="{% if obs.yield_t_ha %}{{ obs.yield_t_ha }} t/ha{% else %}—{% endif %}">
+                    <td class="obs-date-cell">{{ obs.created_at|date:"M d, Y"|default:"—" }}</td>
                     <td><strong>{{ obs.crop.name }}</strong></td>
                     <td>{{ obs.district.name }}</td>
                     <td>{{ obs.district.province.name }}</td>
-                    <td class="obs-season-cell">{{ selected_season_display|default:"SAS 2024 - 2025" }}</td>
-                    <td>{{ obs.plot_area_ha|default:"12.5" }}</td>
-                    <td><strong>{{ obs.yield_t_ha|default:"3.6" }}</strong></td>
-                    <td>{{ obs.source_display|default:"Field Survey" }}</td>
+                    <td class="obs-season-cell">{{ selected_season_display|default:"SAS 2024 – 2025" }}</td>
+                    <td>{{ obs.plot_area_ha|default:"—" }}</td>
+                    <td><strong>{% if obs.yield_t_ha %}{{ obs.yield_t_ha }}{% else %}—{% endif %}</strong></td>
+                    <td>{{ obs.source_display|default:"Enumerator" }}</td>
                     <td><span class="status-badge">Validated</span></td>
-                    <td><button class="btn-view" onclick="alert('Record: {{ obs.source_record_id|escapejs }} | Crop: {{ obs.crop.name|escapejs }} | Yield: {{ obs.yield_t_ha }} t/ha');">View</button></td>
+                    <td><button class="btn-view" onclick="openObsModal(this.closest('tr'))">View</button></td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td>Apr 15, 2025</td>
-                    <td><strong>Maize</strong></td>
-                    <td>Nyabihu</td>
-                    <td>Northern</td>
-                    <td class="obs-season-cell">{{ selected_season_display|default:"SAS 2024 - 2025" }}</td>
-                    <td>12.5</td>
-                    <td><strong>3.6</strong></td>
-                    <td>Field Survey</td>
-                    <td><span class="status-badge">Validated</span></td>
-                    <td><button class="btn-view">View</button></td>
-                </tr>
-                <tr>
-                    <td>Apr 12, 2025</td>
-                    <td><strong>Beans</strong></td>
-                    <td>Rwamagana</td>
-                    <td>Eastern</td>
-                    <td class="obs-season-cell">{{ selected_season_display|default:"SAS 2024 - 2025" }}</td>
-                    <td>8.3</td>
-                    <td><strong>2.4</strong></td>
-                    <td>Enumerator</td>
-                    <td><span class="status-badge">Validated</span></td>
-                    <td><button class="btn-view">View</button></td>
-                </tr>
-                <tr>
-                    <td>Apr 10, 2025</td>
-                    <td><strong>Cassava</strong></td>
-                    <td>Muhanga</td>
-                    <td>Southern</td>
-                    <td class="obs-season-cell">{{ selected_season_display|default:"SAS 2024 - 2025" }}</td>
-                    <td>15.7</td>
-                    <td><strong>14.2</strong></td>
-                    <td>Mobile App</td>
-                    <td><span class="status-badge">Validated</span></td>
-                    <td><button class="btn-view">View</button></td>
-                </tr>
-                <tr>
-                    <td>Apr 08, 2025</td>
-                    <td><strong>Irish Potato</strong></td>
-                    <td>Rubavu</td>
-                    <td>Western</td>
-                    <td class="obs-season-cell">{{ selected_season_display|default:"SAS 2024 - 2025" }}</td>
-                    <td>6.8</td>
-                    <td><strong>18.7</strong></td>
-                    <td>Field Survey</td>
-                    <td><span class="status-badge">Validated</span></td>
-                    <td><button class="btn-view">View</button></td>
-                </tr>
-                <tr>
-                    <td>Apr 05, 2025</td>
-                    <td><strong>Rice</strong></td>
-                    <td>Kayonza</td>
-                    <td>Eastern</td>
-                    <td class="obs-season-cell">{{ selected_season_display|default:"SAS 2024 - 2025" }}</td>
-                    <td>4.2</td>
-                    <td><strong>3.1</strong></td>
-                    <td>Enumerator</td>
-                    <td><span class="status-badge">Validated</span></td>
-                    <td><button class="btn-view">View</button></td>
+                    <td colspan="10" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                        No validated observations recorded for this selection.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -407,7 +359,7 @@
         </div>
 
         <div class="footer-text">
-            <span id="footer-data-survey"><i class="fa-solid fa-shield-check"></i> Data from NISR - National Agricultural Survey ({{ selected_season_display|default:"SAS 2024 - 2025" }}) | 30 districts | 5 provinces | 10,000+ verified observations</span>
+            <span id="footer-data-survey"><i class="fa-solid fa-shield-check"></i> Data from NISR - National Agricultural Survey ({{ selected_season_display|default:"SAS 2024 - 2025" }}){% if districts_count %} | {{ districts_count }} districts{% endif %}{% if provinces_count %} | {{ provinces_count }} provinces{% endif %}{% if total_observations_formatted %} | {{ total_observations_formatted }} verified observations{% endif %}</span>
             <span>Better Data. Better Decisions. A Stronger Rwanda. <i class="fa-solid fa-leaf" style="color:var(--primary-green);"></i></span>
         </div>
     </div>
@@ -421,16 +373,16 @@
             </div>
             <div class="modal-body">
                 <div class="detail-grid">
-                    <div class="detail-item"><label>Record ID</label><span id="m-record-id">SAS25-001</span></div>
-                    <div class="detail-item"><label>Survey Source</label><span id="m-source">Field Survey (NISR)</span></div>
-                    <div class="detail-item"><label>Crop</label><span id="m-crop">Maize</span></div>
-                    <div class="detail-item"><label>Season</label><span>SAS 2024 - 2025 (Season A)</span></div>
-                    <div class="detail-item"><label>District / Province</label><span id="m-location">Nyabihu, Northern</span></div>
-                    <div class="detail-item"><label>Plot Area</label><span id="m-area">12.5 ha</span></div>
-                    <div class="detail-item"><label>Total Production</label><span id="m-prod">45,000 kg</span></div>
-                    <div class="detail-item"><label>Calculated Yield</label><span id="m-yield" style="color:var(--dark-green);">3.6 t/ha</span></div>
+                    <div class="detail-item"><label>Record ID</label><span id="m-record-id">—</span></div>
+                    <div class="detail-item"><label>Survey Source</label><span id="m-source">—</span></div>
+                    <div class="detail-item"><label>Crop</label><span id="m-crop">—</span></div>
+                    <div class="detail-item"><label>Season</label><span id="m-season">—</span></div>
+                    <div class="detail-item"><label>District / Province</label><span id="m-location">—</span></div>
+                    <div class="detail-item"><label>Plot Area</label><span id="m-area">—</span></div>
+                    <div class="detail-item"><label>Total Production</label><span id="m-prod">—</span></div>
+                    <div class="detail-item"><label>Calculated Yield</label><span id="m-yield" style="color:var(--dark-green);">—</span></div>
                     <div class="detail-item"><label>Validation Status</label><span class="status-badge" style="width:fit-content;">Validated &amp; Consistent</span></div>
-                    <div class="detail-item"><label>Sampling Weight</label><span>1.24 (Representative)</span></div>
+                    <div class="detail-item"><label>Sampling Weight</label><span id="m-weight">—</span></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -447,364 +399,42 @@
 
 {% block extra_js %}
 <script>
-    // --- Comprehensive AgriLens Multi-Season & Multi-Crop Dynamic Engine ---
-    var AGRI_SEASON_DATA = {
-        '2025A': {
-            year: 2025,
-            season: 'A',
-            label: 'SAS 2024 – 2025',
-            lastUpdated: 'Apr 24, 2025 10:32',
-            kpiTotals: {
-                crops: '10',
-                records: '10,000',
-                districts: '30',
-                prod: '1.24M t',
-                yield: '2.8 t/ha',
-                quality: '98%'
-            },
-            crops: {
-                'Maize': {
-                    yieldBenchmark: 4.1,
-                    unit: 't/ha',
-                    yMax: 5.0,
-                    yStep: 1.0,
-                    districts: {
-                        'Musanze': 4.3, 'Burera': 3.8, 'Gicumbi': 3.4, 'Rulindo': 1.6, 'Gakenke': 1.4,
-                        'Nyabihu': 3.6, 'Rubavu': 3.9, 'Rutsiro': 2.7, 'Karongi': 2.5, 'Nyamasheke': 2.8, 'Rusizi': 1.7, 'Ngororero': 2.6,
-                        'Muhanga': 2.8, 'Kamonyi': 2.4, 'Ruhango': 2.6, 'Nyanza': 2.5, 'Huye': 2.7, 'Gisagara': 2.2, 'Nyamagabe': 3.2, 'Nyaruguru': 2.6,
-                        'Gasabo': 3.3, 'Kicukiro': 2.8, 'Nyarugenge': 2.9,
-                        'Nyagatare': 3.5, 'Gatsibo': 2.4, 'Rwamagana': 1.5, 'Kayonza': 0.85, 'Kirehe': 0.70, 'Ngoma': 0.90, 'Bugesera': 0.80
-                    },
-                    provincial: {
-                        labels: ['Northern', 'Eastern', 'Southern', 'Western', 'Kigali'],
-                        actual: [2.3, 2.9, 2.7, 2.5, 3.2],
-                        potential: [4.1, 4.5, 4.2, 3.8, 4.3],
-                        gap: [44, 36, 36, 34, 26]
-                    },
-                    topDistricts: ['Musanze', 'Rubavu', 'Burera', 'Nyabihu', 'Gasabo'],
-                    topYields: [4.3, 3.9, 3.8, 3.6, 3.3],
-                    insight: 'The average yield gap is 34% nationally, with the largest gap in the Eastern Province.',
-                    adoption: { seeds: 62, fert: 48, irrig: 22, mech: 15, soil: 37 },
-                    postHarvest: { storage: 42.1, processing: 21.7, losses: 12.4, marketing: 13.6, other: 10.2, centerLoss: '12.4%' },
-                    prices: {
-                        kigali: [800, 850, 820, 950, 1000, 980],
-                        secondary: [750, 780, 800, 880, 900, 920],
-                        secondaryName: 'Rwamagana Hub',
-                        maxPrice: 1400,
-                        months: ['Nov 2024', 'Dec 2024', 'Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025']
-                    },
-                    kpis: { prod: '1.24M t', yield: '2.8 t/ha', records: '10,000' }
-                },
-                'Beans': {
-                    yieldBenchmark: 2.2,
-                    unit: 't/ha',
-                    yMax: 3.0,
-                    yStep: 0.5,
-                    districts: {
-                        'Musanze': 1.5, 'Burera': 1.4, 'Gicumbi': 1.3, 'Rulindo': 1.2, 'Gakenke': 1.1,
-                        'Nyabihu': 1.8, 'Rubavu': 1.6, 'Rutsiro': 1.4, 'Karongi': 1.3, 'Nyamasheke': 1.4, 'Rusizi': 1.2, 'Ngororero': 1.3,
-                        'Muhanga': 1.6, 'Kamonyi': 1.5, 'Ruhango': 1.4, 'Nyanza': 1.5, 'Huye': 1.6, 'Gisagara': 1.4, 'Nyamagabe': 1.5, 'Nyaruguru': 1.3,
-                        'Gasabo': 1.5, 'Kicukiro': 1.4, 'Nyarugenge': 1.4,
-                        'Nyagatare': 1.8, 'Gatsibo': 1.7, 'Rwamagana': 1.6, 'Kayonza': 1.5, 'Kirehe': 1.4, 'Ngoma': 1.5, 'Bugesera': 1.3
-                    },
-                    provincial: {
-                        labels: ['Northern', 'Eastern', 'Southern', 'Western', 'Kigali'],
-                        actual: [1.2, 1.6, 1.4, 1.3, 1.5],
-                        potential: [2.2, 2.5, 2.3, 2.1, 2.4],
-                        gap: [45, 36, 39, 38, 37]
-                    },
-                    topDistricts: ['Nyabihu', 'Nyagatare', 'Gatsibo', 'Muhanga', 'Huye'],
-                    topYields: [1.8, 1.8, 1.7, 1.6, 1.6],
-                    insight: 'The national yield gap for beans is 39%, with Southern and Northern provinces having the highest expansion potential.',
-                    adoption: { seeds: 45, fert: 32, irrig: 12, mech: 8, soil: 42 },
-                    postHarvest: { storage: 38.5, processing: 18.2, losses: 15.6, marketing: 16.4, other: 11.3, centerLoss: '15.6%' },
-                    prices: {
-                        kigali: [1100, 1150, 1200, 1250, 1350, 1300],
-                        secondary: [950, 980, 1050, 1100, 1200, 1180],
-                        secondaryName: 'Rwamagana Hub',
-                        maxPrice: 1600,
-                        months: ['Nov 2024', 'Dec 2024', 'Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025']
-                    },
-                    kpis: { prod: '485K t', yield: '1.4 t/ha', records: '8,420' }
-                },
-                'Cassava': {
-                    yieldBenchmark: 18.0,
-                    unit: 't/ha',
-                    yMax: 25.0,
-                    yStep: 5.0,
-                    districts: {
-                        'Musanze': 8.5, 'Burera': 7.8, 'Gicumbi': 8.2, 'Rulindo': 9.5, 'Gakenke': 9.0,
-                        'Nyabihu': 10.2, 'Rubavu': 11.5, 'Rutsiro': 11.0, 'Karongi': 12.2, 'Nyamasheke': 12.8, 'Rusizi': 13.5, 'Ngororero': 10.8,
-                        'Muhanga': 14.8, 'Kamonyi': 14.2, 'Ruhango': 14.5, 'Nyanza': 15.2, 'Huye': 14.6, 'Gisagara': 13.8, 'Nyamagabe': 12.5, 'Nyaruguru': 12.0,
-                        'Gasabo': 11.2, 'Kicukiro': 10.8, 'Nyarugenge': 10.5,
-                        'Nyagatare': 13.5, 'Gatsibo': 14.0, 'Rwamagana': 15.0, 'Kayonza': 15.5, 'Kirehe': 14.8, 'Ngoma': 15.2, 'Bugesera': 14.5
-                    },
-                    provincial: {
-                        labels: ['Northern', 'Eastern', 'Southern', 'Western', 'Kigali'],
-                        actual: [9.5, 14.8, 14.2, 11.0, 10.5],
-                        potential: [16.0, 22.0, 21.0, 17.0, 15.5],
-                        gap: [40, 33, 32, 35, 32]
-                    },
-                    topDistricts: ['Kayonza', 'Nyanza', 'Ngoma', 'Rwamagana', 'Muhanga'],
-                    topYields: [15.5, 15.2, 15.2, 15.0, 14.8],
-                    insight: 'Cassava achieves peak productivity in Southern and Eastern provinces, with an average yield gap of 33%.',
-                    adoption: { seeds: 58, fert: 28, irrig: 14, mech: 11, soil: 46 },
-                    postHarvest: { storage: 32.0, processing: 35.5, losses: 14.2, marketing: 11.8, other: 6.5, centerLoss: '14.2%' },
-                    prices: {
-                        kigali: [350, 380, 360, 420, 450, 430],
-                        secondary: [280, 310, 300, 350, 380, 360],
-                        secondaryName: 'Ruhango Hub',
-                        maxPrice: 600,
-                        months: ['Nov 2024', 'Dec 2024', 'Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025']
-                    },
-                    kpis: { prod: '3.20M t', yield: '12.8 t/ha', records: '6,150' }
-                },
-                'Irish Potato': {
-                    yieldBenchmark: 22.0,
-                    unit: 't/ha',
-                    yMax: 26.0,
-                    yStep: 5.0,
-                    districts: {
-                        'Musanze': 19.5, 'Burera': 18.2, 'Gicumbi': 15.8, 'Rulindo': 14.2, 'Gakenke': 13.5,
-                        'Nyabihu': 18.7, 'Rubavu': 18.4, 'Rutsiro': 15.2, 'Karongi': 13.8, 'Nyamasheke': 12.5, 'Rusizi': 11.8, 'Ngororero': 14.5,
-                        'Muhanga': 11.2, 'Kamonyi': 9.8, 'Ruhango': 10.5, 'Nyanza': 10.2, 'Huye': 10.8, 'Gisagara': 9.5, 'Nyamagabe': 14.2, 'Nyaruguru': 13.8,
-                        'Gasabo': 10.0, 'Kicukiro': 9.5, 'Nyarugenge': 9.2,
-                        'Nyagatare': 8.5, 'Gatsibo': 8.2, 'Rwamagana': 8.0, 'Kayonza': 7.5, 'Kirehe': 7.2, 'Ngoma': 7.5, 'Bugesera': 7.0
-                    },
-                    provincial: {
-                        labels: ['Northern', 'Eastern', 'Southern', 'Western', 'Kigali'],
-                        actual: [17.5, 7.8, 10.2, 16.8, 9.5],
-                        potential: [24.0, 14.0, 16.0, 23.5, 15.0],
-                        gap: [27, 44, 36, 28, 37]
-                    },
-                    topDistricts: ['Musanze', 'Nyabihu', 'Rubavu', 'Burera', 'Gicumbi'],
-                    topYields: [19.5, 18.7, 18.4, 18.2, 15.8],
-                    insight: 'The volcanic highlands of Western and Northern provinces lead with yields exceeding 18 t/ha, facing an average gap of 29%.',
-                    adoption: { seeds: 78, fert: 68, irrig: 18, mech: 14, soil: 55 },
-                    postHarvest: { storage: 45.0, processing: 14.0, losses: 18.5, marketing: 15.5, other: 7.0, centerLoss: '18.5%' },
-                    prices: {
-                        kigali: [480, 520, 500, 550, 600, 580],
-                        secondary: [320, 350, 340, 380, 420, 400],
-                        secondaryName: 'Musanze Hub',
-                        maxPrice: 800,
-                        months: ['Nov 2024', 'Dec 2024', 'Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025']
-                    },
-                    kpis: { prod: '960K t', yield: '14.2 t/ha', records: '7,800' }
-                },
-                'Rice': {
-                    yieldBenchmark: 5.8,
-                    unit: 't/ha',
-                    yMax: 7.0,
-                    yStep: 1.0,
-                    districts: {
-                        'Musanze': 2.8, 'Burera': 2.5, 'Gicumbi': 3.2, 'Rulindo': 3.4, 'Gakenke': 3.1,
-                        'Nyabihu': 3.2, 'Rubavu': 3.5, 'Rutsiro': 3.8, 'Karongi': 3.9, 'Nyamasheke': 4.1, 'Rusizi': 5.2, 'Ngororero': 3.4,
-                        'Muhanga': 3.8, 'Kamonyi': 4.0, 'Ruhango': 3.9, 'Nyanza': 3.7, 'Huye': 4.1, 'Gisagara': 4.2, 'Nyamagabe': 3.2, 'Nyaruguru': 3.0,
-                        'Gasabo': 3.6, 'Kicukiro': 3.4, 'Nyarugenge': 3.2,
-                        'Nyagatare': 4.6, 'Gatsibo': 4.4, 'Rwamagana': 4.8, 'Kayonza': 4.7, 'Kirehe': 4.3, 'Ngoma': 4.2, 'Bugesera': 4.5
-                    },
-                    provincial: {
-                        labels: ['Northern', 'Eastern', 'Southern', 'Western', 'Kigali'],
-                        actual: [3.2, 4.4, 3.8, 4.6, 3.4],
-                        potential: [5.0, 6.2, 5.5, 6.6, 5.0],
-                        gap: [36, 29, 31, 30, 32]
-                    },
-                    topDistricts: ['Rusizi', 'Rwamagana', 'Kayonza', 'Nyagatare', 'Bugesera'],
-                    topYields: [5.2, 4.8, 4.7, 4.6, 4.5],
-                    insight: 'Marshland irrigation schemes in Western (Bugarama) and Eastern provinces achieve yields up to 5.2 t/ha, with a 31% yield gap.',
-                    adoption: { seeds: 85, fert: 74, irrig: 92, mech: 38, soil: 25 },
-                    postHarvest: { storage: 48.0, processing: 26.5, losses: 8.4, marketing: 12.6, other: 4.5, centerLoss: '8.4%' },
-                    prices: {
-                        kigali: [1250, 1300, 1280, 1380, 1450, 1420],
-                        secondary: [1100, 1150, 1120, 1200, 1280, 1260],
-                        secondaryName: 'Rwamagana Hub',
-                        maxPrice: 1800,
-                        months: ['Nov 2024', 'Dec 2024', 'Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025']
-                    },
-                    kpis: { prod: '140K t', yield: '4.1 t/ha', records: '4,200' }
-                }
-            }
-        },
-        '2024A': {
-            year: 2024,
-            season: 'A',
-            label: 'SAS 2023 – 2024',
-            lastUpdated: 'Oct 18, 2024 14:15',
-            kpiTotals: {
-                crops: '10',
-                records: '5,000',
-                districts: '30',
-                prod: '1.18M t',
-                yield: '2.6 t/ha',
-                quality: '96%'
-            },
-            crops: {
-                'Maize': {
-                    yieldBenchmark: 4.1,
-                    unit: 't/ha',
-                    yMax: 5.0,
-                    yStep: 1.0,
-                    districts: {
-                        'Musanze': 4.0, 'Burera': 3.5, 'Gicumbi': 3.1, 'Rulindo': 1.4, 'Gakenke': 1.3,
-                        'Nyabihu': 3.3, 'Rubavu': 3.6, 'Rutsiro': 2.4, 'Karongi': 2.3, 'Nyamasheke': 2.5, 'Rusizi': 1.5, 'Ngororero': 2.4,
-                        'Muhanga': 2.6, 'Kamonyi': 2.2, 'Ruhango': 2.4, 'Nyanza': 2.3, 'Huye': 2.5, 'Gisagara': 2.0, 'Nyamagabe': 2.9, 'Nyaruguru': 2.4,
-                        'Gasabo': 3.0, 'Kicukiro': 2.6, 'Nyarugenge': 2.7,
-                        'Nyagatare': 3.2, 'Gatsibo': 2.2, 'Rwamagana': 1.4, 'Kayonza': 0.78, 'Kirehe': 0.65, 'Ngoma': 0.82, 'Bugesera': 0.74
-                    },
-                    provincial: {
-                        labels: ['Northern', 'Eastern', 'Southern', 'Western', 'Kigali'],
-                        actual: [2.1, 2.7, 2.5, 2.4, 3.0],
-                        potential: [4.1, 4.5, 4.2, 3.8, 4.3],
-                        gap: [49, 40, 40, 37, 30]
-                    },
-                    topDistricts: ['Musanze', 'Rubavu', 'Burera', 'Nyabihu', 'Gasabo'],
-                    topYields: [4.0, 3.6, 3.5, 3.3, 3.0],
-                    insight: 'The average yield gap was 38% nationally in SAS 2023 - 2024, with the largest gap in the Eastern Province.',
-                    adoption: { seeds: 54, fert: 41, irrig: 19, mech: 12, soil: 34 },
-                    postHarvest: { storage: 39.8, processing: 20.4, losses: 14.8, marketing: 14.5, other: 10.5, centerLoss: '14.8%' },
-                    prices: {
-                        kigali: [700, 740, 720, 810, 860, 840],
-                        secondary: [650, 680, 700, 760, 790, 800],
-                        secondaryName: 'Rwamagana Hub',
-                        maxPrice: 1200,
-                        months: ['Nov 2023', 'Dec 2023', 'Jan 2024', 'Feb 2024', 'Mar 2024', 'Apr 2024']
-                    },
-                    kpis: { prod: '1.18M t', yield: '2.6 t/ha', records: '5,000' }
-                },
-                'Beans': {
-                    yieldBenchmark: 2.2,
-                    unit: 't/ha',
-                    yMax: 3.0,
-                    yStep: 0.5,
-                    districts: {
-                        'Musanze': 1.4, 'Burera': 1.3, 'Gicumbi': 1.2, 'Rulindo': 1.1, 'Gakenke': 1.0,
-                        'Nyabihu': 1.6, 'Rubavu': 1.5, 'Rutsiro': 1.3, 'Karongi': 1.2, 'Nyamasheke': 1.3, 'Rusizi': 1.1, 'Ngororero': 1.2,
-                        'Muhanga': 1.5, 'Kamonyi': 1.4, 'Ruhango': 1.3, 'Nyanza': 1.4, 'Huye': 1.5, 'Gisagara': 1.3, 'Nyamagabe': 1.4, 'Nyaruguru': 1.2,
-                        'Gasabo': 1.4, 'Kicukiro': 1.3, 'Nyarugenge': 1.3,
-                        'Nyagatare': 1.7, 'Gatsibo': 1.6, 'Rwamagana': 1.5, 'Kayonza': 1.4, 'Kirehe': 1.3, 'Ngoma': 1.4, 'Bugesera': 1.2
-                    },
-                    provincial: {
-                        labels: ['Northern', 'Eastern', 'Southern', 'Western', 'Kigali'],
-                        actual: [1.1, 1.5, 1.3, 1.2, 1.4],
-                        potential: [2.2, 2.5, 2.3, 2.1, 2.4],
-                        gap: [50, 40, 43, 43, 42]
-                    },
-                    topDistricts: ['Nyagatare', 'Nyabihu', 'Gatsibo', 'Muhanga', 'Huye'],
-                    topYields: [1.7, 1.6, 1.6, 1.5, 1.5],
-                    insight: 'The national yield gap for beans was 43% in SAS 2023 - 2024, with the highest potential in the Southern Province.',
-                    adoption: { seeds: 38, fert: 27, irrig: 10, mech: 6, soil: 38 },
-                    postHarvest: { storage: 36.5, processing: 17.0, losses: 17.2, marketing: 17.5, other: 11.8, centerLoss: '17.2%' },
-                    prices: {
-                        kigali: [980, 1020, 1080, 1120, 1200, 1160],
-                        secondary: [850, 880, 940, 990, 1070, 1050],
-                        secondaryName: 'Rwamagana Hub',
-                        maxPrice: 1500,
-                        months: ['Nov 2023', 'Dec 2023', 'Jan 2024', 'Feb 2024', 'Mar 2024', 'Apr 2024']
-                    },
-                    kpis: { prod: '450K t', yield: '1.3 t/ha', records: '4,200' }
-                },
-                'Cassava': {
-                    yieldBenchmark: 18.0,
-                    unit: 't/ha',
-                    yMax: 25.0,
-                    yStep: 5.0,
-                    districts: {
-                        'Musanze': 7.8, 'Burera': 7.2, 'Gicumbi': 7.5, 'Rulindo': 8.8, 'Gakenke': 8.4,
-                        'Nyabihu': 9.4, 'Rubavu': 10.5, 'Rutsiro': 10.1, 'Karongi': 11.2, 'Nyamasheke': 11.8, 'Rusizi': 12.4, 'Ngororero': 9.9,
-                        'Muhanga': 13.9, 'Kamonyi': 13.2, 'Ruhango': 13.5, 'Nyanza': 14.1, 'Huye': 13.6, 'Gisagara': 12.9, 'Nyamagabe': 11.5, 'Nyaruguru': 11.0,
-                        'Gasabo': 10.4, 'Kicukiro': 10.0, 'Nyarugenge': 9.8,
-                        'Nyagatare': 12.6, 'Gatsibo': 13.1, 'Rwamagana': 14.0, 'Kayonza': 14.4, 'Kirehe': 13.8, 'Ngoma': 14.1, 'Bugesera': 13.5
-                    },
-                    provincial: {
-                        labels: ['Northern', 'Eastern', 'Southern', 'Western', 'Kigali'],
-                        actual: [8.8, 13.9, 13.4, 10.2, 9.8],
-                        potential: [16.0, 22.0, 21.0, 17.0, 15.5],
-                        gap: [45, 37, 36, 40, 37]
-                    },
-                    topDistricts: ['Kayonza', 'Nyanza', 'Ngoma', 'Rwamagana', 'Muhanga'],
-                    topYields: [14.4, 14.1, 14.1, 14.0, 13.9],
-                    insight: 'Cassava productivity averaged 11.9 t/ha in SAS 2023 - 2024, with peak output in the Southern Province.',
-                    adoption: { seeds: 50, fert: 23, irrig: 11, mech: 9, soil: 41 },
-                    postHarvest: { storage: 30.5, processing: 34.0, losses: 16.5, marketing: 12.2, other: 6.8, centerLoss: '16.5%' },
-                    prices: {
-                        kigali: [310, 340, 320, 380, 410, 390],
-                        secondary: [250, 280, 270, 310, 340, 320],
-                        secondaryName: 'Ruhango Hub',
-                        maxPrice: 500,
-                        months: ['Nov 2023', 'Dec 2023', 'Jan 2024', 'Feb 2024', 'Mar 2024', 'Apr 2024']
-                    },
-                    kpis: { prod: '2.95M t', yield: '11.9 t/ha', records: '3,100' }
-                },
-                'Irish Potato': {
-                    yieldBenchmark: 22.0,
-                    unit: 't/ha',
-                    yMax: 26.0,
-                    yStep: 5.0,
-                    districts: {
-                        'Musanze': 18.2, 'Burera': 17.0, 'Gicumbi': 14.6, 'Rulindo': 13.1, 'Gakenke': 12.4,
-                        'Nyabihu': 17.2, 'Rubavu': 16.9, 'Rutsiro': 14.0, 'Karongi': 12.7, 'Nyamasheke': 11.5, 'Rusizi': 10.9, 'Ngororero': 13.4,
-                        'Muhanga': 10.3, 'Kamonyi': 9.0, 'Ruhango': 9.7, 'Nyanza': 9.4, 'Huye': 9.9, 'Gisagara': 8.8, 'Nyamagabe': 13.1, 'Nyaruguru': 12.6,
-                        'Gasabo': 9.2, 'Kicukiro': 8.8, 'Nyarugenge': 8.5,
-                        'Nyagatare': 7.8, 'Gatsibo': 7.5, 'Rwamagana': 7.3, 'Kayonza': 6.9, 'Kirehe': 6.6, 'Ngoma': 6.9, 'Bugesera': 6.4
-                    },
-                    provincial: {
-                        labels: ['Northern', 'Eastern', 'Southern', 'Western', 'Kigali'],
-                        actual: [16.2, 7.1, 9.4, 15.5, 8.8],
-                        potential: [24.0, 14.0, 16.0, 23.5, 15.0],
-                        gap: [33, 49, 41, 34, 41]
-                    },
-                    topDistricts: ['Musanze', 'Nyabihu', 'Rubavu', 'Burera', 'Gicumbi'],
-                    topYields: [18.2, 17.2, 16.9, 17.0, 14.6],
-                    insight: 'Highland potato yields in Western and Northern provinces led the nation in SAS 2023 - 2024 with a 33% yield gap.',
-                    adoption: { seeds: 71, fert: 60, irrig: 15, mech: 11, soil: 49 },
-                    postHarvest: { storage: 42.5, processing: 13.2, losses: 21.2, marketing: 15.8, other: 7.3, centerLoss: '21.2%' },
-                    prices: {
-                        kigali: [420, 460, 440, 490, 530, 510],
-                        secondary: [280, 310, 300, 340, 370, 350],
-                        secondaryName: 'Musanze Hub',
-                        maxPrice: 700,
-                        months: ['Nov 2023', 'Dec 2023', 'Jan 2024', 'Feb 2024', 'Mar 2024', 'Apr 2024']
-                    },
-                    kpis: { prod: '890K t', yield: '13.1 t/ha', records: '3,900' }
-                },
-                'Rice': {
-                    yieldBenchmark: 5.8,
-                    unit: 't/ha',
-                    yMax: 7.0,
-                    yStep: 1.0,
-                    districts: {
-                        'Musanze': 2.6, 'Burera': 2.3, 'Gicumbi': 2.9, 'Rulindo': 3.1, 'Gakenke': 2.8,
-                        'Nyabihu': 2.9, 'Rubavu': 3.2, 'Rutsiro': 3.5, 'Karongi': 3.6, 'Nyamasheke': 3.8, 'Rusizi': 4.7, 'Ngororero': 3.1,
-                        'Muhanga': 3.5, 'Kamonyi': 3.7, 'Ruhango': 3.6, 'Nyanza': 3.4, 'Huye': 3.8, 'Gisagara': 3.9, 'Nyamagabe': 2.9, 'Nyaruguru': 2.7,
-                        'Gasabo': 3.3, 'Kicukiro': 3.1, 'Nyarugenge': 2.9,
-                        'Nyagatare': 4.3, 'Gatsibo': 4.1, 'Rwamagana': 4.5, 'Kayonza': 4.4, 'Kirehe': 4.0, 'Ngoma': 3.9, 'Bugesera': 4.2
-                    },
-                    provincial: {
-                        labels: ['Northern', 'Eastern', 'Southern', 'Western', 'Kigali'],
-                        actual: [2.9, 4.1, 3.5, 4.2, 3.1],
-                        potential: [5.0, 6.2, 5.5, 6.6, 5.0],
-                        gap: [42, 34, 36, 36, 38]
-                    },
-                    topDistricts: ['Rusizi', 'Rwamagana', 'Kayonza', 'Nyagatare', 'Bugesera'],
-                    topYields: [4.7, 4.5, 4.4, 4.3, 4.2],
-                    insight: 'Rice marshlands in Western and Eastern provinces averaged 3.8 t/ha in SAS 2023 - 2024, with a 36% yield gap.',
-                    adoption: { seeds: 79, fert: 68, irrig: 88, mech: 32, soil: 22 },
-                    postHarvest: { storage: 46.0, processing: 25.0, losses: 10.2, marketing: 13.8, other: 5.0, centerLoss: '10.2%' },
-                    prices: {
-                        kigali: [1120, 1180, 1150, 1240, 1300, 1270],
-                        secondary: [990, 1040, 1010, 1080, 1150, 1130],
-                        secondaryName: 'Rwamagana Hub',
-                        maxPrice: 1600,
-                        months: ['Nov 2023', 'Dec 2023', 'Jan 2024', 'Feb 2024', 'Mar 2024', 'Apr 2024']
-                    },
-                    kpis: { prod: '128K t', yield: '3.8 t/ha', records: '2,100' }
-                }
-            }
-        }
-    };
+    // --- Comprehensive AgriLens Dynamic Analytics Engine (Live DB Integration) ---
+    var liveDistrictData = {};
+    var provincialData = [];
+    var rankingsData = [];
 
-    var currentSeason = "{{ selected_year|default:2025 }}{{ selected_season|default:'A' }}";
-    if (!AGRI_SEASON_DATA[currentSeason]) currentSeason = '2025A';
+    try {
+        var pEl = document.getElementById('provincial-yields-data');
+        if (pEl && pEl.textContent) provincialData = JSON.parse(pEl.textContent);
+    } catch(e) {}
+    try {
+        var rEl = document.getElementById('rankings-data');
+        if (rEl && rEl.textContent) rankingsData = JSON.parse(rEl.textContent);
+    } catch(e) {}
+
+    var currentYear = parseInt("{{ selected_year|default:2025 }}") || 2025;
+    var currentSeasonCode = "{{ selected_season|default:'A' }}";
+    var currentSeason = currentYear + currentSeasonCode;
+
+    function fetchLiveDistrictData(callback) {
+        var url = '/indicators/api/districts/?crop=' + encodeURIComponent(currentCrop) + '&year=' + currentYear + '&season=' + currentSeasonCode + '&source=official';
+        fetch(url)
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                liveDistrictData = {};
+                if (res && res.data && Array.isArray(res.data)) {
+                    res.data.forEach(function(item) {
+                        liveDistrictData[item.district_name] = item;
+                    });
+                }
+                if (callback) callback();
+            })
+            .catch(function(err) {
+                console.warn('District fetch failed:', err);
+                if (callback) callback();
+            });
+    }
 
     var currentCrop = "{{ active_crop_name|default:'Maize' }}";
     var currentIndicator = 'yield';
@@ -873,54 +503,49 @@
     });
 
     function getIndicatorValue(districtName) {
-        var seasonObj = AGRI_SEASON_DATA[currentSeason] || AGRI_SEASON_DATA['2025A'];
-        var cropObj = seasonObj.crops[currentCrop] || seasonObj.crops['Maize'];
-        var yVal = cropObj.districts[districtName] || (currentSeason === '2024A' ? 2.4 : 2.6);
+        var item = liveDistrictData[districtName];
+        if (!item) return null;
         if (currentIndicator === 'production') {
-            var factor = currentSeason === '2024A' ? 8100 : 8500;
-            return Math.round(yVal * factor);
+            return (item.production_mt !== undefined && item.production_mt !== null) ? item.production_mt : (item.total_production_mt !== undefined ? item.total_production_mt : null);
         } else if (currentIndicator === 'area') {
-            var factor = currentSeason === '2024A' ? 2700 : 2800;
-            return Math.round(yVal * factor);
+            return (item.area_ha !== undefined && item.area_ha !== null) ? item.area_ha : (item.planted_area_ha !== undefined ? item.planted_area_ha : null);
         }
-        return yVal;
+        return (item.yield_tha !== undefined && item.yield_tha !== null) ? item.yield_tha : (item.weighted_yield_t_ha !== undefined ? item.weighted_yield_t_ha : null);
     }
 
     function formatIndicatorValue(val) {
+        if (val === null || val === undefined) return 'No data';
         if (currentIndicator === 'production') {
-            return val.toLocaleString() + ' MT';
+            return Number(val).toLocaleString() + ' MT';
         } else if (currentIndicator === 'area') {
-            return val.toLocaleString() + ' ha';
+            return Number(val).toLocaleString() + ' ha';
         }
         return Number(val).toFixed(1) + ' t/ha';
     }
 
     function getDistrictColor(val) {
-        var seasonObj = AGRI_SEASON_DATA[currentSeason] || AGRI_SEASON_DATA['2025A'];
-        var cropObj = seasonObj.crops[currentCrop] || seasonObj.crops['Maize'];
-        var benchmark = cropObj.yieldBenchmark;
+        if (val === null || val === undefined) return '#CBD5E1';
         if (currentIndicator === 'production') {
-            if (val > 40000) return '#15803d';
-            if (val >= 25000) return '#22c55e';
-            if (val >= 15000) return '#84cc16';
-            if (val >= 5000) return '#eab308';
-            if (val > 0) return '#0284c7';
-            return '#cbd5e1';
+            if (val > 40000) return '#166534';
+            if (val >= 25000) return '#15803D';
+            if (val >= 15000) return '#84CC16';
+            if (val >= 5000) return '#FACC15';
+            if (val > 0) return '#2563EB';
+            return '#CBD5E1';
         } else if (currentIndicator === 'area') {
-            if (val > 15000) return '#15803d';
-            if (val >= 10000) return '#22c55e';
-            if (val >= 5000) return '#84cc16';
-            if (val >= 2000) return '#eab308';
-            if (val > 0) return '#0284c7';
-            return '#cbd5e1';
+            if (val > 15000) return '#166534';
+            if (val >= 10000) return '#15803D';
+            if (val >= 5000) return '#84CC16';
+            if (val >= 2000) return '#FACC15';
+            if (val > 0) return '#2563EB';
+            return '#CBD5E1';
         } else {
-            var ratio = val / benchmark;
-            if (ratio > 1.05) return '#15803d';
-            if (ratio >= 0.85) return '#22c55e';
-            if (ratio >= 0.60) return '#84cc16';
-            if (ratio >= 0.35) return '#eab308';
-            if (ratio > 0) return '#0284c7';
-            return '#cbd5e1';
+            if (val > 3.5) return '#166534';
+            if (val >= 2.5) return '#15803D';
+            if (val >= 1.8) return '#84CC16';
+            if (val >= 1.0) return '#FACC15';
+            if (val > 0) return '#2563EB';
+            return '#CBD5E1';
         }
     }
 
@@ -956,8 +581,6 @@
         selectedDistrictName = dName;
         isUserInteracted = true;
 
-        var seasonObj = AGRI_SEASON_DATA[currentSeason] || AGRI_SEASON_DATA['2025A'];
-        var cropObj = seasonObj.crops[currentCrop] || seasonObj.crops['Maize'];
         var val = getIndicatorValue(dName);
         var labelStr = (currentIndicator === 'production') ? 'Production' : (currentIndicator === 'area' ? 'Area' : 'Yield');
 
@@ -1017,12 +640,11 @@
         // Update Key Insight
         var insightElem = document.getElementById('insight-text');
         if (insightElem) {
-            var provLabels = cropObj.provincial.labels;
-            var pIdx = provLabels.indexOf(provName);
-            var potYield = pIdx >= 0 ? cropObj.provincial.potential[pIdx] : cropObj.yieldBenchmark;
-            var gapPct = Math.round(((potYield - val) / potYield) * 100);
-            if (gapPct < 0) gapPct = 0;
-            insightElem.innerHTML = '<strong>' + dName + ' District</strong> (' + provName + ' Province) records an average ' + currentCrop + ' yield of <strong>' + Number(val).toFixed(1) + ' t/ha</strong> against provincial potential of <strong>' + Number(potYield).toFixed(1) + ' t/ha</strong> (Yield gap: <strong>' + gapPct + '%</strong>). <a href="#" id="insight-reset-link" style="color:var(--primary-green); margin-left:6px; font-weight:600; text-decoration:underline;">Reset overview</a>';
+            if (val !== null) {
+                insightElem.innerHTML = '<strong>' + dName + ' District</strong> (' + provName + ' Province) records an average ' + currentCrop + ' yield of <strong>' + Number(val).toFixed(1) + ' t/ha</strong>. <a href="#" id="insight-reset-link" style="color:var(--primary-green); margin-left:6px; font-weight:600; text-decoration:underline;">Reset overview</a>';
+            } else {
+                insightElem.innerHTML = '<strong>' + dName + ' District</strong> (' + provName + ' Province) has no observations recorded for ' + currentCrop + '. <a href="#" id="insight-reset-link" style="color:var(--primary-green); margin-left:6px; font-weight:600; text-decoration:underline;">Reset overview</a>';
+            }
             var rLink = document.getElementById('insight-reset-link');
             if (rLink) {
                 rLink.onclick = function(e) {
@@ -1089,10 +711,6 @@
     }
 
     function updateDashboardKpis(dName, val, provName) {
-        var seasonObj = AGRI_SEASON_DATA[currentSeason] || AGRI_SEASON_DATA['2025A'];
-        var cropObj = seasonObj.crops[currentCrop] || seasonObj.crops['Maize'];
-        var totals = seasonObj.kpiTotals;
-
         var kpiYieldVal = document.querySelector('#kpi-average-yield .metric-value');
         var kpiYieldSub = document.querySelector('#kpi-average-yield .metric-sub');
         var kpiYieldTag = document.querySelector('#kpi-average-yield .metric-tag');
@@ -1113,52 +731,51 @@
         var kpiQualityVal = document.querySelector('#kpi-data-quality .metric-value');
         var kpiQualitySub = document.querySelector('#kpi-data-quality .metric-sub');
 
-        if (dName && val !== undefined) {
-            var factor = currentSeason === '2024A' ? 8100 : 8500;
-            var distProdMt = Math.round(val * factor);
-            var prodDisplay = (distProdMt >= 1000) ? (distProdMt / 1000).toFixed(1) + 'K t' : distProdMt.toLocaleString() + ' t';
-            var baseRecords = parseInt(totals.records.replace(/,/g, '')) || 10000;
-            var sampleCount = Math.round(baseRecords / 30) + (dName.charCodeAt(0) % 20);
+        if (dName && val !== null && val !== undefined) {
+            var dItem = liveDistrictData[dName] || {};
+            var distProd = dItem.production_mt !== undefined ? dItem.production_mt : dItem.total_production_mt;
+            var prodDisplay = distProd ? ((distProd >= 1000) ? (distProd / 1000).toFixed(1) + 'K t' : Number(distProd).toLocaleString() + ' t') : 'Data unavailable';
+            var sampleCount = dItem.plot_count || dItem.plots_sampled;
 
             if (kpiYieldVal) kpiYieldVal.textContent = Number(val).toFixed(1) + ' t/ha';
             if (kpiYieldSub) kpiYieldSub.textContent = '(' + dName + ' District)';
             if (kpiYieldTag) kpiYieldTag.textContent = currentCrop;
 
             if (kpiProdVal) kpiProdVal.textContent = prodDisplay;
-            if (kpiProdSub) kpiProdSub.textContent = '(' + dName + ' estimated)';
+            if (kpiProdSub) kpiProdSub.textContent = '(' + dName + ' District)';
             if (kpiProdTag) kpiProdTag.textContent = currentCrop;
 
             if (kpiGeogVal) kpiGeogVal.textContent = dName;
             if (kpiGeogSub) kpiGeogSub.textContent = (provName || 'District') + ' Province';
             if (kpiGeogTag) kpiGeogTag.textContent = 'Selected District';
 
-            if (kpiRecVal) kpiRecVal.textContent = sampleCount.toLocaleString();
+            if (kpiRecVal) kpiRecVal.textContent = sampleCount ? sampleCount.toLocaleString() : '—';
             if (kpiRecSub) kpiRecSub.textContent = 'Verified in ' + dName;
             if (kpiRecTag) kpiRecTag.textContent = 'High confidence';
 
             if (kpiCropSub) kpiCropSub.textContent = 'Priority crops in ' + dName;
-            if (kpiQualityVal) kpiQualityVal.textContent = '99%';
-            if (kpiQualitySub) kpiQualitySub.textContent = 'High confidence (' + dName + ')';
+            if (kpiQualityVal) kpiQualityVal.textContent = '{{ data_quality_pct|default:"—" }}%';
+            if (kpiQualitySub) kpiQualitySub.textContent = 'Validated & consistent (' + dName + ')';
         } else {
             // Restore national totals
-            if (kpiYieldVal) kpiYieldVal.textContent = cropObj.avgYield || totals.yield;
+            if (kpiYieldVal) kpiYieldVal.textContent = "{% if yield_t_ha %}{{ yield_t_ha }} t/ha{% else %}Data unavailable{% endif %}";
             if (kpiYieldSub) kpiYieldSub.textContent = '(national average)';
-            if (kpiYieldTag) kpiYieldTag.textContent = seasonObj.label;
+            if (kpiYieldTag) kpiYieldTag.textContent = "{{ selected_season_display|default:'SAS 2024 – 2025' }}";
 
-            if (kpiProdVal) kpiProdVal.textContent = totals.prod;
+            if (kpiProdVal) kpiProdVal.textContent = "{{ prod_display|default:'Data unavailable' }}";
             if (kpiProdSub) kpiProdSub.textContent = '(estimated, all crops)';
-            if (kpiProdTag) kpiProdTag.textContent = seasonObj.label;
+            if (kpiProdTag) kpiProdTag.textContent = "{{ selected_season_display|default:'SAS 2024 – 2025' }}";
 
-            if (kpiGeogVal) kpiGeogVal.textContent = totals.districts;
-            if (kpiGeogSub) kpiGeogSub.textContent = 'Districts, 5 provinces';
+            if (kpiGeogVal) kpiGeogVal.textContent = "{{ districts_count|default:'—' }}";
+            if (kpiGeogSub) kpiGeogSub.textContent = 'Districts{% if provinces_count %}, {{ provinces_count }} provinces{% endif %}';
             if (kpiGeogTag) kpiGeogTag.textContent = 'Rwanda';
 
-            if (kpiRecVal) kpiRecVal.textContent = totals.records;
+            if (kpiRecVal) kpiRecVal.textContent = "{{ total_observations_formatted|default:'—' }}";
             if (kpiRecSub) kpiRecSub.textContent = 'Verified observations';
-            if (kpiRecTag) kpiRecTag.textContent = 'From 30 districts';
+            if (kpiRecTag) kpiRecTag.textContent = '{% if districts_count %}From {{ districts_count }} districts{% else %}District coverage unavailable{% endif %}';
 
             if (kpiCropSub) kpiCropSub.textContent = 'Crop types in the national dataset';
-            if (kpiQualityVal) kpiQualityVal.textContent = totals.quality || '98%';
+            if (kpiQualityVal) kpiQualityVal.textContent = "{% if data_quality_pct %}{{ data_quality_pct }}%{% else %}Data unavailable{% endif %}";
             if (kpiQualitySub) kpiQualitySub.textContent = 'Validated & consistent';
         }
     }
@@ -1192,11 +809,9 @@
             renderTable();
         }
 
-        var seasonObj = AGRI_SEASON_DATA[currentSeason] || AGRI_SEASON_DATA['2025A'];
-        var cropObj = seasonObj.crops[currentCrop] || seasonObj.crops['Maize'];
         var insightElem = document.getElementById('insight-text');
         if (insightElem) {
-            insightElem.textContent = cropObj.insight;
+            insightElem.textContent = "{{ key_insight|default:'National agricultural surveillance data overview.'|escapejs }}";
         }
         updateYieldChart();
     }
@@ -1205,10 +820,6 @@
         var legHead = document.querySelector('.map-floating-legend .legend-head');
         var entriesContainer = document.getElementById('dashboard-legend-entries');
         if (!legHead || !entriesContainer) return;
-
-        var seasonObj = AGRI_SEASON_DATA[currentSeason] || AGRI_SEASON_DATA['2025A'];
-        var cropObj = seasonObj.crops[currentCrop] || seasonObj.crops['Maize'];
-        var b = cropObj.yieldBenchmark;
 
         if (currentIndicator === 'typology') {
             legHead.textContent = 'Agro-Ecological Typology (ML)';
@@ -1222,44 +833,32 @@
         } else if (currentIndicator === 'production') {
             legHead.textContent = 'Production (MT)';
             entriesContainer.innerHTML = `
-                <div class="legend-entry"><span class="legend-color-box" style="background: #15803d;"></span> &gt; 40,000</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #22c55e;"></span> 25,000 &ndash; 40,000</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #84cc16;"></span> 15,000 &ndash; 25,000</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #eab308;"></span> 5,000 &ndash; 15,000</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #0284c7;"></span> &lt; 5,000</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #cbd5e1;"></span> No data</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #166534;"></span> &gt; 40,000</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #15803D;"></span> 25,000 &ndash; 40,000</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #84CC16;"></span> 15,000 &ndash; 25,000</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #FACC15;"></span> 5,000 &ndash; 15,000</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #2563EB;"></span> &lt; 5,000</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #CBD5E1;"></span> No data</div>
             `;
         } else if (currentIndicator === 'area') {
             legHead.textContent = 'Area (ha)';
             entriesContainer.innerHTML = `
-                <div class="legend-entry"><span class="legend-color-box" style="background: #15803d;"></span> &gt; 15,000</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #22c55e;"></span> 10,000 &ndash; 15,000</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #84cc16;"></span> 5,000 &ndash; 10,000</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #eab308;"></span> 2,000 &ndash; 5,000</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #0284c7;"></span> &lt; 2,000</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #cbd5e1;"></span> No data</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #166534;"></span> &gt; 15,000</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #15803D;"></span> 10,000 &ndash; 15,000</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #84CC16;"></span> 5,000 &ndash; 10,000</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #FACC15;"></span> 2,000 &ndash; 5,000</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #2563EB;"></span> &lt; 2,000</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #CBD5E1;"></span> No data</div>
             `;
         } else {
             legHead.textContent = 'Yield (t/ha)';
-            var r1 = '&gt; 4.0', r2 = '3.0 &ndash; 4.0', r3 = '2.0 &ndash; 3.0', r4 = '1.0 &ndash; 2.0', r5 = '&lt; 1.0';
-            if (currentCrop !== 'Maize') {
-                var t1 = (b * 1.05).toFixed(1);
-                var t2 = (b * 0.85).toFixed(1);
-                var t3 = (b * 0.60).toFixed(1);
-                var t4 = (b * 0.35).toFixed(1);
-                r1 = '&gt; ' + t1;
-                r2 = t2 + ' &ndash; ' + t1;
-                r3 = t3 + ' &ndash; ' + t2;
-                r4 = t4 + ' &ndash; ' + t3;
-                r5 = '&lt; ' + t4;
-            }
             entriesContainer.innerHTML = `
-                <div class="legend-entry"><span class="legend-color-box" style="background: #15803d;"></span> ` + r1 + `</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #22c55e;"></span> ` + r2 + `</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #84cc16;"></span> ` + r3 + `</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #eab308;"></span> ` + r4 + `</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #0284c7;"></span> ` + r5 + `</div>
-                <div class="legend-entry"><span class="legend-color-box" style="background: #cbd5e1;"></span> No data</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #166534;"></span> &gt; 3.5</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #15803D;"></span> 2.5 &ndash; 3.5</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #84CC16;"></span> 1.8 &ndash; 2.5</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #FACC15;"></span> 1.0 &ndash; 1.8</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #2563EB;"></span> &lt; 1.0</div>
+                <div class="legend-entry"><span class="legend-color-box" style="background: #CBD5E1;"></span> No data</div>
             `;
         }
     }
@@ -1308,6 +907,9 @@
     fetch('/static/data/rwanda_districts.geojson')
         .then(function(res) { return res.json(); })
         .then(function(geojson) {
+            fetchLiveDistrictData(function() {
+                if (geoLayer) refreshMapChoropleth();
+            });
             geoLayer = L.geoJSON(geojson, {
                 style: function (feature) {
                     var name = feature.properties.shapeName || feature.properties.name || '';
@@ -1399,18 +1001,19 @@
         }
     };
 
-    var currentSeasonData = AGRI_SEASON_DATA[currentSeason] || AGRI_SEASON_DATA['2025A'];
-    var currentCropData = currentSeasonData.crops[currentCrop] || currentSeasonData.crops['Maize'];
+    var pLabels = provincialData.map(function(p) { return p.short_name; });
+    var pActual = provincialData.map(function(p) { return p.actual_yield_t_ha; });
+    var pPotential = provincialData.map(function(p) { return p.potential_yield_t_ha; });
 
     var ctxBar = document.getElementById('yieldChart').getContext('2d');
     var yieldChart = new Chart(ctxBar, {
         type: 'bar',
         data: {
-            labels: currentCropData.provincial.labels,
+            labels: pLabels,
             datasets: [
                 {
                     label: 'Actual Yield',
-                    data: currentCropData.provincial.actual,
+                    data: pActual,
                     backgroundColor: '#15803d',
                     borderRadius: { topLeft: 3, topRight: 3, bottomLeft: 0, bottomRight: 0 },
                     barPercentage: 0.65,
@@ -1418,7 +1021,7 @@
                 },
                 {
                     label: 'Potential Yield',
-                    data: currentCropData.provincial.potential,
+                    data: pPotential,
                     backgroundColor: '#2563eb',
                     borderRadius: { topLeft: 3, topRight: 3, bottomLeft: 0, bottomRight: 0 },
                     barPercentage: 0.65,
@@ -1443,15 +1046,15 @@
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: currentCropData.yMax,
+                    max: 6.0,
                     ticks: {
-                        stepSize: currentCropData.yStep,
+                        stepSize: 1.0,
                         font: { size: 10, family: 'Inter' },
                         color: '#64748b'
                     },
                     title: {
                         display: true,
-                        text: 'Yield (' + currentCropData.unit + ')',
+                        text: 'Yield (t/ha)',
                         font: { size: 10, family: 'Inter', weight: '600' },
                         color: '#64748b'
                     },
@@ -1470,17 +1073,17 @@
     });
 
     function updateYieldChart() {
-        var seasonObj = AGRI_SEASON_DATA[currentSeason] || AGRI_SEASON_DATA['2025A'];
-        var cropObj = seasonObj.crops[currentCrop] || seasonObj.crops['Maize'];
         var provName = selectedDistrictName ? (DISTRICT_PROVINCE_MAP[selectedDistrictName] || null) : null;
 
         if (activeSubtab === 'comparison') {
-            var labels = cropObj.provincial.labels;
+            var labels = provincialData.map(function(p) { return p.short_name; });
+            var actual = provincialData.map(function(p) { return p.actual_yield_t_ha; });
+            var potential = provincialData.map(function(p) { return p.potential_yield_t_ha; });
             yieldChart.data.labels = labels;
             yieldChart.data.datasets = [
                 {
                     label: 'Actual Yield',
-                    data: cropObj.provincial.actual,
+                    data: actual,
                     backgroundColor: labels.map(function(l) {
                         return (provName && l === provName) ? '#10b981' : '#15803d';
                     }),
@@ -1496,7 +1099,7 @@
                 },
                 {
                     label: 'Potential Yield',
-                    data: cropObj.provincial.potential,
+                    data: potential,
                     backgroundColor: labels.map(function(l) {
                         return (provName && l === provName) ? '#1d4ed8' : '#2563eb';
                     }),
@@ -1511,14 +1114,15 @@
                     categoryPercentage: 0.72
                 }
             ];
-            yieldChart.options.scales.y.title.text = 'Yield (' + cropObj.unit + ')';
-            yieldChart.options.scales.y.max = cropObj.yMax;
-            yieldChart.options.scales.y.ticks.stepSize = cropObj.yStep;
+            yieldChart.options.scales.y.title.text = 'Yield (t/ha)';
+            yieldChart.options.scales.y.max = 6.0;
         } else if (activeSubtab === 'gap') {
-            yieldChart.data.labels = cropObj.provincial.labels;
+            var labels = provincialData.map(function(p) { return p.short_name; });
+            var gap = provincialData.map(function(p) { return p.yield_gap_pct; });
+            yieldChart.data.labels = labels;
             yieldChart.data.datasets = [{
                 label: 'Yield Gap (%)',
-                data: cropObj.provincial.gap,
+                data: gap,
                 backgroundColor: '#f59e0b',
                 borderRadius: 3,
                 barPercentage: 0.5,
@@ -1526,77 +1130,30 @@
             }];
             yieldChart.options.scales.y.title.text = 'Yield Gap (%)';
             yieldChart.options.scales.y.max = 60;
-            yieldChart.options.scales.y.ticks.stepSize = 10;
         } else if (activeSubtab === 'rankings') {
-            yieldChart.data.labels = cropObj.topDistricts;
+            var labels = rankingsData.map(function(r) { return r.district_name; });
+            var yields = rankingsData.map(function(r) { return r.weighted_yield_t_ha; });
+            yieldChart.data.labels = labels;
             yieldChart.data.datasets = [{
-                label: 'District Yield (' + cropObj.unit + ')',
-                data: cropObj.topYields,
-                backgroundColor: cropObj.topDistricts.map(function(d) {
+                label: 'District Yield (t/ha)',
+                data: yields,
+                backgroundColor: labels.map(function(d) {
                     return (selectedDistrictName && d.toLowerCase() === selectedDistrictName.toLowerCase()) ? '#059669' : '#10b981';
                 }),
-                borderColor: cropObj.topDistricts.map(function(d) {
+                borderColor: labels.map(function(d) {
                     return (selectedDistrictName && d.toLowerCase() === selectedDistrictName.toLowerCase()) ? '#0f172a' : 'transparent';
                 }),
-                borderWidth: cropObj.topDistricts.map(function(d) {
+                borderWidth: labels.map(function(d) {
                     return (selectedDistrictName && d.toLowerCase() === selectedDistrictName.toLowerCase()) ? 2 : 0;
                 }),
                 borderRadius: 3,
                 barPercentage: 0.5,
                 categoryPercentage: 0.7
             }];
-            yieldChart.options.scales.y.title.text = 'Yield (' + cropObj.unit + ')';
-            yieldChart.options.scales.y.max = cropObj.yMax;
-            yieldChart.options.scales.y.ticks.stepSize = cropObj.yStep;
-        } else if (activeSubtab === 'trends') {
-            yieldChart.data.labels = ['SAS 2022', 'SAS 2023', 'SAS 2024', 'SAS 2025'];
-            var baseA = cropObj.provincial.actual[0];
-            var baseP = cropObj.provincial.potential[0];
-            yieldChart.data.datasets = [
-                {
-                    label: 'Actual',
-                    data: [Number((baseA*0.85).toFixed(1)), Number((baseA*0.92).toFixed(1)), Number((baseA*0.97).toFixed(1)), baseA],
-                    backgroundColor: '#15803d',
-                    borderRadius: 3,
-                    barPercentage: 0.5,
-                    categoryPercentage: 0.7
-                },
-                {
-                    label: 'Potential',
-                    data: [Number((baseP*0.95).toFixed(1)), Number((baseP*0.97).toFixed(1)), Number((baseP*0.99).toFixed(1)), baseP],
-                    backgroundColor: '#2563eb',
-                    borderRadius: 3,
-                    barPercentage: 0.5,
-                    categoryPercentage: 0.7
-                }
-            ];
-            yieldChart.options.scales.y.title.text = 'Yield (' + cropObj.unit + ')';
-            yieldChart.options.scales.y.max = cropObj.yMax;
+            yieldChart.options.scales.y.title.text = 'Yield (t/ha)';
+            yieldChart.options.scales.y.max = 6.0;
         }
         yieldChart.update();
-
-        // Update Key Insight
-        var insightElem = document.getElementById('insight-text');
-        if (insightElem) {
-            if (selectedDistrictName) {
-                var pLabels = cropObj.provincial.labels;
-                var pIdx = pLabels.indexOf(provName);
-                var potYield = pIdx >= 0 ? cropObj.provincial.potential[pIdx] : cropObj.yieldBenchmark;
-                var dYield = cropObj.districts[selectedDistrictName] || (currentSeason === '2024A' ? 2.4 : 2.5);
-                var gapPct = Math.round(((potYield - dYield) / potYield) * 100);
-                if (gapPct < 0) gapPct = 0;
-                insightElem.innerHTML = '<strong>' + selectedDistrictName + ' District</strong> (' + provName + ' Province) records an average ' + currentCrop + ' yield of <strong>' + Number(dYield).toFixed(1) + ' t/ha</strong> against provincial potential of <strong>' + Number(potYield).toFixed(1) + ' t/ha</strong> (Yield gap: <strong>' + gapPct + '%</strong>). <a href="#" id="insight-reset-link" style="color:var(--primary-green); margin-left:6px; font-weight:600; text-decoration:underline;">Reset overview</a>';
-                var rLink = document.getElementById('insight-reset-link');
-                if (rLink) {
-                    rLink.onclick = function(e) {
-                        e.preventDefault();
-                        resetDistrictSelection();
-                    };
-                }
-            } else {
-                insightElem.textContent = cropObj.insight;
-            }
-        }
     }
 
     // Subtab click handlers
@@ -1621,16 +1178,16 @@
                 {
                     label: 'Kigali',
                     data: currentCropData.prices.kigali,
-                    borderColor: '#10b981',
-                    backgroundColor: '#10b981',
+                    borderColor: '#15803D',
+                    backgroundColor: '#15803D',
                     tension: 0.3,
                     pointRadius: 3
                 },
                 {
                     label: currentCropData.prices.secondaryName,
                     data: currentCropData.prices.secondary,
-                    borderColor: '#3b82f6',
-                    backgroundColor: '#3b82f6',
+                    borderColor: '#2563EB',
+                    backgroundColor: '#2563EB',
                     tension: 0.3,
                     pointRadius: 3
                 }
@@ -1650,36 +1207,22 @@
     });
 
     function updatePriceChart() {
-        var seasonObj = AGRI_SEASON_DATA[currentSeason] || AGRI_SEASON_DATA['2025A'];
-        var cropObj = seasonObj.crops[currentCrop] || seasonObj.crops['Maize'];
-        var prices = cropObj.prices;
-        var timeSelect = document.getElementById('price-time-select');
-        var monthsCount = timeSelect ? parseInt(timeSelect.value) : 6;
-
-        var allMonths = prices.months;
-        var labels = allMonths.slice(allMonths.length - monthsCount);
-
-        var kigaliData = prices.kigali;
-        var secData = prices.secondary;
-
-        if (monthsCount === 3) {
-            kigaliData = kigaliData.slice(-3);
-            secData = secData.slice(-3);
-        } else if (monthsCount === 12) {
-            var prevK = kigaliData.map(function(v){ return Math.round(v * 0.92); });
-            var prevS = secData.map(function(v){ return Math.round(v * 0.92); });
-            kigaliData = prevK.concat(prices.kigali);
-            secData = prevS.concat(prices.secondary);
-            var mYear = (seasonObj.year === 2024) ? 2023 : 2024;
-            labels = ['May ' + mYear, 'Jun ' + mYear, 'Jul ' + mYear, 'Aug ' + mYear, 'Sep ' + mYear, 'Oct ' + mYear].concat(allMonths);
-        }
-
-        priceChart.data.labels = labels;
-        priceChart.data.datasets[0].data = kigaliData;
-        priceChart.data.datasets[1].data = secData;
-        priceChart.data.datasets[1].label = prices.secondaryName;
-        priceChart.options.scales.y.max = prices.maxPrice;
-        priceChart.update();
+        // Price surveillance line chart reflects real surveillance quotes
+        fetch('/api/v1/commodity-prices/?crop=' + encodeURIComponent(currentCrop))
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                var prices = res.results || res || [];
+                if (prices.length > 0) {
+                    var labels = prices.slice(0, 6).map(function(p) { return p.market_name || p.date_recorded; });
+                    var values = prices.slice(0, 6).map(function(p) { return parseFloat(p.price_per_kg_rwf); });
+                    priceChart.data.labels = labels;
+                    priceChart.data.datasets[0].data = values;
+                    priceChart.data.datasets[0].label = currentCrop + ' Quotes (RWF/kg)';
+                    if (priceChart.data.datasets[1]) priceChart.data.datasets[1].data = [];
+                    priceChart.update();
+                }
+            })
+            .catch(function(e) { console.warn('Price chart load:', e); });
     }
 
     var priceCropSelect = document.getElementById('price-crop-select');
@@ -1709,11 +1252,11 @@
                     currentCropData.postHarvest.other
                 ],
                 backgroundColor: [
-                    '#10b981', // green
-                    '#3b82f6', // blue
-                    '#f59e0b', // orange
-                    '#8b5cf6', // purple
-                    '#64748b'  // gray
+                    '#166534', // Primary Green
+                    '#15803D', // Action Green
+                    '#D97706', // Warning
+                    '#2563EB', // Info Blue
+                    '#7C3AED'  // Purple
                 ],
                 borderWidth: 0,
                 cutout: '75%'
@@ -1730,30 +1273,9 @@
     });
 
     function updatePostHarvestChart(cropKey) {
-        var seasonObj = AGRI_SEASON_DATA[currentSeason] || AGRI_SEASON_DATA['2025A'];
-        var cropObj = (cropKey && cropKey !== 'all') ? (seasonObj.crops[cropKey] || seasonObj.crops['Maize']) : seasonObj.crops['Maize'];
-        var ph = cropObj.postHarvest;
-
-        doughnutChart.data.datasets[0].data = [ph.storage, ph.processing, ph.losses, ph.marketing, ph.other];
-        doughnutChart.update();
-
+        var lossRate = parseFloat("{{ summary.loss_rate_percentage|default:'0' }}") || 0;
         var centerLoss = document.getElementById('postharvest-center-val');
-        if (centerLoss) centerLoss.textContent = ph.centerLoss;
-
-        var vStorage = document.getElementById('postharvest-val-storage');
-        if (vStorage) vStorage.textContent = ph.storage + '%';
-
-        var vProc = document.getElementById('postharvest-val-processing');
-        if (vProc) vProc.textContent = ph.processing + '%';
-
-        var vLoss = document.getElementById('postharvest-val-losses');
-        if (vLoss) vLoss.textContent = ph.losses + '%';
-
-        var vMkt = document.getElementById('postharvest-val-marketing');
-        if (vMkt) vMkt.textContent = ph.marketing + '%';
-
-        var vOth = document.getElementById('postharvest-val-other');
-        if (vOth) vOth.textContent = ph.other + '%';
+        if (centerLoss) centerLoss.textContent = lossRate > 0 ? (lossRate.toFixed(1) + '%') : '—';
     }
 
     var postharvestSelect = document.getElementById('postharvest-crop-select');
@@ -1765,61 +1287,14 @@
 
     // --- 5. Technology Adoption Reactive Update ---
     function updateAdoptionBars(cropKey) {
-        var seasonObj = AGRI_SEASON_DATA[currentSeason] || AGRI_SEASON_DATA['2025A'];
-        var cropObj = seasonObj.crops[cropKey] || seasonObj.crops['Maize'];
-        var ad = cropObj.adoption;
-
-        var sBar = document.getElementById('adopt-seed-bar');
-        var sVal = document.getElementById('adopt-seed-val');
-        if (sBar) sBar.style.width = ad.seeds + '%';
-        if (sVal) sVal.textContent = ad.seeds + '%';
-
-        var fBar = document.getElementById('adopt-fert-bar');
-        var fVal = document.getElementById('adopt-fert-val');
-        if (fBar) fBar.style.width = ad.fert + '%';
-        if (fVal) fVal.textContent = ad.fert + '%';
-
-        var iBar = document.getElementById('adopt-irrig-bar');
-        var iVal = document.getElementById('adopt-irrig-val');
-        if (iBar) iBar.style.width = ad.irrig + '%';
-        if (iVal) iVal.textContent = ad.irrig + '%';
-
-        var mBar = document.getElementById('adopt-mech-bar');
-        var mVal = document.getElementById('adopt-mech-val');
-        if (mBar) mBar.style.width = ad.mech + '%';
-        if (mVal) mVal.textContent = ad.mech + '%';
-
-        var soBar = document.getElementById('adopt-soil-bar');
-        var soVal = document.getElementById('adopt-soil-val');
-        if (soBar) soBar.style.width = ad.soil + '%';
-        if (soVal) soVal.textContent = ad.soil + '%';
+        // Adoption values are rendered server-side from summary.adoption_rates
     }
 
     // Synchronize all crop selections smoothly
     function syncCropSelection(cropName) {
-        currentCrop = cropName;
-        ['map-crop-select', 'chart-crop-select', 'price-crop-select'].forEach(function(id) {
-            var el = document.getElementById(id);
-            if (el && el.value !== cropName) el.value = cropName;
-        });
-
-        // Update KPI cards reactively
-        var seasonObj = AGRI_SEASON_DATA[currentSeason] || AGRI_SEASON_DATA['2025A'];
-        var cropObj = seasonObj.crops[cropName];
-        if (cropObj && cropObj.kpis) {
-            var prodElem = document.querySelector('#kpi-total-production .metric-value');
-            if (prodElem) prodElem.textContent = cropObj.kpis.prod;
-            var yieldElem = document.querySelector('#kpi-average-yield .metric-value');
-            if (yieldElem) yieldElem.textContent = cropObj.kpis.yield;
-            var recElem = document.querySelector('#kpi-validated-records .metric-value');
-            if (recElem) recElem.textContent = cropObj.kpis.records;
-        }
-
-        refreshMapChoropleth();
-        updateYieldChart();
-        updatePriceChart();
-        updateAdoptionBars(cropName);
-        updatePostHarvestChart(cropName);
+        var yr = "{{ selected_year|default:2025 }}";
+        var sn = "{{ selected_season|default:'A' }}";
+        window.location.href = '/dashboard/?year=' + yr + '&season=' + sn + '&crop=' + encodeURIComponent(cropName);
     }
 
     var mapCropSelect = document.getElementById('map-crop-select');
@@ -1852,91 +1327,10 @@
 
     // --- 6. Season / Year Switching Engine (Full Dashboard Change) ---
     window.switchSeason = function(seasonCode) {
-        if (!AGRI_SEASON_DATA[seasonCode]) seasonCode = '2025A';
-        currentSeason = seasonCode;
-        var seasonObj = AGRI_SEASON_DATA[seasonCode];
-
-        // 1. Sync dropdowns
-        var topSelect = document.getElementById('topbar-season-select');
-        if (topSelect && topSelect.value !== seasonCode) topSelect.value = seasonCode;
-
-        var mapSeason = document.getElementById('map-season-select');
-        if (mapSeason && mapSeason.value !== seasonCode) mapSeason.value = seasonCode;
-
-        // 2. Update Navbar Last Updated
-        var lastUpdatedElem = document.getElementById('topbar-last-updated');
-        if (lastUpdatedElem) lastUpdatedElem.textContent = seasonObj.lastUpdated;
-
-        // 3. Update Top KPI Cards
-        var tagSeason = seasonObj.label;
-        document.querySelectorAll('.metric-tag').forEach(function(tag) {
-            if (tag.textContent.indexOf('SAS') !== -1) {
-                tag.textContent = tagSeason;
-            }
-        });
-
-        var cropObj = seasonObj.crops[currentCrop] || seasonObj.crops['Maize'];
-        var kpis = cropObj.kpis;
-        var prodElem = document.querySelector('#kpi-total-production .metric-value');
-        if (prodElem) prodElem.textContent = kpis.prod;
-        var yieldElem = document.querySelector('#kpi-average-yield .metric-value');
-        if (yieldElem) yieldElem.textContent = kpis.yield;
-        var recElem = document.querySelector('#kpi-validated-records .metric-value');
-        if (recElem) recElem.textContent = kpis.records;
-        var qualElem = document.querySelector('#kpi-data-quality .metric-value');
-        if (qualElem) qualElem.textContent = seasonObj.kpiTotals.quality;
-
-        // 4. Update footnotes
-        var adoptSub = document.getElementById('adopt-survey-sub');
-        if (adoptSub) adoptSub.innerHTML = '<i class="fa-solid fa-circle-info"></i> % of surveyed farms (' + tagSeason + ')';
-
-        var phSub = document.getElementById('postharvest-survey-sub');
-        if (phSub) phSub.innerHTML = '<i class="fa-solid fa-circle-info"></i> Based on verified survey data (' + tagSeason + ')';
-
-        var footerSub = document.getElementById('footer-data-survey');
-        if (footerSub) footerSub.innerHTML = '<i class="fa-solid fa-shield-check"></i> Data from NISR - National Agricultural Survey (' + tagSeason + ') | 30 districts | 5 provinces | 10,000+ verified observations';
-
-        // 5. Update Table Season Column and Dates
-        var rows = document.querySelectorAll('#obs-table-body tr');
-        rows.forEach(function(row) {
-            var seasonCell = row.querySelector('.obs-season-cell');
-            if (seasonCell) seasonCell.textContent = tagSeason;
-            var dateCell = row.querySelector('.obs-date-cell');
-            if (dateCell) {
-                var txt = dateCell.textContent;
-                if (seasonCode === '2024A') {
-                    dateCell.textContent = txt.replace('2025', '2024');
-                } else {
-                    dateCell.textContent = txt.replace('2024', '2025');
-                }
-            }
-        });
-
-        // 6. Update Map Choropleth & Pinned Badge
-        refreshMapChoropleth();
-
-        // 7. Update Yield Bar Chart & Insight
-        updateYieldChart();
-
-        // 8. Update Price Line Chart
-        updatePriceChart();
-
-        // 9. Update Technology Adoption Progress Bars
-        updateAdoptionBars(currentCrop);
-
-        // 10. Update Post-Harvest Analysis Doughnut
-        updatePostHarvestChart(currentCrop);
-
-        // 11. Re-render table pagination
-        renderTable();
-
-        // 12. Push URL state without hard reload
-        var yr = seasonObj.year;
-        var sn = seasonObj.season;
-        var newUrl = '/dashboard/?year=' + yr + '&season=' + sn + (currentCrop ? '&crop=' + currentCrop : '');
-        try {
-            window.history.pushState({ year: yr, season: sn, crop: currentCrop }, '', newUrl);
-        } catch(e) {}
+        if (!seasonCode || seasonCode.length < 5) return;
+        var yr = seasonCode.slice(0, 4);
+        var sn = seasonCode.slice(4);
+        window.location.href = '/dashboard/?year=' + yr + '&season=' + sn + (currentCrop ? '&crop=' + encodeURIComponent(currentCrop) : '');
     };
 
     var mapSeasonSelect = document.getElementById('map-season-select');
@@ -2058,18 +1452,14 @@
 
     // Modal interactions for 'View' buttons
     window.openObsModal = function(rowElem) {
-        var cells = rowElem.getElementsByTagName('td');
-        if (cells.length < 9) return;
-        document.getElementById('m-record-id').textContent = 'NISR-SAS-' + Math.floor(1000 + Math.random() * 9000);
-        document.getElementById('m-source').textContent = cells[7].textContent.trim();
-        document.getElementById('m-crop').textContent = cells[1].textContent.trim();
-        document.getElementById('m-location').textContent = cells[2].textContent.trim() + ', ' + cells[3].textContent.trim();
-        document.getElementById('m-area').textContent = cells[5].textContent.trim() + ' ha';
-        document.getElementById('m-yield').textContent = cells[6].textContent.trim() + ' t/ha';
-        var yNum = parseFloat(cells[6].textContent) || 3.0;
-        var aNum = parseFloat(cells[5].textContent) || 1.0;
-        document.getElementById('m-prod').textContent = Math.round(yNum * aNum * 1000).toLocaleString() + ' kg';
-
+        if (!rowElem) return;
+        document.getElementById('m-record-id').textContent = rowElem.dataset.recordId || '—';
+        document.getElementById('m-source').textContent = rowElem.dataset.source || '—';
+        document.getElementById('m-crop').textContent = rowElem.dataset.crop || '—';
+        document.getElementById('m-location').textContent = rowElem.dataset.location || '—';
+        document.getElementById('m-area').textContent = rowElem.dataset.area || '—';
+        document.getElementById('m-prod').textContent = rowElem.dataset.prod || '—';
+        document.getElementById('m-yield').textContent = rowElem.dataset.yield || '—';
         document.getElementById('obs-detail-modal').classList.add('active');
     };
 

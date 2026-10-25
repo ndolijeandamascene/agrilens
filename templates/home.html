@@ -219,7 +219,7 @@
                 </div>
                 <div class="kpi-content">
                     <span class="kpi-label" id="kpi-crops-label">Tracked Crops</span>
-                    <strong class="kpi-value" id="kpi-crops">{{ priority_crops_count|default:"10" }}</strong>
+                    <strong class="kpi-value" id="kpi-crops">{{ priority_crops_count|default:"—" }}</strong>
                     <span class="kpi-subtext" id="kpi-crops-sub">Crop types in the national dataset</span>
                 </div>
             </div>
@@ -250,8 +250,8 @@
                 </div>
                 <div class="kpi-content">
                     <span class="kpi-label" id="kpi-districts-label">Geographic Coverage</span>
-                    <strong class="kpi-value" id="kpi-districts">{{ districts_count|default:"30" }}</strong>
-                    <span class="kpi-subtext" id="kpi-districts-sub">Districts, {{ provinces_count|default:"5" }} provinces</span>
+                    <strong class="kpi-value" id="kpi-districts">{{ districts_count|default:"—" }}</strong>
+                    <span class="kpi-subtext" id="kpi-districts-sub">Districts{% if provinces_count %}, {{ provinces_count }} provinces{% endif %}</span>
                 </div>
             </div>
 
@@ -265,7 +265,7 @@
                 </div>
                 <div class="kpi-content">
                     <span class="kpi-label" id="kpi-prod-label">Total Production</span>
-                    <strong class="kpi-value" id="kpi-prod">{{ total_production_display|default:"1.24M t" }}</strong>
+                    <strong class="kpi-value" id="kpi-prod">{{ total_production_display|default:"—" }}</strong>
                     <span class="kpi-subtext" id="kpi-prod-sub">(estimated, all crops)</span>
                 </div>
             </div>
@@ -281,7 +281,7 @@
                 </div>
                 <div class="kpi-content">
                     <span class="kpi-label" id="kpi-yield-label">Average Yield</span>
-                    <strong class="kpi-value" id="kpi-yield">{{ avg_yield_display|default:"2.8 t/ha" }}</strong>
+                    <strong class="kpi-value" id="kpi-yield">{{ avg_yield_display|default:"—" }}</strong>
                     <span class="kpi-subtext" id="kpi-yield-sub">(national average)</span>
                 </div>
             </div>
@@ -295,7 +295,7 @@
                 </div>
                 <div class="kpi-content">
                     <span class="kpi-label" id="kpi-quality-label">Data Quality</span>
-                    <strong class="kpi-value" id="kpi-quality">{{ data_quality_pct|default:"98%" }}</strong>
+                    <strong class="kpi-value" id="kpi-quality">{{ data_quality_pct|default:"—" }}</strong>
                     <span class="kpi-subtext" id="kpi-quality-sub">Validated &amp; consistent</span>
                 </div>
             </div>

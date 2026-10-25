@@ -1,0 +1,51 @@
+{% extends request.user.is_authenticated|yesno:"base.html,public_base.html" %}
+
+{% block title %}404 Page Not Found | AgriLens Rwanda{% endblock %}
+{% block section_title %}Resource Not Found (HTTP 404){% endblock %}
+
+{% block content %}
+<div class="content-container" style="max-width: 660px; margin: 48px auto; text-align: center;">
+    <div class="panel-card" style="box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08); border: 1px solid #E2E8F0;">
+        <!-- Official AgriLens Brand 4-Color Stripe -->
+        <div style="display: flex; height: 5px; width: 100%;">
+            <span style="flex: 1; background: #166534;"></span>
+            <span style="flex: 1; background: #15803D;"></span>
+            <span style="flex: 1; background: #84CC16;"></span>
+            <span style="flex: 1; background: #FACC15;"></span>
+        </div>
+
+        <div class="panel-body" style="padding: 48px 36px;">
+            <!-- Not Found Compass / Map Pin Icon -->
+            <div style="width: 72px; height: 72px; border-radius: 50%; background: #F0FDF4; color: #166534; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 4px 12px rgba(22, 101, 52, 0.15);">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                </svg>
+            </div>
+
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #166534; background: #F0FDF4; padding: 4px 12px; border-radius: 9999px; margin-bottom: 12px; border: 1px solid #BBF7D0;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #166534;"></span>
+                <span>RESOURCE NOT LOCATED &bull; HTTP 404</span>
+            </div>
+
+            <h2 style="font-size: 1.55rem; font-weight: 800; color: #0F172A; margin: 0 0 12px; letter-spacing: -0.02em;">
+                Statistical Dataset or Page Not Found
+            </h2>
+
+            <p style="font-size: 0.92rem; color: #64748B; line-height: 1.6; margin: 0 0 28px;">
+                The dataset, report, or system view you requested could not be identified within the active AgriLens surveillance index. It may have been archived, relocated, or temporarily unindexed.
+            </p>
+
+            <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                <a href="javascript:history.back()" class="btn-action">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    <span>Return to Previous Page</span>
+                </a>
+                <a href="{% url 'dashboard:overview' %}" class="btn-action primary">
+                    <span>National Dashboard &rarr;</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -15,15 +15,15 @@
             <span>Back to Officers Registry</span>
         </a>
 
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <a href="{% url 'accounts:user_edit' pk=officer.pk %}" style="padding: 8px 16px; background: #005CAB; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 0.84rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a href="{% url 'accounts:user_edit' pk=officer.pk %}" class="btn-action primary">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                 <span>Edit Account</span>
             </a>
 
             <form method="post" action="{% url 'accounts:user_generate_setup_link' pk=officer.pk %}" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" onclick="return confirm('Generate a fresh single-use activation/setup link for this officer?');" style="padding: 8px 14px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-size: 0.84rem; font-weight: 600; cursor: pointer;">
+                <button type="submit" onclick="return confirm('Generate a fresh single-use activation/setup link for this officer?');" class="btn-action" style="color: #15803D; border-color: #BBF7D0; background: #F0FDF4;">
                     Issue Setup Link
                 </button>
             </form>
@@ -31,8 +31,14 @@
             {% if officer.pk != request.user.pk %}
             <form method="post" action="{% url 'accounts:user_toggle_status' pk=officer.pk %}" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" onclick="return confirm('Are you sure you want to {% if officer.is_active %}deactivate{% else %}activate{% endif %} this officer account?');" style="padding: 8px 14px; border-radius: 8px; font-size: 0.84rem; font-weight: 600; cursor: pointer; border: 1px solid {% if officer.is_active %}#FCA5A5; background: #FEF2F2; color: #DC2626;{% else %}#86EFAC; background: #F0FDF4; color: #166534;{% endif %}">
+                <button type="submit" onclick="return confirm('Are you sure you want to {% if officer.is_active %}deactivate{% else %}activate{% endif %} this officer account?');" class="btn-action" style="{% if officer.is_active %}border-color: #FCA5A5; background: #FEF2F2; color: #DC2626;{% else %}border-color: #86EFAC; background: #F0FDF4; color: #166534;{% endif %}">
                     {% if officer.is_active %}Deactivate Account{% else %}Activate Account{% endif %}
+                </button>
+            </form>
+            <form method="post" action="{% url 'accounts:user_delete' pk=officer.pk %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" onclick="return confirm('Are you sure you want to permanently delete account \'{{ officer.username|escapejs }}\'?');" class="btn-action danger">
+                    Delete Account
                 </button>
             </form>
             {% endif %}
@@ -51,12 +57,12 @@
     <!-- Profile Dossier Header -->
     <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 28px; margin-bottom: 24px; box-shadow: 0 4px 12px -2px rgba(0, 31, 59, 0.05); display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
         <div style="display: flex; gap: 20px; align-items: center;">
-            <div style="width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(135deg, #005CAB 0%, #00AEEF 100%); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; box-shadow: 0 4px 12px rgba(0, 92, 171, 0.3);">
+            <div style="width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(135deg, #166534 0%, #15803D 100%); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; box-shadow: 0 4px 12px rgba(22, 101, 52, 0.25);">
                 {{ officer.username|slice:":2"|upper }}
             </div>
             <div>
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-                    <h1 style="margin: 0; font-size: 1.45rem; font-weight: 800; color: #001F3B;">
+                    <h1 style="margin: 0; font-size: 1.45rem; font-weight: 800; color: #0F172A;">
                         {{ officer.get_full_name|default:officer.username }}
                     </h1>
                     {% if officer.is_active %}
@@ -69,7 +75,7 @@
                     @{{ officer.username }} &bull; {{ officer.organization|default:"National Institute of Statistics of Rwanda (NISR)" }}
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <span style="display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; background: #E8F7FE; color: #005CAB; border: 1px solid #BAE0FB;">
+                    <span style="display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE;">
                         {{ officer.get_role_display }}
                     </span>
                     {% if officer.is_superuser %}
@@ -93,17 +99,17 @@
     <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 12px -2px rgba(0, 31, 59, 0.05);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 12px;">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#005CAB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="2" y1="12" x2="22" y2="12"></line>
                     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
                 </svg>
-                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #001F3B;">
+                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #0F172A;">
                     Geographic Jurisdiction &amp; Query Scoping
                 </h3>
             </div>
             {% if officer.is_national_scope %}
-                <span style="font-size: 0.78rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 4px 10px; border-radius: 6px;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: #2563EB; background: #EFF6FF; padding: 4px 10px; border-radius: 6px;">
                     National Clearance
                 </span>
             {% else %}
@@ -114,13 +120,13 @@
         </div>
 
         {% if officer.is_national_scope %}
-            <div style="padding: 16px; background: #F0F7FD; border: 1px solid #BAE0FB; border-radius: 10px; color: #003E73; font-size: 0.88rem; line-height: 1.5;">
+            <div style="padding: 16px; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; color: #1E3A8A; font-size: 0.88rem; line-height: 1.5;">
                 <strong>National Analytical Jurisdiction:</strong> This account holds unrestricted read and operational clearance across all 5 Provinces and 30 Districts of the Republic of Rwanda.
             </div>
         {% else %}
             <div style="margin-bottom: 16px;">
                 <div style="font-size: 0.84rem; color: #64748B; margin-bottom: 4px;">Assigned Province:</div>
-                <div style="font-size: 0.95rem; font-weight: 700; color: #001F3B;">
+                <div style="font-size: 0.95rem; font-weight: 700; color: #0F172A;">
                     {{ officer.assigned_province.name|default:"Not province-restricted" }}
                 </div>
             </div>
@@ -130,7 +136,7 @@
                 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                     {% for district in officer.assigned_districts.all %}
                         <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.82rem; font-weight: 600; color: #0F172A;">
-                            <span style="width: 8px; height: 8px; border-radius: 50%; background: #005CAB;"></span>
+                            <span style="width: 8px; height: 8px; border-radius: 50%; background: #2563EB;"></span>
                             {{ district.name }} ({{ district.province.name }})
                         </span>
                     {% empty %}
@@ -147,14 +153,14 @@
     <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 24px; box-shadow: 0 4px 12px -2px rgba(0, 31, 59, 0.05); overflow: hidden;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 12px;">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#005CAB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                 </svg>
-                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #001F3B;">
+                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #0F172A;">
                     Security &amp; Account Activity Audit Log
                 </h3>
             </div>
-            <a href="{% url 'accounts:audit_log_list' %}?q={{ officer.username }}" style="font-size: 0.8rem; color: #005CAB; text-decoration: none; font-weight: 600;">
+            <a href="{% url 'accounts:audit_log_list' %}?q={{ officer.username }}" style="font-size: 0.8rem; color: #15803D; text-decoration: none; font-weight: 600;">
                 View All System Logs &rarr;
             </a>
         </div>

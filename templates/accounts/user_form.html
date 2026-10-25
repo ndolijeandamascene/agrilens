@@ -15,7 +15,7 @@
             <span>Back to Officers Registry</span>
         </a>
         {% if officer %}
-        <a href="{% url 'accounts:user_detail' pk=officer.pk %}" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #005CAB; font-size: 0.88rem; font-weight: 600;">
+        <a href="{% url 'accounts:user_detail' pk=officer.pk %}" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #15803D; font-size: 0.88rem; font-weight: 600;">
             <span>View Officer Dossier &rarr;</span>
         </a>
         {% endif %}
@@ -198,10 +198,10 @@
 
             <!-- Form Action Buttons -->
             <div style="display: flex; justify-content: flex-end; gap: 14px; border-top: 1px solid #E2E8F0; padding-top: 20px;">
-                <a href="{% url 'accounts:user_list' %}" style="padding: 10px 20px; background: #F1F5F9; color: #475569; border-radius: 8px; font-weight: 600; font-size: 0.88rem; text-decoration: none;">
+                <a href="{% url 'accounts:user_list' %}" class="btn-action">
                     Cancel
                 </a>
-                <button type="submit" style="padding: 10px 26px; background: #005CAB; color: #FFFFFF; border: none; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0, 92, 171, 0.25);">
+                <button type="submit" class="btn-action primary" style="padding: 10px 26px;">
                     {% if officer %}Save Officer Changes{% else %}Register Officer &amp; Generate Setup Link{% endif %}
                 </button>
             </div>

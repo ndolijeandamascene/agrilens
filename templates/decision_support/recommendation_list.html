@@ -8,12 +8,12 @@
     <!-- Header Strip -->
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
         <div>
-            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #005CAB; background: #E8F7FE; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">
+            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 700; color: #166534; background: #F0FDF4; border: 1px solid #BBF7D0; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">
                 <span>Decision Support &bull; Recommendations Queue</span>
                 <span>&bull;</span>
                 <span>{{ recommendations|length }} Active Advisory Items</span>
             </div>
-            <h1 style="margin: 0; font-size: 1.6rem; color: #001F3B; font-weight: 800; letter-spacing: -0.02em;">
+            <h1 style="margin: 0; font-size: 1.6rem; color: #0F172A; font-weight: 800; letter-spacing: -0.02em;">
                 Evidence-Backed Agricultural Recommendations
             </h1>
             <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #64748B;">
@@ -21,7 +21,7 @@
             </p>
         </div>
         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <a href="{% url 'decision_support:hub' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #005CAB; border: 1px solid #BAE0FB; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
+            <a href="{% url 'decision_support:hub' %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: #FFFFFF; color: #166534; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
                 <span>&larr; Decision Hub</span>
             </a>
             <a href="{% url 'decision_support:recommendation_export_csv' %}?stakeholder={{ selected_stakeholder }}&amp;priority={{ selected_priority }}&amp;status={{ selected_status }}&amp;crop={{ selected_crop }}&amp;district={{ selected_district }}" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; background: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-decoration: none;">
@@ -116,9 +116,9 @@
                     {% if r.priority == 'CRITICAL' %}
                         <span style="background: #DC2626; color: #FFFFFF; font-size: 0.7rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.04em;">CRITICAL</span>
                     {% elif r.priority == 'HIGH' %}
-                        <span style="background: #F59E0B; color: #FFFFFF; font-size: 0.7rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.04em;">HIGH</span>
+                        <span style="background: #D97706; color: #FFFFFF; font-size: 0.7rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.04em;">HIGH</span>
                     {% elif r.priority == 'MEDIUM' %}
-                        <span style="background: #0284C7; color: #FFFFFF; font-size: 0.7rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.04em;">MEDIUM</span>
+                        <span style="background: #2563EB; color: #FFFFFF; font-size: 0.7rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.04em;">MEDIUM</span>
                     {% else %}
                         <span style="background: #64748B; color: #FFFFFF; font-size: 0.7rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.04em;">LOW</span>
                     {% endif %}
@@ -127,15 +127,15 @@
                     {% if r.target_stakeholder == 'GOVERNMENT' %}
                         <span style="background: #DCFCE7; color: #166534; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px;">MINAGRI / Policy</span>
                     {% elif r.target_stakeholder == 'BANK' %}
-                        <span style="background: #E0F2FE; color: #0369A1; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px;">Lender / Credit Risk</span>
+                        <span style="background: #EFF6FF; color: #1D4ED8; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px;">Lender / Credit Risk</span>
                     {% elif r.target_stakeholder == 'INSURER' %}
-                        <span style="background: #F3E8FF; color: #7E22CE; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px;">Crop Insurance</span>
+                        <span style="background: #FAF5FF; color: #7C3AED; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px;">Crop Insurance</span>
                     {% else %}
-                        <span style="background: #FEF3C7; color: #92400E; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px;">Agribusiness Offtake</span>
+                        <span style="background: #FFFBEB; color: #92400E; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px;">Agribusiness Offtake</span>
                     {% endif %}
 
                     <!-- Geography & Crop -->
-                    <span style="font-size: 0.76rem; font-weight: 700; color: #001F3B;">
+                    <span style="font-size: 0.76rem; font-weight: 700; color: #0F172A;">
                         {% if r.district %}{{ r.district.name }} District{% else %}National Aggregate{% endif %}
                         &bull; {{ r.crop.name }}
                         &bull; SAS {{ r.season.year }} {{ r.season.season_code }}
@@ -148,15 +148,15 @@
                 </div>
 
                 <!-- Recommendation Title -->
-                <h3 style="margin: 0 0 6px 0; font-size: 1.12rem; font-weight: 800; color: #001F3B;">
-                    <a href="{% url 'decision_support:recommendation_detail' r.id %}" style="text-decoration: none; color: #001F3B;">
+                <h3 style="margin: 0 0 6px 0; font-size: 1.12rem; font-weight: 800; color: #0F172A;">
+                    <a href="{% url 'decision_support:recommendation_detail' r.id %}" style="text-decoration: none; color: #0F172A;">
                         {{ r.title }}
                     </a>
                 </h3>
 
                 <!-- Problem Statement Snippet -->
                 <p style="margin: 0 0 8px 0; font-size: 0.84rem; color: #475569; line-height: 1.45;">
-                    <strong style="color: #001F3B;">Observed Issue:</strong> {{ r.problem_statement|truncatewords:30 }}
+                    <strong style="color: #0F172A;">Observed Issue:</strong> {{ r.problem_statement|truncatewords:30 }}
                 </p>
 
                 <!-- Recommended Action Snippet -->
@@ -193,13 +193,13 @@
 
             <!-- Action & Link Column -->
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px; min-width: 160px;">
-                <a href="{% url 'decision_support:recommendation_detail' r.id %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #005CAB; color: #FFFFFF; border-radius: 6px; font-size: 0.84rem; font-weight: 700; text-decoration: none;">
+                <a href="{% url 'decision_support:recommendation_detail' r.id %}" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #15803D; color: #FFFFFF; border-radius: 6px; font-size: 0.84rem; font-weight: 700; text-decoration: none; transition: background 0.15s ease;" onmouseover="this.style.background='#166534'" onmouseout="this.style.background='#15803D'">
                     <span>Inspect Dossier</span>
                     <span>&rarr;</span>
                 </a>
 
                 {% if r.district %}
-                <a href="{% url 'dashboard:reports_district' %}?district={{ r.district.id }}&amp;year={{ r.season.year }}&amp;season={{ r.season.season_code }}&amp;crop={{ r.crop.name }}" style="font-size: 0.76rem; color: #005CAB; text-decoration: none; font-weight: 600;">
+                <a href="{% url 'dashboard:reports_district' %}?district={{ r.district.id }}&amp;year={{ r.season.year }}&amp;season={{ r.season.season_code }}&amp;crop={{ r.crop.name }}" style="font-size: 0.76rem; color: #15803D; text-decoration: none; font-weight: 600;">
                     View District Dossier &rarr;
                 </a>
                 {% endif %}
@@ -214,7 +214,7 @@
     {% else %}
     <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 48px 24px; text-align: center; color: #64748B;">
         <div style="font-size: 2rem; margin-bottom: 12px;">📊</div>
-        <h3 style="margin: 0 0 6px 0; font-size: 1.1rem; font-weight: 700; color: #001F3B;">No Recommendations Found</h3>
+        <h3 style="margin: 0 0 6px 0; font-size: 1.1rem; font-weight: 700; color: #0F172A;">No Recommendations Found</h3>
         <p style="margin: 0; font-size: 0.86rem; color: #64748B;">No recommendations match your current filter parameters or geographic clearance.</p>
     </div>
     {% endif %}

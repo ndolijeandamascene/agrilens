@@ -10,6 +10,7 @@ urlpatterns = [
     path('recommendations/<int:pk>/transition/', views.recommendation_transition, name='recommendation_transition'),
     path('recommendations/<int:pk>/actions/create/', views.action_plan_create, name='action_plan_create'),
     path('actions/<int:pk>/update/', views.action_plan_update, name='action_plan_update'),
+    path('actions/<int:pk>/delete/', views.action_plan_delete, name='action_plan_delete'),
     path('impact/', views.impact_dashboard, name='impact_dashboard'),
     path('generate/', views.generate_recommendations_action, name='generate'),
     path('export/csv/', views.recommendation_export_csv, name='recommendation_export_csv'),

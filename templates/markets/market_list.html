@@ -994,13 +994,19 @@
         <div class="market-kpi-info">
           <span class="market-kpi-label">{{ kpi_commodity_name }} average</span>
           <div class="market-kpi-val-row">
-            <span class="market-kpi-number">{{ kpi_commodity_avg }}</span>
+            <span class="market-kpi-number">{{ kpi_commodity_avg|default:"—" }}</span>
             <span class="market-kpi-unit">RWF/kg</span>
           </div>
+          {% if kpi_commodity_trend %}
           <span class="market-kpi-badge">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
             +{{ kpi_commodity_trend }}%
           </span>
+          {% else %}
+          <span class="market-kpi-badge" style="background: #f1f5f9; color: #64748b;">
+            Single period
+          </span>
+          {% endif %}
         </div>
       </div>
 
@@ -1236,32 +1242,33 @@
           <div class="trend-stat-box">
             <span class="trend-stat-label">National Average</span>
             <div class="trend-stat-value">
-              <span>{{ trend_chart_data.national_avg }} RWF/kg</span>
+              <span>{{ trend_chart_data.national_avg|default:"—" }} RWF/kg</span>
+              {% if trend_chart_data.trend_pct %}
               <span class="trend-stat-change">&uarr; +{{ trend_chart_data.trend_pct }}%</span>
+              {% endif %}
             </div>
           </div>
         </div>
 
+        {% if trend_chart_data.is_insufficient_time_series %}
+        <!-- Honest Alert when historical time series has only a single collection date -->
+        <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 10px; padding: 32px 20px; text-align: center; margin-bottom: 18px;">
+          <div style="font-size: 1.5rem; margin-bottom: 8px;">📊</div>
+          <div style="font-weight: 700; color: #0f172a; font-size: 0.95rem; margin-bottom: 6px;">INSUFFICIENT TIME-SERIES DATA</div>
+          <p style="color: #64748b; font-size: 0.82rem; margin: 0 auto; max-width: 420px; line-height: 1.5;">
+            Multi-day historical trend surveillance requires verified quotes across 2 or more distinct collection dates. Currently, verified quotes exist for a single collection period ({{ kpi_last_updated_date }}).
+          </p>
+        </div>
+        {% else %}
         <!-- SVG Trend Chart -->
         <div class="trend-svg-container">
-          <svg class="trend-svg-chart" viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="7-Day Price Trend Chart">
+          <svg class="trend-svg-chart" viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Historical Price Trend Chart">
             <!-- Horizontal Grid Lines and Y-Axis Ticks -->
             <g class="chart-grid">
               {% for tick in trend_chart_data.chart_ticks reversed %}
               <text class="chart-axis-text" x="5" y="{% cycle 24 64 104 144 %}">{{ tick }}</text>
               <line class="chart-grid-line" x1="36" y1="{% cycle 20 60 100 140 %}" x2="470" y2="{% cycle 20 60 100 140 %}"></line>
               {% endfor %}
-            </g>
-
-            <!-- X-Axis Labels: Wed to Tue -->
-            <g class="chart-x-labels">
-              <text class="chart-axis-text" x="55" y="166" text-anchor="middle">Wed</text>
-              <text class="chart-axis-text" x="120" y="166" text-anchor="middle">Thu</text>
-              <text class="chart-axis-text" x="185" y="166" text-anchor="middle">Fri</text>
-              <text class="chart-axis-text" x="250" y="166" text-anchor="middle">Sat</text>
-              <text class="chart-axis-text" x="315" y="166" text-anchor="middle">Sun</text>
-              <text class="chart-axis-text" x="380" y="166" text-anchor="middle">Mon</text>
-              <text class="chart-axis-text" x="445" y="166" text-anchor="middle">Tue</text>
             </g>
 
             <!-- Gradient Area Fill under Curve -->
@@ -1271,26 +1278,26 @@
                 <stop offset="100%" stop-color="#10b981" stop-opacity="0.0"/>
               </linearGradient>
             </defs>
-            <path d="M {{ trend_chart_data.x_coords.0 }},{{ trend_chart_data.y_coords.0 }} L {{ trend_chart_data.x_coords.1 }},{{ trend_chart_data.y_coords.1 }} L {{ trend_chart_data.x_coords.2 }},{{ trend_chart_data.y_coords.2 }} L {{ trend_chart_data.x_coords.3 }},{{ trend_chart_data.y_coords.3 }} L {{ trend_chart_data.x_coords.4 }},{{ trend_chart_data.y_coords.4 }} L {{ trend_chart_data.x_coords.5 }},{{ trend_chart_data.y_coords.5 }} L {{ trend_chart_data.x_coords.6 }},{{ trend_chart_data.y_coords.6 }} L {{ trend_chart_data.x_coords.6 }},140 L {{ trend_chart_data.x_coords.0 }},140 Z" fill="url(#trendAreaGrad)"></path>
+            <path d="M {{ trend_chart_data.x_coords.0 }},{{ trend_chart_data.y_coords.0 }} {% for x, y, pt in trend_chart_data.svg_pts %}L {{ x }},{{ y }} {% endfor %} L {{ trend_chart_data.x_coords|last }},140 L {{ trend_chart_data.x_coords.0 }},140 Z" fill="url(#trendAreaGrad)"></path>
 
             <!-- Trend Curve Line -->
-            <path class="chart-curve-path" d="M {{ trend_chart_data.x_coords.0 }},{{ trend_chart_data.y_coords.0 }} L {{ trend_chart_data.x_coords.1 }},{{ trend_chart_data.y_coords.1 }} L {{ trend_chart_data.x_coords.2 }},{{ trend_chart_data.y_coords.2 }} L {{ trend_chart_data.x_coords.3 }},{{ trend_chart_data.y_coords.3 }} L {{ trend_chart_data.x_coords.4 }},{{ trend_chart_data.y_coords.4 }} L {{ trend_chart_data.x_coords.5 }},{{ trend_chart_data.y_coords.5 }} L {{ trend_chart_data.x_coords.6 }},{{ trend_chart_data.y_coords.6 }}"></path>
+            <path class="chart-curve-path" d="M {{ trend_chart_data.x_coords.0 }},{{ trend_chart_data.y_coords.0 }} {% for x, y, pt in trend_chart_data.svg_pts %}L {{ x }},{{ y }} {% endfor %}"></path>
 
             <!-- Plotted Dots -->
             {% for x, y, pt in trend_chart_data.svg_pts %}
             <circle class="chart-dot" cx="{{ x }}" cy="{{ y }}" r="4.2" data-price="{{ pt }}" title="{{ pt }} RWF/kg"></circle>
             {% endfor %}
 
-            <!-- Dynamic Highlight Badge on Tuesday (Last Point) -->
+            <!-- Dynamic Highlight Badge on Last Point -->
             <rect class="chart-pill-badge" x="422" y="100" width="46" height="18" rx="4"></rect>
             <text class="chart-pill-text" x="445" y="113">{{ trend_chart_data.national_avg }}</text>
           </svg>
         </div>
+        {% endif %}
 
         <!-- Key Insights Box -->
         <div class="trend-insights-box">
           <div class="insights-heading-row">
-            <!-- Lightbulb SVG -->
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
               <path d="M9 18h6"></path>
@@ -1299,9 +1306,9 @@
             <span class="insights-heading-title">Key insights</span>
           </div>
           <ul class="insights-list">
-            <li><strong>{{ trend_chart_data.crop_name }}</strong> national average price is {{ trend_chart_data.national_avg }} RWF/kg (+{{ trend_chart_data.trend_pct }}% this week).</li>
-            <li>Highest retail prices are registered in Kigali urban markets and border hubs.</li>
-            <li>Consistent supply observed across major regional assembly markets.</li>
+            <li><strong>{{ trend_chart_data.crop_name }}</strong> national average price is {% if trend_chart_data.national_avg %}{{ trend_chart_data.national_avg }} RWF/kg{% else %}unavailable{% endif %}{% if trend_chart_data.trend_pct %} (+{{ trend_chart_data.trend_pct }}% observed change){% endif %}.</li>
+            <li>Published prices represent verified transactions approved by market surveillance officers.</li>
+            <li>Observed quotes are collected across commercial wholesale and retail markets nationwide.</li>
           </ul>
           <a href="{% url 'markets:market_list' %}?commodity={{ trend_chart_data.crop_name }}" class="insights-link">
             <span>Filter all {{ trend_chart_data.crop_name }} prices</span>
@@ -1399,7 +1406,9 @@
 
               <!-- 5. Weekly Change -->
               <td>
-                {% if price.is_positive_change %}
+                {% if price.change_display == "—" %}
+                <span style="color: #94a3b8; font-weight: 500;">—</span>
+                {% elif price.is_positive_change %}
                 <span class="table-change-badge positive">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
                   {{ price.change_display }}
@@ -1415,7 +1424,7 @@
               <!-- 6. Updated Date & Time -->
               <td>
                 <div class="updated-date-line">{{ price.formatted_date }}</div>
-                <div class="updated-time-line">{{ price.formatted_time }}</div>
+                <div class="updated-time-line">{% if price.formatted_time != "—" %}{{ price.formatted_time }}{% endif %}</div>
               </td>
             </tr>
             {% empty %}
@@ -1469,7 +1478,7 @@
   let geoLayer = null;
   let pinnedMarker = null;
   let pinnedPopup = null;
-  let pinnedDistrictName = '{{ selected_district|default:"Nyanza" }}';
+  let pinnedDistrictName = '{{ selected_district|default:""|escapejs }}';
 
   // Dynamic 30-District Market Prices passed from Django Backend
   let districtPriceData = {{ district_price_json|safe }};
@@ -1706,10 +1715,12 @@
           };
         }
 
-        // Initialize pinned badge on selected district (Nyanza by default)
-        const initialCenter = DISTRICT_CENTROIDS[pinnedDistrictName] || [-2.3203, 29.7702];
-        showPinnedDistrictPopup(initialCenter, pinnedDistrictName);
-        highlightDistrict(pinnedDistrictName);
+        // Initialize pinned badge if a district was selected in filter
+        if (pinnedDistrictName && DISTRICT_CENTROIDS[pinnedDistrictName]) {
+          const initialCenter = DISTRICT_CENTROIDS[pinnedDistrictName];
+          showPinnedDistrictPopup(initialCenter, pinnedDistrictName);
+          highlightDistrict(pinnedDistrictName);
+        }
       })
       .catch(err => console.error('Error loading Rwanda GeoJSON for market map:', err));
 

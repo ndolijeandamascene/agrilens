@@ -1,8 +1,139 @@
 {% extends request.user.is_authenticated|yesno:"base.html,public_base.html" %}
-{% block section_title %}Market Price Monitoring{% endblock %}
+
+{% block title %}Commodity Market Price Surveillance | AgriLens Rwanda{% endblock %}
+{% block section_title %}Commodity Markets &amp; Price Intelligence Portal{% endblock %}
+
 {% block content %}
-<div class="panel-card">
-    <div class="panel-header"><h3>Wholesale & Retail Commodity Prices</h3></div>
-    <div class="panel-body"><p>Tracking agricultural commodity prices across provincial and urban trade hubs.</p></div>
+<div class="content-container">
+    <!-- Header Strip -->
+    <div class="dashboard-header-strip">
+        <div class="header-left-meta">
+            <span class="live-stream-badge">
+                <span class="pulse-dot"></span>
+                <span>Active Market Price Feeds</span>
+            </span>
+            <span class="header-coverage-tag">Rwanda Wholesale &amp; Retail Price Monitoring</span>
+        </div>
+        <div class="header-right-tools">
+            <a href="{% url 'markets:market_list' %}" class="btn-action primary">
+                <span>Public Price Board &rarr;</span>
+            </a>
+            {% if request.user.is_authenticated %}
+            <a href="{% url 'markets:internal_dashboard' %}" class="btn-action secondary">
+                <span>Staff Management Suite</span>
+            </a>
+            <a href="{% url 'markets:internal_record_create' %}" class="btn-action">
+                <span>+ Log Price Record</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Executive Overview Hero Card -->
+    <div class="panel-card" style="margin-bottom: 24px;">
+        <div style="display: flex; height: 5px; width: 100%;">
+            <span style="flex: 1; background: #166534;"></span>
+            <span style="flex: 1; background: #15803D;"></span>
+            <span style="flex: 1; background: #84CC16;"></span>
+            <span style="flex: 1; background: #FACC15;"></span>
+        </div>
+        <div class="panel-body" style="padding: 28px 32px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+                <div style="max-width: 780px;">
+                    <span class="panel-badge yellow" style="margin-bottom: 12px;">Market Surveillance</span>
+                    <h2 style="font-size: 1.6rem; font-weight: 800; color: #001F3B; margin: 0 0 10px; letter-spacing: -0.02em;">
+                        Agricultural Commodity Price Intelligence &amp; Food Security
+                    </h2>
+                    <p style="font-size: 0.92rem; color: #475569; line-height: 1.6; margin: 0 0 18px;">
+                        Tracking retail, wholesale, and farmgate commodity prices across provincial trading hubs in Rwanda. AgriLens provides transparent price discovery for farmers, prevents localized market distortions, and supports food price stabilization policies.
+                    </p>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <a href="{% url 'markets:market_list' %}" class="btn-action primary">
+                            Launch Public Price Board
+                        </a>
+                        {% if request.user.is_authenticated %}
+                        <a href="{% url 'markets:internal_analytics' %}" class="btn-action">
+                            Price Analytics &rarr;
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px 24px; min-width: 240px;">
+                    <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 8px;">Surveillance Coverage</div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div>
+                            <span style="font-size: 1.4rem; font-weight: 800; color: #2563EB;">30+</span>
+                            <span style="font-size: 0.8rem; color: #334155; margin-left: 6px;">Commercial Trade Hubs</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 1.4rem; font-weight: 800; color: #166534;">RWF/kg</span>
+                            <span style="font-size: 0.8rem; color: #334155; margin-left: 6px;">Standard Metric Benchmarks</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 1.4rem; font-weight: 800; color: #D97706;">Daily</span>
+                            <span style="font-size: 0.8rem; color: #334155; margin-left: 6px;">Data Synchronization</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation Modules -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        <div class="panel-card" style="margin-bottom: 0;">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <h3>Public Market Board</h3>
+                    <p class="panel-subtitle">Transparent consumer &amp; trader prices</p>
+                </div>
+                <span class="panel-badge green">Public Access</span>
+            </div>
+            <div class="panel-body">
+                <p style="font-size: 0.86rem; color: #64748B; line-height: 1.5; margin-bottom: 18px;">
+                    Interactive map and district commodity pricing across Irish potatoes, beans, maize, cassava flour, and rice.
+                </p>
+                <a href="{% url 'markets:market_list' %}" class="btn-action primary" style="width: 100%; box-sizing: border-box; text-align: center;">
+                    View Commodity Prices &rarr;
+                </a>
+            </div>
+        </div>
+
+        <div class="panel-card" style="margin-bottom: 0;">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <h3>Staff Management Suite</h3>
+                    <p class="panel-subtitle">Authorized price enumerators workspace</p>
+                </div>
+                <span class="panel-badge blue">Staff Only</span>
+            </div>
+            <div class="panel-body">
+                <p style="font-size: 0.86rem; color: #64748B; line-height: 1.5; margin-bottom: 18px;">
+                    Submit field price observations, review automated validation checks, and manage official price bulletins.
+                </p>
+                <a href="{% url 'markets:internal_dashboard' %}" class="btn-action secondary" style="width: 100%; box-sizing: border-box; text-align: center;">
+                    Open Staff Workspace &rarr;
+                </a>
+            </div>
+        </div>
+
+        <div class="panel-card" style="margin-bottom: 0;">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <h3>Trading Hubs Catalog</h3>
+                    <p class="panel-subtitle">Geographic market locations in Rwanda</p>
+                </div>
+                <span class="panel-badge yellow">Locations</span>
+            </div>
+            <div class="panel-body">
+                <p style="font-size: 0.86rem; color: #64748B; line-height: 1.5; margin-bottom: 18px;">
+                    Catalog of aggregation markets across Kimironko, Nyabugogo, Musanze Commercial, Mahoko, Huye, and border hubs.
+                </p>
+                <a href="{% url 'markets:internal_markets' %}" class="btn-action" style="width: 100%; box-sizing: border-box; text-align: center;">
+                    Explore Market Hubs &rarr;
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

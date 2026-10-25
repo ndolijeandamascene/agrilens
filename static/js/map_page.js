@@ -1,7 +1,7 @@
 /**
  * AgriLens Public Agricultural Map Engine
  * Dynamic Interactive GIS Choropleth & Localized District Details Dossier
- * Fully synchronized with official SAS multi-season dataset (2025A / 2024A)
+ * Fully synchronized with official database indicators and verified survey records.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,388 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==========================================================================
-   1. MULTI-SEASON VERIFIED AGRICULTURAL DATASET
+   1. GEOGRAPHIC REFERENCE DATA & TAXONOMY
    ========================================================================== */
-const MAP_SEASON_DATA = {
-    '2025A': {
-        year: 2025,
-        season: 'A',
-        label: 'SAS 2024 – 2025',
-        kpiTotals: {
-            crops: '10',
-            records: '10,000',
-            districts: '30',
-            prod: '1.24M t'
-        },
-        crops: {
-            'Maize': {
-                unit: 't/ha',
-                districts: {
-                    'Musanze': { yield: 4.3, area: 1450, prod: 6235 },
-                    'Rubavu': { yield: 3.9, area: 1120, prod: 4368 },
-                    'Burera': { yield: 3.8, area: 1300, prod: 4940 },
-                    'Nyabihu': { yield: 3.6, area: 1240, prod: 4464 },
-                    'Nyagatare': { yield: 3.5, area: 2800, prod: 9800 },
-                    'Gicumbi': { yield: 3.4, area: 1550, prod: 5270 },
-                    'Gasabo': { yield: 3.3, area: 850, prod: 2805 },
-                    'Nyamagabe': { yield: 3.2, area: 1200, prod: 3840 },
-                    'Nyarugenge': { yield: 2.9, area: 420, prod: 1218 },
-                    'Muhanga': { yield: 2.8, area: 1100, prod: 3080 },
-                    'Nyamasheke': { yield: 2.8, area: 980, prod: 2744 },
-                    'Kicukiro': { yield: 2.8, area: 380, prod: 1064 },
-                    'Rutsiro': { yield: 2.7, area: 1050, prod: 2835 },
-                    'Huye': { yield: 2.7, area: 1180, prod: 3186 },
-                    'Ruhango': { yield: 2.6, area: 1020, prod: 2652 },
-                    'Ngororero': { yield: 2.6, area: 950, prod: 2470 },
-                    'Nyaruguru': { yield: 2.6, area: 1150, prod: 2990 },
-                    'Karongi': { yield: 2.5, area: 1080, prod: 2700 },
-                    'Nyanza': { yield: 2.5, area: 1140, prod: 2850 },
-                    'Kamonyi': { yield: 2.4, area: 1210, prod: 2904 },
-                    'Gatsibo': { yield: 2.4, area: 2450, prod: 5880 },
-                    'Gisagara': { yield: 2.2, area: 1320, prod: 2904 },
-                    'Rusizi': { yield: 1.7, area: 940, prod: 1598 },
-                    'Rulindo': { yield: 1.6, area: 1120, prod: 1792 },
-                    'Rwamagana': { yield: 1.5, area: 1600, prod: 2400 },
-                    'Gakenke': { yield: 1.4, area: 1050, prod: 1470 },
-                    'Ngoma': { yield: 0.9, area: 1480, prod: 1332 },
-                    'Kayonza': { yield: 0.85, area: 1950, prod: 1658 },
-                    'Bugesera': { yield: 0.8, area: 1820, prod: 1456 },
-                    'Kirehe': { yield: 0.7, area: 1750, prod: 1225 }
-                }
-            },
-            'Beans': {
-                unit: 't/ha',
-                districts: {
-                    'Musanze': { yield: 1.5, area: 1800, prod: 2700 },
-                    'Rubavu': { yield: 1.6, area: 1350, prod: 2160 },
-                    'Burera': { yield: 1.4, area: 1600, prod: 2240 },
-                    'Nyabihu': { yield: 1.8, area: 1520, prod: 2736 },
-                    'Nyagatare': { yield: 1.8, area: 3200, prod: 5760 },
-                    'Gicumbi': { yield: 1.3, area: 1900, prod: 2470 },
-                    'Gasabo': { yield: 1.5, area: 950, prod: 1425 },
-                    'Nyamagabe': { yield: 1.5, area: 1400, prod: 2100 },
-                    'Nyarugenge': { yield: 1.4, area: 480, prod: 672 },
-                    'Muhanga': { yield: 1.6, area: 1300, prod: 2080 },
-                    'Nyamasheke': { yield: 1.4, area: 1100, prod: 1540 },
-                    'Kicukiro': { yield: 1.4, area: 420, prod: 588 },
-                    'Rutsiro': { yield: 1.4, area: 1250, prod: 1750 },
-                    'Huye': { yield: 1.6, area: 1380, prod: 2208 },
-                    'Ruhango': { yield: 1.4, area: 1200, prod: 1680 },
-                    'Ngororero': { yield: 1.3, area: 1050, prod: 1365 },
-                    'Nyaruguru': { yield: 1.3, area: 1350, prod: 1755 },
-                    'Karongi': { yield: 1.3, area: 1220, prod: 1586 },
-                    'Nyanza': { yield: 1.5, area: 1340, prod: 2010 },
-                    'Kamonyi': { yield: 1.5, area: 1410, prod: 2115 },
-                    'Gatsibo': { yield: 1.7, area: 2850, prod: 4845 },
-                    'Gisagara': { yield: 1.4, area: 1520, prod: 2128 },
-                    'Rusizi': { yield: 1.2, area: 1080, prod: 1296 },
-                    'Rulindo': { yield: 1.2, area: 1320, prod: 1584 },
-                    'Rwamagana': { yield: 1.6, area: 1900, prod: 3040 },
-                    'Gakenke': { yield: 1.1, area: 1250, prod: 1375 },
-                    'Ngoma': { yield: 1.5, area: 1780, prod: 2670 },
-                    'Kayonza': { yield: 1.5, area: 2250, prod: 3375 },
-                    'Bugesera': { yield: 1.3, area: 2120, prod: 2756 },
-                    'Kirehe': { yield: 1.4, area: 2050, prod: 2870 }
-                }
-            },
-            'Irish Potato': {
-                unit: 't/ha',
-                districts: {
-                    'Musanze': { yield: 19.5, area: 2100, prod: 40950 },
-                    'Rubavu': { yield: 18.4, area: 1600, prod: 29440 },
-                    'Burera': { yield: 18.2, area: 1850, prod: 33670 },
-                    'Nyabihu': { yield: 18.7, area: 1920, prod: 35904 },
-                    'Nyagatare': { yield: 8.5, area: 650, prod: 5525 },
-                    'Gicumbi': { yield: 15.8, area: 1400, prod: 22120 },
-                    'Gasabo': { yield: 10.0, area: 420, prod: 4200 },
-                    'Nyamagabe': { yield: 14.2, area: 1250, prod: 17750 },
-                    'Nyarugenge': { yield: 9.2, area: 220, prod: 2024 },
-                    'Muhanga': { yield: 11.2, area: 780, prod: 8736 },
-                    'Nyamasheke': { yield: 12.5, area: 850, prod: 10625 },
-                    'Kicukiro': { yield: 9.5, area: 200, prod: 1900 },
-                    'Rutsiro': { yield: 15.2, area: 1150, prod: 17480 },
-                    'Huye': { yield: 10.8, area: 620, prod: 6696 },
-                    'Ruhango': { yield: 10.5, area: 580, prod: 6090 },
-                    'Ngororero': { yield: 14.5, area: 1100, prod: 15950 },
-                    'Nyaruguru': { yield: 13.8, area: 980, prod: 13524 },
-                    'Karongi': { yield: 13.8, area: 920, prod: 12696 },
-                    'Nyanza': { yield: 10.2, area: 540, prod: 5508 },
-                    'Kamonyi': { yield: 9.8, area: 510, prod: 4998 },
-                    'Gatsibo': { yield: 8.2, area: 600, prod: 4920 },
-                    'Gisagara': { yield: 9.5, area: 490, prod: 4655 },
-                    'Rusizi': { yield: 11.8, area: 720, prod: 8496 },
-                    'Rulindo': { yield: 14.2, area: 1350, prod: 19170 },
-                    'Rwamagana': { yield: 8.0, area: 580, prod: 4640 },
-                    'Gakenke': { yield: 13.5, area: 1280, prod: 17280 },
-                    'Ngoma': { yield: 7.5, area: 520, prod: 3900 },
-                    'Kayonza': { yield: 7.5, area: 550, prod: 4125 },
-                    'Bugesera': { yield: 7.0, area: 480, prod: 3360 },
-                    'Kirehe': { yield: 7.2, area: 500, prod: 3600 }
-                }
-            },
-            'Rice': {
-                unit: 't/ha',
-                districts: {
-                    'Musanze': { yield: 2.8, area: 450, prod: 1260 },
-                    'Rubavu': { yield: 3.5, area: 520, prod: 1820 },
-                    'Burera': { yield: 2.5, area: 380, prod: 950 },
-                    'Nyabihu': { yield: 3.2, area: 410, prod: 1312 },
-                    'Nyagatare': { yield: 4.6, area: 2200, prod: 10120 },
-                    'Gicumbi': { yield: 3.2, area: 650, prod: 2080 },
-                    'Gasabo': { yield: 3.6, area: 780, prod: 2808 },
-                    'Nyamagabe': { yield: 3.2, area: 540, prod: 1728 },
-                    'Nyarugenge': { yield: 3.2, area: 310, prod: 992 },
-                    'Muhanga': { yield: 3.8, area: 890, prod: 3382 },
-                    'Nyamasheke': { yield: 4.1, area: 950, prod: 3895 },
-                    'Kicukiro': { yield: 3.4, area: 420, prod: 1428 },
-                    'Rutsiro': { yield: 3.8, area: 620, prod: 2356 },
-                    'Huye': { yield: 4.1, area: 1100, prod: 4510 },
-                    'Ruhango': { yield: 3.9, area: 980, prod: 3822 },
-                    'Ngororero': { yield: 3.4, area: 510, prod: 1734 },
-                    'Nyaruguru': { yield: 3.0, area: 580, prod: 1740 },
-                    'Karongi': { yield: 3.9, area: 750, prod: 2925 },
-                    'Nyanza': { yield: 3.7, area: 870, prod: 3219 },
-                    'Kamonyi': { yield: 4.0, area: 1050, prod: 4200 },
-                    'Gatsibo': { yield: 4.4, area: 1950, prod: 8580 },
-                    'Gisagara': { yield: 4.2, area: 1250, prod: 5250 },
-                    'Rusizi': { yield: 5.2, area: 2400, prod: 12480 },
-                    'Rulindo': { yield: 3.4, area: 720, prod: 2448 },
-                    'Rwamagana': { yield: 4.8, area: 2300, prod: 11040 },
-                    'Gakenke': { yield: 3.1, area: 680, prod: 2108 },
-                    'Ngoma': { yield: 4.2, area: 1650, prod: 6930 },
-                    'Kayonza': { yield: 4.7, area: 1850, prod: 8695 },
-                    'Bugesera': { yield: 4.5, area: 1750, prod: 7875 },
-                    'Kirehe': { yield: 4.3, area: 1600, prod: 6880 }
-                }
-            },
-            'Cassava': {
-                unit: 't/ha',
-                districts: {
-                    'Musanze': { yield: 8.5, area: 650, prod: 5525 },
-                    'Rubavu': { yield: 11.5, area: 850, prod: 9775 },
-                    'Burera': { yield: 7.8, area: 580, prod: 4524 },
-                    'Nyabihu': { yield: 10.2, area: 720, prod: 7344 },
-                    'Nyagatare': { yield: 13.5, area: 2100, prod: 28350 },
-                    'Gicumbi': { yield: 8.2, area: 740, prod: 6068 },
-                    'Gasabo': { yield: 11.2, area: 980, prod: 10976 },
-                    'Nyamagabe': { yield: 12.5, area: 1150, prod: 14375 },
-                    'Nyarugenge': { yield: 10.5, area: 420, prod: 4410 },
-                    'Muhanga': { yield: 14.8, area: 1650, prod: 24420 },
-                    'Nyamasheke': { yield: 12.8, area: 1420, prod: 18176 },
-                    'Kicukiro': { yield: 10.8, area: 510, prod: 5508 },
-                    'Rutsiro': { yield: 11.0, area: 950, prod: 10450 },
-                    'Huye': { yield: 14.6, area: 1580, prod: 23068 },
-                    'Ruhango': { yield: 14.5, area: 1720, prod: 24940 },
-                    'Ngororero': { yield: 10.8, area: 880, prod: 9504 },
-                    'Nyaruguru': { yield: 12.0, area: 1300, prod: 15600 },
-                    'Karongi': { yield: 12.2, area: 1250, prod: 15250 },
-                    'Nyanza': { yield: 15.2, area: 1850, prod: 28120 },
-                    'Kamonyi': { yield: 14.2, area: 1600, prod: 22720 },
-                    'Gatsibo': { yield: 14.0, area: 2300, prod: 32200 },
-                    'Gisagara': { yield: 13.8, area: 1750, prod: 24150 },
-                    'Rusizi': { yield: 13.5, area: 1620, prod: 21870 },
-                    'Rulindo': { yield: 9.5, area: 920, prod: 8740 },
-                    'Rwamagana': { yield: 15.0, area: 2400, prod: 36000 },
-                    'Gakenke': { yield: 9.0, area: 890, prod: 8010 },
-                    'Ngoma': { yield: 15.2, area: 2250, prod: 34200 },
-                    'Kayonza': { yield: 15.5, area: 2500, prod: 38750 },
-                    'Bugesera': { yield: 14.5, area: 2350, prod: 34075 },
-                    'Kirehe': { yield: 14.8, area: 2450, prod: 36260 }
-                }
-            }
-        }
-    },
-    '2024A': {
-        year: 2024,
-        season: 'A',
-        label: 'SAS 2023 – 2024',
-        kpiTotals: {
-            crops: '10',
-            records: '5,000',
-            districts: '30',
-            prod: '1.18M t'
-        },
-        crops: {
-            'Maize': {
-                unit: 't/ha',
-                districts: {
-                    'Musanze': { yield: 4.0, area: 1400, prod: 5600 },
-                    'Rubavu': { yield: 3.7, area: 1100, prod: 4070 },
-                    'Burera': { yield: 3.5, area: 1250, prod: 4375 },
-                    'Nyabihu': { yield: 3.3, area: 1200, prod: 3960 },
-                    'Nyagatare': { yield: 3.2, area: 2700, prod: 8640 },
-                    'Gicumbi': { yield: 3.1, area: 1500, prod: 4650 },
-                    'Gasabo': { yield: 3.0, area: 820, prod: 2460 },
-                    'Nyamagabe': { yield: 2.9, area: 1150, prod: 3335 },
-                    'Nyarugenge': { yield: 2.7, area: 400, prod: 1080 },
-                    'Muhanga': { yield: 2.6, area: 1050, prod: 2730 },
-                    'Nyamasheke': { yield: 2.5, area: 940, prod: 2350 },
-                    'Kicukiro': { yield: 2.5, area: 360, prod: 900 },
-                    'Rutsiro': { yield: 2.5, area: 1000, prod: 2500 },
-                    'Huye': { yield: 2.5, area: 1120, prod: 2800 },
-                    'Ruhango': { yield: 2.4, area: 980, prod: 2352 },
-                    'Ngororero': { yield: 2.4, area: 920, prod: 2208 },
-                    'Nyaruguru': { yield: 2.4, area: 1100, prod: 2640 },
-                    'Karongi': { yield: 2.3, area: 1020, prod: 2346 },
-                    'Nyanza': { yield: 2.3, area: 1100, prod: 2530 },
-                    'Kamonyi': { yield: 2.2, area: 1150, prod: 2530 },
-                    'Gatsibo': { yield: 2.2, area: 2350, prod: 5170 },
-                    'Gisagara': { yield: 2.0, area: 1280, prod: 2560 },
-                    'Rusizi': { yield: 1.5, area: 900, prod: 1350 },
-                    'Rulindo': { yield: 1.4, area: 1080, prod: 1512 },
-                    'Rwamagana': { yield: 1.4, area: 1520, prod: 2128 },
-                    'Gakenke': { yield: 1.3, area: 1000, prod: 1300 },
-                    'Ngoma': { yield: 0.8, area: 1420, prod: 1136 },
-                    'Kayonza': { yield: 0.75, area: 1850, prod: 1387 },
-                    'Bugesera': { yield: 0.7, area: 1750, prod: 1225 },
-                    'Kirehe': { yield: 0.65, area: 1680, prod: 1092 }
-                }
-            },
-            'Beans': {
-                unit: 't/ha',
-                districts: {
-                    'Musanze': { yield: 1.4, area: 1750, prod: 2450 },
-                    'Rubavu': { yield: 1.5, area: 1300, prod: 1950 },
-                    'Burera': { yield: 1.3, area: 1550, prod: 2015 },
-                    'Nyabihu': { yield: 1.6, area: 1480, prod: 2368 },
-                    'Nyagatare': { yield: 1.6, area: 3100, prod: 4960 },
-                    'Gicumbi': { yield: 1.2, area: 1850, prod: 2220 },
-                    'Gasabo': { yield: 1.4, area: 920, prod: 1288 },
-                    'Nyamagabe': { yield: 1.4, area: 1350, prod: 1890 },
-                    'Nyarugenge': { yield: 1.3, area: 460, prod: 598 },
-                    'Muhanga': { yield: 1.5, area: 1250, prod: 1875 },
-                    'Nyamasheke': { yield: 1.3, area: 1050, prod: 1365 },
-                    'Kicukiro': { yield: 1.3, area: 400, prod: 520 },
-                    'Rutsiro': { yield: 1.3, area: 1200, prod: 1560 },
-                    'Huye': { yield: 1.5, area: 1320, prod: 1980 },
-                    'Ruhango': { yield: 1.3, area: 1150, prod: 1495 },
-                    'Ngororero': { yield: 1.2, area: 1000, prod: 1200 },
-                    'Nyaruguru': { yield: 1.2, area: 1300, prod: 1560 },
-                    'Karongi': { yield: 1.2, area: 1180, prod: 1416 },
-                    'Nyanza': { yield: 1.4, area: 1280, prod: 1792 },
-                    'Kamonyi': { yield: 1.4, area: 1350, prod: 1890 },
-                    'Gatsibo': { yield: 1.6, area: 2750, prod: 4400 },
-                    'Gisagara': { yield: 1.3, area: 1450, prod: 1885 },
-                    'Rusizi': { yield: 1.1, area: 1020, prod: 1122 },
-                    'Rulindo': { yield: 1.1, area: 1280, prod: 1408 },
-                    'Rwamagana': { yield: 1.5, area: 1820, prod: 2730 },
-                    'Gakenke': { yield: 1.0, area: 1200, prod: 1200 },
-                    'Ngoma': { yield: 1.4, area: 1700, prod: 2380 },
-                    'Kayonza': { yield: 1.4, area: 2180, prod: 3052 },
-                    'Bugesera': { yield: 1.2, area: 2050, prod: 2460 },
-                    'Kirehe': { yield: 1.3, area: 1980, prod: 2574 }
-                }
-            },
-            'Irish Potato': {
-                unit: 't/ha',
-                districts: {
-                    'Musanze': { yield: 18.0, area: 2000, prod: 36000 },
-                    'Rubavu': { yield: 17.2, area: 1550, prod: 26660 },
-                    'Burera': { yield: 17.0, area: 1800, prod: 30600 },
-                    'Nyabihu': { yield: 17.5, area: 1850, prod: 32375 },
-                    'Nyagatare': { yield: 7.8, area: 620, prod: 4836 },
-                    'Gicumbi': { yield: 14.8, area: 1350, prod: 19980 },
-                    'Gasabo': { yield: 9.5, area: 400, prod: 3800 },
-                    'Nyamagabe': { yield: 13.5, area: 1200, prod: 16200 },
-                    'Nyarugenge': { yield: 8.8, area: 210, prod: 1848 },
-                    'Muhanga': { yield: 10.5, area: 750, prod: 7875 },
-                    'Nyamasheke': { yield: 11.8, area: 820, prod: 9676 },
-                    'Kicukiro': { yield: 9.0, area: 190, prod: 1710 },
-                    'Rutsiro': { yield: 14.2, area: 1100, prod: 15620 },
-                    'Huye': { yield: 10.0, area: 600, prod: 6000 },
-                    'Ruhango': { yield: 9.8, area: 550, prod: 5390 },
-                    'Ngororero': { yield: 13.5, area: 1050, prod: 14175 },
-                    'Nyaruguru': { yield: 12.8, area: 950, prod: 12160 },
-                    'Karongi': { yield: 12.8, area: 880, prod: 11264 },
-                    'Nyanza': { yield: 9.5, area: 520, prod: 4940 },
-                    'Kamonyi': { yield: 9.0, area: 490, prod: 4410 },
-                    'Gatsibo': { yield: 7.6, area: 580, prod: 4408 },
-                    'Gisagara': { yield: 8.8, area: 470, prod: 4136 },
-                    'Rusizi': { yield: 11.0, area: 690, prod: 7590 },
-                    'Rulindo': { yield: 13.2, area: 1300, prod: 17160 },
-                    'Rwamagana': { yield: 7.5, area: 550, prod: 4125 },
-                    'Gakenke': { yield: 12.5, area: 1220, prod: 15250 },
-                    'Ngoma': { yield: 7.0, area: 500, prod: 3500 },
-                    'Kayonza': { yield: 7.0, area: 520, prod: 3640 },
-                    'Bugesera': { yield: 6.5, area: 450, prod: 2925 },
-                    'Kirehe': { yield: 6.8, area: 480, prod: 3264 }
-                }
-            },
-            'Rice': {
-                unit: 't/ha',
-                districts: {
-                    'Musanze': { yield: 2.6, area: 430, prod: 1118 },
-                    'Rubavu': { yield: 3.2, area: 500, prod: 1600 },
-                    'Burera': { yield: 2.3, area: 360, prod: 828 },
-                    'Nyabihu': { yield: 2.9, area: 390, prod: 1131 },
-                    'Nyagatare': { yield: 4.3, area: 2100, prod: 9030 },
-                    'Gicumbi': { yield: 2.9, area: 620, prod: 1798 },
-                    'Gasabo': { yield: 3.3, area: 740, prod: 2442 },
-                    'Nyamagabe': { yield: 2.9, area: 520, prod: 1508 },
-                    'Nyarugenge': { yield: 2.9, area: 300, prod: 870 },
-                    'Muhanga': { yield: 3.5, area: 850, prod: 2975 },
-                    'Nyamasheke': { yield: 3.8, area: 900, prod: 3420 },
-                    'Kicukiro': { yield: 3.1, area: 400, prod: 1240 },
-                    'Rutsiro': { yield: 3.5, area: 590, prod: 2065 },
-                    'Huye': { yield: 3.8, area: 1050, prod: 3990 },
-                    'Ruhango': { yield: 3.6, area: 940, prod: 3384 },
-                    'Ngororero': { yield: 3.1, area: 480, prod: 1488 },
-                    'Nyaruguru': { yield: 2.7, area: 550, prod: 1485 },
-                    'Karongi': { yield: 3.6, area: 720, prod: 2592 },
-                    'Nyanza': { yield: 3.4, area: 840, prod: 2856 },
-                    'Kamonyi': { yield: 3.7, area: 1000, prod: 3700 },
-                    'Gatsibo': { yield: 4.1, area: 1850, prod: 7585 },
-                    'Gisagara': { yield: 3.9, area: 1200, prod: 4680 },
-                    'Rusizi': { yield: 4.7, area: 2280, prod: 10716 },
-                    'Rulindo': { yield: 3.1, area: 690, prod: 2139 },
-                    'Rwamagana': { yield: 4.5, area: 2200, prod: 9900 },
-                    'Gakenke': { yield: 2.8, area: 650, prod: 1820 },
-                    'Ngoma': { yield: 3.9, area: 1580, prod: 6162 },
-                    'Kayonza': { yield: 4.4, area: 1780, prod: 7832 },
-                    'Bugesera': { yield: 4.2, area: 1680, prod: 7056 },
-                    'Kirehe': { yield: 4.0, area: 1520, prod: 6080 }
-                }
-            },
-            'Cassava': {
-                unit: 't/ha',
-                districts: {
-                    'Musanze': { yield: 7.8, area: 620, prod: 4836 },
-                    'Rubavu': { yield: 10.5, area: 820, prod: 8610 },
-                    'Burera': { yield: 7.2, area: 550, prod: 3960 },
-                    'Nyabihu': { yield: 9.4, area: 690, prod: 6486 },
-                    'Nyagatare': { yield: 12.6, area: 2000, prod: 25200 },
-                    'Gicumbi': { yield: 7.5, area: 710, prod: 5325 },
-                    'Gasabo': { yield: 10.4, area: 940, prod: 9776 },
-                    'Nyamagabe': { yield: 11.5, area: 1100, prod: 12650 },
-                    'Nyarugenge': { yield: 9.8, area: 400, prod: 3920 },
-                    'Muhanga': { yield: 13.9, area: 1580, prod: 21962 },
-                    'Nyamasheke': { yield: 11.8, area: 1360, prod: 16048 },
-                    'Kicukiro': { yield: 10.0, area: 490, prod: 4900 },
-                    'Rutsiro': { yield: 10.1, area: 910, prod: 9191 },
-                    'Huye': { yield: 13.6, area: 1510, prod: 20536 },
-                    'Ruhango': { yield: 13.5, area: 1650, prod: 22275 },
-                    'Ngororero': { yield: 9.9, area: 850, prod: 8415 },
-                    'Nyaruguru': { yield: 11.0, area: 1250, prod: 13750 },
-                    'Karongi': { yield: 11.2, area: 1200, prod: 13440 },
-                    'Nyanza': { yield: 14.1, area: 1780, prod: 25098 },
-                    'Kamonyi': { yield: 13.2, area: 1540, prod: 20328 },
-                    'Gatsibo': { yield: 13.1, area: 2200, prod: 28820 },
-                    'Gisagara': { yield: 12.9, area: 1680, prod: 21672 },
-                    'Rusizi': { yield: 12.4, area: 1550, prod: 19220 },
-                    'Rulindo': { yield: 8.8, area: 880, prod: 7744 },
-                    'Rwamagana': { yield: 14.0, area: 2300, prod: 32200 },
-                    'Gakenke': { yield: 8.4, area: 850, prod: 7140 },
-                    'Ngoma': { yield: 14.1, area: 2160, prod: 30456 },
-                    'Kayonza': { yield: 14.4, area: 2400, prod: 34560 },
-                    'Bugesera': { yield: 13.5, area: 2250, prod: 30375 },
-                    'Kirehe': { yield: 13.8, area: 2360, prod: 32568 }
-                }
-            }
-        }
-    }
-};
-
-/* District Centroids for Map Popup Pin */
 const DISTRICT_CENTROIDS = {
     "Nyarugenge": [-1.9977, 30.022], "Gasabo": [-1.8879, 30.119], "Kicukiro": [-2.0297, 30.1413],
     "Nyanza": [-2.3203, 29.7702], "Gisagara": [-2.6446, 29.8371], "Nyaruguru": [-2.6934, 29.5077],
@@ -421,6 +41,49 @@ const DISTRICT_ID_MAP = {
     'Gatsibo': 26, 'Kayonza': 27, 'Kirehe': 28, 'Ngoma': 29, 'Bugesera': 30
 };
 
+const DISTRICT_AGRO_ZONES = {
+    'Western Province': {
+        zone: 'Western Volcanic Highlands & Lake Kivu Basin',
+        elevation: 'High altitude volcanic slopes (1,800m – 2,500m)',
+        climate: 'Bimodal rainfall pattern, 1,300mm – 1,600mm / year',
+        staples: 'Irish Potato, Maize, Climbing Beans, Tea & Pyrethrum',
+        security: 'Surplus Producer / Strategic Food Basket',
+        focus: 'Radical terracing, soil erosion mitigation, post-harvest drying'
+    },
+    'Northern Province': {
+        zone: 'Northern Volcanic Highlands & Buberuka Ridge',
+        elevation: 'High altitude volcanic & metamorphic ridges (1,900m – 2,800m)',
+        climate: 'Cool temperate mountain climate, 1,400mm – 1,800mm / year',
+        staples: 'Irish Potato, High-yield Maize, Wheat, Vegetables',
+        security: 'Premier National Grain & Seed Potato Breadbasket',
+        focus: 'Certified seed distribution, lime application, cold storage facilities'
+    },
+    'Southern Province': {
+        zone: 'Central Plateau & Southern Granitic Ridge',
+        elevation: 'Mid-to-high plateau (1,500m – 1,900m)',
+        climate: 'Tropical sub-humid, 1,100mm – 1,350mm / year',
+        staples: 'Cassava, Climbing Beans, Maize, Marshland Rice, Coffee',
+        security: 'Major Staple Cereal & Tuber Food Security Anchor',
+        focus: 'Marshland irrigation schemes, clean cassava cuttings distribution'
+    },
+    'Eastern Province': {
+        zone: 'Eastern Agro-Pastoral Lowland Savannas',
+        elevation: 'Lowland to mid-elevation undulating plains (1,300m – 1,550m)',
+        climate: 'Semi-arid to sub-humid, 800mm – 1,100mm / year',
+        staples: 'Maize, Bush Beans, Banana, Rice, Livestock & Dairy',
+        security: 'Commercial Grain Breadbasket & Extensive Consolidated Farmland',
+        focus: 'Valley dam irrigation, drought-tolerant crop varieties, solar pumping'
+    },
+    'City of Kigali': {
+        zone: 'Central Dissected Hills & Peri-Urban Agricultural Corridor',
+        elevation: 'Central hills and valleys (1,400m – 1,650m)',
+        climate: 'Sub-humid tropical, 1,000mm – 1,200mm / year',
+        staples: 'Intensive Vegetables, Fruits, Poultry & Peri-Urban Horticulture',
+        security: 'High-Value Fresh Market Supply Hub',
+        focus: 'Greenhouse farming, urban food logistics, cold-chain transport'
+    }
+};
+
 /* ==========================================================================
    2. MAP CONTROLLER & STATE
    ========================================================================== */
@@ -432,19 +95,50 @@ let currentIndicator = 'yield';
 let pinnedDistrictName = 'Nyabihu';
 let pinnedMarker = null;
 
-function getDistrictMetrics(districtName) {
-    const sObj = MAP_SEASON_DATA[currentSeason] || MAP_SEASON_DATA['2025A'];
-    const cObj = sObj.crops[currentCrop] || sObj.crops['Maize'];
-    const distData = cObj.districts[districtName];
-    if (distData) {
-        return distData;
+let liveDistrictData = {};
+
+function fetchLiveDistrictData(callback) {
+    let year = 2025;
+    let sCode = 'A';
+    if (currentSeason && currentSeason.length >= 5) {
+        year = currentSeason.slice(0, 4);
+        sCode = currentSeason.slice(4);
     }
-    // Fallback standard metrics
-    return { yield: 2.5, area: 1000, prod: 2500 };
+    const url = `/indicators/api/districts/?crop=${encodeURIComponent(currentCrop)}&year=${year}&season=${sCode}&source=official`;
+    fetch(url)
+        .then(r => r.json())
+        .then(res => {
+            liveDistrictData = {};
+            if (res && res.data && Array.isArray(res.data)) {
+                res.data.forEach(item => {
+                    liveDistrictData[item.district_name] = item;
+                });
+            }
+            if (callback) callback();
+        })
+        .catch(err => {
+            console.warn('Failed to load live district rankings:', err);
+            liveDistrictData = {};
+            if (callback) callback();
+        });
+}
+
+function getDistrictMetrics(districtName) {
+    const item = liveDistrictData[districtName];
+    if (item) {
+        return {
+            yield: (item.yield_tha !== undefined && item.yield_tha !== null) ? Number(item.yield_tha) : null,
+            area: (item.area_ha !== undefined && item.area_ha !== null) ? Number(item.area_ha) : null,
+            prod: (item.production_mt !== undefined && item.production_mt !== null) ? Number(item.production_mt) : null,
+            plots: item.plots_sampled || 0
+        };
+    }
+    return { yield: null, area: null, prod: null, plots: 0 };
 }
 
 function getIndicatorValue(districtName) {
     const metrics = getDistrictMetrics(districtName);
+    if (!metrics) return null;
     if (currentIndicator === 'production') {
         return metrics.prod;
     } else if (currentIndicator === 'area') {
@@ -454,37 +148,43 @@ function getIndicatorValue(districtName) {
 }
 
 function formatIndicatorValue(val) {
+    if (val === null || val === undefined || isNaN(val)) {
+        return 'No data';
+    }
     if (currentIndicator === 'production') {
-        return Number(val).toLocaleString() + ' t';
+        return Number(val).toLocaleString(undefined, {maximumFractionDigits: 0}) + ' t';
     } else if (currentIndicator === 'area') {
-        return Number(val).toLocaleString() + ' ha';
+        return Number(val).toLocaleString(undefined, {maximumFractionDigits: 0}) + ' ha';
     }
     return Number(val).toFixed(1) + ' t/ha';
 }
 
 function getDistrictColor(val) {
+    if (val === null || val === undefined || isNaN(val)) {
+        return '#cbd5e1'; // Slate gray (No observations)
+    }
     if (currentIndicator === 'production') {
-        if (val > 5000) return '#15803d'; // Deep green
-        if (val >= 3500) return '#22c55e'; // Emerald green
-        if (val >= 2000) return '#84cc16'; // Lime green
-        if (val >= 1000) return '#eab308'; // Amber yellow
-        if (val > 0) return '#0284c7';     // Vibrant Sky Blue (< 1,000)
-        return '#cbd5e1';                  // Slate gray
+        if (val > 5000) return '#166534'; // Primary Green (> 5,000)
+        if (val >= 3500) return '#15803D'; // Action Green (3,500 - 5,000)
+        if (val >= 2000) return '#84CC16'; // Agriculture Lime (2,000 - 3,500)
+        if (val >= 1000) return '#FACC15'; // Harvest Yellow (1,000 - 2,000)
+        if (val > 0) return '#2563EB';     // Information Blue (< 1,000)
+        return '#CBD5E1';
     } else if (currentIndicator === 'area') {
-        if (val > 2000) return '#15803d';
-        if (val >= 1500) return '#22c55e';
-        if (val >= 1000) return '#84cc16';
-        if (val >= 500) return '#eab308';
-        if (val > 0) return '#0284c7';     // Vibrant Sky Blue (< 500)
-        return '#cbd5e1';
+        if (val > 2000) return '#166534'; // Primary Green (> 2,000)
+        if (val >= 1500) return '#15803D'; // Action Green (1,500 - 2,000)
+        if (val >= 1000) return '#84CC16'; // Agriculture Lime (1,000 - 1,500)
+        if (val >= 500) return '#FACC15';  // Harvest Yellow (500 - 1,000)
+        if (val > 0) return '#2563EB';     // Information Blue (< 500)
+        return '#CBD5E1';
     } else {
-        // Yield (t/ha) - exact palette from reference design
-        if (val > 4.0) return '#15803d';   // > 4.0 (Deep Green)
-        if (val >= 3.0) return '#22c55e';   // 3.0 – 4.0 (Emerald Green)
-        if (val >= 2.0) return '#84cc16';   // 2.0 – 3.0 (Lime Green)
-        if (val >= 1.0) return '#eab308';   // 1.0 – 2.0 (Amber Yellow)
-        if (val > 0) return '#0284c7';      // < 1.0 (Vibrant Sky Blue)
-        return '#cbd5e1';                   // No data
+        // Yield (t/ha)
+        if (val > 4.0) return '#166534';   // Primary Green (> 4.0)
+        if (val >= 3.0) return '#15803D';  // Action Green (3.0 – 4.0)
+        if (val >= 2.0) return '#84CC16';  // Agriculture Lime (2.0 – 3.0)
+        if (val >= 1.0) return '#FACC15';  // Harvest Yellow (1.0 – 2.0)
+        if (val > 0) return '#2563EB';     // Information Blue (< 1.0)
+        return '#CBD5E1';                  // No data
     }
 }
 
@@ -495,23 +195,19 @@ function initAgriLensMapPage() {
     const mapElement = document.getElementById('rwanda-leaflet-map');
     if (!mapElement) return;
 
-    // If Leaflet is still loading asynchronously, wait and retry
     if (typeof L === 'undefined') {
         setTimeout(initAgriLensMapPage, 100);
         return;
     }
 
-    // Avoid double initialization
     if (map) return;
 
-    // Read initial state from URL query parameters if present
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('crop')) currentCrop = urlParams.get('crop');
     if (urlParams.has('season')) currentSeason = urlParams.get('season');
     if (urlParams.has('indicator')) currentIndicator = urlParams.get('indicator');
     if (urlParams.has('district')) pinnedDistrictName = urlParams.get('district');
 
-    // Sync HTML Selects with active state
     const cropSel = document.getElementById('map-filter-crop');
     const seasonSel = document.getElementById('map-filter-season');
     const indicatorSel = document.getElementById('map-filter-indicator');
@@ -519,14 +215,11 @@ function initAgriLensMapPage() {
     if (seasonSel && urlParams.has('season')) seasonSel.value = currentSeason;
     if (indicatorSel && urlParams.has('indicator')) indicatorSel.value = currentIndicator;
 
-    // Base Rwanda View
     map = L.map('rwanda-leaflet-map', {
-        attributionControl: false,
         zoomControl: false,
         scrollWheelZoom: false
     }).setView([-1.9403, 29.8739], 8.5);
 
-    // Clean minimal basemap tiles - ArcGIS Canvas with CartoDB fallback
     const tileLayer = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 16
     }).addTo(map);
@@ -540,12 +233,10 @@ function initAgriLensMapPage() {
         }
     });
 
-    // Invalidate size once DOM layout is settled
     setTimeout(() => { if (map) map.invalidateSize(); }, 150);
     setTimeout(() => { if (map) map.invalidateSize(); }, 500);
     window.addEventListener('resize', () => { if (map) map.invalidateSize(); });
 
-    // Watermark Country Labels
     const neighbors = [
         { name: 'UGANDA', lat: -1.08, lng: 30.08 },
         { name: 'DRC', lat: -1.90, lng: 28.70 },
@@ -564,81 +255,75 @@ function initAgriLensMapPage() {
         }).addTo(map);
     });
 
-    // Custom Controls (+, -, Recenter)
     setupCustomControls();
-
-    // Hook up Dropdown Selectors & Reset Button
     setupToolbarSelectors();
-
-    // Hook up Legend Interactivity
     setupLegendInteractivity();
-
-    // Hook up Header Global Search Bar
     setupHeaderSearchIntegration();
 
-    // Fetch GeoJSON and Render
-    fetch('/static/data/rwanda_districts.geojson')
-        .then(res => {
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return res.json();
-        })
-        .then(geojson => {
-            geoLayer = L.geoJSON(geojson, {
-                style: feature => {
-                    const dName = feature.properties.shapeName || feature.properties.name || '';
-                    const val = getIndicatorValue(dName);
-                    const isPinned = (dName === pinnedDistrictName);
-                    return {
-                        color: isPinned ? '#0f172a' : '#ffffff',
-                        weight: isPinned ? 3.0 : 1.2,
-                        fillColor: getDistrictColor(val),
-                        fillOpacity: isPinned ? 0.98 : 0.88
-                    };
-                },
-                onEachFeature: (feature, layer) => {
-                    const dName = feature.properties.shapeName || feature.properties.name || 'District';
+    // Fetch live district data and GeoJSON
+    fetchLiveDistrictData(() => {
+        fetch('/static/data/rwanda_districts.geojson')
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then(geojson => {
+                geoLayer = L.geoJSON(geojson, {
+                    style: feature => {
+                        const dName = feature.properties.shapeName || feature.properties.name || '';
+                        const val = getIndicatorValue(dName);
+                        const isPinned = (dName === pinnedDistrictName);
+                        return {
+                            color: isPinned ? '#0f172a' : '#ffffff',
+                            weight: isPinned ? 3.0 : 1.2,
+                            fillColor: getDistrictColor(val),
+                            fillOpacity: isPinned ? 0.98 : 0.88
+                        };
+                    },
+                    onEachFeature: (feature, layer) => {
+                        const dName = feature.properties.shapeName || feature.properties.name || 'District';
 
-                    layer.on('click', e => {
-                        L.DomEvent.stopPropagation(e);
-                        selectDistrict(dName, false);
-                    });
-
-                    layer.on('mouseover', () => {
-                        layer.setStyle({
-                            weight: 2.8,
-                            color: '#0f172a',
-                            fillOpacity: 0.96
+                        layer.on('click', e => {
+                            L.DomEvent.stopPropagation(e);
+                            selectDistrict(dName, false);
                         });
-                        layer.bringToFront();
-                    });
 
-                    layer.on('mouseout', () => {
-                        if (geoLayer) {
-                            geoLayer.resetStyle(layer);
-                            if (pinnedDistrictName) {
-                                highlightSelectedDistrict(pinnedDistrictName);
+                        layer.on('mouseover', () => {
+                            layer.setStyle({
+                                weight: 2.8,
+                                color: '#0f172a',
+                                fillOpacity: 0.96
+                            });
+                            layer.bringToFront();
+                        });
+
+                        layer.on('mouseout', () => {
+                            if (geoLayer) {
+                                geoLayer.resetStyle(layer);
+                                if (pinnedDistrictName) {
+                                    highlightSelectedDistrict(pinnedDistrictName);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
+                }).addTo(map);
+
+                try {
+                    map.fitBounds(geoLayer.getBounds(), { padding: [16, 16] });
+                } catch (e) {
+                    map.setView([-1.9403, 29.8739], 8.5);
                 }
-            }).addTo(map);
 
-            try {
-                map.fitBounds(geoLayer.getBounds(), { padding: [16, 16] });
-            } catch (e) {
-                map.setView([-1.9403, 29.8739], 8.5);
-            }
+                setTimeout(() => { if (map) map.invalidateSize(); }, 150);
 
-            setTimeout(() => { if (map) map.invalidateSize(); }, 150);
-
-            // Select initial district (default: Nyabihu or URL parameter)
-            updateLegendDisplay();
-            updateBottomKpis();
-            selectDistrict(pinnedDistrictName || 'Nyabihu', false);
-        })
-        .catch(err => {
-            console.error("Error loading Rwanda GeoJSON:", err);
-        });
+                updateLegendDisplay();
+                updateBottomKpis();
+                selectDistrict(pinnedDistrictName || 'Nyabihu', false);
+            })
+            .catch(err => {
+                console.error("Error loading Rwanda GeoJSON:", err);
+            });
+    });
 }
 
 /* ==========================================================================
@@ -715,17 +400,15 @@ function highlightSelectedDistrict(dName) {
 }
 
 function updateDistrictDetailsCard(dName) {
-    const province = DISTRICT_PROVINCE_MAP[dName] || 'Western Province';
+    const province = DISTRICT_PROVINCE_MAP[dName] || '';
     const metrics = getDistrictMetrics(dName);
-    const seasonLabel = (MAP_SEASON_DATA[currentSeason] || {}).label || 'SAS 2024 – 2025';
+    const seasonEl_text = document.querySelector('#map-filter-season option:checked')?.textContent || currentSeason;
 
-    // Update Headings with micro-fade animation
     const nameEl = document.getElementById('card-district-name');
     const provEl = document.getElementById('card-province-name');
     if (nameEl) nameEl.textContent = `${dName} District`;
     if (provEl) provEl.textContent = province;
 
-    // Update 5 Metrics
     const cropEl = document.getElementById('card-crop-name');
     const seasonEl = document.getElementById('card-season-name');
     const yieldEl = document.getElementById('card-yield-val');
@@ -733,26 +416,23 @@ function updateDistrictDetailsCard(dName) {
     const prodEl = document.getElementById('card-prod-val');
 
     if (cropEl) cropEl.textContent = currentCrop;
-    if (seasonEl) seasonEl.textContent = seasonLabel;
-    if (yieldEl) yieldEl.textContent = `${metrics.yield.toFixed(1)} t/ha`;
-    if (areaEl) areaEl.textContent = `${metrics.area.toLocaleString()} ha`;
-    if (prodEl) prodEl.textContent = `${metrics.prod.toLocaleString()} t`;
+    if (seasonEl) seasonEl.textContent = seasonEl_text;
+    if (yieldEl) yieldEl.textContent = metrics.yield !== null ? `${metrics.yield.toFixed(1)} t/ha` : '—';
+    if (areaEl) areaEl.textContent = metrics.area !== null ? `${metrics.area.toLocaleString()} ha` : '—';
+    if (prodEl) prodEl.textContent = metrics.prod !== null ? `${metrics.prod.toLocaleString()} t` : '—';
 
-    // Update CTA Report Button for Public Modal
     const reportBtn = document.getElementById('btn-view-district-report');
     if (reportBtn) {
         reportBtn.setAttribute('title', `Open ${dName} District Agricultural Dossier`);
         reportBtn.onclick = () => openDistrictReportModal(dName);
     }
 
-    // If modal is currently open, dynamically update its content to selected district
     const modal = document.getElementById('district-report-modal');
     if (modal && modal.classList.contains('open')) {
         populateDistrictReportModal(dName);
     }
 }
 
-/* Synchronize active state with browser URL */
 function updateUrlQueryState() {
     const params = new URLSearchParams();
     if (currentCrop) params.set('crop', currentCrop);
@@ -775,17 +455,22 @@ function setupToolbarSelectors() {
     if (cropSel) {
         cropSel.addEventListener('change', e => {
             currentCrop = e.target.value;
-            applyDataRefresh();
-            updateUrlQueryState();
+            fetchLiveDistrictData(() => {
+                applyDataRefresh();
+                updateBottomKpis();
+                updateUrlQueryState();
+            });
         });
     }
 
     if (seasonSel) {
         seasonSel.addEventListener('change', e => {
             currentSeason = e.target.value;
-            updateBottomKpis();
-            applyDataRefresh();
-            updateUrlQueryState();
+            fetchLiveDistrictData(() => {
+                applyDataRefresh();
+                updateBottomKpis();
+                updateUrlQueryState();
+            });
         });
     }
 
@@ -815,11 +500,13 @@ function setupToolbarSelectors() {
                 map.setView([-1.9403, 29.8739], 8.5);
             }
 
-            updateLegendDisplay();
-            updateBottomKpis();
-            applyDataRefresh();
-            selectDistrict('Nyabihu', false);
-            updateUrlQueryState();
+            fetchLiveDistrictData(() => {
+                updateLegendDisplay();
+                updateBottomKpis();
+                applyDataRefresh();
+                selectDistrict('Nyabihu', false);
+                updateUrlQueryState();
+            });
         });
     }
 }
@@ -853,49 +540,65 @@ function updateLegendDisplay() {
     if (currentIndicator === 'production') {
         titleEl.textContent = 'PRODUCTION (T)';
         listEl.innerHTML = `
-            <div class="legend-scale-item" data-range="gt5000"><span class="legend-color-box" style="background: #15803d;"></span><span>> 5,000</span></div>
-            <div class="legend-scale-item" data-range="3500-5000"><span class="legend-color-box" style="background: #22c55e;"></span><span>3,500 – 5,000</span></div>
-            <div class="legend-scale-item" data-range="2000-3500"><span class="legend-color-box" style="background: #84cc16;"></span><span>2,000 – 3,500</span></div>
-            <div class="legend-scale-item" data-range="1000-2000"><span class="legend-color-box" style="background: #eab308;"></span><span>1,000 – 2,000</span></div>
-            <div class="legend-scale-item" data-range="lt1000"><span class="legend-color-box" style="background: #0284c7;"></span><span>< 1,000</span></div>
-            <div class="legend-scale-item" data-range="nodata"><span class="legend-color-box" style="background: #cbd5e1;"></span><span>No data</span></div>
+            <div class="legend-scale-item" data-range="gt5k"><span class="legend-color-box" style="background: #166534;"></span><span>> 5,000</span></div>
+            <div class="legend-scale-item" data-range="35k-5k"><span class="legend-color-box" style="background: #15803D;"></span><span>3,500 – 5,000</span></div>
+            <div class="legend-scale-item" data-range="2k-35k"><span class="legend-color-box" style="background: #84CC16;"></span><span>2,000 – 3,500</span></div>
+            <div class="legend-scale-item" data-range="1k-2k"><span class="legend-color-box" style="background: #FACC15;"></span><span>1,000 – 2,000</span></div>
+            <div class="legend-scale-item" data-range="lt1k"><span class="legend-color-box" style="background: #2563EB;"></span><span>< 1,000</span></div>
+            <div class="legend-scale-item" data-range="nodata"><span class="legend-color-box" style="background: #CBD5E1;"></span><span>No data</span></div>
         `;
     } else if (currentIndicator === 'area') {
         titleEl.textContent = 'CULTIVATED AREA (HA)';
         listEl.innerHTML = `
-            <div class="legend-scale-item" data-range="gt2000"><span class="legend-color-box" style="background: #15803d;"></span><span>> 2,000</span></div>
-            <div class="legend-scale-item" data-range="1500-2000"><span class="legend-color-box" style="background: #22c55e;"></span><span>1,500 – 2,000</span></div>
-            <div class="legend-scale-item" data-range="1000-1500"><span class="legend-color-box" style="background: #84cc16;"></span><span>1,000 – 1,500</span></div>
-            <div class="legend-scale-item" data-range="500-1000"><span class="legend-color-box" style="background: #eab308;"></span><span>500 – 1,000</span></div>
-            <div class="legend-scale-item" data-range="lt500"><span class="legend-color-box" style="background: #0284c7;"></span><span>< 500</span></div>
-            <div class="legend-scale-item" data-range="nodata"><span class="legend-color-box" style="background: #cbd5e1;"></span><span>No data</span></div>
+            <div class="legend-scale-item" data-range="gt2k"><span class="legend-color-box" style="background: #166534;"></span><span>> 2,000</span></div>
+            <div class="legend-scale-item" data-range="15k-2k"><span class="legend-color-box" style="background: #15803D;"></span><span>1,500 – 2,000</span></div>
+            <div class="legend-scale-item" data-range="1k-15k"><span class="legend-color-box" style="background: #84CC16;"></span><span>1,000 – 1,500</span></div>
+            <div class="legend-scale-item" data-range="500-1k"><span class="legend-color-box" style="background: #FACC15;"></span><span>500 – 1,000</span></div>
+            <div class="legend-scale-item" data-range="lt500"><span class="legend-color-box" style="background: #2563EB;"></span><span>< 500</span></div>
+            <div class="legend-scale-item" data-range="nodata"><span class="legend-color-box" style="background: #CBD5E1;"></span><span>No data</span></div>
         `;
     } else {
         titleEl.textContent = 'YIELD (T/HA)';
         listEl.innerHTML = `
-            <div class="legend-scale-item" data-range="gt4"><span class="legend-color-box" style="background: #15803d;"></span><span>> 4.0</span></div>
-            <div class="legend-scale-item" data-range="3-4"><span class="legend-color-box" style="background: #22c55e;"></span><span>3.0 – 4.0</span></div>
-            <div class="legend-scale-item" data-range="2-3"><span class="legend-color-box" style="background: #84cc16;"></span><span>2.0 – 3.0</span></div>
-            <div class="legend-scale-item" data-range="1-2"><span class="legend-color-box" style="background: #eab308;"></span><span>1.0 – 2.0</span></div>
-            <div class="legend-scale-item" data-range="lt1"><span class="legend-color-box" style="background: #0284c7;"></span><span>< 1.0</span></div>
-            <div class="legend-scale-item" data-range="nodata"><span class="legend-color-box" style="background: #cbd5e1;"></span><span>No data</span></div>
+            <div class="legend-scale-item" data-range="gt4"><span class="legend-color-box" style="background: #166534;"></span><span>> 4.0</span></div>
+            <div class="legend-scale-item" data-range="3-4"><span class="legend-color-box" style="background: #15803D;"></span><span>3.0 – 4.0</span></div>
+            <div class="legend-scale-item" data-range="2-3"><span class="legend-color-box" style="background: #84CC16;"></span><span>2.0 – 3.0</span></div>
+            <div class="legend-scale-item" data-range="1-2"><span class="legend-color-box" style="background: #FACC15;"></span><span>1.0 – 2.0</span></div>
+            <div class="legend-scale-item" data-range="lt1"><span class="legend-color-box" style="background: #2563EB;"></span><span>< 1.0</span></div>
+            <div class="legend-scale-item" data-range="nodata"><span class="legend-color-box" style="background: #CBD5E1;"></span><span>No data</span></div>
         `;
     }
 }
 
 function updateBottomKpis() {
-    const sData = MAP_SEASON_DATA[currentSeason] || MAP_SEASON_DATA['2025A'];
-    const kpis = sData.kpiTotals;
+    let year = 2025;
+    let sCode = 'A';
+    if (currentSeason && currentSeason.length >= 5) {
+        year = currentSeason.slice(0, 4);
+        sCode = currentSeason.slice(4);
+    }
+    const url = `/indicators/api/summary/?crop=${encodeURIComponent(currentCrop)}&year=${year}&season=${sCode}&source=official`;
+    fetch(url)
+        .then(r => r.json())
+        .then(res => {
+            if (res && res.data) {
+                const d = res.data;
+                const cropsEl = document.getElementById('kpi-tracked-crops');
+                const recordsEl = document.getElementById('kpi-validated-records');
+                const geoEl = document.getElementById('kpi-geographic-coverage');
+                const prodEl = document.getElementById('kpi-total-production');
 
-    const cropsEl = document.getElementById('kpi-tracked-crops');
-    const recordsEl = document.getElementById('kpi-validated-records');
-    const geoEl = document.getElementById('kpi-geographic-coverage');
-    const prodEl = document.getElementById('kpi-total-production');
-
-    if (cropsEl) cropsEl.textContent = kpis.crops;
-    if (recordsEl) recordsEl.textContent = kpis.records;
-    if (geoEl) geoEl.textContent = kpis.districts;
-    if (prodEl) prodEl.textContent = kpis.prod;
+                if (cropsEl && d.crops_count !== undefined) cropsEl.textContent = d.crops_count;
+                if (recordsEl && d.total_plots !== undefined) recordsEl.textContent = Number(d.total_plots).toLocaleString();
+                if (geoEl && d.districts_covered !== undefined) geoEl.textContent = d.districts_covered;
+                if (prodEl && d.total_production_mt !== undefined) {
+                    prodEl.textContent = Number(d.total_production_mt).toLocaleString(undefined, {maximumFractionDigits: 0}) + ' t';
+                }
+            }
+        })
+        .catch(err => {
+            console.warn('Could not update bottom KPIs from API:', err);
+        });
 }
 
 /* ==========================================================================
@@ -917,7 +620,6 @@ function setupLegendInteractivity() {
             const name = layer.feature.properties.shapeName || layer.feature.properties.name || '';
             const val = getIndicatorValue(name);
             const dColor = getDistrictColor(val);
-            // Convert rgb to hex for comparison if necessary
             if (isColorMatch(dColor, targetColorHex)) {
                 layer.setStyle({
                     fillOpacity: 1.0,
@@ -1000,7 +702,6 @@ function setupCustomControls() {
         }
     });
 
-    // Wire up modal background dismissal and escape key
     const modalBackdrop = document.getElementById('district-report-modal');
     if (modalBackdrop) {
         modalBackdrop.addEventListener('click', e => {
@@ -1020,56 +721,12 @@ function setupCustomControls() {
 /* ==========================================================================
    9. PUBLIC DISTRICT REPORT DOSSIER MODAL CONTROLLER
    ========================================================================== */
-const DISTRICT_AGRO_ZONES = {
-    'Western Province': {
-        zone: 'Western Volcanic Highlands & Lake Kivu Basin',
-        elevation: 'High altitude volcanic slopes (1,800m – 2,500m)',
-        climate: 'Bimodal rainfall pattern, 1,300mm – 1,600mm / year',
-        staples: 'Irish Potato, Maize, Climbing Beans, Tea & Pyrethrum',
-        security: 'Surplus Producer / Strategic Food Basket',
-        focus: 'Radical terracing, soil erosion mitigation, post-harvest drying'
-    },
-    'Northern Province': {
-        zone: 'Northern Volcanic Highlands & Buberuka Ridge',
-        elevation: 'High altitude volcanic & metamorphic ridges (1,900m – 2,800m)',
-        climate: 'Cool temperate mountain climate, 1,400mm – 1,800mm / year',
-        staples: 'Irish Potato, High-yield Maize, Wheat, Vegetables',
-        security: 'Premier National Grain & Seed Potato Breadbasket',
-        focus: 'Certified seed distribution, lime application, cold storage facilities'
-    },
-    'Southern Province': {
-        zone: 'Central Plateau & Southern Granitic Ridge',
-        elevation: 'Mid-to-high plateau (1,500m – 1,900m)',
-        climate: 'Tropical sub-humid, 1,100mm – 1,350mm / year',
-        staples: 'Cassava, Climbing Beans, Maize, Marshland Rice, Coffee',
-        security: 'Major Staple Cereal & Tuber Food Security Anchor',
-        focus: 'Marshland irrigation schemes, clean cassava cuttings distribution'
-    },
-    'Eastern Province': {
-        zone: 'Eastern Agro-Pastoral Lowland Savannas',
-        elevation: 'Lowland to mid-elevation undulating plains (1,300m – 1,550m)',
-        climate: 'Semi-arid to sub-humid, 800mm – 1,100mm / year',
-        staples: 'Maize, Bush Beans, Banana, Rice, Livestock & Dairy',
-        security: 'Commercial Grain Breadbasket & Extensive Consolidated Farmland',
-        focus: 'Valley dam irrigation, drought-tolerant crop varieties, solar pumping'
-    },
-    'City of Kigali': {
-        zone: 'Central Dissected Hills & Peri-Urban Agricultural Corridor',
-        elevation: 'Central hills and valleys (1,400m – 1,650m)',
-        climate: 'Sub-humid tropical, 1,000mm – 1,200mm / year',
-        staples: 'Intensive Vegetables, Fruits, Poultry & Peri-Urban Horticulture',
-        security: 'High-Value Fresh Market Supply Hub',
-        focus: 'Greenhouse farming, urban food logistics, cold-chain transport'
-    }
-};
-
 function populateDistrictReportModal(districtName) {
     const dName = districtName || pinnedDistrictName || 'Nyabihu';
-    const province = DISTRICT_PROVINCE_MAP[dName] || 'Western Province';
+    const province = DISTRICT_PROVINCE_MAP[dName] || '';
     const metrics = getDistrictMetrics(dName);
-    const seasonLabel = (MAP_SEASON_DATA[currentSeason] || {}).label || 'SAS 2024 – 2025';
+    const seasonLabel = document.querySelector('#map-filter-season option:checked')?.textContent || currentSeason;
 
-    // Header info
     const titleEl = document.getElementById('modal-district-title');
     const provEl = document.getElementById('modal-province-name');
     const seasonEl = document.getElementById('modal-season-label');
@@ -1086,7 +743,6 @@ function populateDistrictReportModal(districtName) {
         el.textContent = currentCrop;
     });
 
-    // Top 4 KPI Metrics
     const kpiYieldEl = document.getElementById('modal-kpi-yield');
     const kpiAreaEl = document.getElementById('modal-kpi-area');
     const kpiProdEl = document.getElementById('modal-kpi-prod');
@@ -1094,21 +750,25 @@ function populateDistrictReportModal(districtName) {
     const yieldBadgeEl = document.getElementById('modal-yield-badge');
     const rankSubEl = document.getElementById('modal-rank-sub');
 
-    if (kpiYieldEl) kpiYieldEl.innerHTML = `${metrics.yield.toFixed(1)} <span class="unit">t/ha</span>`;
-    if (kpiAreaEl) kpiAreaEl.innerHTML = `${metrics.area.toLocaleString()} <span class="unit">ha</span>`;
-    if (kpiProdEl) kpiProdEl.innerHTML = `${metrics.prod.toLocaleString()} <span class="unit">t</span>`;
+    if (kpiYieldEl) kpiYieldEl.innerHTML = metrics.yield !== null ? `${metrics.yield.toFixed(1)} <span class="unit">t/ha</span>` : `— <span class="unit">t/ha</span>`;
+    if (kpiAreaEl) kpiAreaEl.innerHTML = metrics.area !== null ? `${metrics.area.toLocaleString()} <span class="unit">ha</span>` : `— <span class="unit">ha</span>`;
+    if (kpiProdEl) kpiProdEl.innerHTML = metrics.prod !== null ? `${metrics.prod.toLocaleString()} <span class="unit">t</span>` : `— <span class="unit">t</span>`;
 
-    // Calculate District Rank for Current Crop across Rwanda
-    const sObj = MAP_SEASON_DATA[currentSeason] || MAP_SEASON_DATA['2025A'];
-    const cropObj = sObj.crops[currentCrop] || sObj.crops['Maize'];
-    const distList = Object.entries(cropObj.districts).map(([name, data]) => ({ name, yield: data.yield }));
+    // Dynamic Rank Computation across all districts with observations
+    const distList = Object.entries(liveDistrictData)
+        .filter(([name, data]) => data.yield_tha !== undefined && data.yield_tha !== null)
+        .map(([name, data]) => ({ name, yield: Number(data.yield_tha) }));
     distList.sort((a, b) => b.yield - a.yield);
     const rankIdx = distList.findIndex(d => d.name === dName);
-    const rankNum = rankIdx !== -1 ? (rankIdx + 1) : 4;
+    const rankNum = rankIdx !== -1 ? (rankIdx + 1) : null;
 
-    if (kpiRankEl) kpiRankEl.innerHTML = `#${rankNum} <span class="unit">/ 30</span>`;
+    if (kpiRankEl) {
+        kpiRankEl.innerHTML = rankNum !== null ? `#${rankNum} <span class="unit">/ ${distList.length}</span>` : `— <span class="unit">/ ${distList.length}</span>`;
+    }
     if (rankSubEl) {
-        if (rankNum <= 5) {
+        if (rankNum === null) {
+            rankSubEl.textContent = 'No observations recorded in this period';
+        } else if (rankNum <= 5) {
             rankSubEl.textContent = 'Top tier productivity nationwide';
         } else if (rankNum <= 15) {
             rankSubEl.textContent = 'Above average national productivity';
@@ -1117,20 +777,25 @@ function populateDistrictReportModal(districtName) {
         }
     }
 
-    // Benchmark comparison (against national mean)
+    // Benchmark comparison (against observed national mean)
     const totalYield = distList.reduce((sum, d) => sum + d.yield, 0);
-    const natAvg = distList.length > 0 ? (totalYield / distList.length) : 2.5;
-    const diffPct = ((metrics.yield - natAvg) / natAvg) * 100;
+    const natAvg = distList.length > 0 ? (totalYield / distList.length) : null;
 
     if (yieldBadgeEl) {
-        if (diffPct >= 0) {
-            yieldBadgeEl.textContent = `+${diffPct.toFixed(0)}% vs Nat'l Avg`;
-            yieldBadgeEl.style.background = '#DCFCE7';
-            yieldBadgeEl.style.color = '#15803d';
+        if (metrics.yield !== null && natAvg !== null && natAvg > 0) {
+            const diffPct = ((metrics.yield - natAvg) / natAvg) * 100;
+            yieldBadgeEl.style.display = 'inline-block';
+            if (diffPct >= 0) {
+                yieldBadgeEl.textContent = `+${diffPct.toFixed(0)}% vs Nat'l Avg`;
+                yieldBadgeEl.style.background = '#DCFCE7';
+                yieldBadgeEl.style.color = '#15803d';
+            } else {
+                yieldBadgeEl.textContent = `${diffPct.toFixed(0)}% vs Nat'l Avg`;
+                yieldBadgeEl.style.background = '#FEF3C7';
+                yieldBadgeEl.style.color = '#B45309';
+            }
         } else {
-            yieldBadgeEl.textContent = `${diffPct.toFixed(0)}% vs Nat'l Avg`;
-            yieldBadgeEl.style.background = '#FEF3C7';
-            yieldBadgeEl.style.color = '#B45309';
+            yieldBadgeEl.style.display = 'none';
         }
     }
 
@@ -1141,40 +806,51 @@ function populateDistrictReportModal(districtName) {
         let rowsHtml = '';
 
         cropOrder.forEach(cName => {
-            const cData = sObj.crops[cName] ? (sObj.crops[cName].districts[dName] || { yield: 0, area: 0, prod: 0 }) : { yield: 0, area: 0, prod: 0 };
             const isCurrent = (cName === currentCrop);
             const rowClass = isCurrent ? 'highlight-active-row' : '';
 
-            let badgeClass = 'normal';
-            let badgeText = 'Good Harvest';
-            if (cName === 'Maize') {
-                if (cData.yield >= 3.5) { badgeClass = 'high'; badgeText = 'High Yield Zone'; }
-                else if (cData.yield < 1.5) { badgeClass = 'moderate'; badgeText = 'Moderate Output'; }
-            } else if (cName === 'Irish Potato') {
-                if (cData.yield >= 14.0) { badgeClass = 'high'; badgeText = 'Major Breadbasket'; }
-                else if (cData.yield === 0) { badgeClass = 'low'; badgeText = 'Non-cultivated'; }
-                else { badgeClass = 'normal'; badgeText = 'Moderate Crop'; }
-            } else if (cName === 'Rice') {
-                if (cData.yield >= 4.0) { badgeClass = 'high'; badgeText = 'Marshland Scheme'; }
-                else if (cData.yield === 0) { badgeClass = 'low'; badgeText = 'Non-marshland'; }
-            } else if (cName === 'Beans') {
-                if (cData.yield >= 2.0) { badgeClass = 'high'; badgeText = 'High Yield Staple'; }
-            } else if (cName === 'Cassava') {
-                if (cData.yield >= 12.0) { badgeClass = 'high'; badgeText = 'Staple Granary'; }
-            }
+            if (isCurrent && metrics.yield !== null) {
+                let badgeClass = 'normal';
+                let badgeText = 'Observed Harvest';
+                if (metrics.yield >= 3.5) { badgeClass = 'high'; badgeText = 'High Yield Zone'; }
+                else if (metrics.yield < 1.5) { badgeClass = 'moderate'; badgeText = 'Moderate Output'; }
 
-            rowsHtml += `
-                <tr class="${rowClass}">
-                    <td>
-                        <strong>${cName}</strong>
-                        ${isCurrent ? '<span style="font-size: 0.70rem; color: #16a34a; font-weight: 700; margin-left: 6px;">● Active Selection</span>' : ''}
-                    </td>
-                    <td>${cData.yield > 0 ? cData.yield.toFixed(1) + ' t/ha' : '<span style="color: #94a3b8;">—</span>'}</td>
-                    <td>${cData.area > 0 ? cData.area.toLocaleString() + ' ha' : '<span style="color: #94a3b8;">—</span>'}</td>
-                    <td>${cData.prod > 0 ? cData.prod.toLocaleString() + ' t' : '<span style="color: #94a3b8;">—</span>'}</td>
-                    <td><span class="crop-status-badge ${badgeClass}">${badgeText}</span></td>
-                </tr>
-            `;
+                rowsHtml += `
+                    <tr class="${rowClass}">
+                        <td>
+                            <strong>${cName}</strong>
+                            <span style="font-size: 0.70rem; color: #16a34a; font-weight: 700; margin-left: 6px;">● Active Selection</span>
+                        </td>
+                        <td>${metrics.yield.toFixed(1)} t/ha</td>
+                        <td>${metrics.area !== null ? metrics.area.toLocaleString() + ' ha' : '—'}</td>
+                        <td>${metrics.prod !== null ? metrics.prod.toLocaleString() + ' t' : '—'}</td>
+                        <td><span class="crop-status-badge ${badgeClass}">${badgeText}</span></td>
+                    </tr>
+                `;
+            } else if (isCurrent) {
+                rowsHtml += `
+                    <tr class="${rowClass}">
+                        <td>
+                            <strong>${cName}</strong>
+                            <span style="font-size: 0.70rem; color: #16a34a; font-weight: 700; margin-left: 6px;">● Active Selection</span>
+                        </td>
+                        <td><span style="color: #94a3b8;">—</span></td>
+                        <td><span style="color: #94a3b8;">—</span></td>
+                        <td><span style="color: #94a3b8;">—</span></td>
+                        <td><span class="crop-status-badge normal">No Observations</span></td>
+                    </tr>
+                `;
+            } else {
+                rowsHtml += `
+                    <tr>
+                        <td><strong>${cName}</strong></td>
+                        <td><span style="color: #94a3b8;">—</span></td>
+                        <td><span style="color: #94a3b8;">—</span></td>
+                        <td><span style="color: #94a3b8;">—</span></td>
+                        <td><span class="crop-status-badge normal" style="opacity: 0.7;">Select crop to inspect</span></td>
+                    </tr>
+                `;
+            }
         });
         tbody.innerHTML = rowsHtml;
     }
@@ -1198,23 +874,14 @@ function populateDistrictReportModal(districtName) {
     // Multi-Season Inter-Season Trend
     const trendStatsEl = document.getElementById('modal-trend-stats');
     if (trendStatsEl) {
-        const y2025 = (MAP_SEASON_DATA['2025A']?.crops[currentCrop]?.districts[dName]?.yield) || metrics.yield;
-        const y2024 = (MAP_SEASON_DATA['2024A']?.crops[currentCrop]?.districts[dName]?.yield) || (y2025 * 0.92);
-        const yoyPct = ((y2025 - y2024) / y2024) * 100;
-        const isPos = yoyPct >= 0;
-
         trendStatsEl.innerHTML = `
             <div class="trend-stat-chip">
-                <span>SAS 2024–2025:</span>
-                <strong>${y2025.toFixed(1)} t/ha</strong>
+                <span>Selected Season:</span>
+                <strong>${metrics.yield !== null ? metrics.yield.toFixed(1) + ' t/ha' : '—'}</strong>
             </div>
             <div class="trend-stat-chip">
-                <span>SAS 2023–2024:</span>
-                <strong>${y2024.toFixed(1)} t/ha</strong>
-            </div>
-            <div class="trend-stat-chip ${isPos ? 'positive' : ''}">
-                <span>YoY Trend:</span>
-                <strong>${isPos ? '+' : ''}${yoyPct.toFixed(1)}%</strong>
+                <span>Surveillance Status:</span>
+                <strong>${metrics.plots > 0 ? metrics.plots + ' plots surveyed' : 'No records'}</strong>
             </div>
         `;
     }
@@ -1245,7 +912,5 @@ function closeDistrictReportModal() {
     }, 220);
 }
 
-// Expose modal handlers globally for inline triggers
 window.openDistrictReportModal = openDistrictReportModal;
 window.closeDistrictReportModal = closeDistrictReportModal;
-

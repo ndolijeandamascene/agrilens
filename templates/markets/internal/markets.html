@@ -25,6 +25,7 @@
                         <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Type</th>
                         <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Major Hub</th>
                         <th style="padding: 10px 14px; font-weight: 700; color: #475569;">Quotes</th>
+                        <th style="padding: 10px 14px; font-weight: 700; color: #475569; text-align: right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,10 +47,21 @@
                             {% endif %}
                         </td>
                         <td style="padding: 12px 14px; font-weight: 700; color: #0F172A;">{{ m.record_count }}</td>
+                        <td style="padding: 12px 14px; text-align: right; white-space: nowrap;">
+                            <a href="{% url 'markets:internal_market_edit' m.id %}" style="padding: 3px 8px; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 4px; color: #1E293B; font-weight: 600; text-decoration: none; font-size: 0.78rem; margin-right: 6px;">
+                                Edit
+                            </a>
+                            <form method="POST" action="{% url 'markets:internal_market_delete' m.id %}" style="display: inline;" onsubmit="return confirm('Delete market hub \'{{ m.name|escapejs }}\'?');">
+                                {% csrf_token %}
+                                <button type="submit" style="padding: 3px 8px; background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 4px; color: #DC2626; font-weight: 600; font-size: 0.78rem; cursor: pointer;">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" style="text-align: center; padding: 30px; color: #64748B;">No markets registered yet.</td>
+                        <td colspan="7" style="text-align: center; padding: 30px; color: #64748B;">No markets registered yet.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
