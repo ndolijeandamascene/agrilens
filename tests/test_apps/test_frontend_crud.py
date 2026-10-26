@@ -13,7 +13,7 @@ from apps.agriculture.models import CropCategory, Crop, AgriculturalSeason
 from apps.farmers.models import Cooperative, Farmer
 from apps.inputs.models import InputCategory, AgriculturalInput
 from apps.markets.models import MarketLocation, MarketCommodity, CommodityPrice
-from apps.surveys.models import SurveyCampaign
+from apps.surveys.models import SurveyCampaign, DistrictSocioeconomicProfile, FarmSurveySubmission
 from apps.data_management.models import DataSource, ManualObservation
 from apps.decision_support.models import Recommendation, ActionPlan
 
@@ -329,6 +329,94 @@ class FrontendCRUDTestSuite(TestCase):
         # Delete
         self.client.post(reverse('surveys:survey_campaign_delete', kwargs={'pk': campaign.pk}), follow=True)
         self.assertFalse(SurveyCampaign.objects.filter(pk=campaign.pk).exists())
+
+        # =====================================================================
+        # District Socioeconomic Profile CRUD (AHS 2024)
+        # =====================================================================
+        # Create
+        res = self.client.post(reverse('surveys:socioeconomic_create'), {
+            'district': self.district.pk,
+            'survey_year': 2024,
+            'provenance': 'NISR_AHS_2024',
+            'sample_households_count': 120,
+            'total_plots_surveyed': 750,
+            'extension_advisory_reach_pct': '68.5',
+            'twigire_muhinzi_membership_pct': '15.2',
+            'credit_access_pct': '12.0',
+            'sacco_credit_share_pct': '8.5',
+            'bank_credit_share_pct': '3.5',
+            'formal_land_title_pct': '64.0',
+            'avg_plots_per_household': '6.25',
+            'avg_plot_area_sqm': '820.0',
+            'sustainable_practices_pct': '35.0',
+            'dairy_producing_households_pct': '28.0',
+        }, follow=True)
+        self.assertEqual(res.status_code, 200)
+        profile = DistrictSocioeconomicProfile.objects.get(district=self.district, survey_year=2024)
+        self.assertEqual(profile.sample_households_count, 120)
+
+        # Edit
+        self.client.post(reverse('surveys:socioeconomic_edit', kwargs={'pk': profile.pk}), {
+            'district': self.district.pk,
+            'survey_year': 2024,
+            'provenance': 'NISR_AHS_2024',
+            'sample_households_count': 135,
+            'total_plots_surveyed': 800,
+            'extension_advisory_reach_pct': '72.0',
+            'twigire_muhinzi_membership_pct': '18.0',
+            'credit_access_pct': '15.0',
+            'sacco_credit_share_pct': '10.0',
+            'bank_credit_share_pct': '5.0',
+            'formal_land_title_pct': '68.0',
+            'avg_plots_per_household': '6.10',
+            'avg_plot_area_sqm': '850.0',
+            'sustainable_practices_pct': '40.0',
+            'dairy_producing_households_pct': '30.0',
+        }, follow=True)
+        profile.refresh_from_db()
+        self.assertEqual(profile.sample_households_count, 135)
+        self.assertEqual(profile.extension_advisory_reach_pct, Decimal('72.00'))
+
+        # Delete
+        self.client.post(reverse('surveys:socioeconomic_delete', kwargs={'pk': profile.pk}), follow=True)
+        self.assertFalse(DistrictSocioeconomicProfile.objects.filter(pk=profile.pk).exists())
+
+        # =====================================================================
+        # Farm Survey Submission CRUD
+        # =====================================================================
+        campaign2 = SurveyCampaign.objects.create(
+            title='SAS Round 2',
+            season=self.season,
+            is_active=True
+        )
+        # Create Submission
+        res = self.client.post(reverse('surveys:submission_create'), {
+            'campaign': campaign2.pk,
+            'sector': self.sector.pk,
+            'crop': self.crop.pk,
+            'area_planted_ha': '0.75',
+            'quantity_harvested_kg': '2250.00',
+            'yield_kg_per_ha': '3000.00'
+        }, follow=True)
+        self.assertEqual(res.status_code, 200)
+        sub = FarmSurveySubmission.objects.get(campaign=campaign2, crop=self.crop)
+        self.assertEqual(sub.area_planted_ha, Decimal('0.75'))
+
+        # Edit Submission
+        self.client.post(reverse('surveys:submission_edit', kwargs={'pk': sub.pk}), {
+            'campaign': campaign2.pk,
+            'sector': self.sector.pk,
+            'crop': self.crop.pk,
+            'area_planted_ha': '1.00',
+            'quantity_harvested_kg': '3500.00',
+            'yield_kg_per_ha': '3500.00'
+        }, follow=True)
+        sub.refresh_from_db()
+        self.assertEqual(sub.area_planted_ha, Decimal('1.00'))
+
+        # Delete Submission
+        self.client.post(reverse('surveys:submission_delete', kwargs={'pk': sub.pk}), follow=True)
+        self.assertFalse(FarmSurveySubmission.objects.filter(pk=sub.pk).exists())
 
     def test_data_management_crud(self):
         self.client.force_login(self.admin)

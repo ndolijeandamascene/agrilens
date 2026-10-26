@@ -87,13 +87,14 @@
                     {% if request.path == '/reports/' %}<span class="nav-active-bar" aria-hidden="true"></span>{% endif %}
                 </a>
 
-                <a href="/data-api/" class="public-nav-link {% if '/data-api/' in request.path %}active{% endif %}">
+                <a href="/insights/" class="public-nav-link {% if '/insights/' in request.path %}active{% endif %}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <polyline points="16 18 22 12 16 6"></polyline>
-                        <polyline points="8 6 2 12 8 18"></polyline>
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
                     </svg>
-                    <span>Data &amp; API</span>
-                    {% if '/data-api/' in request.path %}<span class="nav-active-bar" aria-hidden="true"></span>{% endif %}
+                    <span>Insights</span>
+                    {% if '/insights/' in request.path %}<span class="nav-active-bar" aria-hidden="true"></span>{% endif %}
                 </a>
 
                 <a href="/markets/" class="public-nav-link {% if '/markets/' in request.path and not '/markets/internal/' in request.path %}active{% endif %}">

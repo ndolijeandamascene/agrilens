@@ -101,6 +101,7 @@ LOCAL_APPS = [
     'apps.decision_support.apps.DecisionSupportConfig',
     'apps.ml.apps.MlConfig',
     'apps.notifications.apps.NotificationsConfig',
+    'apps.insights.apps.InsightsConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

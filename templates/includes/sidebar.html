@@ -18,6 +18,14 @@
     </div>
 
     <div class="nav-section">
+        <div class="nav-title">Agricultural Insights</div>
+        <a href="/insights/" class="nav-item {% if request.path == '/insights/' or request.path|slice:':10' == '/insights/' and '/manage/' not in request.path %}active{% endif %}"><i class="fa-solid fa-lightbulb"></i> Data Stories</a>
+        <a href="/insights/manage/" class="nav-item {% if request.path == '/insights/manage/' %}active{% endif %}"><i class="fa-solid fa-gauge-high"></i> Insights Command</a>
+        <a href="/insights/manage/review/" class="nav-item {% if '/insights/manage/review/' in request.path %}active{% endif %}"><i class="fa-solid fa-clipboard-check"></i> Review &amp; Approval</a>
+        <a href="/insights/manage/all/" class="nav-item {% if '/insights/manage/all/' in request.path %}active{% endif %}"><i class="fa-solid fa-folder-tree"></i> Insights Repository</a>
+    </div>
+
+    <div class="nav-section">
         <div class="nav-title">Productivity & Gap</div>
         <a href="/indicators/productivity/" class="nav-item {% if request.path|slice:':12' == '/indicators/' %}active{% endif %}"><i class="fa-solid fa-chart-line"></i> Yield Gap Intelligence</a>
         <a href="/decision-support/" class="nav-item {% if request.path == '/decision-support/' %}active{% endif %}"><i class="fa-solid fa-compass"></i> Decision Support</a>
@@ -45,7 +53,6 @@
         <a href="/inputs/" class="nav-item {% if request.path|slice:':8' == '/inputs/' %}active{% endif %}"><i class="fa-solid fa-box"></i> Inputs & Subsidies</a>
         <a href="/markets/" class="nav-item {% if request.path == '/markets/' %}active{% endif %}"><i class="fa-solid fa-shop"></i> Commodity Markets</a>
         <a href="/markets/internal/" class="nav-item {% if '/markets/internal/' in request.path %}active{% endif %}"><i class="fa-solid fa-scale-balanced"></i> Commodity Prices (Staff)</a>
-        <a href="/api/" class="nav-item {% if request.path|slice:':5' == '/api/' %}active{% endif %}"><i class="fa-solid fa-code"></i> Developer Data API</a>
     </div>
     
     <div class="nav-section">

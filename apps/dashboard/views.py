@@ -23,7 +23,7 @@ def public_home(request):
     Presents official NISR survey metrics, interactive Rwanda choropleth map,
     national productivity indicators, and market intelligence access.
     """
-    cache_key = 'agrilens_public_home_context_v3'
+    cache_key = 'agrilens_public_home_context_v4'
     context = cache.get(cache_key)
 
     if context is None:
@@ -72,15 +72,26 @@ def public_home(request):
             name = f"SAS {s.year - 1} – {s.year}" if s.season == 'A' else f"SAS {s.year} Season {s.season}"
             available_seasons.append({'code': code, 'name': name, 'year': s.year, 'season': s.season})
 
-        recent_reports = PublishedReport.objects.filter(is_published=True).order_by('-publication_date')[:4]
+        from apps.insights.models import AgriculturalInsight
+        published_insights = AgriculturalInsight.objects.published()[:4]
         latest_insights = []
-        for r in recent_reports:
-            latest_insights.append({
-                'title': r.title,
-                'subtitle': r.subtitle or r.report_type_label,
-                'date': r.publication_date.strftime('%b %d, %Y'),
-                'url': f"/reports/{r.slug}/pdf/" if r.slug else "/dashboard/reports/national/",
-            })
+        if published_insights.exists():
+            for ins in published_insights:
+                latest_insights.append({
+                    'title': ins.title,
+                    'subtitle': ins.headline or (ins.summary[:140] + '...' if len(ins.summary) > 140 else ins.summary),
+                    'date': ins.published_at.strftime('%b %d, %Y') if ins.published_at else (ins.created_at.strftime('%b %d, %Y') if ins.created_at else ''),
+                    'url': ins.get_absolute_url(),
+                })
+        else:
+            recent_reports = PublishedReport.objects.filter(is_published=True).order_by('-publication_date')[:4]
+            for r in recent_reports:
+                latest_insights.append({
+                    'title': r.title,
+                    'subtitle': r.subtitle or r.report_type_label,
+                    'date': r.publication_date.strftime('%b %d, %Y'),
+                    'url': f"/reports/{r.slug}/pdf/" if r.slug else "/dashboard/reports/national/",
+                })
 
         context = {
             'page_title': 'AgriLens • Rwanda Agricultural Intelligence Platform',

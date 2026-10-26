@@ -57,6 +57,61 @@ PRODUCTIVITY_MENU = {
     ],
 }
 
+AGRICULTURAL_INSIGHTS_MENU = {
+    "id": "insights",
+    "name": "Agricultural Insights",
+    "icon": "insights",
+    "description": "Evidence-based patterns, data stories, and review queue",
+    "roles": ["*"],
+    "submenu": [
+        {
+            "id": "insights_public",
+            "name": "Data Stories",
+            "url": "insights:public_list",
+            "icon": "stories",
+            "description": "Published agricultural intelligence and data stories",
+        },
+        {
+            "id": "insights_dashboard",
+            "name": "Insights Command",
+            "url": "insights:internal_dashboard",
+            "icon": "dashboard",
+            "description": "Internal insights management dashboard and metrics",
+        },
+        {
+            "id": "insights_review",
+            "name": "Review Queue",
+            "url": "insights:internal_review_queue",
+            "icon": "review",
+            "description": "Verify and approve generated agricultural insights",
+        },
+        {
+            "id": "insights_all",
+            "name": "All Insights",
+            "url": "insights:internal_list",
+            "icon": "registry",
+            "description": "Searchable repository of all generated and published insights",
+        },
+    ],
+}
+
+AGRICULTURAL_INSIGHTS_MENU_PUBLIC = {
+    "id": "insights",
+    "name": "Agricultural Insights",
+    "icon": "insights",
+    "description": "Published agricultural intelligence and data stories",
+    "roles": ["PUBLIC"],
+    "submenu": [
+        {
+            "id": "insights_public",
+            "name": "Data Stories",
+            "url": "insights:public_list",
+            "icon": "stories",
+            "description": "Published agricultural intelligence and data stories",
+        },
+    ],
+}
+
 REPORTS_MENU_FULL = {
     "id": "reports",
     "name": "Reports & Bulletins",
@@ -178,13 +233,6 @@ AGRICULTURAL_DOMAINS_MENU = {
             "icon": "markets",
             "description": "Wholesale and retail agricultural commodity prices",
         },
-        {
-            "id": "domain_api",
-            "name": "Developer Data API",
-            "url": "/api/",
-            "icon": "api",
-            "description": "REST API root and OpenAPI schema documentation",
-        },
     ],
 }
 
@@ -284,13 +332,6 @@ AGRICULTURAL_DOMAINS_MENU_PUBLIC = {
             "url": "markets:market_list",
             "icon": "markets",
             "description": "Published market data and wholesale/retail prices",
-        },
-        {
-            "id": "domain_api",
-            "name": "Developer API",
-            "url": "/api/",
-            "icon": "api",
-            "description": "REST API root and OpenAPI schema documentation",
         },
     ],
 }
@@ -441,6 +482,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
             PRODUCTIVITY_MENU,
+            AGRICULTURAL_INSIGHTS_MENU,
             DECISION_SUPPORT_MENU,
             REPORTS_MENU_FULL,
             AGRICULTURAL_DOMAINS_MENU,
@@ -454,6 +496,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
             PRODUCTIVITY_MENU,
+            AGRICULTURAL_INSIGHTS_MENU,
             DECISION_SUPPORT_MENU,
             REPORTS_MENU_FULL,
             AGRICULTURAL_DOMAINS_MENU,
@@ -466,6 +509,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
             PRODUCTIVITY_MENU,
+            AGRICULTURAL_INSIGHTS_MENU,
             DECISION_SUPPORT_MENU,
             REPORTS_MENU_FULL,
             AGRICULTURAL_DOMAINS_MENU,
@@ -478,6 +522,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
             PRODUCTIVITY_MENU,
+            AGRICULTURAL_INSIGHTS_MENU,
             DECISION_SUPPORT_MENU,
             REPORTS_MENU_FULL,
             AGRICULTURAL_DOMAINS_MENU,
@@ -489,6 +534,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
             PRODUCTIVITY_MENU,
+            AGRICULTURAL_INSIGHTS_MENU,
             DECISION_SUPPORT_MENU,
             REPORTS_MENU_DISTRICT_ONLY,
             AGRICULTURAL_DOMAINS_MENU,
@@ -509,6 +555,7 @@ MENU_CONFIG = {
     "REVIEWER": {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
+            AGRICULTURAL_INSIGHTS_MENU,
             DECISION_SUPPORT_MENU,
             REPORTS_MENU_FULL,
             DATA_GOVERNANCE_MENU_REVIEWER,
@@ -521,6 +568,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
             PRODUCTIVITY_MENU,
+            AGRICULTURAL_INSIGHTS_MENU,
             DECISION_SUPPORT_MENU,
             REPORTS_MENU_FULL,
             AGRICULTURAL_DOMAINS_MENU,
@@ -539,6 +587,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU,
             PRODUCTIVITY_MENU,
+            AGRICULTURAL_INSIGHTS_MENU,
             DECISION_SUPPORT_MENU,
             REPORTS_MENU_FULL,
             AGRICULTURAL_DOMAINS_MENU,
@@ -551,6 +600,7 @@ MENU_CONFIG = {
         "sidebar": [
             CORE_INTELLIGENCE_MENU_PUBLIC,
             PRODUCTIVITY_MENU_PUBLIC,
+            AGRICULTURAL_INSIGHTS_MENU_PUBLIC,
             REPORTS_MENU_PUBLIC,
             AGRICULTURAL_DOMAINS_MENU_PUBLIC,
         ]

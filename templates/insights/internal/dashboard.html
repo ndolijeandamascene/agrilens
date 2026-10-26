@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Agricultural Insights Management &bull; AgriLens Command Center{% endblock %}
+
+{% block content %}
+<div class="p-6 max-w-7xl mx-auto space-y-6">
+
+    <!-- TOP HEADER -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                    Institutional Governance
+                </span>
+                <span class="text-xs text-slate-500">Maker-Checker Intelligence Engine</span>
+            </div>
+            <h1 class="text-2xl font-black text-slate-900 mt-1">
+                Agricultural Insights Command Center
+            </h1>
+            <p class="text-xs text-slate-600">
+                Automated statistical pattern discovery, data story curation, and editorial review pipeline.
+            </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <a href="{% url 'insights:internal_review_queue' %}" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold hover:bg-amber-100 transition">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>Review Queue ({{ under_review_count|add:generated_count }})</span>
+            </a>
+
+            <a href="{% url 'insights:public_list' %}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                <span>Live Public Portal</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- MESSAGES -->
+    {% if messages %}
+    <div class="space-y-2">
+        {% for message in messages %}
+        <div class="p-3 rounded-lg text-xs font-medium {% if message.tags == 'success' %}bg-emerald-50 text-emerald-800 border border-emerald-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- KPI STATS CARDS -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <span class="text-xs text-slate-500 font-medium block">Total Discovered</span>
+            <div class="text-2xl font-black text-slate-900 mt-1">{{ total_count }}</div>
+            <span class="text-[11px] text-slate-400">All lifecycle states</span>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <span class="text-xs text-amber-700 font-medium block">Pending Review</span>
+            <div class="text-2xl font-black text-amber-700 mt-1">{{ generated_count|add:under_review_count }}</div>
+            <span class="text-[11px] text-amber-600">Requires verification</span>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <span class="text-xs text-blue-700 font-medium block">Approved</span>
+            <div class="text-2xl font-black text-blue-700 mt-1">{{ approved_count }}</div>
+            <span class="text-[11px] text-blue-500">Ready to publish</span>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <span class="text-xs text-emerald-700 font-medium block">Published</span>
+            <div class="text-2xl font-black text-emerald-700 mt-1">{{ published_count }}</div>
+            <span class="text-[11px] text-emerald-600">Publicly visible</span>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <span class="text-xs text-red-700 font-medium block">Rejected</span>
+            <div class="text-2xl font-black text-red-700 mt-1">{{ rejected_count }}</div>
+            <span class="text-[11px] text-red-500">Revision requested</span>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <span class="text-xs text-purple-700 font-medium block">Coverage</span>
+            <div class="text-2xl font-black text-purple-700 mt-1">30 / 30</div>
+            <span class="text-[11px] text-purple-500">Districts analyzed</span>
+        </div>
+    </div>
+
+    <!-- TRIGGER DISCOVERY MODAL / BAR -->
+    <div class="bg-gradient-to-r from-emerald-50 to-slate-50 rounded-xl border border-emerald-200 p-5 shadow-sm">
+        <form method="post" action="{% url 'insights:internal_generate' %}" class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            {% csrf_token %}
+            <div class="space-y-1 max-w-lg">
+                <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.5">
+                        <path d="M23 4v6h-6"></path>
+                        <path d="M1 20v-6h6"></path>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                    Execute Agricultural Insight Discovery Engine
+                </h3>
+                <p class="text-xs text-slate-600">
+                    Runs automated statistical algorithms against verified SAS microdata to discover productivity shifts, district benchmarks, and anomalies.
+                </p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Target Season</label>
+                    <select name="season_id" class="text-xs rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 py-1.5 px-2 bg-white">
+                        {% for s in seasons %}
+                        <option value="{{ s.id }}">{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2 pt-4">
+                    <label class="inline-flex items-center text-xs text-slate-700 cursor-pointer">
+                        <input type="checkbox" name="auto_publish" class="rounded border-slate-300 text-emerald-600 shadow-sm focus:ring-emerald-500 mr-1.5">
+                        <span>Auto-publish</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-800 text-white text-xs font-bold hover:bg-emerald-700 transition shadow-sm">
+                    <span>Run Engine</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- CATEGORY DISTRIBUTION BREAKDOWN -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+        <h3 class="text-sm font-bold text-slate-900 mb-4 flex items-center justify-between">
+            <span>Insights by Agricultural Domain Category</span>
+            <a href="{% url 'insights:internal_list' %}" class="text-xs text-emerald-700 font-semibold hover:underline">
+                View All Insights &rarr;
+            </a>
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {% for cat in cat_breakdown %}
+            <div class="p-4 rounded-lg bg-slate-50 border border-slate-200/80">
+                <span class="text-xs font-semibold text-slate-700 block mb-1">{{ cat.label }}</span>
+                <div class="flex items-baseline justify-between mt-2">
+                    <span class="text-xl font-black text-slate-900">{{ cat.total }}</span>
+                    <span class="text-xs text-emerald-700 font-medium">{{ cat.published }} published</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- RECENTLY DISCOVERED INSIGHTS -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-900">Recently Discovered Insights</h3>
+            <a href="{% url 'insights:internal_list' %}" class="text-xs text-emerald-700 font-semibold hover:underline">
+                View Full Catalog ({{ total_count }}) &rarr;
+            </a>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-700">
+                <thead class="bg-slate-50 text-slate-500 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                    <tr>
+                        <th class="p-3">Title &amp; Story</th>
+                        <th class="p-3">Category</th>
+                        <th class="p-3">Scope</th>
+                        <th class="p-3">Period</th>
+                        <th class="p-3">Shift</th>
+                        <th class="p-3">Status</th>
+                        <th class="p-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    {% for ins in recent_insights %}
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-medium text-slate-900 max-w-xs truncate">
+                            <a href="{% url 'insights:internal_detail' ins.id %}" class="hover:text-emerald-700">
+                                {{ ins.title }}
+                            </a>
+                        </td>
+                        <td class="p-3 text-slate-600">{{ ins.get_category_display }}</td>
+                        <td class="p-3 text-slate-600">{{ ins.scope_label }}</td>
+                        <td class="p-3 text-slate-500">{{ ins.current_season }}</td>
+                        <td class="p-3 font-bold {% if ins.percentage_change > 0 %}text-emerald-700{% elif ins.percentage_change < 0 %}text-red-600{% else %}text-slate-700{% endif %}">
+                            {{ ins.formatted_change }}
+                        </td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase
+                                {% if ins.status == 'published' %}bg-emerald-100 text-emerald-800
+                                {% elif ins.status == 'approved' %}bg-blue-100 text-blue-800
+                                {% elif ins.status == 'rejected' %}bg-red-100 text-red-800
+                                {% else %}bg-amber-100 text-amber-800{% endif %}">
+                                {{ ins.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="p-3 text-right">
+                            <a href="{% url 'insights:internal_detail' ins.id %}" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800">
+                                Inspect &rarr;
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="p-8 text-center text-slate-400">
+                            No insights recorded yet. Click "Run Engine" above to discover patterns.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

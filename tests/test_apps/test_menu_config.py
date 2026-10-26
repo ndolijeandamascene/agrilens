@@ -275,7 +275,7 @@ class ContextProcessorAndTemplateTestCase(TestCase):
         self.assertIn("Crops & Seasons", sub_names)
         self.assertIn("Seasonal Surveys", sub_names)
         self.assertIn("Commodity Markets", sub_names)
-        self.assertIn("Developer API", sub_names)
+        self.assertNotIn("Developer API", sub_names)
 
         # Verify privacy exclusions: farmer registries, subsidies, district dossiers are NOT in public
         self.assertNotIn("Farmers & Cooperatives", sub_names)

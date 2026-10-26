@@ -142,8 +142,9 @@ class Command(BaseCommand):
             df = df.head(limit)
             total_rows = len(df)
 
-        batch.total_rows = total_rows
-        batch.save(update_fields=['total_rows'])
+        if batch:
+            batch.total_rows = total_rows
+            batch.save(update_fields=['total_rows'])
         self.stdout.write(f"Source rows loaded: {total_rows:,}")
 
         # 4. Preload reference lookups (Districts & Crops)

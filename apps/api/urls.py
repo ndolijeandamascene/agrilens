@@ -13,6 +13,8 @@ router.register(r'prices', views.CommodityPriceViewSet, basename='price')
 urlpatterns = [
     path('v1/notifications/', include('apps.notifications.api.urls')),
     path('notifications/', include('apps.notifications.api.urls')),
+    path('v1/', include('apps.insights.api_urls')),
+    path('', include('apps.insights.api_urls')),
     path('v1/', include(router.urls)),
     path('', include(router.urls)),
 ]
