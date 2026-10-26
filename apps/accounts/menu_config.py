@@ -65,13 +65,6 @@ AGRICULTURAL_INSIGHTS_MENU = {
     "roles": ["*"],
     "submenu": [
         {
-            "id": "insights_public",
-            "name": "Data Stories",
-            "url": "insights:public_list",
-            "icon": "stories",
-            "description": "Published agricultural intelligence and data stories",
-        },
-        {
             "id": "insights_dashboard",
             "name": "Insights Command",
             "url": "insights:internal_dashboard",
@@ -197,13 +190,6 @@ AGRICULTURAL_DOMAINS_MENU = {
             "url": "agriculture:crop_list",
             "icon": "crops",
             "description": "National crop catalog, varieties, and seasonal cycles",
-        },
-        {
-            "id": "domain_districts",
-            "name": "Districts & Mapping",
-            "url": "geography:district_list",
-            "icon": "districts",
-            "description": "Provinces, 30 districts, and administrative boundaries",
         },
         {
             "id": "domain_surveys",

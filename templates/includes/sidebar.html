@@ -19,7 +19,6 @@
 
     <div class="nav-section">
         <div class="nav-title">Agricultural Insights</div>
-        <a href="/insights/" class="nav-item {% if request.path == '/insights/' or request.path|slice:':10' == '/insights/' and '/manage/' not in request.path %}active{% endif %}"><i class="fa-solid fa-lightbulb"></i> Data Stories</a>
         <a href="/insights/manage/" class="nav-item {% if request.path == '/insights/manage/' %}active{% endif %}"><i class="fa-solid fa-gauge-high"></i> Insights Command</a>
         <a href="/insights/manage/review/" class="nav-item {% if '/insights/manage/review/' in request.path %}active{% endif %}"><i class="fa-solid fa-clipboard-check"></i> Review &amp; Approval</a>
         <a href="/insights/manage/all/" class="nav-item {% if '/insights/manage/all/' in request.path %}active{% endif %}"><i class="fa-solid fa-folder-tree"></i> Insights Repository</a>
@@ -47,7 +46,6 @@
     <div class="nav-section">
         <div class="nav-title">Agricultural Domains</div>
         <a href="/agriculture/" class="nav-item {% if request.path|slice:':13' == '/agriculture/' %}active{% endif %}"><i class="fa-solid fa-seedling"></i> Crops & Seasons</a>
-        <a href="/geography/" class="nav-item {% if request.path|slice:':11' == '/geography/' %}active{% endif %}"><i class="fa-solid fa-map"></i> Districts & Mapping</a>
         <a href="/surveys/" class="nav-item {% if request.path|slice:':9' == '/surveys/' %}active{% endif %}"><i class="fa-solid fa-calendar-days"></i> Seasonal Surveys</a>
         <a href="/farmers/" class="nav-item {% if request.path|slice:':9' == '/farmers/' %}active{% endif %}"><i class="fa-solid fa-people-group"></i> Farmers & Cooperatives</a>
         <a href="/inputs/" class="nav-item {% if request.path|slice:':8' == '/inputs/' %}active{% endif %}"><i class="fa-solid fa-box"></i> Inputs & Subsidies</a>
