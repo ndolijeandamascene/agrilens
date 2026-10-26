@@ -231,6 +231,10 @@ def decision_hub(request):
     else:
         verified_gain_pct = "Data unavailable"
 
+    # District Agricultural Vulnerability Index (AVI)
+    from .services.vulnerability import AgriculturalVulnerabilityService
+    avi_data = AgriculturalVulnerabilityService.compute_all_districts()
+
     context = {
         'page_title': 'Agricultural Decision Support & Stakeholder Intelligence Hub',
         'total_recommendations': total_recommendations,
@@ -262,6 +266,9 @@ def decision_hub(request):
         'selected_stakeholder': selected_stakeholder,
         'selected_priority': selected_priority,
         'selected_district': selected_district,
+        'avi_summary': avi_data.get('national_summary', {}),
+        'top_vulnerable_districts': avi_data.get('districts', [])[:5],
+        'all_vulnerable_districts': avi_data.get('districts', []),
     }
     return render(request, 'decision_support/hub.html', context)
 
@@ -770,4 +777,29 @@ def recommendation_export_excel(request):
     )
     response['Content-Disposition'] = f'attachment; filename="agrilens_recommendations_{timezone.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
     return response
+
+
+def district_vulnerability_api(request):
+    """
+    GET /decision-support/api/vulnerability/
+    Returns multi-criteria District Agricultural Vulnerability Index (AVI) scores,
+    component breakdowns, and operational risk tiers.
+    """
+    from django.http import JsonResponse
+    from .services.vulnerability import AgriculturalVulnerabilityService
+
+    try:
+        year = int(request.GET.get('year', 2025))
+    except (ValueError, TypeError):
+        year = 2025
+    season = request.GET.get('season', 'A').strip().upper()
+    refresh = request.GET.get('refresh', 'false').lower() == 'true'
+
+    data = AgriculturalVulnerabilityService.compute_all_districts(
+        year=year,
+        season=season,
+        use_cache=not refresh
+    )
+    return JsonResponse(data)
+
 

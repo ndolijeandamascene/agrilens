@@ -10,6 +10,8 @@
 let mlSimulatorMode = 'single'; // 'single' or 'scenario'
 let mlForecastChartInstance = null;
 let liveDistrictTypologies = {};
+let liveDistrictVulnerabilities = {};
+let currentMapLayerMode = 'yield';
 let isTypologyMapActive = false;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,6 +27,9 @@ function initMLIntelligenceSuite() {
 
     // 3. Preload district clusters for the Leaflet map layer
     preloadDistrictTypologyClusters();
+
+    // 4. Preload district vulnerability index (AVI)
+    preloadDistrictVulnerabilities();
 }
 
 /* ==========================================================================
@@ -137,6 +142,47 @@ function renderSinglePredictionOutputs(data) {
     }
     if (yieldKgElem) {
         yieldKgElem.textContent = `${data.predicted_yield_kg_per_ha.toLocaleString()} kg/ha`;
+    }
+
+    // 1b. 80% Confidence Interval Band
+    const confElem = document.getElementById('mlOutputConfBand');
+    if (confElem && data.confidence_interval_80) {
+        const ci = data.confidence_interval_80;
+        confElem.innerHTML = `80% CI: <strong>${ci.lower_p10_tha.toFixed(2)}</strong> &ndash; <strong>${ci.upper_p90_tha.toFixed(2)}</strong> t/ha <span style="font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #E0F2FE; color: #0369A1; margin-left: 4px; font-weight: 700;">&plusmn;${ci.downside_risk_tha.toFixed(2)} t</span>`;
+    }
+
+    // 1c. Submodel Badge
+    const submodelBadge = document.getElementById('mlSubmodelBadge');
+    if (submodelBadge && data.model_info && data.model_info.crop_submodel_applied) {
+        submodelBadge.textContent = `Submodel: ${data.model_info.crop_submodel_applied}`;
+    }
+
+    // 1d. Local Waterfall Attributions
+    const attrList = document.getElementById('mlLocalAttributionList');
+    if (attrList && Array.isArray(data.local_attributions)) {
+        attrList.innerHTML = '';
+        data.local_attributions.forEach(item => {
+            const isAdopted = item.is_adopted;
+            const sign = item.marginal_contribution_tha >= 0 ? '+' : '';
+            const badgeBg = isAdopted ? '#ECFDF5' : '#F8FAFC';
+            const badgeColor = isAdopted ? '#065F46' : '#64748B';
+            const tagBorder = isAdopted ? 'border: 1px solid #A7F3D0;' : 'border: 1px dashed #E2E8F0;';
+            const valColor = isAdopted ? '#15803D' : '#0284C7';
+
+            const row = document.createElement('div');
+            row.style.cssText = `display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: ${badgeBg}; border-radius: 6px; ${tagBorder} font-size: 11px;`;
+            row.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid ${isAdopted ? 'fa-circle-check' : 'fa-circle-plus'}" style="color: ${isAdopted ? '#10B981' : '#94A3B8'};"></i>
+                    <span style="font-weight: 600; color: ${badgeColor};">${item.practice_name}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 10px; color: #64748B;">${isAdopted ? 'Active Impact:' : 'Untapped:'}</span>
+                    <strong style="color: ${valColor};">${sign}${item.marginal_contribution_tha.toFixed(2)} t/ha</strong>
+                </div>
+            `;
+            attrList.appendChild(row);
+        });
     }
 
     // 2. Production
@@ -267,22 +313,44 @@ async function preloadDistrictTypologyClusters() {
     }
 }
 
+async function preloadDistrictVulnerabilities() {
+    try {
+        const resp = await fetch('/api/v1/ml/vulnerability/');
+        if (!resp.ok) return;
+        const data = await resp.json();
+        if (data.status === 'SUCCESS' && Array.isArray(data.districts)) {
+            data.districts.forEach(d => {
+                liveDistrictVulnerabilities[d.district_name] = d;
+            });
+        }
+    } catch (err) {
+        console.warn('Could not load district vulnerabilities:', err);
+    }
+}
+
 function setMapLayerMode(layerMode) {
+    currentMapLayerMode = layerMode;
     isTypologyMapActive = (layerMode === 'typology');
+    const isVulnerability = (layerMode === 'vulnerability');
     
     // Update legend UI
     const yieldLegend = document.getElementById('dashboard-legend-entries');
     const typologyLegend = document.getElementById('dashboard-typology-legend-entries');
+    const aviLegend = document.getElementById('dashboard-avi-legend-entries');
     const legendHead = document.querySelector('.legend-head');
 
-    if (isTypologyMapActive) {
-        if (yieldLegend) yieldLegend.style.display = 'none';
-        if (typologyLegend) typologyLegend.style.display = 'block';
-        if (legendHead) legendHead.textContent = 'Agro-Ecological Typology (ML)';
-    } else {
-        if (yieldLegend) yieldLegend.style.display = 'block';
-        if (typologyLegend) typologyLegend.style.display = 'none';
-        if (legendHead) legendHead.textContent = 'Yield (t/ha)';
+    if (yieldLegend) yieldLegend.style.display = (layerMode === 'yield') ? 'block' : 'none';
+    if (typologyLegend) typologyLegend.style.display = isTypologyMapActive ? 'block' : 'none';
+    if (aviLegend) aviLegend.style.display = isVulnerability ? 'block' : 'none';
+
+    if (legendHead) {
+        if (isTypologyMapActive) {
+            legendHead.textContent = 'Agro-Ecological Typology (ML)';
+        } else if (isVulnerability) {
+            legendHead.textContent = 'Vulnerability Index (AVI)';
+        } else {
+            legendHead.textContent = 'Yield (t/ha)';
+        }
     }
 
     // Trigger map restyle if Leaflet layer is available
@@ -293,6 +361,14 @@ function setMapLayerMode(layerMode) {
                 const style = liveDistrictTypologies[dName].style;
                 layer.setStyle({
                     fillColor: style.fillColor,
+                    color: '#FFFFFF',
+                    weight: 1.5,
+                    fillOpacity: 0.90
+                });
+            } else if (isVulnerability && liveDistrictVulnerabilities[dName]) {
+                const v = liveDistrictVulnerabilities[dName];
+                layer.setStyle({
+                    fillColor: v.color || '#EAB308',
                     color: '#FFFFFF',
                     weight: 1.5,
                     fillOpacity: 0.90
@@ -321,6 +397,7 @@ async function fetchMLForecast(crop = 'Maize') {
 
         renderMLForecastChart(data);
         renderMLEarlyWarning(data);
+        renderMLProductionDecomposition(data);
     } catch (err) {
         console.warn('Failed to load ML production forecast:', err);
     }
@@ -432,7 +509,7 @@ function renderMLEarlyWarning(data) {
         }
     }
 
-    // Render top district forecast breakdown
+    // Render top district forecast breakdown with structural growth driver
     const tbody = document.getElementById('mlDistrictForecastBody');
     if (tbody && Array.isArray(data.district_breakdown)) {
         tbody.innerHTML = '';
@@ -440,13 +517,67 @@ function renderMLEarlyWarning(data) {
             const tr = document.createElement('tr');
             const sign = d.difference_tonnes >= 0 ? '+' : '';
             const color = d.difference_tonnes >= 0 ? '#059669' : '#DC2626';
+            const isYieldLed = d.primary_driver === 'YIELD_INTENSIFICATION';
+            const badgeBg = isYieldLed ? '#ECFDF5' : '#EFF6FF';
+            const badgeColor = isYieldLed ? '#047857' : '#1D4ED8';
+            const driverShort = isYieldLed ? 'Yield' : (d.primary_driver === 'LAND_EXTENSIFICATION' ? 'Area' : 'Balanced');
+
             tr.innerHTML = `
                 <td><strong>${d.district_name}</strong></td>
                 <td>${d.historical_tonnes.toLocaleString()} t</td>
                 <td><strong>${d.forecast_tonnes.toLocaleString()} t</strong></td>
                 <td style="color: ${color}; font-weight: 700;">${sign}${d.difference_tonnes.toLocaleString()} t</td>
+                <td><span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">${driverShort}</span></td>
             `;
             tbody.appendChild(tr);
         });
     }
 }
+
+function renderMLProductionDecomposition(data) {
+    if (!data.production_decomposition || !data.production_decomposition.forecast) return;
+
+    const decomp = data.production_decomposition.forecast;
+
+    const yieldEffectEl = document.getElementById('mlDecompYieldEffect');
+    const yieldShareEl = document.getElementById('mlDecompYieldShare');
+    const areaEffectEl = document.getElementById('mlDecompAreaEffect');
+    const areaShareEl = document.getElementById('mlDecompAreaShare');
+    const interactionEffectEl = document.getElementById('mlDecompInteractionEffect');
+    const interactionShareEl = document.getElementById('mlDecompInteractionShare');
+    const badgeEl = document.getElementById('mlDecompPrimaryBadge');
+    const narrativeEl = document.getElementById('mlDecompNarrative');
+
+    const fmtSign = (val) => (val >= 0 ? `+${val.toLocaleString()}` : `${val.toLocaleString()}`);
+
+    if (yieldEffectEl) yieldEffectEl.textContent = `${fmtSign(decomp.yield_effect_tonnes)} MT`;
+    if (yieldShareEl) yieldShareEl.textContent = `${decomp.intensification_share_pct}%`;
+
+    if (areaEffectEl) areaEffectEl.textContent = `${fmtSign(decomp.area_effect_tonnes)} MT`;
+    if (areaShareEl) areaShareEl.textContent = `${decomp.extensification_share_pct}%`;
+
+    if (interactionEffectEl) interactionEffectEl.textContent = `${fmtSign(decomp.interaction_effect_tonnes)} MT`;
+    if (interactionShareEl) interactionShareEl.textContent = `${decomp.interaction_share_pct}%`;
+
+    if (badgeEl) {
+        badgeEl.textContent = decomp.primary_driver_label;
+        if (decomp.primary_driver === 'YIELD_INTENSIFICATION') {
+            badgeEl.style.background = '#ECFDF5';
+            badgeEl.style.color = '#065F46';
+            badgeEl.style.borderColor = '#A7F3D0';
+        } else if (decomp.primary_driver === 'LAND_EXTENSIFICATION') {
+            badgeEl.style.background = '#EFF6FF';
+            badgeEl.style.color = '#1E40AF';
+            badgeEl.style.borderColor = '#BFDBFE';
+        } else {
+            badgeEl.style.background = '#F8FAFC';
+            badgeEl.style.color = '#334155';
+            badgeEl.style.borderColor = '#CBD5E1';
+        }
+    }
+
+    if (narrativeEl && decomp.narrative) {
+        narrativeEl.textContent = decomp.narrative;
+    }
+}
+

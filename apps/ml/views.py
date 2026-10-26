@@ -254,3 +254,30 @@ class TrainModelsAPIView(APIView):
                 {'status': 'FAILED', 'error': str(exc)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class DistrictVulnerabilityAPIView(APIView):
+    """
+    GET /api/v1/ml/vulnerability/
+    Returns multi-criteria District Agricultural Vulnerability Index (AVI) scores,
+    component breakdowns (yield gap, post-harvest loss, input deficit, price volatility),
+    and operational intervention tiers for all 30 districts in Rwanda.
+    """
+    permission_classes = [CanViewML]
+
+    def get(self, request):
+        try:
+            year = int(request.GET.get('year', 2025))
+        except (ValueError, TypeError):
+            year = 2025
+        season = request.GET.get('season', 'A').strip().upper()
+        refresh = request.GET.get('refresh', 'false').lower() == 'true'
+
+        from apps.decision_support.services.vulnerability import AgriculturalVulnerabilityService
+        data = AgriculturalVulnerabilityService.compute_all_districts(
+            year=year,
+            season=season,
+            use_cache=not refresh
+        )
+        return Response(data, status=status.HTTP_200_OK)
+

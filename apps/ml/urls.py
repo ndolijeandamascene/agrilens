@@ -13,8 +13,9 @@ urlpatterns = [
     path('predict-yield/', views.PredictYieldAPIView.as_view(), name='predict_yield'),
     path('simulate-scenario/', views.SimulateScenarioAPIView.as_view(), name='simulate_scenario'),
 
-    # Spatial District Clustering
+    # Spatial District Clustering & Vulnerability Index
     path('district-clusters/', views.DistrictClustersAPIView.as_view(), name='district_clusters'),
+    path('vulnerability/', views.DistrictVulnerabilityAPIView.as_view(), name='district_vulnerability'),
 
     # Seasonal Forecasting
     path('forecast/', views.ProductionForecastAPIView.as_view(), name='production_forecast'),

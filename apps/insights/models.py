@@ -124,6 +124,18 @@ class AgriculturalInsight(models.Model):
     absolute_change = models.DecimalField(max_digits=14, decimal_places=2, null=True, blank=True)
     percentage_change = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     direction = models.CharField(max_length=25, choices=Direction.choices, default=Direction.STABLE)
+    p_value = models.DecimalField(
+        max_digits=7,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Two-tailed p-value from survey-weighted hypothesis test"
+    )
+    is_statistically_significant = models.BooleanField(
+        default=True,
+        db_index=True,
+        help_text="True if p-value < 0.05 or sufficient statistical confidence"
+    )
 
     # Data provenance and quality
     source = models.CharField(max_length=120, default='NISR Seasonal Agricultural Survey (SAS)')

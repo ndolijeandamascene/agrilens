@@ -15,4 +15,5 @@ urlpatterns = [
     path('generate/', views.generate_recommendations_action, name='generate'),
     path('export/csv/', views.recommendation_export_csv, name='recommendation_export_csv'),
     path('export/excel/', views.recommendation_export_excel, name='recommendation_export_excel'),
+    path('api/vulnerability/', views.district_vulnerability_api, name='api_vulnerability'),
 ]

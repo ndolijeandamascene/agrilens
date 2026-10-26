@@ -131,7 +131,28 @@ class ProductionForecastingService:
                 'message': f"Stable production profile (+{yoy_change}% YoY). Output expected to track seasonal consumption requirements.",
             }
 
-        # Top district forecasts
+        # Structural Yield-Area Production Decomposition
+        forecast_decomp = cls.compute_production_decomposition(
+            baseline_prod_tonnes=latest_prod,
+            target_prod_tonnes=projected_prod,
+            baseline_area_ha=latest_area,
+            target_area_ha=projected_area,
+            baseline_yield_tha=latest_yield,
+            target_yield_tha=projected_yield,
+        )
+
+        historical_decomp = None
+        if len(history) > 1:
+            historical_decomp = cls.compute_production_decomposition(
+                baseline_prod_tonnes=prior_prod,
+                target_prod_tonnes=latest_prod,
+                baseline_area_ha=prior_hist['cultivated_area_ha'],
+                target_area_ha=latest_area,
+                baseline_yield_tha=prior_hist['avg_yield_tha'],
+                target_yield_tha=latest_yield,
+            )
+
+        # Top district forecasts with localized decomposition
         district_breakdown = cls._get_district_forecast_breakdown(crop_name, damped_growth)
 
         return {
@@ -144,19 +165,111 @@ class ProductionForecastingService:
             'projected_yield_tha': projected_yield,
             'yoy_change_percentage': yoy_change,
             'early_warning': early_warning,
+            'production_decomposition': {
+                'forecast': forecast_decomp,
+                'historical': historical_decomp,
+            },
             'district_breakdown': district_breakdown,
             'model_info': {
                 'model_name': 'AgriLens Multi-Season Trend & Input Extrapolator',
-                'version': 'v1.0',
+                'version': 'v2.0-structural-decomp',
                 'baseline_periods': [h['period'] for h in history],
-                'methodology': 'Survey-weighted multi-season area trend regression with input adoption dampening',
+                'methodology': 'Survey-weighted multi-season area trend regression with structural yield-area decomposition',
             },
             'disclaimer': MANDATORY_FORECAST_DISCLAIMER,
         }
 
+    @staticmethod
+    def compute_production_decomposition(
+        baseline_prod_tonnes: float,
+        target_prod_tonnes: float,
+        baseline_area_ha: float,
+        target_area_ha: float,
+        baseline_yield_tha: float,
+        target_yield_tha: float,
+    ) -> Dict[str, Any]:
+        """
+        Decomposes total harvest production changes into three strictly additive components:
+        ΔP = P1 - P0 = Y0 * ΔA (Extensification) + A0 * ΔY (Intensification) + ΔA * ΔY (Interaction)
+        """
+        delta_p = round(target_prod_tonnes - baseline_prod_tonnes, 2)
+        delta_a = round(target_area_ha - baseline_area_ha, 2)
+        delta_y = round(target_yield_tha - baseline_yield_tha, 4)
+
+        area_effect = round(baseline_yield_tha * delta_a, 2)
+        yield_effect = round(baseline_area_ha * delta_y, 2)
+        interaction_effect = round(delta_a * delta_y, 2)
+
+        abs_delta_p = abs(delta_p)
+        if abs_delta_p > 0.0001:
+            extensification_share = round((area_effect / delta_p) * 100.0, 1)
+            intensification_share = round((yield_effect / delta_p) * 100.0, 1)
+            interaction_share = round((interaction_effect / delta_p) * 100.0, 1)
+        else:
+            extensification_share = 0.0
+            intensification_share = 0.0
+            interaction_share = 0.0
+
+        if abs(yield_effect) > abs(area_effect):
+            primary_driver = "YIELD_INTENSIFICATION"
+            primary_driver_label = "Yield Intensification"
+        elif abs(area_effect) > abs(yield_effect):
+            primary_driver = "LAND_EXTENSIFICATION"
+            primary_driver_label = "Land Extensification"
+        else:
+            primary_driver = "BALANCED"
+            primary_driver_label = "Balanced Growth"
+
+        if delta_p > 0:
+            if primary_driver == "YIELD_INTENSIFICATION":
+                narrative = (
+                    f"Production expansion (+{delta_p:,.1f} MT) is driven primarily by yield intensification "
+                    f"(+{yield_effect:,.1f} MT, {intensification_share}% of growth), reflecting enhanced per-hectare "
+                    "efficiency rather than clearing additional agricultural land."
+                )
+            elif primary_driver == "LAND_EXTENSIFICATION":
+                narrative = (
+                    f"Production expansion (+{delta_p:,.1f} MT) is driven primarily by land extensification "
+                    f"(+{area_effect:,.1f} MT, {extensification_share}% of growth), indicating harvest gains "
+                    "came from expanding planted acreage."
+                )
+            else:
+                narrative = (
+                    f"Production expansion (+{delta_p:,.1f} MT) reflects balanced contributions from both acreage "
+                    "expansion and per-hectare yield improvements."
+                )
+        elif delta_p < 0:
+            if primary_driver == "YIELD_INTENSIFICATION":
+                narrative = (
+                    f"Production contraction ({delta_p:,.1f} MT) stems predominantly from declining crop yields "
+                    f"({yield_effect:,.1f} MT impact), pointing to weather shocks or reduced input intensity."
+                )
+            else:
+                narrative = (
+                    f"Production contraction ({delta_p:,.1f} MT) stems predominantly from reduced cultivated area "
+                    f"({area_effect:,.1f} MT impact), indicating farmland reduction or crop switching."
+                )
+        else:
+            narrative = "Production level remains unchanged between periods."
+
+        return {
+            'delta_production_tonnes': delta_p,
+            'delta_area_ha': delta_a,
+            'delta_yield_tha': delta_y,
+            'area_effect_tonnes': area_effect,
+            'yield_effect_tonnes': yield_effect,
+            'interaction_effect_tonnes': interaction_effect,
+            'extensification_share_pct': extensification_share,
+            'intensification_share_pct': intensification_share,
+            'interaction_share_pct': interaction_share,
+            'primary_driver': primary_driver,
+            'primary_driver_label': primary_driver_label,
+            'narrative': narrative,
+        }
+
     @classmethod
     def _get_district_forecast_breakdown(cls, crop_name: str, growth_rate: float) -> List[Dict[str, Any]]:
-        """Projects top 8 producer districts for the targeted crop."""
+        """Projects top 8 producer districts for the targeted crop with structural decomposition."""
         qs = ValidatedObservation.objects.filter(
             provenance__startswith='NISR_',
             season__year=2025,
@@ -176,13 +289,32 @@ class ProductionForecastingService:
         districts = []
         for r in aggs:
             p_hist = float(r['prod_kg'] or 0.0) / 1000.0
+            a_hist = float(r['area_ha'] or 0.0)
+            y_hist = round((p_hist / a_hist), 2) if a_hist > 0 else 0.0
+
             p_fore = round(p_hist * (1.0 + growth_rate), 1)
+            a_fore = round(a_hist * (1.0 + growth_rate * 0.5), 1)
+            y_fore = round((p_fore / a_fore), 2) if a_fore > 0 else y_hist
+
+            decomp = cls.compute_production_decomposition(
+                baseline_prod_tonnes=p_hist,
+                target_prod_tonnes=p_fore,
+                baseline_area_ha=a_hist,
+                target_area_ha=a_fore,
+                baseline_yield_tha=y_hist,
+                target_yield_tha=y_fore,
+            )
+
             districts.append({
                 'district_name': r['district__name'],
                 'province_name': r['district__province__name'],
                 'historical_tonnes': round(p_hist, 1),
                 'forecast_tonnes': p_fore,
                 'difference_tonnes': round(p_fore - p_hist, 1),
+                'extensification_tonnes': decomp['area_effect_tonnes'],
+                'intensification_tonnes': decomp['yield_effect_tonnes'],
+                'primary_driver': decomp['primary_driver'],
+                'primary_driver_label': decomp['primary_driver_label'],
             })
         return districts
 

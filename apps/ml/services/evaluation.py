@@ -72,3 +72,99 @@ class ModelEvaluationService:
             'baseline_r2': float(r2_score(y_test, preds)),
         }
 
+    @classmethod
+    def evaluate_spatial_holdout(
+        cls,
+        pipeline_builder_fn,
+        df,
+        feature_cols: list,
+        target_col: str,
+        district_col: str = 'district',
+        sample_weight_col: str = 'sampling_weight',
+        max_districts: int = 10
+    ):
+        """
+        Executes Leave-One-District-Out (LODO) Spatial Cross-Validation.
+        Iteratively trains on N-1 districts and measures out-of-fold error on the held-out district.
+        """
+        districts = sorted(df[district_col].unique())
+        if max_districts and len(districts) > max_districts:
+            # Select top districts by sample count for computational efficiency
+            top_districts = df[district_col].value_counts().index[:max_districts].tolist()
+            eval_districts = sorted(top_districts)
+        else:
+            eval_districts = districts
+
+        district_results = []
+        spatial_maes = []
+        spatial_rmses = []
+
+        for target_dist in eval_districts:
+            train_mask = df[district_col] != target_dist
+            test_mask = df[district_col] == target_dist
+
+            train_df = df[train_mask]
+            test_df = df[test_mask]
+
+            if len(test_df) < 5 or len(train_df) < 20:
+                continue
+
+            try:
+                pipeline = pipeline_builder_fn()
+                weights = train_df[sample_weight_col].values if sample_weight_col in train_df.columns else None
+
+                if weights is not None:
+                    pipeline.fit(train_df[feature_cols], train_df[target_col], regressor__sample_weight=weights)
+                else:
+                    pipeline.fit(train_df[feature_cols], train_df[target_col])
+
+                preds = pipeline.predict(test_df[feature_cols])
+                y_true = test_df[target_col].values
+
+                d_mae = float(mean_absolute_error(y_true, preds))
+                d_rmse = float(np.sqrt(mean_squared_error(y_true, preds)))
+                spatial_maes.append(d_mae)
+                spatial_rmses.append(d_rmse)
+
+                district_results.append({
+                    'district': str(target_dist),
+                    'test_samples': int(len(test_df)),
+                    'mae_kg_per_ha': round(d_mae, 1),
+                    'rmse_kg_per_ha': round(d_rmse, 1),
+                    'mean_actual_yield': round(float(np.mean(y_true)), 1),
+                    'mean_predicted_yield': round(float(np.mean(preds)), 1),
+                })
+            except Exception:
+                continue
+
+        if not spatial_maes:
+            return {
+                'method': 'Leave-One-District-Out Spatial Cross-Validation (LODO-CV)',
+                'total_districts_evaluated': 0,
+                'mean_spatial_mae': None,
+                'spatial_generalization_note': 'Insufficient district sample splits for spatial holdout.',
+            }
+
+        mean_mae = float(np.mean(spatial_maes))
+        std_mae = float(np.std(spatial_maes))
+
+        # Best and worst generalizing districts
+        sorted_d = sorted(district_results, key=lambda x: x['mae_kg_per_ha'])
+
+        return {
+            'method': 'Leave-One-District-Out Spatial Cross-Validation (LODO-CV)',
+            'total_districts_evaluated': len(district_results),
+            'mean_spatial_mae': round(mean_mae, 1),
+            'spatial_mae_std': round(std_mae, 1),
+            'mean_spatial_rmse': round(float(np.mean(spatial_rmses)), 1),
+            'best_generalizing_district': sorted_d[0]['district'] if sorted_d else None,
+            'most_challenging_district': sorted_d[-1]['district'] if sorted_d else None,
+            'district_breakdown': district_results,
+            'spatial_generalization_note': (
+                f"LODO-CV evaluated across {len(district_results)} districts. "
+                f"Average cross-district prediction error is {mean_mae:,.0f} kg/ha (std: {std_mae:,.0f} kg/ha). "
+                f"Lowest error observed in {sorted_d[0]['district']}, highest error in {sorted_d[-1]['district']}."
+            ) if sorted_d else "Spatial CV completed.",
+        }
+
+

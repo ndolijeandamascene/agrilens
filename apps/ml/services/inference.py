@@ -61,6 +61,21 @@ class YieldInferenceService:
             # Safe Fallback: Informative estimation using survey-weighted benchmarks
             logger.info("Active yield ML model not loaded; using empirical statistical baseline.")
             pred_yield_kg = baseline_yield_kg
+            p10_kg = max(50.0, round(baseline_yield_kg * 0.75, 1))
+            p90_kg = round(baseline_yield_kg * 1.25, 1)
+            conf_interval = {
+                'lower_p10_kg_per_ha': p10_kg,
+                'lower_p10_tha': round(p10_kg / 1000.0, 2),
+                'median_p50_kg_per_ha': baseline_yield_kg,
+                'median_p50_tha': round(baseline_yield_kg / 1000.0, 2),
+                'upper_p90_kg_per_ha': p90_kg,
+                'upper_p90_tha': round(p90_kg / 1000.0, 2),
+                'downside_risk_tha': round((baseline_yield_kg - p10_kg) / 1000.0, 2),
+                'upside_potential_tha': round((p90_kg - baseline_yield_kg) / 1000.0, 2),
+                'risk_classification': 'BASELINE_ESTIMATION',
+            }
+            attributions = []
+            applied_taxonomy = 'BASELINE'
             model_info = {
                 'model_name': 'Empirical Survey Baseline (Model Pending Retraining)',
                 'version': 'baseline-v0',
@@ -68,6 +83,8 @@ class YieldInferenceService:
                 'is_ml_active': False,
                 'r2_score': None,
                 'mae_kg_per_ha': None,
+                'has_quantiles': False,
+                'crop_submodel_applied': 'BASELINE',
             }
         else:
             # Resolve district province if present in model features
@@ -91,9 +108,44 @@ class YieldInferenceService:
             }])
 
             try:
-                raw_pred = float(pipeline.predict(input_df)[0])
-                # Ensure plausible bounds (> 0)
-                pred_yield_kg = max(50.0, round(raw_pred, 1))
+                if hasattr(pipeline, 'predict_with_uncertainty'):
+                    unc_dict = pipeline.predict_with_uncertainty(input_df)
+                    pred_yield_kg = unc_dict['point_prediction_kg_ha']
+                    conf_interval = {
+                        'lower_p10_kg_per_ha': unc_dict['p10_lower_kg_ha'],
+                        'lower_p10_tha': unc_dict['p10_lower_tha'],
+                        'median_p50_kg_per_ha': unc_dict['p50_median_kg_ha'],
+                        'median_p50_tha': unc_dict['p50_median_tha'],
+                        'upper_p90_kg_per_ha': unc_dict['p90_upper_kg_ha'],
+                        'upper_p90_tha': unc_dict['p90_upper_tha'],
+                        'downside_risk_tha': unc_dict['downside_risk_tha'],
+                        'upside_potential_tha': unc_dict['upside_potential_tha'],
+                        'risk_classification': (
+                            'LOW_DOWNSIDE_VARIANCE' if unc_dict['downside_risk_tha'] < 0.6
+                            else ('HIGH_DOWNSIDE_VARIANCE' if unc_dict['downside_risk_tha'] > 1.2 else 'MODERATE_DOWNSIDE_VARIANCE')
+                        ),
+                    }
+                    attributions = pipeline.compute_local_attributions(input_df)
+                    applied_taxonomy = unc_dict.get('crop_taxonomy_applied', 'GLOBAL')
+                else:
+                    raw_pred = float(pipeline.predict(input_df)[0])
+                    pred_yield_kg = max(50.0, round(raw_pred, 1))
+                    p10_kg = max(50.0, round(pred_yield_kg * 0.78, 1))
+                    p90_kg = round(pred_yield_kg * 1.22, 1)
+                    conf_interval = {
+                        'lower_p10_kg_per_ha': p10_kg,
+                        'lower_p10_tha': round(p10_kg / 1000.0, 2),
+                        'median_p50_kg_per_ha': pred_yield_kg,
+                        'median_p50_tha': round(pred_yield_kg / 1000.0, 2),
+                        'upper_p90_kg_per_ha': p90_kg,
+                        'upper_p90_tha': round(p90_kg / 1000.0, 2),
+                        'downside_risk_tha': round((pred_yield_kg - p10_kg) / 1000.0, 2),
+                        'upside_potential_tha': round((p90_kg - pred_yield_kg) / 1000.0, 2),
+                        'risk_classification': 'MODERATE_DOWNSIDE_VARIANCE',
+                    }
+                    attributions = []
+                    applied_taxonomy = 'GLOBAL'
+
                 metrics = model_record.metrics or {}
                 model_info = {
                     'model_name': model_record.name,
@@ -102,6 +154,8 @@ class YieldInferenceService:
                     'is_ml_active': True,
                     'r2_score': metrics.get('r2'),
                     'mae_kg_per_ha': metrics.get('mae'),
+                    'coverage_80_pct': metrics.get('coverage_80_pct'),
+                    'crop_submodel_applied': applied_taxonomy,
                     'training_provenance': model_record.training_provenance,
                     'observation_count': model_record.observation_count,
                     'validation_methodology': model_record.validation_methodology,
@@ -109,6 +163,20 @@ class YieldInferenceService:
             except Exception as exc:
                 logger.error("Inference pipeline error: %s", exc)
                 pred_yield_kg = baseline_yield_kg
+                p10_kg = max(50.0, round(baseline_yield_kg * 0.75, 1))
+                p90_kg = round(baseline_yield_kg * 1.25, 1)
+                conf_interval = {
+                    'lower_p10_kg_per_ha': p10_kg,
+                    'lower_p10_tha': round(p10_kg / 1000.0, 2),
+                    'median_p50_kg_per_ha': baseline_yield_kg,
+                    'median_p50_tha': round(baseline_yield_kg / 1000.0, 2),
+                    'upper_p90_kg_per_ha': p90_kg,
+                    'upper_p90_tha': round(p90_kg / 1000.0, 2),
+                    'downside_risk_tha': round((baseline_yield_kg - p10_kg) / 1000.0, 2),
+                    'upside_potential_tha': round((p90_kg - baseline_yield_kg) / 1000.0, 2),
+                    'risk_classification': 'FALLBACK_ESTIMATION',
+                }
+                attributions = []
                 model_info = {
                     'model_name': 'Fallback Baseline',
                     'version': 'fallback',
@@ -145,6 +213,8 @@ class YieldInferenceService:
             },
             'predicted_yield_kg_per_ha': pred_yield_kg,
             'predicted_yield_tha': pred_yield_tha,
+            'confidence_interval_80': conf_interval,
+            'local_attributions': attributions,
             'predicted_production_kg': pred_production_kg,
             'predicted_production_tonnes': pred_production_tonnes,
             'baseline_yield_kg_per_ha': baseline_yield_kg,

@@ -27,6 +27,9 @@ class TestMLPredictionAPIs:
         data = response.json()
         assert 'predicted_yield_kg_per_ha' in data
         assert 'predicted_yield_tha' in data
+        assert 'confidence_interval_80' in data
+        assert 'local_attributions' in data
+        assert data['confidence_interval_80']['lower_p10_tha'] <= data['confidence_interval_80']['upper_p90_tha']
         assert 'predicted_production_tonnes' in data
         assert 'baseline_comparison' in data
         assert 'disclaimer' in data

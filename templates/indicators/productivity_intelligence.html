@@ -1258,6 +1258,7 @@
                         <select class="filter-select" id="map-layer-mode-select" onchange="setMapLayerMode(this.value)" style="font-weight: 700; color: #047857;">
                             <option value="yield" selected>Historical Yield (t/ha)</option>
                             <option value="typology">Agro-Ecological Typology (ML)</option>
+                            <option value="vulnerability">Agricultural Vulnerability (AVI)</option>
                         </select>
                     </div>
                     <div class="filter-field">
@@ -1305,6 +1306,12 @@
                         <div class="legend-entry"><span class="legend-color-box" style="background: #2563EB;"></span> Semi-Arid Fertilizer-Constrained Plains</div>
                         <div class="legend-entry"><span class="legend-color-box" style="background: #D97706;"></span> Highlands Erosion &amp; Cold-Slope Typology</div>
                         <div class="legend-entry"><span class="legend-color-box" style="background: #7C3AED;"></span> Acidic Uplands Soil-Deficit Zone</div>
+                    </div>
+                    <div id="dashboard-avi-legend-entries" style="display: none;">
+                        <div class="legend-entry"><span class="legend-color-box" style="background: #DC2626;"></span> Critical Risk (&ge; 70)</div>
+                        <div class="legend-entry"><span class="legend-color-box" style="background: #F97316;"></span> Elevated Risk (50 &ndash; 70)</div>
+                        <div class="legend-entry"><span class="legend-color-box" style="background: #EAB308;"></span> Moderate Monitoring (30 &ndash; 50)</div>
+                        <div class="legend-entry"><span class="legend-color-box" style="background: #16A34A;"></span> Resilient Surplus (&lt; 30)</div>
                     </div>
                 </div>
 
@@ -2050,7 +2057,13 @@ function showDarkHoverPopup(latlng, dName) {
     const yieldVal = (d && d.yieldTha > 0) ? Number(d.yieldTha).toFixed(1) : (dName === 'Nyabihu' ? '3.6' : '2.6');
     let contentHtml = `<div class='nyabihu-badge-title'>${dName} District</div><div class='nyabihu-badge-yield'>Yield: ${yieldVal} t/ha</div>`;
 
-    if (typeof isTypologyMapActive !== 'undefined' && isTypologyMapActive && typeof liveDistrictTypologies !== 'undefined' && liveDistrictTypologies[dName]) {
+    if (typeof currentMapLayerMode !== 'undefined' && currentMapLayerMode === 'vulnerability' && typeof liveDistrictVulnerabilities !== 'undefined' && liveDistrictVulnerabilities[dName]) {
+        const v = liveDistrictVulnerabilities[dName];
+        contentHtml = `<div class='nyabihu-badge-title'>${dName} District</div>
+        <div style='font-size:11px;font-weight:700;color:${v.color};margin-top:2px;'>AVI: ${v.avi_score} (${v.risk_tier_label})</div>
+        <div style='font-size:10px;color:#CBD5E1;margin-top:2px;'>Yield Gap: ${v.components.yield_gap_index}% &bull; Loss: ${v.components.loss_rate_pct}%</div>
+        <div style='font-size:10px;color:#38BDF8;margin-top:2px;'>Action: ${v.recommended_action.substring(0, 75)}...</div>`;
+    } else if (typeof isTypologyMapActive !== 'undefined' && isTypologyMapActive && typeof liveDistrictTypologies !== 'undefined' && liveDistrictTypologies[dName]) {
         const t = liveDistrictTypologies[dName];
         contentHtml = `<div class='nyabihu-badge-title'>${dName} District</div>
         <div style='font-size:11px;font-weight:700;color:${t.style.fillColor};margin-top:2px;'>${t.cluster_name}</div>
@@ -2098,7 +2111,9 @@ function selectDistrict(dName, center) {
             const name = layer.feature.properties.shapeName || '';
             const isSelected = (name.toLowerCase() === dName.toLowerCase());
             let fillColor = getDistrictChoroplethColor(name);
-            if (typeof isTypologyMapActive !== 'undefined' && isTypologyMapActive && typeof liveDistrictTypologies !== 'undefined' && liveDistrictTypologies[name]) {
+            if (typeof currentMapLayerMode !== 'undefined' && currentMapLayerMode === 'vulnerability' && typeof liveDistrictVulnerabilities !== 'undefined' && liveDistrictVulnerabilities[name]) {
+                fillColor = liveDistrictVulnerabilities[name].color;
+            } else if (typeof isTypologyMapActive !== 'undefined' && isTypologyMapActive && typeof liveDistrictTypologies !== 'undefined' && liveDistrictTypologies[name]) {
                 fillColor = liveDistrictTypologies[name].style.fillColor;
             }
             layer.setStyle({

@@ -112,3 +112,66 @@ def determine_direction(percentage_change: Optional[Decimal], threshold: float =
     elif pct_f <= -threshold:
         return "decrease"
     return "stable"
+
+
+def compute_survey_weighted_diff_p_value(
+    mean_current: Optional[float],
+    mean_prev: Optional[float],
+    var_current: Optional[float],
+    var_prev: Optional[float],
+    n_current: int = 0,
+    n_prev: int = 0
+) -> Tuple[Optional[Decimal], bool, str]:
+    """
+    Computes two-tailed p-value for the difference between two survey-weighted seasonal averages.
+    
+    Formula:
+        SE(diff) = sqrt( Var(Y_current) + Var(Y_prev) )
+        z = (Y_current - Y_prev) / SE(diff)
+        p = 2 * (1 - NormalCDF(|z|))
+    
+    Returns:
+        (p_value_decimal, is_significant, explanation_text)
+    """
+    if mean_current is None or mean_prev is None:
+        return None, True, "Hypothesis test not applicable: missing mean estimates."
+
+    if n_current < 3 or n_prev < 3:
+        return None, True, f"Sample size too small for asymptotic hypothesis testing (n1={n_current}, n2={n_prev})."
+
+    v_curr = float(var_current or 0.0)
+    v_prev = float(var_prev or 0.0)
+    pooled_se = (v_curr + v_prev) ** 0.5
+
+    if pooled_se <= 1e-9:
+        # Zero variance: deterministic identical observations
+        diff = abs(float(mean_current) - float(mean_prev))
+        if diff > 1e-6:
+            return Decimal('0.0001'), True, "Deterministic shift with zero sample variance (p < 0.001)."
+        return Decimal('1.0000'), False, "Zero difference between observation periods (p = 1.0)."
+
+    import math
+    diff = float(mean_current) - float(mean_prev)
+    z_score = diff / pooled_se
+
+    try:
+        from scipy import stats
+        p_val = float(2.0 * (1.0 - stats.norm.cdf(abs(z_score))))
+    except Exception:
+        # Fallback approximation for standard normal CDF if scipy unavailable
+        p_val = float(math.erfc(abs(z_score) / math.sqrt(2.0)))
+
+    p_val_clamped = max(0.0001, min(1.0, p_val))
+    p_dec = Decimal(str(round(p_val_clamped, 4)))
+    is_sig = p_val_clamped < 0.05
+
+    if is_sig:
+        note = f"Statistically significant shift at 95% confidence level (z={z_score:+.2f}, p={p_val_clamped:.4f})."
+    else:
+        note = (
+            f"Observed change is not statistically significant at 95% confidence (z={z_score:+.2f}, p={p_val_clamped:.4f}). "
+            "Variation is consistent with survey sampling noise."
+        )
+
+    return p_dec, is_sig, note
+

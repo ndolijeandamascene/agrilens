@@ -27,8 +27,10 @@ urlpatterns = [
     path('decision-support/', include('apps.decision_support.urls', namespace='decision_support')),
     path('notifications/', include('apps.notifications.urls', namespace='notifications')),
     path('insights/', include('apps.insights.urls', namespace='insights')),
+    path('assistant/', include('apps.assistant.urls', namespace='assistant')),
     path('api/', include('apps.api.urls', namespace='api')),
     path('api/v1/ml/', include('apps.ml.urls', namespace='ml')),
+    path('api/v1/assistant/', include('apps.assistant.urls')),
 ]
 
 if settings.DEBUG:

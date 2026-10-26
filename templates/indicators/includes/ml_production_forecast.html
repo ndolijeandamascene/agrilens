@@ -72,6 +72,7 @@
                                 <th>2025A Actual</th>
                                 <th>2026A Forecast</th>
                                 <th>Net Change</th>
+                                <th>Growth Driver</th>
                             </tr>
                         </thead>
                         <tbody id="mlDistrictForecastBody">
@@ -79,25 +80,98 @@
                                 <td><strong>Nyagatare</strong></td>
                                 <td>18,400 t</td>
                                 <td><strong>19,800 t</strong></td>
-                                <td style="color: #059669; font-weight: 700;">+7.6%</td>
+                                <td style="color: #059669; font-weight: 700;">+1,400 t</td>
+                                <td><span style="background: #ECFDF5; color: #047857; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">Yield</span></td>
                             </tr>
                             <tr>
                                 <td><strong>Gatsibo</strong></td>
                                 <td>14,200 t</td>
                                 <td><strong>15,100 t</strong></td>
-                                <td style="color: #059669; font-weight: 700;">+6.3%</td>
+                                <td style="color: #059669; font-weight: 700;">+900 t</td>
+                                <td><span style="background: #ECFDF5; color: #047857; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">Yield</span></td>
                             </tr>
                             <tr>
                                 <td><strong>Musanze</strong></td>
                                 <td>12,500 t</td>
                                 <td><strong>13,200 t</strong></td>
-                                <td style="color: #059669; font-weight: 700;">+5.6%</td>
+                                <td style="color: #059669; font-weight: 700;">+700 t</td>
+                                <td><span style="background: #EFF6FF; color: #1D4ED8; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">Area</span></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- Structural Yield-Area Production Decomposition (Task 3.1) -->
+    <div id="mlDecompositionSection" style="margin-top: 14px; padding-top: 14px; border-top: 1px dashed #E2E8F0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 11.5px; font-weight: 800; color: #0F172A; text-transform: uppercase; letter-spacing: 0.05em;">
+                    <i class="fa-solid fa-layer-group" style="color: #059669;"></i> Structural Yield-Area Production Decomposition
+                </span>
+                <span id="mlDecompPrimaryBadge" style="background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 12px;">
+                    Yield Intensification (Productivity Led)
+                </span>
+            </div>
+            <span style="font-size: 10px; color: #64748B;">
+                Mathematical Identity: &Delta;P = Y<sub>0</sub>&Delta;A + A<sub>0</sub>&Delta;Y + &Delta;A&Delta;Y
+            </span>
+        </div>
+
+        <!-- Decomposition Split Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 10px;">
+            <!-- Yield Intensification Card -->
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-left: 4px solid #059669; border-radius: 6px; padding: 10px 12px;">
+                <div style="font-size: 10px; font-weight: 700; color: #64748B; text-transform: uppercase;">
+                    Yield Intensification Effect (A<sub>0</sub> &bull; &Delta;Y)
+                </div>
+                <div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 4px;">
+                    <span id="mlDecompYieldEffect" style="font-size: 15px; font-weight: 800; color: #065F46;">-- MT</span>
+                    <span id="mlDecompYieldShare" style="font-size: 11.5px; font-weight: 700; color: #059669;">--%</span>
+                </div>
+                <div style="font-size: 10px; color: #64748B; margin-top: 2px;">
+                    Output change from per-hectare productivity
+                </div>
+            </div>
+
+            <!-- Land Extensification Card -->
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-left: 4px solid #0284C7; border-radius: 6px; padding: 10px 12px;">
+                <div style="font-size: 10px; font-weight: 700; color: #64748B; text-transform: uppercase;">
+                    Land Extensification Effect (Y<sub>0</sub> &bull; &Delta;A)
+                </div>
+                <div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 4px;">
+                    <span id="mlDecompAreaEffect" style="font-size: 15px; font-weight: 800; color: #0369A1;">-- MT</span>
+                    <span id="mlDecompAreaShare" style="font-size: 11.5px; font-weight: 700; color: #0284C7;">--%</span>
+                </div>
+                <div style="font-size: 10px; color: #64748B; margin-top: 2px;">
+                    Output change from planted area shifts
+                </div>
+            </div>
+
+            <!-- Interaction Card -->
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-left: 4px solid #64748B; border-radius: 6px; padding: 10px 12px;">
+                <div style="font-size: 10px; font-weight: 700; color: #64748B; text-transform: uppercase;">
+                    Interaction Effect (&Delta;A &bull; &Delta;Y)
+                </div>
+                <div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 4px;">
+                    <span id="mlDecompInteractionEffect" style="font-size: 15px; font-weight: 800; color: #334155;">-- MT</span>
+                    <span id="mlDecompInteractionShare" style="font-size: 11.5px; font-weight: 700; color: #64748B;">--%</span>
+                </div>
+                <div style="font-size: 10px; color: #64748B; margin-top: 2px;">
+                    Simultaneous area &amp; yield change interaction
+                </div>
+            </div>
+        </div>
+
+        <!-- Narrative Explanation -->
+        <div style="background: #F1F5F9; border-radius: 6px; padding: 8px 12px; font-size: 11px; color: #334155; line-height: 1.4;">
+            <i class="fa-solid fa-circle-info" style="color: #0284C7; margin-right: 4px;"></i>
+            <span id="mlDecompNarrative">
+                Decomposing production shift into agronomic intensification vs land extensification.
+            </span>
         </div>
     </div>
 </div>

@@ -24,6 +24,7 @@ from apps.insights.services.rules import (
     calculate_absolute_change,
     resolve_comparison_period,
     determine_direction,
+    compute_survey_weighted_diff_p_value,
 )
 
 
@@ -92,23 +93,29 @@ class AgriculturalInsightEngine:
             output_field=DecimalField(max_digits=18, decimal_places=4)
         )
 
+        from django.db.models import StdDev
+
         aggs = qs.annotate(
             weighted_prod=prod_weight,
             weighted_area=area_weight
         ).aggregate(
             sum_prod=Sum('weighted_prod'),
-            sum_area=Sum('weighted_area')
+            sum_area=Sum('weighted_area'),
+            std_yield=StdDev('calculated_yield_kg_per_ha')
         )
 
         sum_prod = float(aggs['sum_prod'] or 0.0)
         sum_area = float(aggs['sum_area'] or 0.0)
+        std_yield = float(aggs['std_yield'] or 0.0)
         weighted_yield = round(sum_prod / sum_area, 2) if sum_area > 0 else 0.0
         prod_mt = round(sum_prod / 1000.0, 2)
         area_ha = round(sum_area, 2)
+        yield_var = (std_yield ** 2) / plot_count if plot_count > 1 else 0.0
 
         return {
             'count': plot_count,
             'yield_kg_ha': weighted_yield,
+            'yield_var': yield_var,
             'production_mt': prod_mt,
             'area_ha': area_ha,
         }
@@ -165,6 +172,13 @@ class AgriculturalInsightEngine:
                 f"3. Verify agro-climatic conditions and post-harvest loss figures reported during {self.current_season}."
             )
 
+            p_val, is_sig, test_note = compute_survey_weighted_diff_p_value(
+                curr['yield_kg_ha'], prev['yield_kg_ha'],
+                curr.get('yield_var'), prev.get('yield_var'),
+                curr['count'], prev['count']
+            )
+            final_quality_notes = f"{quality_notes} | {test_note}" if quality_notes else test_note
+
             fingerprint = self._compute_sha256(
                 AgriculturalInsight.Category.PRODUCTIVITY_CHANGE,
                 crop.id, None, self.current_season.id, self.comparison_season.id, "Crop Yield"
@@ -189,15 +203,22 @@ class AgriculturalInsightEngine:
                     'absolute_change': abs_change,
                     'percentage_change': pct_change,
                     'direction': direction,
+                    'p_value': p_val,
+                    'is_statistically_significant': is_sig,
                     'source': "NISR Seasonal Agricultural Survey (SAS)",
                     'data_quality_status': quality_status,
-                    'data_quality_notes': quality_notes,
+                    'data_quality_notes': final_quality_notes,
                     'sample_size_current': curr['count'],
                     'sample_size_comparison': prev['count'],
                     'investigation_next_steps': next_steps,
                     'evidence_metadata': {
                         'current_stats': curr,
                         'comparison_stats': prev,
+                        'hypothesis_test': {
+                            'p_value': float(p_val) if p_val else None,
+                            'is_significant': is_sig,
+                            'interpretation': test_note,
+                        },
                         'calculation_method': "Survey-weighted ratio estimator: sum(W*Production)/sum(W*Area)",
                     },
                     'status': AgriculturalInsight.Status.PUBLISHED if auto_publish else AgriculturalInsight.Status.GENERATED,
@@ -248,6 +269,13 @@ class AgriculturalInsightEngine:
                     f"3. Verify pest/disease incident logs and irrigation availability in {district.name} marshlands."
                 )
 
+                p_val, is_sig, test_note = compute_survey_weighted_diff_p_value(
+                    curr['yield_kg_ha'], prev['yield_kg_ha'],
+                    curr.get('yield_var'), prev.get('yield_var'),
+                    curr['count'], prev['count']
+                )
+                final_quality_notes = f"{quality_notes} | {test_note}" if quality_notes else test_note
+
                 fingerprint = self._compute_sha256(
                     AgriculturalInsight.Category.PRODUCTIVITY_CHANGE,
                     crop.id, district.id, self.current_season.id, self.comparison_season.id, "Crop Yield"
@@ -272,9 +300,11 @@ class AgriculturalInsightEngine:
                         'absolute_change': abs_change,
                         'percentage_change': pct_change,
                         'direction': direction,
+                        'p_value': p_val,
+                        'is_statistically_significant': is_sig,
                         'source': "NISR Seasonal Agricultural Survey (SAS)",
                         'data_quality_status': quality_status,
-                        'data_quality_notes': quality_notes,
+                        'data_quality_notes': final_quality_notes,
                         'sample_size_current': curr['count'],
                         'sample_size_comparison': prev['count'],
                         'investigation_next_steps': next_steps,
@@ -283,6 +313,11 @@ class AgriculturalInsightEngine:
                             'comparison_stats': prev,
                             'district_name': district.name,
                             'province_name': district.province.name,
+                            'hypothesis_test': {
+                                'p_value': float(p_val) if p_val else None,
+                                'is_significant': is_sig,
+                                'interpretation': test_note,
+                            },
                         },
                         'status': AgriculturalInsight.Status.PUBLISHED if auto_publish else AgriculturalInsight.Status.GENERATED,
                         'published_at': timezone.now() if auto_publish else None,

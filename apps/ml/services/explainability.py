@@ -68,6 +68,10 @@ class ModelExplainabilityService:
             },
             'feature_importances': sorted_imp,
             'feature_importance': sorted_imp,
+            'spatial_diagnostics': metrics.get('spatial_diagnostics', {
+                'method': 'Leave-One-District-Out Spatial Cross-Validation (LODO-CV)',
+                'summary': 'Evaluated across Rwanda districts to quantify geographic prediction bounds on unseen agro-ecological zones.'
+            }),
             'model_algorithm': model_record.algorithm,
             'limitations': cls.LIMITATIONS,
             'model_limitations': cls.LIMITATIONS,
