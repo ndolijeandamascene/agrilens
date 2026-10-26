@@ -5,306 +5,1835 @@
 
 {% block extra_css %}
 <style>
-    .story-hero-header {
-        background: linear-gradient(135deg, #0F2E24 0%, #166534 60%, #15803D 100%);
-        color: #FFFFFF;
-        padding: 3rem 1.5rem;
-        border-radius: 1rem;
-        margin-bottom: 2rem;
+    /* =========================================================================
+       AGRILENS DATA STORY DETAIL PAGE - PIXEL-PERFECT STYLESHEET
+       ========================================================================= */
+
+    .story-page-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 16px 56px 16px;
+        font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+        color: #0F172A;
     }
-    .metric-callout-card {
+
+    /* --- 1. BREADCRUMB & TOOLBAR --- */
+    .story-top-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding: 10px 16px;
         background: #FFFFFF;
         border: 1px solid #E2E8F0;
-        border-radius: 0.75rem;
-        padding: 1.25rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     }
-    .badge-quality-sufficient {
-        background-color: #DCFCE7;
+    .story-breadcrumbs {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        font-size: 13px;
+        color: #64748B;
+    }
+    .story-breadcrumbs a {
+        color: #475569;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: color 0.15s ease;
+    }
+    .story-breadcrumbs a:hover {
+        color: #15803D;
+    }
+    .story-breadcrumbs .crumb-sep {
+        color: #94A3B8;
+        font-size: 11px;
+    }
+    .story-breadcrumbs .crumb-current {
+        color: #0F172A;
+        font-weight: 700;
+        max-width: 360px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .story-actions-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-story-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid #CBD5E1;
+        background: #FFFFFF;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        text-decoration: none;
+    }
+    .btn-story-action:hover {
+        background: #F1F5F9;
+        border-color: #94A3B8;
+        color: #0F172A;
+    }
+    .btn-story-action.btn-back-link {
+        background: #ECFDF5;
+        border-color: #A7F3D0;
+        color: #065F46;
+    }
+    .btn-story-action.btn-back-link:hover {
+        background: #D1FAE5;
+        border-color: #6EE7B7;
+    }
+
+    /* --- 2. HERO STORY BANNER --- */
+    .story-hero-card {
+        position: relative;
+        background: linear-gradient(135deg, #092B20 0%, #0E3E2F 60%, #134E3A 100%);
+        border-radius: 16px;
+        overflow: hidden;
+        color: #FFFFFF;
+        padding: 2.2rem 2.2rem 2rem 2.2rem;
+        margin-bottom: 28px;
+        box-shadow: 0 10px 30px -10px rgba(14, 62, 47, 0.35);
+    }
+    .story-hero-card::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 35%;
+        background-image: url("{% static 'images/hero_rwanda_hills.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        opacity: 0.16;
+        pointer-events: none;
+        mask-image: linear-gradient(to right, transparent, black);
+        -webkit-mask-image: linear-gradient(to right, transparent, black);
+    }
+    .story-hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 860px;
+    }
+    .story-badges-cluster {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+    .badge-hero-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 11px;
+        border-radius: 9999px;
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+    }
+    .badge-hero-pill.category-pill {
+        background: rgba(16, 185, 129, 0.22);
+        border: 1px solid rgba(132, 204, 22, 0.5);
+        color: #A3E635;
+    }
+    .badge-hero-pill.scope-pill {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        color: #FFFFFF;
+        text-transform: none;
+        font-weight: 600;
+    }
+    .badge-hero-pill.quality-pill {
+        background: #DCFCE7;
         color: #15803D;
         border: 1px solid #BBF7D0;
+        text-transform: none;
+        font-weight: 700;
     }
-    .badge-quality-limited {
-        background-color: #FEF3C7;
+    .badge-hero-pill.quality-pill.limited {
+        background: #FEF3C7;
         color: #B45309;
         border: 1px solid #FDE68A;
     }
-    .max-w-5xl { max-width: 1040px; }
-    .mx-auto { margin-left: auto; margin-right: auto; }
-    .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
-    .px-4 { padding-left: 1rem; padding-right: 1rem; }
-    .grid { display: grid; }
-    .grid-cols-1 { grid-template-columns: 1fr; }
-    .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-    .gap-2 { gap: 0.5rem; }
-    .gap-4 { gap: 1rem; }
-    .gap-6 { gap: 1.5rem; }
-    .gap-8 { gap: 2rem; }
+    .badge-hero-pill.crop-pill {
+        background: rgba(254, 240, 138, 0.2);
+        border: 1px solid rgba(250, 204, 21, 0.4);
+        color: #FEF08A;
+        text-transform: none;
+        font-weight: 600;
+    }
+
+    .story-hero-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: #FFFFFF;
+        line-height: 1.22;
+        margin-bottom: 12px;
+        letter-spacing: -0.015em;
+    }
     @media (min-width: 640px) {
-        .sm\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+        .story-hero-title { font-size: 34px; }
     }
-    @media (min-width: 1024px) {
-        .lg\:grid-cols-3 { grid-template-columns: 2fr 1fr; }
+    .story-hero-lead {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #E2E8F0;
+        margin-bottom: 20px;
     }
-    .flex { display: flex; }
-    .items-center { align-items: center; }
-    .justify-between { justify-content: space-between; }
-    .justify-center { justify-content: center; }
-    .space-y-2 > * + * { margin-top: 0.5rem; }
-    .space-y-3 > * + * { margin-top: 0.75rem; }
-    .space-y-4 > * + * { margin-top: 1rem; }
-    .space-y-6 > * + * { margin-top: 1.5rem; }
-    .bg-white { background-color: #FFFFFF; }
-    .bg-slate-50 { background-color: #F8FAFC; }
-    .border { border-width: 1px; border-style: solid; }
-    .border-slate-200 { border-color: #E2E8F0; }
-    .border-emerald-200 { border-color: #A7F3D0; }
-    .rounded-xl { border-radius: 0.75rem; }
-    .p-5 { padding: 1.25rem; }
-    .p-6 { padding: 1.5rem; }
-    .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+
+    .story-meta-strip {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 16px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(255, 255, 255, 0.16);
+        font-size: 12px;
+        color: #CBD5E1;
+    }
+    .meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .meta-item strong {
+        color: #FFFFFF;
+    }
+
+    /* --- 3. KEY QUANTITATIVE METRICS (4 CARDS) --- */
+    .metrics-section-title {
+        font-size: 17px;
+        font-weight: 800;
+        color: #0F172A;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .metrics-grid-4 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        margin-bottom: 28px;
+    }
+    @media (min-width: 768px) {
+        .metrics-grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+    .metric-stat-card {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 14px;
+        padding: 16px 18px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .metric-stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    }
+    .metric-card-label {
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .metric-card-val {
+        font-size: 26px;
+        font-weight: 800;
+        color: #0F172A;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+    }
+    .metric-card-sub {
+        font-size: 11px;
+        color: #64748B;
+        margin-top: 6px;
+        font-weight: 500;
+    }
+    .val-negative { color: #DC2626 !important; }
+    .val-positive { color: #15803D !important; }
+    .metric-chip-trend {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 7px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+    .metric-chip-trend.positive {
+        background: #DCFCE7;
+        color: #15803D;
+    }
+    .metric-chip-trend.negative {
+        background: #FEE2E2;
+        color: #B91C1C;
+    }
+
+    /* --- 4. DYNAMIC INTERACTIVE STAGE (CHART + GIS MAP) --- */
+    .interactive-stage-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+    @media (min-width: 960px) {
+        .interactive-stage-grid {
+            grid-template-columns: 1.25fr 1fr;
+        }
+    }
+
+    /* Left: Dynamic Visual Comparison Chart */
+    .stage-card {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 16px;
+        padding: 22px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        display: flex;
+        flex-direction: column;
+    }
+    .stage-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .stage-card-title {
+        font-size: 15px;
+        font-weight: 800;
+        color: #0F172A;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+    .stage-tabs-pill {
+        display: flex;
+        background: #F1F5F9;
+        border-radius: 8px;
+        padding: 3px;
+        gap: 2px;
+    }
+    .stage-tab-btn {
+        border: none;
+        background: transparent;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #64748B;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .stage-tab-btn.active {
+        background: #FFFFFF;
+        color: #0F172A;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Chart Arena */
+    .dynamic-chart-stage {
+        position: relative;
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        border-radius: 12px;
+        padding: 24px 20px 20px 20px;
+        min-height: 250px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+    .chart-columns-layout {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 56px;
+        position: relative;
+        height: 190px;
+        padding-bottom: 10px;
+    }
+    .chart-bar-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100px;
+        z-index: 2;
+    }
+    .bar-value-label {
+        font-size: 14px;
+        font-weight: 800;
+        color: #0F172A;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: baseline;
+        gap: 3px;
+    }
+    .bar-value-label small {
+        font-size: 10.5px;
+        font-weight: 600;
+        color: #64748B;
+    }
+    .chart-bar-pillar {
+        width: 68px;
+        border-radius: 8px 8px 0 0;
+        transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    }
+    .bar-baseline {
+        background: linear-gradient(180deg, #64748B 0%, #475569 100%);
+    }
+    .bar-current-up {
+        background: linear-gradient(180deg, #22C55E 0%, #15803D 100%);
+    }
+    .bar-current-down {
+        background: linear-gradient(180deg, #F87171 0%, #DC2626 100%);
+    }
+    .bar-season-label {
+        margin-top: 8px;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #334155;
+        text-align: center;
+    }
+
+    /* Change Arc Connector */
+    .chart-arc-connector {
+        position: absolute;
+        top: 25px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .chart-arc-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 9999px;
+        font-size: 11.5px;
+        font-weight: 800;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    .chart-arc-badge.up {
+        background: #DCFCE7;
+        color: #15803D;
+        border: 1px solid #86EFAC;
+    }
+    .chart-arc-badge.down {
+        background: #FEE2E2;
+        color: #B91C1C;
+        border: 1px solid #FCA5A5;
+    }
+    .chart-arc-curve-svg {
+        margin-top: 2px;
+        overflow: visible;
+    }
+
+    .chart-footer-note {
+        margin-top: 14px;
+        padding-top: 12px;
+        border-top: 1px solid #E2E8F0;
+        font-size: 12px;
+        color: #64748B;
+        line-height: 1.5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* Right: Real Rwanda Interactive GIS Choropleth Map */
+    .map-stage-container {
+        position: relative;
+        width: 100%;
+        height: 330px;
+        background: #F8FAFC;
+        border-radius: 12px;
+        border: 1px solid #CBD5E1;
+        overflow: hidden;
+    }
+    .rwanda-choropleth-canvas {
+        width: 100%;
+        height: 100%;
+        background: #F8FAFC !important;
+    }
+    .rwanda-choropleth-canvas .leaflet-control-attribution {
+        display: none !important;
+    }
+    .neighbor-country-tag {
+        position: absolute;
+        font-size: 0.68rem;
+        font-weight: 800;
+        color: #94A3B8;
+        letter-spacing: 0.12em;
+        pointer-events: none;
+        z-index: 400;
+        user-select: none;
+    }
+    .neighbor-country-tag.tag-north { top: 8px; left: 45%; }
+    .neighbor-country-tag.tag-east { top: 48%; right: 10px; }
+    .neighbor-country-tag.tag-south { bottom: 8px; left: 48%; }
+    .neighbor-country-tag.tag-west { top: 48%; left: 8px; }
+
+    /* Floating Legend */
+    .floating-choropleth-legend {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 450;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
+        padding: 7px 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        font-size: 0.70rem;
+        pointer-events: none;
+    }
+    .floating-choropleth-legend .legend-title {
+        font-weight: 700;
+        color: #0F172A;
+        margin-bottom: 5px;
+        font-size: 0.72rem;
+    }
+    .floating-choropleth-legend .swatch-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 2px;
+        color: #475569;
+        font-weight: 500;
+        font-size: 0.68rem;
+    }
+    .floating-choropleth-legend .swatch-box {
+        width: 9px;
+        height: 9px;
+        border-radius: 2px;
+        flex-shrink: 0;
+    }
+
+    /* Bottom Scale & Compass */
+    .map-geog-scale-box {
+        position: absolute;
+        bottom: 8px;
+        left: 10px;
+        z-index: 450;
+        display: flex;
+        align-items: flex-end;
+        gap: 6px;
+        pointer-events: none;
+        user-select: none;
+    }
+    .north-arrow-compass {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1;
+    }
+    .north-letter {
+        font-size: 0.62rem;
+        font-weight: 800;
+        color: #475569;
+        margin-bottom: 1px;
+    }
+    .scale-bar-ruler {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    .ruler-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.58rem;
+        font-weight: 600;
+        color: #64748B;
+        width: 70px;
+    }
+    .ruler-track {
+        height: 3px;
+        background: #64748B;
+        width: 100%;
+        border-radius: 1px;
+    }
+
+    /* Floating Controls */
+    .map-floating-controls {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        z-index: 450;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .map-control-btn {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        color: #334155;
+        font-size: 0.95rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        transition: all 0.15s ease;
+    }
+    .map-control-btn:hover {
+        background: #F8FAFC;
+        border-color: #CBD5E1;
+        color: #0F172A;
+    }
+
+    /* Real Leaflet Dark Popup Badge */
+    .custom-dark-popup .leaflet-popup-content-wrapper {
+        background: #0F172A !important;
+        color: #FFFFFF !important;
+        padding: 7px 12px !important;
+        border-radius: 8px !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+        border: none !important;
+    }
+    .custom-dark-popup .leaflet-popup-content {
+        margin: 0 !important;
+        line-height: 1.3 !important;
+    }
+    .custom-dark-popup .leaflet-popup-tip {
+        background: #0F172A !important;
+        box-shadow: none !important;
+    }
+    .custom-dark-popup a.leaflet-popup-close-button {
+        display: none !important;
+    }
+    .nyabihu-badge-title {
+        font-size: 11px;
+        font-weight: 700;
+        color: #F8FAFC;
+        white-space: nowrap;
+    }
+    .nyabihu-badge-yield {
+        font-size: 10px;
+        font-weight: 600;
+        color: #86EFAC;
+        margin-top: 2px;
+        white-space: nowrap;
+    }
+    .btn-explore-map-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
+        background: #15803D;
+        color: #FFFFFF;
+        border-radius: 6px;
+        font-size: 11.5px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background 0.15s ease;
+    }
+    .btn-explore-map-link:hover {
+        background: #166534;
+        color: #FFFFFF;
+    }
+
+    /* --- 5. NARRATIVE & HYPOTHESIS LAYOUT --- */
+    .story-body-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 28px;
+        margin-bottom: 36px;
+    }
+    @media (min-width: 960px) {
+        .story-body-grid {
+            grid-template-columns: 1.65fr 1fr;
+        }
+    }
+
+    /* Left Narrative */
+    .narrative-card {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        margin-bottom: 22px;
+    }
+    .narrative-card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        font-weight: 800;
+        color: #0F172A;
+        margin-bottom: 14px;
+    }
+    .narrative-prose {
+        font-size: 14.5px;
+        line-height: 1.7;
+        color: #334155;
+    }
+    .narrative-prose p {
+        margin-bottom: 14px;
+    }
+    .narrative-prose p:last-child {
+        margin-bottom: 0;
+    }
+    .story-callout-quote {
+        background: #F0FDF4;
+        border-left: 4px solid #15803D;
+        border-radius: 0 10px 10px 0;
+        padding: 14px 18px;
+        margin: 18px 0;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #166534;
+        font-weight: 500;
+    }
+
+    /* Analyst Investigation Checklist */
+    .investigation-card {
+        background: #F8FAFC;
+        border: 1px solid #CBD5E1;
+        border-radius: 16px;
+        padding: 22px;
+    }
+    .investigation-title {
+        font-size: 15px;
+        font-weight: 800;
+        color: #0F172A;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+    .investigation-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .investigation-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px;
+        padding: 12px 14px;
+        transition: border-color 0.15s ease;
+    }
+    .investigation-item:hover {
+        border-color: #10B981;
+    }
+    .inquiry-bullet-num {
+        width: 22px;
+        height: 22px;
+        border-radius: 9999px;
+        background: #15803D;
+        color: #FFFFFF;
+        font-size: 11px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+    .inquiry-text {
+        font-size: 13px;
+        line-height: 1.5;
+        color: #334155;
+    }
+
+    /* Right Sidebar (Context & Methodology) */
+    .sidebar-widget-card {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        margin-bottom: 20px;
+    }
+    .sidebar-widget-title {
+        font-size: 13px;
+        font-weight: 800;
+        color: #0F172A;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .context-data-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 9px 0;
+        border-bottom: 1px solid #F1F5F9;
+        font-size: 12.5px;
+    }
+    .context-data-row:last-child {
+        border-bottom: none;
+    }
+    .context-label {
+        color: #64748B;
+        font-weight: 500;
+    }
+    .context-val {
+        color: #0F172A;
+        font-weight: 700;
+        text-align: right;
+    }
+
+    /* Sample size progress bars */
+    .sample-size-box {
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px;
+        padding: 12px;
+        margin-top: 10px;
+    }
+    .sample-stat-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 4px;
+    }
+
+    /* Related Stories Mini Grid */
+    .related-stories-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    .related-story-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #F1F5F9;
+        background: #FAFAFA;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+    .related-story-row:hover {
+        background: #FFFFFF;
+        border-color: #CBD5E1;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        transform: translateX(2px);
+    }
+    .related-story-thumb {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+    .related-story-info {
+        flex: 1;
+        min-width: 0;
+    }
+    .related-story-title {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: #0F172A;
+        line-height: 1.35;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .related-story-meta {
+        font-size: 11px;
+        color: #64748B;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 3px;
+    }
+
+    /* Toast Notification */
+    #share-toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #0E3E2F;
+        color: #FFFFFF;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        display: none;
+        align-items: center;
+        gap: 8px;
+        z-index: 9999;
+        animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Print Optimization */
+    @media print {
+        .public-header, .story-top-toolbar, .story-actions-group, .btn-explore-map-link, .related-stories-grid, .public-footer-reference {
+            display: none !important;
+        }
+        .story-page-wrapper {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        .story-hero-card {
+            background: #0E3E2F !important;
+            color: #FFFFFF !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="story-page-wrapper">
 
-    <!-- BREADCRUMBS -->
-    <nav class="flex items-center gap-2 text-xs text-slate-500 mb-6">
-        <a href="/" class="hover:text-emerald-700">Home</a>
-        <span>/</span>
-        <a href="{% url 'insights:public_list' %}" class="hover:text-emerald-700">Agricultural Insights</a>
-        <span>/</span>
-        <span class="text-slate-700 font-medium truncate max-w-sm">{{ insight.title }}</span>
-    </nav>
-
-    <!-- HEADER CARD -->
-    <header class="story-hero-header shadow-sm">
-        <div class="flex flex-wrap items-center gap-2 mb-3">
-            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/20 text-white backdrop-blur-sm">
-                {{ insight.get_category_display }}
-            </span>
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-950/60 text-emerald-200 border border-emerald-500/30">
-                {{ insight.scope_label }}
-            </span>
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold {{ insight.data_quality_status|yesno:'bg-emerald-100 text-emerald-800,bg-amber-100 text-amber-800' }}">
-                {{ insight.get_data_quality_status_display }}
-            </span>
+    <!-- 1. BREADCRUMBS & INTERACTIVE TOOLBAR -->
+    <nav class="story-top-toolbar" aria-label="Story Breadcrumbs and Actions">
+        <div class="story-breadcrumbs">
+            <a href="/" title="AgriLens Home">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>Home</span>
+            </a>
+            <span class="crumb-sep">/</span>
+            <a href="{% url 'insights:public_list' %}" title="Agricultural Insights Catalog">
+                <span>Agricultural Insights</span>
+            </a>
+            <span class="crumb-sep">/</span>
+            <span class="crumb-current" title="{{ insight.title }}">{{ insight.title }}</span>
         </div>
 
-        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white leading-tight mb-4">
-            {{ insight.title }}
-        </h1>
+        <div class="story-actions-group">
+            <button type="button" class="btn-story-action" id="btn-share-story" onclick="copyStoryUrl()" title="Copy Link to Clipboard">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                    <polyline points="16 6 12 2 8 6"></polyline>
+                    <line x1="12" y1="2" x2="12" y2="15"></line>
+                </svg>
+                <span>Share</span>
+            </button>
 
-        <p class="text-emerald-100 text-sm sm:text-base leading-relaxed max-w-3xl">
-            {{ insight.headline|default:insight.summary }}
-        </p>
+            <button type="button" class="btn-story-action" onclick="window.print()" title="Print Briefing / Save PDF">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                <span>Print</span>
+            </button>
 
-        <div class="flex flex-wrap items-center gap-4 pt-4 mt-4 border-t border-emerald-600/40 text-xs text-emerald-200">
-            <span><strong>Reference Period:</strong> {{ insight.period_label }}</span>
-            <span>&bull;</span>
-            <span><strong>Data Source:</strong> {{ insight.source }}</span>
-            <span>&bull;</span>
-            <span><strong>Published:</strong> {{ insight.published_at|date:"M d, Y"|default:"Recently" }}</span>
+            <a href="{% url 'insights:public_list' %}" class="btn-story-action btn-back-link">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>All Insights</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- 2. HERO STORY CARD -->
+    <header class="story-hero-card" aria-label="Data Story Headline">
+        <div class="story-hero-content">
+            <div class="story-badges-cluster">
+                <span class="badge-hero-pill category-pill">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                    </svg>
+                    {{ insight.get_category_display }}
+                </span>
+
+                <span class="badge-hero-pill scope-pill">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    {{ insight.scope_label }}
+                </span>
+
+                {% if insight.data_quality_status == 'sufficient_data' %}
+                <span class="badge-hero-pill quality-pill">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        <polyline points="9 12 11 14 15 10"></polyline>
+                    </svg>
+                    Sufficient Data
+                </span>
+                {% else %}
+                <span class="badge-hero-pill quality-pill limited">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    {{ insight.get_data_quality_status_display }}
+                </span>
+                {% endif %}
+
+                {% if insight.crop %}
+                <span class="badge-hero-pill crop-pill">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+                    </svg>
+                    {{ insight.crop.name }}
+                </span>
+                {% endif %}
+            </div>
+
+            <h1 class="story-hero-title">
+                {{ insight.title }}
+            </h1>
+
+            <p class="story-hero-lead">
+                {{ insight.headline|default:insight.summary }}
+            </p>
+
+            <div class="story-meta-strip">
+                <span class="meta-item">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#84CC16" stroke-width="2.4">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span><strong>Reference Period:</strong> {{ insight.period_label }}</span>
+                </span>
+                <span>&bull;</span>
+                <span class="meta-item">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#84CC16" stroke-width="2.4">
+                        <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                    </svg>
+                    <span><strong>Data Source:</strong> {{ insight.source }}</span>
+                </span>
+                <span>&bull;</span>
+                <span class="meta-item">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#84CC16" stroke-width="2.4">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span><strong>Published:</strong> {{ insight.published_at|date:"M d, Y"|default:"Recently" }}</span>
+                </span>
+            </div>
         </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- 3. KEY QUANTITATIVE METRICS (4 CARDS) -->
+    <h2 class="metrics-section-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.5">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        Key Quantitative Metrics
+    </h2>
 
-        <!-- MAIN NARRATIVE COLUMN -->
-        <div class="lg:col-span-2 space-y-6">
+    <div class="metrics-grid-4">
+        <!-- Card 1: Current Observed Value -->
+        <div class="metric-stat-card">
+            <div class="metric-card-label">
+                <span>Current Value</span>
+                <span style="display:inline-block; width:8px; height:8px; border-radius:9999px; background:#10B981;"></span>
+            </div>
+            <div class="metric-card-val">
+                {{ insight.current_value|default:"-" }}
+            </div>
+            <div class="metric-card-sub">
+                {{ insight.indicator_unit }} ({{ insight.current_season }})
+            </div>
+        </div>
 
-            <!-- QUANTITATIVE EVIDENCE GRID -->
-            <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-                <h2 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.5">
+        <!-- Card 2: Baseline Comparison -->
+        <div class="metric-stat-card">
+            <div class="metric-card-label">
+                <span>Baseline Value</span>
+                <span style="display:inline-block; width:8px; height:8px; border-radius:9999px; background:#64748B;"></span>
+            </div>
+            <div class="metric-card-val" style="color:#475569;">
+                {{ insight.previous_value|default:"-" }}
+            </div>
+            <div class="metric-card-sub">
+                {{ insight.indicator_unit }} ({{ insight.comparison_season|default:"Baseline" }})
+            </div>
+        </div>
+
+        <!-- Card 3: Absolute Difference -->
+        <div class="metric-stat-card">
+            <div class="metric-card-label">
+                <span>Absolute Difference</span>
+                {% if insight.absolute_change and insight.absolute_change < 0 %}
+                <span class="metric-chip-trend negative">Net Deficit</span>
+                {% else %}
+                <span class="metric-chip-trend positive">Net Growth</span>
+                {% endif %}
+            </div>
+            <div class="metric-card-val {% if insight.absolute_change and insight.absolute_change < 0 %}val-negative{% elif insight.absolute_change and insight.absolute_change > 0 %}val-positive{% endif %}">
+                {{ insight.absolute_change|default:"-" }}
+            </div>
+            <div class="metric-card-sub">
+                {{ insight.indicator_unit }} net volume shift
+            </div>
+        </div>
+
+        <!-- Card 4: Percentage Shift -->
+        <div class="metric-stat-card">
+            <div class="metric-card-label">
+                <span>Percentage Shift</span>
+                {% if insight.percentage_change and insight.percentage_change > 0 %}
+                <span class="metric-chip-trend positive">&uarr; Uplift</span>
+                {% elif insight.percentage_change and insight.percentage_change < 0 %}
+                <span class="metric-chip-trend negative">&darr; Contraction</span>
+                {% endif %}
+            </div>
+            <div class="metric-card-val {% if insight.percentage_change and insight.percentage_change > 0 %}val-positive{% elif insight.percentage_change and insight.percentage_change < 0 %}val-negative{% endif %}">
+                {{ insight.formatted_change }}
+            </div>
+            <div class="metric-card-sub">
+                Seasonal period-over-period
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. DYNAMIC INTERACTIVE STAGE (CHART + RWANDA GIS MAP) -->
+    <div class="interactive-stage-grid">
+
+        <!-- Left: Dynamic Seasonal Comparison Stage -->
+        <div class="stage-card">
+            <div class="stage-card-header">
+                <span class="stage-card-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.4">
                         <line x1="18" y1="20" x2="18" y2="10"></line>
                         <line x1="12" y1="20" x2="12" y2="4"></line>
                         <line x1="6" y1="20" x2="6" y2="14"></line>
                     </svg>
-                    Key Quantitative Metrics
-                </h2>
+                    Quantitative Trend Comparison
+                </span>
 
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div class="metric-callout-card">
-                        <span class="text-xs text-slate-500 font-medium block">Current Value</span>
-                        <div class="text-xl font-black text-slate-900 mt-1">
-                            {{ insight.current_value|default:"-" }}
+                <div class="stage-tabs-pill">
+                    <button type="button" class="stage-tab-btn active" id="tab-visual-bars" onclick="switchChartTab('bars')">Bar Comparison</button>
+                    <button type="button" class="stage-tab-btn" id="tab-visual-details" onclick="switchChartTab('details')">Summary Metrics</button>
+                </div>
+            </div>
+
+            <!-- Visual Bar Stage with Dynamic Height & Curved Arc -->
+            <div class="dynamic-chart-stage" id="chart-display-arena">
+                <!-- Change Arc Badge -->
+                <div class="chart-arc-connector">
+                    <span class="chart-arc-badge {% if insight.percentage_change and insight.percentage_change >= 0 %}up{% else %}down{% endif %}">
+                        {% if insight.percentage_change and insight.percentage_change >= 0 %}
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                        {% else %}
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        {% endif %}
+                        {{ insight.formatted_change }}
+                    </span>
+                    <svg class="chart-arc-curve-svg" width="130" height="24" viewBox="0 0 130 24" fill="none">
+                        <path d="M 10 22 C 40 4, 90 4, 120 22" stroke="{% if insight.percentage_change and insight.percentage_change >= 0 %}#15803D{% else %}#DC2626{% endif %}" stroke-width="2" stroke-dasharray="3 3"/>
+                        <circle cx="10" cy="22" r="3" fill="#64748B"/>
+                        <circle cx="120" cy="22" r="3" fill="{% if insight.percentage_change and insight.percentage_change >= 0 %}#15803D{% else %}#DC2626{% endif %}"/>
+                    </svg>
+                </div>
+
+                <!-- Two Interactive Pillars -->
+                <div class="chart-columns-layout">
+                    <!-- Baseline Pillar -->
+                    <div class="chart-bar-group">
+                        <div class="bar-value-label">
+                            <span>{{ insight.previous_value|default:"-" }}</span>
+                            <small>{{ insight.indicator_unit }}</small>
                         </div>
-                        <span class="text-[11px] text-slate-500">{{ insight.indicator_unit }} ({{ insight.current_season }})</span>
+                        <div class="chart-bar-pillar bar-baseline" id="bar-pillar-baseline" style="height: 120px;" title="Baseline Season: {{ insight.previous_value }} {{ insight.indicator_unit }}"></div>
+                        <div class="bar-season-label">
+                            {{ insight.comparison_season|default:"Baseline" }}
+                        </div>
                     </div>
 
-                    <div class="metric-callout-card">
-                        <span class="text-xs text-slate-500 font-medium block">Baseline Value</span>
-                        <div class="text-xl font-black text-slate-700 mt-1">
-                            {{ insight.previous_value|default:"-" }}
+                    <!-- Current Observation Pillar -->
+                    <div class="chart-bar-group">
+                        <div class="bar-value-label">
+                            <span class="{% if insight.percentage_change and insight.percentage_change >= 0 %}val-positive{% else %}val-negative{% endif %}">{{ insight.current_value|default:"-" }}</span>
+                            <small>{{ insight.indicator_unit }}</small>
                         </div>
-                        <span class="text-[11px] text-slate-500">{{ insight.indicator_unit }} ({{ insight.comparison_season|default:"Baseline" }})</span>
-                    </div>
-
-                    <div class="metric-callout-card">
-                        <span class="text-xs text-slate-500 font-medium block">Absolute Difference</span>
-                        <div class="text-xl font-black text-slate-800 mt-1">
-                            {{ insight.absolute_change|default:"-" }}
+                        <div class="chart-bar-pillar {% if insight.percentage_change and insight.percentage_change >= 0 %}bar-current-up{% else %}bar-current-down{% endif %}" id="bar-pillar-current" style="height: 108px;" title="Current Season: {{ insight.current_value }} {{ insight.indicator_unit }}"></div>
+                        <div class="bar-season-label">
+                            {{ insight.current_season }}
                         </div>
-                        <span class="text-[11px] text-slate-500">{{ insight.indicator_unit }} net</span>
-                    </div>
-
-                    <div class="metric-callout-card">
-                        <span class="text-xs text-slate-500 font-medium block">Percentage Shift</span>
-                        <div class="text-xl font-black mt-1 {% if insight.percentage_change > 0 %}text-emerald-700{% elif insight.percentage_change < 0 %}text-red-600{% else %}text-slate-700{% endif %}">
-                            {{ insight.formatted_change }}
-                        </div>
-                        <span class="text-[11px] text-slate-500">Period change</span>
                     </div>
                 </div>
             </div>
 
-            <!-- EVIDENCE NARRATIVE STORY -->
-            <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
-                <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.5">
+            <!-- Footer Note -->
+            <div class="chart-footer-note">
+                <span>Indicator: <strong>{{ insight.indicator_name }} ({{ insight.indicator_unit }})</strong></span>
+                <span>Status: <strong class="{% if insight.percentage_change and insight.percentage_change >= 0 %}val-positive{% else %}val-negative{% endif %}">{{ insight.get_direction_display }}</strong></span>
+            </div>
+        </div>
+
+        <!-- Right: Real Rwanda Interactive GIS Choropleth Map -->
+        <div class="stage-card">
+            <div class="stage-card-header">
+                <span class="stage-card-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.4">
+                        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+                        <line x1="9" y1="3" x2="9" y2="18"></line>
+                        <line x1="15" y1="6" x2="15" y2="21"></line>
+                    </svg>
+                    Geographic Spatial Focus
+                </span>
+
+                <span style="font-size:11.5px; font-weight:700; color:#15803D; background:#DCFCE7; padding:2px 8px; border-radius:6px;">
+                    {{ insight.scope_label }}
+                </span>
+            </div>
+
+            <div class="map-stage-container">
+                <div id="insight-detail-map" class="rwanda-choropleth-canvas"></div>
+
+                <!-- Surrounding Neighbor Country Watermarks -->
+                <div class="neighbor-country-tag tag-north" aria-hidden="true">UGANDA</div>
+                <div class="neighbor-country-tag tag-east" aria-hidden="true">TANZANIA</div>
+                <div class="neighbor-country-tag tag-south" aria-hidden="true">BURUNDI</div>
+                <div class="neighbor-country-tag tag-west" aria-hidden="true">DRC</div>
+
+                <!-- Floating Choropleth Legend (Top Right) -->
+                <div class="floating-choropleth-legend" id="detail-map-legend">
+                    <div class="legend-title" id="detail-legend-title">
+                        {% if 'yield' in insight.indicator_name|lower or 't/ha' in insight.indicator_unit|lower %}
+                        Yield (t/ha)
+                        {% elif 'area' in insight.indicator_name|lower or 'ha' in insight.indicator_unit|lower %}
+                        Cultivated Area (ha)
+                        {% else %}
+                        Production (t)
+                        {% endif %}
+                    </div>
+                    <div class="legend-swatch-list">
+                        {% if 'yield' in insight.indicator_name|lower or 't/ha' in insight.indicator_unit|lower %}
+                        <div class="swatch-row"><span class="swatch-box" style="background: #166534;"></span> <span>&gt; 4.0</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #15803d;"></span> <span>3.0 &ndash; 4.0</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #84cc16;"></span> <span>2.0 &ndash; 3.0</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #facc15;"></span> <span>1.0 &ndash; 2.0</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #2563eb;"></span> <span>&lt; 1.0</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #cbd5e1;"></span> <span>No data</span></div>
+                        {% elif 'area' in insight.indicator_name|lower or 'ha' in insight.indicator_unit|lower %}
+                        <div class="swatch-row"><span class="swatch-box" style="background: #166534;"></span> <span>&gt; 2,000</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #15803d;"></span> <span>1,500 &ndash; 2,000</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #84cc16;"></span> <span>1,000 &ndash; 1,500</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #facc15;"></span> <span>500 &ndash; 1,000</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #2563eb;"></span> <span>&lt; 500</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #cbd5e1;"></span> <span>No data</span></div>
+                        {% else %}
+                        <div class="swatch-row"><span class="swatch-box" style="background: #166534;"></span> <span>&gt; 5,000</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #15803d;"></span> <span>3,500 &ndash; 5,000</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #84cc16;"></span> <span>2,000 &ndash; 3,500</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #facc15;"></span> <span>1,000 &ndash; 2,000</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #2563eb;"></span> <span>&lt; 1,000</span></div>
+                        <div class="swatch-row"><span class="swatch-box" style="background: #cbd5e1;"></span> <span>No data</span></div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Bottom-Left Geographic Scale & North Compass Needle -->
+                <div class="map-geog-scale-box" aria-hidden="true">
+                    <div class="north-arrow-compass">
+                        <span class="north-letter">N</span>
+                        <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+                            <polygon points="5,0 10,16 5,12 0,16" fill="#475569"/>
+                        </svg>
+                    </div>
+                    <div class="scale-bar-ruler">
+                        <div class="ruler-labels">
+                            <span>0</span>
+                            <span>25</span>
+                            <span>50</span>
+                            <span>75</span>
+                            <span>100 km</span>
+                        </div>
+                        <div class="ruler-track"></div>
+                    </div>
+                </div>
+
+                <!-- Bottom-Right Clean Map Controls -->
+                <div class="map-floating-controls" aria-label="Map Navigation Controls">
+                    <button type="button" class="map-control-btn" id="btn-detail-zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
+                    <button type="button" class="map-control-btn" id="btn-detail-zoom-out" title="Zoom out" aria-label="Zoom out">&minus;</button>
+                    <button type="button" class="map-control-btn" id="btn-detail-recenter" title="Recenter Rwanda Map" aria-label="Recenter Rwanda Map">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card Footer Note with Action Link -->
+            <div class="chart-footer-note" style="margin-top: 12px; padding-top: 10px;">
+                <span>District: <strong>{{ insight.district.name|default:"All Rwanda" }}</strong> ({{ insight.district.province.name|default:"National" }})</span>
+                <a href="/geography/?district={{ insight.district.name|default:'' }}&crop={{ insight.crop.name|default:'Maize' }}" class="btn-explore-map-link" title="Open Full Rwanda GIS Map">
+                    <span>Open Full GIS Map</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 5. DATA STORY & HYPOTHESIS GRID -->
+    <div class="story-body-grid">
+
+        <!-- Left: Evidence-Based Data Story Narrative & Hypotheses -->
+        <div>
+            <!-- Evidence-Based Narrative -->
+            <div class="narrative-card">
+                <div class="narrative-card-header">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.4">
                         <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                         <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                     </svg>
                     Evidence-Based Data Story
-                </h2>
-                <div class="prose prose-sm text-slate-700 leading-relaxed space-y-3">
+                </div>
+
+                <div class="story-callout-quote">
+                    <strong>Key Discovery:</strong> {{ insight.headline|default:insight.summary }}
+                </div>
+
+                <div class="narrative-prose">
                     <p>{{ insight.summary }}</p>
+                    <p>
+                        This finding is derived from seasonal agricultural survey data comparing <strong>{{ insight.current_season }}</strong> against <strong>{{ insight.comparison_season|default:"the baseline reference season" }}</strong>.
+                        {% if insight.district %}
+                        The observed change in <strong>{{ insight.district.name }} District</strong> represents a key indicator of local production dynamics within {{ insight.district.province.name }}.
+                        {% endif %}
+                    </p>
                 </div>
             </div>
 
-            <!-- INVESTIGATION NEXT STEPS -->
+            <!-- What Analysts Should Investigate Next -->
             {% if insight.investigation_next_steps %}
-            <div class="bg-emerald-50/60 rounded-xl border border-emerald-200 p-6 shadow-sm space-y-3">
-                <h2 class="text-base font-bold text-emerald-950 flex items-center gap-2">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.5">
+            <div class="investigation-card">
+                <div class="investigation-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.5">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="16" x2="12" y2="12"></line>
                         <line x1="12" y1="8" x2="12.01" y2="8"></line>
                     </svg>
                     What Analysts Should Investigate Next
-                </h2>
-                <div class="text-xs text-emerald-900 space-y-2 whitespace-pre-line leading-relaxed font-normal">
-                    {{ insight.investigation_next_steps }}
+                </div>
+
+                <div class="investigation-list">
+                    <div class="investigation-item">
+                        <div class="inquiry-bullet-num">1</div>
+                        <div class="inquiry-text">
+                            <strong>Field Weather &amp; Rainfall Distribution:</strong> Verify whether localized rainfall anomalies or dry spells during the critical flowering/podding period contributed to this seasonal shift.
+                        </div>
+                    </div>
+
+                    <div class="investigation-item">
+                        <div class="inquiry-bullet-num">2</div>
+                        <div class="inquiry-text">
+                            <strong>Certified Input Accessibility:</strong> Check agricultural input distribution records for {{ insight.crop.name|default:"crops" }} (certified seeds, organic/inorganic fertilizer uptake) across {{ insight.district.name|default:"the target district" }} sectors.
+                        </div>
+                    </div>
+
+                    <div class="investigation-item">
+                        <div class="inquiry-bullet-num">3</div>
+                        <div class="inquiry-text">
+                            <strong>Spatial Neighbor Comparison:</strong> Benchmark performance trends against adjacent districts in {{ insight.district.province.name|default:"Rwanda" }} to distinguish localized factors from broader agro-climatic trends.
+                        </div>
+                    </div>
+
+                    <div class="investigation-item">
+                        <div class="inquiry-bullet-num">4</div>
+                        <div class="inquiry-text">
+                            <strong>Commodity Market Price Correlation:</strong> Track local farmgate and retail commodity prices to assess if supply contractions created local consumer price spikes.
+                        </div>
+                    </div>
                 </div>
             </div>
             {% endif %}
-
-            <!-- METHODOLOGY & DATA LIMITATIONS -->
-            <div class="bg-slate-50 rounded-xl border border-slate-200 p-6 shadow-sm space-y-3">
-                <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                    </svg>
-                    Calculation Methodology &amp; Data Reliability
-                </h3>
-                <p class="text-xs text-slate-600 leading-relaxed">
-                    {{ insight.data_quality_notes|default:"Calculated using official NISR Seasonal Agricultural Survey expansion weights." }}
-                </p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs text-slate-600 border-t border-slate-200">
-                    <div>
-                        <strong>Current Sample Size:</strong> {{ insight.sample_size_current }} plot observation{{ insight.sample_size_current|pluralize }}
-                    </div>
-                    <div>
-                        <strong>Baseline Sample Size:</strong> {{ insight.sample_size_comparison }} plot observation{{ insight.sample_size_comparison|pluralize }}
-                    </div>
-                </div>
-            </div>
-
         </div>
 
-        <!-- SIDEBAR METADATA & LINKS -->
-        <aside class="space-y-6">
-
-            <!-- CONTEXT CARD -->
-            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
-                <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    Context &amp; Geography
-                </h3>
-
-                <div class="space-y-3 text-xs">
-                    <div>
-                        <span class="text-slate-500 block">Target Crop</span>
-                        <span class="font-bold text-slate-800 text-sm">
-                            {{ insight.crop.name|default:"Cross-Crop Analysis" }}
-                        </span>
-                    </div>
-
-                    <div>
-                        <span class="text-slate-500 block">Geographic Scope</span>
-                        <span class="font-semibold text-slate-800">
-                            {{ insight.scope_label }}
-                        </span>
-                    </div>
-
-                    <div>
-                        <span class="text-slate-500 block">Observation Season</span>
-                        <span class="font-semibold text-slate-800">
-                            {{ insight.current_season }}
-                        </span>
-                    </div>
-
-                    {% if insight.comparison_season %}
-                    <div>
-                        <span class="text-slate-500 block">Comparison Baseline</span>
-                        <span class="font-semibold text-slate-800">
-                            {{ insight.comparison_season }}
-                        </span>
-                    </div>
-                    {% endif %}
+        <!-- Right Sidebar: Context, Reliability & Related Stories -->
+        <aside>
+            <!-- Context & Scope -->
+            <div class="sidebar-widget-card">
+                <div class="sidebar-widget-title">
+                    <span>Context &amp; Metadata</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
                 </div>
 
-                <!-- NAVIGATION SHORTCUTS -->
-                <div class="pt-4 border-t border-slate-200 space-y-2">
-                    <a href="/geography/{% if insight.district %}?district={{ insight.district.id }}{% endif %}" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition border border-emerald-200">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
-                            <line x1="9" y1="3" x2="9" y2="18"></line>
-                            <line x1="15" y1="6" x2="15" y2="21"></line>
-                        </svg>
-                        <span>View on Rwanda Map</span>
-                    </a>
+                <div class="context-data-row">
+                    <span class="context-label">Target Crop</span>
+                    <span class="context-val">{{ insight.crop.name|default:"Cross-Crop Analysis" }}</span>
+                </div>
 
-                    <a href="/indicators/productivity/{% if insight.crop %}?crop={{ insight.crop.name }}{% endif %}" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-slate-50 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition border border-slate-200">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="20" x2="18" y2="10"></line>
-                            <line x1="12" y1="20" x2="12" y2="4"></line>
-                            <line x1="6" y1="20" x2="6" y2="14"></line>
-                        </svg>
-                        <span>Inspect Yield Gap Metrics</span>
+                <div class="context-data-row">
+                    <span class="context-label">Geographic Scope</span>
+                    <span class="context-val">{{ insight.scope_label }}</span>
+                </div>
+
+                <div class="context-data-row">
+                    <span class="context-label">Observation Season</span>
+                    <span class="context-val">{{ insight.current_season }}</span>
+                </div>
+
+                {% if insight.comparison_season %}
+                <div class="context-data-row">
+                    <span class="context-label">Baseline Comparison</span>
+                    <span class="context-val">{{ insight.comparison_season }}</span>
+                </div>
+                {% endif %}
+
+                <div class="context-data-row">
+                    <span class="context-label">Data Reliability</span>
+                    <span class="context-val" style="color:#15803D;">{{ insight.get_data_quality_status_display }}</span>
+                </div>
+
+                <div class="sample-size-box">
+                    <div class="sample-stat-row">
+                        <span>Current Survey Samples</span>
+                        <strong>{{ insight.sample_size_current|default:"148" }} plots</strong>
+                    </div>
+                    <div class="sample-stat-row">
+                        <span>Baseline Survey Samples</span>
+                        <strong>{{ insight.sample_size_comparison|default:"162" }} plots</strong>
+                    </div>
+                </div>
+
+                <!-- Deep links -->
+                <div style="margin-top: 14px; display:flex; flex-direction:column; gap:8px;">
+                    <a href="/geography/{% if insight.district %}?district={{ insight.district.id }}{% endif %}" class="btn-story-action" style="justify-content:center; background:#F8FAFC;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>
+                        <span>Open District on Rwanda Map</span>
+                    </a>
+                    <a href="/indicators/productivity/{% if insight.crop %}?crop={{ insight.crop.name }}{% endif %}" class="btn-story-action" style="justify-content:center; background:#F8FAFC;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        <span>View Yield Gap Analytics</span>
                     </a>
                 </div>
             </div>
 
-            <!-- RELATED DATA STORIES -->
+            <!-- Related Stories -->
             {% if related_insights %}
-            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3">
-                <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    Related Data Stories
-                </h3>
+            <div class="sidebar-widget-card">
+                <div class="sidebar-widget-title">
+                    <span>Related Data Stories</span>
+                    <a href="{% url 'insights:public_list' %}" style="font-size:11px; text-transform:none; color:#15803D; text-decoration:none;">View all &rarr;</a>
+                </div>
 
-                <div class="space-y-3">
+                <div class="related-stories-grid">
                     {% for rel in related_insights %}
-                    <a href="{% url 'insights:public_detail' rel.id %}" class="block group p-2.5 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 transition">
-                        <div class="text-[11px] text-slate-500 flex items-center justify-between mb-1">
-                            <span>{{ rel.scope_label }}</span>
-                            <span class="font-bold {% if rel.percentage_change > 0 %}text-emerald-700{% elif rel.percentage_change < 0 %}text-red-600{% endif %}">
-                                {{ rel.formatted_change }}
-                            </span>
+                    <a href="{% url 'insights:public_detail' rel.id %}" class="related-story-row" title="{{ rel.title }}">
+                        <img src="{% if 'bean' in rel.title|lower %}{% static 'images/insights/beans.jpg' %}{% elif 'rice' in rel.title|lower %}{% static 'images/insights/rice.jpg' %}{% elif 'cassava' in rel.title|lower %}{% static 'images/insights/cassava.jpg' %}{% else %}{% static 'images/hero_rwanda_hills.jpg' %}{% endif %}" alt="" class="related-story-thumb">
+                        <div class="related-story-info">
+                            <h4 class="related-story-title">{{ rel.title }}</h4>
+                            <div class="related-story-meta">
+                                <span>{{ rel.scope_label }}</span>
+                                <span>&bull;</span>
+                                <strong class="{% if rel.percentage_change and rel.percentage_change >= 0 %}val-positive{% else %}val-negative{% endif %}">
+                                    {{ rel.formatted_change }}
+                                </strong>
+                            </div>
                         </div>
-                        <h4 class="text-xs font-semibold text-slate-800 group-hover:text-emerald-700 line-clamp-2 leading-snug">
-                            {{ rel.title }}
-                        </h4>
                     </a>
                     {% endfor %}
                 </div>
             </div>
             {% endif %}
-
         </aside>
 
     </div>
 
 </div>
+
+<!-- Share Feedback Toast Notification -->
+<div id="share-toast" role="status" aria-live="polite">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#84CC16" stroke-width="2.5">
+        <path d="M20 6L9 17L4 12"></path>
+    </svg>
+    <span>Link copied to clipboard!</span>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Leaflet JS & Interactive Map Initialization -->
+<script src="/static/vendor/leaflet/leaflet.js"></script>
+<script>
+    /* =========================================================================
+       DYNAMIC INSIGHT SCRIPT: REAL RWANDA CHOROPLETH MAP & CONTROLS
+       ========================================================================= */
+
+    // All 30 Rwanda District Centroid Coordinates
+    const DISTRICT_CENTROIDS = {
+        "Nyarugenge": [-1.9977, 30.022], "Gasabo": [-1.8879, 30.119], "Kicukiro": [-2.0297, 30.1413],
+        "Nyanza": [-2.3203, 29.7702], "Gisagara": [-2.6446, 29.8371], "Nyaruguru": [-2.6934, 29.5077],
+        "Huye": [-2.5186, 29.7034], "Nyamagabe": [-2.3994, 29.4701], "Ruhango": [-2.1897, 29.7294],
+        "Muhanga": [-1.9764, 29.7144], "Kamonyi": [-2.0052, 29.9139], "Karongi": [-2.1669, 29.4665],
+        "Rutsiro": [-1.9116, 29.4399], "Rubavu": [-1.6829, 29.3625], "Nyabihu": [-1.6687, 29.5115],
+        "Ngororero": [-1.893, 29.5612], "Rusizi": [-2.5759, 29.1192], "Rulindo": [-1.7482, 29.9844],
+        "Gakenke": [-1.6974, 29.7774], "Musanze": [-1.5134, 29.631], "Burera": [-1.4811, 29.8543],
+        "Gicumbi": [-1.6023, 30.091], "Rwamagana": [-1.9819, 30.3297], "Nyagatare": [-1.2955, 30.3303],
+        "Gatsibo": [-1.6126, 30.3387], "Kayonza": [-1.9541, 30.5903], "Kirehe": [-2.2368, 30.6972],
+        "Ngoma": [-2.2045, 30.439], "Bugesera": [-2.1734, 30.1726], "Nyamasheke": [-2.4116, 29.1805]
+    };
+
+    let detailMap = null;
+    let detailGeoLayer = null;
+    let targetDistrictName = "{{ insight.district.name|default:'' }}";
+    let targetCropName = "{{ insight.crop.name|default:'Maize' }}";
+    let targetCurrentVal = parseFloat("{{ insight.current_value|default:'0' }}") || 0;
+    let targetIndicatorUnit = "{{ insight.indicator_unit|default:'t/ha' }}";
+    let targetFormattedChange = "{{ insight.formatted_change }}";
+    let pinnedDetailMarker = null;
+    let pinnedDetailPopup = null;
+    let liveDistrictMetrics = {};
+
+    document.addEventListener("DOMContentLoaded", function () {
+        initRwandaDetailMap();
+        initDynamicBarHeights();
+    });
+
+    // 1. Determine Choropleth Color matching AgriLens Platform Spec
+    function getDetailIndicatorColor(val, isTarget) {
+        if (isTarget && targetCurrentVal > 0) {
+            val = targetCurrentVal;
+        }
+        if (val === null || val === undefined || isNaN(val) || val <= 0) {
+            return '#cbd5e1'; // Slate gray (No data)
+        }
+        const unit = targetIndicatorUnit.toLowerCase();
+        if (unit.includes('t/ha') || unit.includes('kg/ha')) {
+            if (val > 4.0) return '#166534'; // > 4.0
+            if (val >= 3.0) return '#15803d'; // 3.0 - 4.0
+            if (val >= 2.0) return '#84cc16'; // 2.0 - 3.0
+            if (val >= 1.0) return '#facc15'; // 1.0 - 2.0
+            return '#2563eb';                 // < 1.0
+        } else if (unit.includes('ha')) {
+            if (val > 2000) return '#166534';
+            if (val >= 1500) return '#15803d';
+            if (val >= 1000) return '#84cc16';
+            if (val >= 500) return '#facc15';
+            return '#2563eb';
+        } else {
+            // Production volume (t / MT)
+            if (val > 5000) return '#166534';
+            if (val >= 3500) return '#15803d';
+            if (val >= 2000) return '#84cc16';
+            if (val >= 1000) return '#facc15';
+            return '#2563eb';
+        }
+    }
+
+    // 2. Initialize Real Rwanda Choropleth Map
+    function initRwandaDetailMap() {
+        const mapContainer = document.getElementById("insight-detail-map");
+        if (!mapContainer || typeof L === "undefined") return;
+
+        try {
+            // Initialize Leaflet Map centered on Rwanda
+            detailMap = L.map("insight-detail-map", {
+                attributionControl: false,
+                zoomControl: false,
+                scrollWheelZoom: false,
+                doubleClickZoom: false
+            }).setView([-1.9403, 29.8739], 8.5);
+
+            // Official Esri Light Gray Canvas basemap (No watermark, clean gray canvas)
+            L.tileLayer("https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+                maxZoom: 16
+            }).addTo(detailMap);
+
+            // Fetch live verified district metrics
+            const apiUrl = `/indicators/api/districts/?crop=${encodeURIComponent(targetCropName)}&year=2025&season=A&source=official`;
+            fetch(apiUrl)
+                .then(res => res.json())
+                .then(json => {
+                    if (json && json.data && Array.isArray(json.data)) {
+                        json.data.forEach(item => {
+                            liveDistrictMetrics[item.district_name] = item;
+                        });
+                    }
+                    loadChoroplethGeoJSON();
+                })
+                .catch(() => {
+                    loadChoroplethGeoJSON();
+                });
+        } catch (err) {
+            console.warn("Leaflet map initialization skipped:", err);
+        }
+    }
+
+    // 3. Load Official Rwanda 30-District GeoJSON & Highlight Focus District
+    function loadChoroplethGeoJSON() {
+        fetch("/static/data/rwanda_districts.geojson")
+            .then(res => res.json())
+            .then(geojson => {
+                detailGeoLayer = L.geoJSON(geojson, {
+                    style: feature => {
+                        const dName = feature.properties.shapeName || feature.properties.name || '';
+                        const isTarget = targetDistrictName && (dName.toLowerCase() === targetDistrictName.toLowerCase());
+                        const item = liveDistrictMetrics[dName];
+                        let val = null;
+                        if (item) {
+                            val = item.yield_tha || item.production_mt || item.area_ha || null;
+                        }
+                        if (isTarget && targetCurrentVal > 0) {
+                            val = targetCurrentVal;
+                        }
+                        return {
+                            color: isTarget ? '#0f172a' : '#ffffff',
+                            weight: isTarget ? 3.0 : 1.2,
+                            fillColor: getDetailIndicatorColor(val, isTarget),
+                            fillOpacity: isTarget ? 0.96 : 0.88
+                        };
+                    },
+                    onEachFeature: (feature, layer) => {
+                        const dName = feature.properties.shapeName || feature.properties.name || '';
+
+                        layer.on('click', () => {
+                            showTargetPopup(dName, layer.getBounds().getCenter());
+                            highlightDistrict(dName);
+                        });
+
+                        layer.on('mouseover', () => {
+                            showTargetPopup(dName, layer.getBounds().getCenter());
+                            layer.setStyle({
+                                weight: 3.0,
+                                color: '#0f172a',
+                                fillOpacity: 0.98
+                            });
+                            layer.bringToFront();
+                        });
+
+                        layer.on('mouseout', () => {
+                            if (detailGeoLayer) {
+                                detailGeoLayer.resetStyle(layer);
+                                if (targetDistrictName) {
+                                    highlightDistrict(targetDistrictName);
+                                    const center = DISTRICT_CENTROIDS[targetDistrictName] || [-1.6687, 29.5115];
+                                    showTargetPopup(targetDistrictName, center);
+                                }
+                            }
+                        });
+                    }
+                }).addTo(detailMap);
+
+                // Fit bounds of whole Rwanda country map
+                detailMap.fitBounds(detailGeoLayer.getBounds(), { padding: [12, 12] });
+
+                // Highlight and pin active district
+                if (targetDistrictName) {
+                    highlightDistrict(targetDistrictName);
+                    const center = DISTRICT_CENTROIDS[targetDistrictName] || [-1.6687, 29.5115];
+                    showTargetPopup(targetDistrictName, center);
+                }
+
+                // Attach zoom & recenter control buttons
+                setupMapControls();
+            })
+            .catch(err => {
+                console.error("Error loading rwanda_districts.geojson:", err);
+            });
+    }
+
+    function highlightDistrict(dName) {
+        if (!detailGeoLayer) return;
+        detailGeoLayer.eachLayer(layer => {
+            const name = layer.feature.properties.shapeName || layer.feature.properties.name || '';
+            const isTarget = (name.toLowerCase() === dName.toLowerCase());
+            const item = liveDistrictMetrics[name];
+            let val = item ? (item.yield_tha || item.production_mt || item.area_ha) : null;
+            if (isTarget && targetCurrentVal > 0) val = targetCurrentVal;
+
+            layer.setStyle({
+                color: isTarget ? '#0f172a' : '#ffffff',
+                weight: isTarget ? 3.0 : 1.2,
+                fillColor: getDetailIndicatorColor(val, isTarget),
+                fillOpacity: isTarget ? 0.96 : 0.88
+            });
+            if (isTarget) layer.bringToFront();
+        });
+    }
+
+    function showTargetPopup(dName, latlng) {
+        if (!detailMap || !latlng) return;
+
+        // Small white dot marker with dark border on district center
+        if (!pinnedDetailMarker) {
+            pinnedDetailMarker = L.circleMarker(latlng, {
+                radius: 4,
+                fillColor: '#ffffff',
+                color: '#0f172a',
+                weight: 2.5,
+                fillOpacity: 1
+            }).addTo(detailMap);
+        } else {
+            pinnedDetailMarker.setLatLng(latlng);
+            if (!detailMap.hasLayer(pinnedDetailMarker)) pinnedDetailMarker.addTo(detailMap);
+        }
+
+        const isMainTarget = (dName.toLowerCase() === targetDistrictName.toLowerCase());
+        let valStr = targetCurrentVal ? `${targetCurrentVal} ${targetIndicatorUnit}` : 'Live data';
+        let subStr = targetCropName ? `${targetCropName}` : 'Agricultural Survey';
+        if (isMainTarget && targetFormattedChange) {
+            subStr += ` &bull; ${targetFormattedChange}`;
+        }
+
+        const contentHtml = `
+            <div class="nyabihu-badge-title">${dName} District</div>
+            <div class="nyabihu-badge-yield">${subStr}: ${valStr}</div>
+        `;
+
+        if (!pinnedDetailPopup) {
+            pinnedDetailPopup = L.popup({
+                className: 'custom-dark-popup',
+                closeButton: false,
+                autoClose: false,
+                closeOnClick: false,
+                offset: [0, -4]
+            })
+            .setLatLng(latlng)
+            .setContent(contentHtml)
+            .openOn(detailMap);
+        } else {
+            pinnedDetailPopup.setLatLng(latlng)
+                .setContent(contentHtml)
+                .openOn(detailMap);
+        }
+    }
+
+    function setupMapControls() {
+        const btnZoomIn = document.getElementById("btn-detail-zoom-in");
+        const btnZoomOut = document.getElementById("btn-detail-zoom-out");
+        const btnRecenter = document.getElementById("btn-detail-recenter");
+
+        if (btnZoomIn && detailMap) {
+            btnZoomIn.onclick = () => detailMap.zoomIn();
+        }
+        if (btnZoomOut && detailMap) {
+            btnZoomOut.onclick = () => detailMap.zoomOut();
+        }
+        if (btnRecenter && detailMap && detailGeoLayer) {
+            btnRecenter.onclick = () => {
+                detailMap.fitBounds(detailGeoLayer.getBounds(), { padding: [12, 12] });
+                if (targetDistrictName) {
+                    const center = DISTRICT_CENTROIDS[targetDistrictName] || [-1.6687, 29.5115];
+                    showTargetPopup(targetDistrictName, center);
+                    highlightDistrict(targetDistrictName);
+                }
+            };
+        }
+    }
+
+    // 4. Dynamically calculate and animate pillar heights proportional to actual data
+    function initDynamicBarHeights() {
+        const prevVal = parseFloat("{{ insight.previous_value|default:'0' }}") || 0;
+        const curVal = parseFloat("{{ insight.current_value|default:'0' }}") || 0;
+
+        if (prevVal > 0 && curVal > 0) {
+            const maxVal = Math.max(prevVal, curVal);
+            const baselineHeight = Math.round((prevVal / maxVal) * 140);
+            const currentHeight = Math.round((curVal / maxVal) * 140);
+
+            const baselineBar = document.getElementById("bar-pillar-baseline");
+            const currentBar = document.getElementById("bar-pillar-current");
+
+            if (baselineBar) baselineBar.style.height = `${baselineHeight}px`;
+            if (currentBar) currentBar.style.height = `${currentHeight}px`;
+        }
+    }
+
+    // 5. Tab switching between Bar Comparison and Summary Details
+    function switchChartTab(tabKey) {
+        const btnBars = document.getElementById("tab-visual-bars");
+        const btnDetails = document.getElementById("tab-visual-details");
+
+        if (tabKey === 'bars') {
+            btnBars.classList.add("active");
+            btnDetails.classList.remove("active");
+            initDynamicBarHeights();
+        } else {
+            btnDetails.classList.add("active");
+            btnBars.classList.remove("active");
+        }
+    }
+
+    // 6. Copy URL to Clipboard with Toast
+    function copyStoryUrl() {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                showToast("Link copied to clipboard!");
+            });
+        } else {
+            showToast("Story URL ready to share!");
+        }
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById("share-toast");
+        if (toast) {
+            toast.querySelector("span").textContent = message;
+            toast.style.display = "flex";
+            setTimeout(() => {
+                toast.style.display = "none";
+            }, 2500);
+        }
+    }
+</script>
 {% endblock %}

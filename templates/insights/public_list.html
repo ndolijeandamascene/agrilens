@@ -25,24 +25,24 @@
         border-radius: 0;
         overflow: hidden;
         color: #FFFFFF;
-        margin: 0 0 32px 0;
+        margin: 0 0 24px 0;
         box-shadow: 0 4px 20px -2px rgba(14, 62, 47, 0.25);
     }
     .insights-hero-split {
         display: flex;
         flex-direction: column;
-        min-height: 280px;
+        min-height: 230px;
         width: 100%;
     }
     @media (min-width: 900px) {
         .insights-hero-split {
             flex-direction: row;
             align-items: stretch;
-            min-height: 310px;
+            min-height: 240px;
         }
         .hero-text-side {
             flex: 1 1 58%;
-            padding: 3rem 2.5rem 3rem 2rem;
+            padding: 1.85rem 2.5rem 1.85rem 2rem;
             padding-left: max(2rem, calc((100vw - 1200px) / 2 + 1rem));
             z-index: 2;
         }
@@ -59,28 +59,28 @@
             top: 0;
             bottom: 0;
             left: -1px;
-            width: 90px;
+            width: 80px;
             background: #0E3E2F;
-            clip-path: ellipse(85px 100% at 0% 50%);
+            clip-path: ellipse(75px 100% at 0% 50%);
             z-index: 1;
         }
         .hero-accent-curve {
             position: absolute;
             top: 0;
             bottom: 0;
-            left: 14px;
-            width: 14px;
+            left: 12px;
+            width: 12px;
             background: linear-gradient(180deg, #FACC15 0%, #84CC16 100%);
-            clip-path: ellipse(75px 100% at 0% 50%);
+            clip-path: ellipse(68px 100% at 0% 50%);
             z-index: 2;
         }
     }
     @media (max-width: 899px) {
         .hero-text-side {
-            padding: 2.2rem 1.5rem;
+            padding: 1.75rem 1.25rem;
         }
         .hero-image-side {
-            height: 200px;
+            height: 160px;
             background-image: url("{% static 'images/hero_rwanda_hills.jpg' %}");
             background-size: cover;
             background-position: center;
@@ -92,7 +92,7 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 4px 12px;
+        padding: 3px 10px;
         border-radius: 9999px;
         background: rgba(16, 185, 129, 0.2);
         border: 1px solid rgba(132, 204, 22, 0.4);
@@ -101,30 +101,30 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
     }
     .hero-title {
-        font-size: 32px;
+        font-size: 30px;
         font-weight: 800;
         color: #FFFFFF;
-        line-height: 1.2;
-        margin-bottom: 10px;
+        line-height: 1.18;
+        margin-bottom: 6px;
     }
     @media (min-width: 640px) {
-        .hero-title { font-size: 38px; }
+        .hero-title { font-size: 34px; }
     }
     .hero-subtitle {
-        font-size: 14px;
-        line-height: 1.6;
+        font-size: 13.5px;
+        line-height: 1.5;
         color: rgba(226, 232, 240, 0.92);
         max-width: 580px;
-        margin-bottom: 22px;
+        margin-bottom: 16px;
     }
     .hero-badges-row {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
     }
     .hero-badge-pill {
         display: inline-flex;
@@ -132,9 +132,9 @@
         gap: 6px;
         background: rgba(255, 255, 255, 0.09);
         border: 1px solid rgba(255, 255, 255, 0.14);
-        padding: 6px 14px;
+        padding: 4px 11px;
         border-radius: 9999px;
-        font-size: 12px;
+        font-size: 11.5px;
         color: #E2E8F0;
         backdrop-filter: blur(4px);
     }
