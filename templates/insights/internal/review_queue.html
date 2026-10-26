@@ -3,100 +3,127 @@
 
 {% block title %}Review &amp; Approval Queue &bull; AgriLens Management{% endblock %}
 
-{% block content %}
-<div class="p-6 max-w-7xl mx-auto space-y-6">
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/insights_internal.css' %}?v=20261026_v2">
+{% endblock %}
 
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
-        <div>
-            <div class="flex items-center gap-2">
-                <a href="{% url 'insights:internal_dashboard' %}" class="text-xs text-emerald-700 hover:underline">&larr; Command Dashboard</a>
-                <span class="text-xs text-slate-400">/</span>
-                <span class="text-xs text-slate-500">Editorial Governance</span>
+{% block content %}
+<div class="mgmt-container">
+
+    <!-- 1. TOP HEADER -->
+    <header class="mgmt-header">
+        <div class="mgmt-header-left">
+            <div class="mgmt-kicker-row">
+                <a href="{% url 'insights:internal_dashboard' %}" class="mgmt-pill-kicker" style="text-decoration:none;">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Command Dashboard
+                </a>
+                <span class="mgmt-kicker-sub">Editorial Governance</span>
             </div>
-            <h1 class="text-2xl font-black text-slate-900 mt-1">Review &amp; Approval Queue</h1>
-            <p class="text-xs text-slate-600">
+            <h1 class="mgmt-h1">Review &amp; Approval Queue</h1>
+            <p class="mgmt-lead">
                 Institutional maker-checker workflow: Review discovered findings, inspect underlying microdata, and approve for public publication.
             </p>
         </div>
 
-        <span class="px-3 py-1.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-200">
-            {{ pending_count }} Pending Review
-        </span>
-    </div>
+        <div class="mgmt-header-actions">
+            <span class="btn-mgmt btn-mgmt-warning" style="cursor:default;">
+                <i class="fa-regular fa-clock"></i>
+                <span>{{ pending_count }} Pending Review</span>
+            </span>
+            <a href="{% url 'insights:internal_list' %}" class="btn-mgmt btn-mgmt-secondary" style="background:#F1F5F9; border:1px solid #CBD5E1; color:#334155;">
+                <i class="fa-solid fa-folder-open"></i>
+                <span>All Insights</span>
+            </a>
+        </div>
+    </header>
 
-    <!-- MESSAGES -->
+    <!-- 2. MESSAGES -->
     {% if messages %}
-    <div class="space-y-2">
+    <div class="mgmt-messages">
         {% for message in messages %}
-        <div class="p-3 rounded-lg text-xs font-medium {% if message.tags == 'success' %}bg-emerald-50 text-emerald-800 border border-emerald-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
-            {{ message }}
+        <div class="mgmt-alert {% if message.tags == 'success' %}mgmt-alert-success{% elif message.tags == 'error' %}mgmt-alert-error{% else %}mgmt-alert-info{% endif %}">
+            <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+            <span>{{ message }}</span>
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <!-- QUEUE TABLE -->
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-slate-700">
-                <thead class="bg-slate-50 text-slate-500 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+    <!-- 3. QUEUE TABLE CARD -->
+    <section class="mgmt-card">
+        <div class="mgmt-card-header">
+            <div class="mgmt-card-title">
+                <i class="fa-solid fa-clipboard-check" style="color: #D97706;"></i>
+                Pending Verification &amp; Approval
+            </div>
+            <span style="font-size:12px; color:#64748B;">Total: <strong>{{ pending_count }}</strong> items</span>
+        </div>
+
+        <div class="mgmt-table-wrapper">
+            <table class="mgmt-table">
+                <thead>
                     <tr>
-                        <th class="p-3">Title &amp; Proposed Story</th>
-                        <th class="p-3">Category</th>
-                        <th class="p-3">Scope &amp; Crop</th>
-                        <th class="p-3">Period</th>
-                        <th class="p-3">Shift</th>
-                        <th class="p-3">Quality</th>
-                        <th class="p-3">Status</th>
-                        <th class="p-3 text-right">Actions</th>
+                        <th>Title &amp; Proposed Story</th>
+                        <th>Category</th>
+                        <th>Scope &amp; Crop</th>
+                        <th>Period</th>
+                        <th>Shift</th>
+                        <th>Quality</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-200">
+                <tbody>
                     {% for ins in page_obj %}
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-3 font-semibold text-slate-900 max-w-sm">
-                            <a href="{% url 'insights:internal_detail' ins.id %}" class="hover:text-emerald-700 line-clamp-2">
+                    <tr>
+                        <td>
+                            <a href="{% url 'insights:internal_detail' ins.id %}" class="story-link-title" title="{{ ins.title }}">
                                 {{ ins.title }}
                             </a>
                         </td>
-                        <td class="p-3 text-slate-600">{{ ins.get_category_display }}</td>
-                        <td class="p-3 text-slate-600">
-                            <div>{{ ins.scope_label }}</div>
-                            <div class="text-[11px] text-slate-400">{{ ins.crop.name|default:"Multi-crop" }}</div>
+                        <td>
+                            <span style="font-weight:600; color:#475569;">{{ ins.get_category_display }}</span>
                         </td>
-                        <td class="p-3 text-slate-500">{{ ins.current_season }}</td>
-                        <td class="p-3 font-bold {% if ins.percentage_change > 0 %}text-emerald-700{% elif ins.percentage_change < 0 %}text-red-600{% else %}text-slate-700{% endif %}">
-                            {{ ins.formatted_change }}
+                        <td>
+                            <span style="color:#64748B;">{{ ins.scope_label }}</span>
+                            {% if ins.crop %}
+                            <span style="display:block; font-size:11px; font-weight:700; color:#065F46;">{{ ins.crop.name }}</span>
+                            {% endif %}
                         </td>
-                        <td class="p-3">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold
-                                {% if ins.data_quality_status == 'sufficient_data' %}bg-emerald-50 text-emerald-800 border border-emerald-200
-                                {% elif ins.data_quality_status == 'limited_data' %}bg-amber-50 text-amber-800 border border-amber-200
-                                {% else %}bg-purple-50 text-purple-800 border border-purple-200{% endif %}">
+                        <td>
+                            <span style="color:#64748B; font-size:12px;">{{ ins.current_season }}</span>
+                        </td>
+                        <td>
+                            <span class="{% if ins.percentage_change > 0 %}shift-val-positive{% elif ins.percentage_change < 0 %}shift-val-negative{% else %}shift-val-neutral{% endif %}">
+                                {{ ins.formatted_change }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-pill {% if ins.data_quality_status == 'sufficient_data' %}published{% elif ins.data_quality_status == 'limited_data' %}under_review{% else %}approved{% endif %}">
                                 {{ ins.get_data_quality_status_display }}
                             </span>
                         </td>
-                        <td class="p-3">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-100 text-amber-800">
+                        <td>
+                            <span class="status-pill {{ ins.status }}">
                                 {{ ins.get_status_display }}
                             </span>
                         </td>
-                        <td class="p-3 text-right space-x-1">
-                            <a href="{% url 'insights:internal_detail' ins.id %}" class="inline-flex items-center px-2.5 py-1 rounded bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition">
-                                Review
+                        <td style="text-align: right;">
+                            <a href="{% url 'insights:internal_detail' ins.id %}" class="btn-inspect-action">
+                                <span>Review</span>
+                                <i class="fa-solid fa-arrow-right" style="font-size: 10px;"></i>
                             </a>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="8" class="p-12 text-center text-slate-400">
-                            <div class="w-12 h-12 mx-auto rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 mb-3">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
+                        <td colspan="8" style="padding: 48px; text-align: center; color: #64748B;">
+                            <div style="width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; background: #DCFCE7; display: flex; align-items: center; justify-content: center; color: #15803D; font-size: 20px;">
+                                <i class="fa-solid fa-check"></i>
                             </div>
-                            <h4 class="font-bold text-slate-700 text-sm">Review Queue Clear</h4>
-                            <p class="text-xs text-slate-500 mt-1">There are no pending agricultural insights awaiting review.</p>
+                            <h4 style="font-size: 14px; font-weight: 700; color: #0F172A; margin-bottom: 4px;">Review Queue Clear</h4>
+                            <p style="font-size: 12px; color: #64748B;">There are no pending agricultural insights awaiting review.</p>
                         </td>
                     </tr>
                     {% endfor %}
@@ -104,20 +131,60 @@
             </table>
         </div>
 
+        <!-- PAGINATION BAR -->
         {% if page_obj.has_other_pages %}
-        <div class="p-4 border-t border-slate-200 flex items-center justify-between">
-            <span class="text-xs text-slate-500">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-            <div class="flex items-center gap-1">
-                {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}" class="px-2.5 py-1 rounded border text-xs text-slate-600 hover:bg-slate-50">Prev</a>
-                {% endif %}
-                {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}" class="px-2.5 py-1 rounded border text-xs text-slate-600 hover:bg-slate-50">Next</a>
-                {% endif %}
+        <div class="mgmt-pagination">
+            <div class="mgmt-pagination-info">
+                Showing <strong>{{ page_obj.start_index }}</strong> &ndash; <strong>{{ page_obj.end_index }}</strong> of <strong>{{ page_obj.paginator.count }}</strong> pending items
             </div>
+            <nav class="mgmt-pagination-nav" aria-label="Review Queue Pagination">
+                {% if page_obj.has_previous %}
+                <a href="?page=1" class="mgmt-page-btn" title="First Page">
+                    <i class="fa-solid fa-angles-left"></i>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}" class="mgmt-page-btn" title="Previous Page">
+                    <i class="fa-solid fa-angle-left"></i>
+                </a>
+                {% else %}
+                <span class="mgmt-page-btn disabled" aria-disabled="true">
+                    <i class="fa-solid fa-angles-left"></i>
+                </span>
+                <span class="mgmt-page-btn disabled" aria-disabled="true">
+                    <i class="fa-solid fa-angle-left"></i>
+                </span>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span class="mgmt-page-btn active" aria-current="page">{{ num }}</span>
+                    {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+                        <a href="?page={{ num }}" class="mgmt-page-btn">{{ num }}</a>
+                    {% elif num == 1 or num == page_obj.paginator.num_pages %}
+                        <a href="?page={{ num }}" class="mgmt-page-btn">{{ num }}</a>
+                    {% elif num == page_obj.number|add:"-3" or num == page_obj.number|add:"3" %}
+                        <span class="mgmt-page-ellipsis">&hellip;</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="mgmt-page-btn" title="Next Page">
+                    <i class="fa-solid fa-angle-right"></i>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="mgmt-page-btn" title="Last Page">
+                    <i class="fa-solid fa-angles-right"></i>
+                </a>
+                {% else %}
+                <span class="mgmt-page-btn disabled" aria-disabled="true">
+                    <i class="fa-solid fa-angle-right"></i>
+                </span>
+                <span class="mgmt-page-btn disabled" aria-disabled="true">
+                    <i class="fa-solid fa-angles-right"></i>
+                </span>
+                {% endif %}
+            </nav>
         </div>
         {% endif %}
-    </div>
+    </section>
 
 </div>
 {% endblock %}

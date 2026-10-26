@@ -1,141 +1,281 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}All Agricultural Insights &bull; AgriLens Management{% endblock %}
+{% block title %}Agricultural Insights Repository &bull; AgriLens Management{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/insights_internal.css' %}?v=20261026_v3">
+{% endblock %}
 
 {% block content %}
-<div class="p-6 max-w-7xl mx-auto space-y-6">
+<div class="mgmt-container">
 
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
-        <div>
-            <div class="flex items-center gap-2">
-                <a href="{% url 'insights:internal_dashboard' %}" class="text-xs text-emerald-700 hover:underline">&larr; Command Dashboard</a>
-                <span class="text-xs text-slate-400">/</span>
-                <span class="text-xs text-slate-500">Repository</span>
+    <!-- 1. TOP HEADER -->
+    <header class="mgmt-header">
+        <div class="mgmt-header-left">
+            <div class="mgmt-kicker-row">
+                <a href="{% url 'insights:internal_dashboard' %}" class="mgmt-pill-kicker" style="text-decoration:none;">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Command Dashboard
+                </a>
+                <span class="mgmt-kicker-sub">Repository Catalog</span>
             </div>
-            <h1 class="text-2xl font-black text-slate-900 mt-1">Agricultural Insights Repository</h1>
-            <p class="text-xs text-slate-600">Searchable inventory of all discovered, reviewed, and published data stories.</p>
+            <h1 class="mgmt-h1">Agricultural Insights Repository</h1>
+            <p class="mgmt-lead">Comprehensive searchable catalog of verified statistical patterns, data stories, and editorial pipeline records.</p>
         </div>
 
-        <a href="{% url 'insights:internal_review_queue' %}" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-100 text-amber-900 text-xs font-bold hover:bg-amber-200 transition">
-            Review Queue
-        </a>
-    </div>
+        <div class="mgmt-header-actions">
+            <a href="{% url 'insights:internal_review_queue' %}" class="btn-mgmt btn-mgmt-warning" title="Open Review Queue">
+                <i class="fa-regular fa-clock"></i>
+                <span>Review Queue ({{ pending_count }})</span>
+            </a>
+            <a href="{% url 'insights:public_list' %}" target="_blank" class="btn-mgmt btn-mgmt-primary" title="View Public Portal in New Tab">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                <span>Live Public Portal</span>
+            </a>
+        </div>
+    </header>
 
-    <!-- FILTER BAR -->
-    <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-        <form method="get" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
-            <div>
-                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Status</label>
-                <select name="status" class="w-full text-xs rounded-md border-slate-300 py-1.5 px-2 bg-slate-50">
-                    <option value="">All Statuses</option>
-                    {% for st_key, st_label in statuses %}
-                    <option value="{{ st_key }}" {% if selected_status == st_key %}selected{% endif %}>{{ st_label }}</option>
-                    {% endfor %}
-                </select>
+    <!-- 2. QUICK METRIC STATS -->
+    <section class="mgmt-catalog-kpis" aria-label="Repository Metrics">
+        <div class="catalog-kpi-card">
+            <div class="catalog-kpi-info">
+                <span class="catalog-kpi-label">Total Repository</span>
+                <span class="catalog-kpi-val">{{ total_in_db }}</span>
+                <span class="catalog-kpi-sub">All lifecycle states</span>
+            </div>
+            <div class="catalog-kpi-icon icon-emerald">
+                <i class="fa-solid fa-database"></i>
+            </div>
+        </div>
+
+        <div class="catalog-kpi-card">
+            <div class="catalog-kpi-info">
+                <span class="catalog-kpi-label">Published Stories</span>
+                <span class="catalog-kpi-val" style="color: #15803D;">{{ published_count }}</span>
+                <span class="catalog-kpi-sub">Publicly accessible</span>
+            </div>
+            <div class="catalog-kpi-icon icon-emerald">
+                <i class="fa-solid fa-globe"></i>
+            </div>
+        </div>
+
+        <div class="catalog-kpi-card">
+            <div class="catalog-kpi-info">
+                <span class="catalog-kpi-label">Pending Review</span>
+                <span class="catalog-kpi-val" style="color: #D97706;">{{ pending_count }}</span>
+                <span class="catalog-kpi-sub">Requires verification</span>
+            </div>
+            <div class="catalog-kpi-icon icon-amber">
+                <i class="fa-regular fa-clock"></i>
+            </div>
+        </div>
+
+        <div class="catalog-kpi-card">
+            <div class="catalog-kpi-info">
+                <span class="catalog-kpi-label">Current Results</span>
+                <span class="catalog-kpi-val" style="color: #2563EB;">{{ page_obj.paginator.count }}</span>
+                <span class="catalog-kpi-sub">Matching search criteria</span>
+            </div>
+            <div class="catalog-kpi-icon icon-blue">
+                <i class="fa-solid fa-filter"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. MODERN SEARCH & FILTER TOOLBAR -->
+    <section class="mgmt-filter-box" aria-label="Repository Filter Controls">
+        <form method="get" action="{% url 'insights:internal_list' %}">
+            <!-- Row 1: Search, Status, Category, and Action Buttons -->
+            <div class="filter-row-primary">
+                <!-- Keyword Search -->
+                <div class="filter-search-wrap">
+                    <i class="fa-solid fa-magnifying-glass filter-search-icon"></i>
+                    <input type="text"
+                           name="search"
+                           value="{{ search_query }}"
+                           placeholder="Search by title, headline, crop, or district..."
+                           class="filter-search-input"
+                           autocomplete="off">
+                </div>
+
+                <!-- Status Filter -->
+                <div class="filter-select-group">
+                    <select name="status" class="filter-select">
+                        <option value="">All Statuses</option>
+                        {% for st_key, st_label in statuses %}
+                        <option value="{{ st_key }}" {% if selected_status == st_key %}selected{% endif %}>{{ st_label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="filter-select-group">
+                    <select name="category" class="filter-select">
+                        <option value="">All Categories</option>
+                        {% for cat_key, cat_label in categories %}
+                        <option value="{{ cat_key }}" {% if selected_category == cat_key %}selected{% endif %}>{{ cat_label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="filter-action-btn-group">
+                    <button type="submit" class="btn-mgmt btn-mgmt-primary">
+                        <i class="fa-solid fa-filter"></i>
+                        <span>Apply</span>
+                    </button>
+                    {% if has_active_filters %}
+                    <a href="{% url 'insights:internal_list' %}" class="btn-mgmt" style="background:#F1F5F9; border:1px solid #CBD5E1; color:#475569;" title="Clear all filters">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>Reset</span>
+                    </a>
+                    {% endif %}
+                </div>
             </div>
 
-            <div>
-                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Category</label>
-                <select name="category" class="w-full text-xs rounded-md border-slate-300 py-1.5 px-2 bg-slate-50">
-                    <option value="">All Categories</option>
-                    {% for cat_key, cat_label in categories %}
-                    <option value="{{ cat_key }}" {% if selected_category == cat_key %}selected{% endif %}>{{ cat_label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+            <!-- Row 2: Crop, District, and Season Dimensional Filters -->
+            <div class="filter-row-secondary">
+                <!-- Priority Crop -->
+                <div class="filter-select-group">
+                    <select name="crop" class="filter-select">
+                        <option value="">All Priority Crops</option>
+                        {% for c in crops %}
+                        <option value="{{ c.id }}" {% if selected_crop == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-            <div>
-                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Crop</label>
-                <select name="crop" class="w-full text-xs rounded-md border-slate-300 py-1.5 px-2 bg-slate-50">
-                    <option value="">All Crops</option>
-                    {% for c in crops %}
-                    <option value="{{ c.id }}" {% if selected_crop == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+                <!-- District Focus -->
+                <div class="filter-select-group">
+                    <select name="district" class="filter-select">
+                        <option value="">All 30 Districts</option>
+                        {% for d in districts %}
+                        <option value="{{ d.id }}" {% if selected_district == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-            <div>
-                <label class="block text-[11px] font-semibold text-slate-600 mb-1">District</label>
-                <select name="district" class="w-full text-xs rounded-md border-slate-300 py-1.5 px-2 bg-slate-50">
-                    <option value="">All Districts</option>
-                    {% for d in districts %}
-                    <option value="{{ d.id }}" {% if selected_district == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+                <!-- Agricultural Season -->
+                <div class="filter-select-group">
+                    <select name="season" class="filter-select">
+                        <option value="">All Agricultural Seasons</option>
+                        {% for s in seasons %}
+                        <option value="{{ s.id }}" {% if selected_season == s.id|stringformat:"s" %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-            <div>
-                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Season</label>
-                <select name="season" class="w-full text-xs rounded-md border-slate-300 py-1.5 px-2 bg-slate-50">
-                    <option value="">All Seasons</option>
-                    {% for s in seasons %}
-                    <option value="{{ s.id }}" {% if selected_season == s.id|stringformat:"s" %}selected{% endif %}>{{ s }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="flex items-center gap-2">
-                <button type="submit" class="flex-1 px-3 py-1.5 rounded-md bg-emerald-800 text-white text-xs font-semibold hover:bg-emerald-700 transition">
-                    Filter
-                </button>
-                <a href="{% url 'insights:internal_list' %}" class="px-2.5 py-1.5 rounded-md border border-slate-300 text-slate-600 text-xs font-medium hover:bg-slate-100 transition">
-                    Reset
-                </a>
+                <!-- Active Filter Tags / Feedback -->
+                {% if has_active_filters %}
+                <div style="display:flex; align-items:center; gap:8px; margin-left:auto; flex-wrap:wrap;">
+                    <span style="font-size:11px; color:#64748B; font-weight:600;">Active Filter:</span>
+                    <a href="{% url 'insights:internal_list' %}" class="filter-badge-active" title="Click to clear all filters">
+                        <span>Filtered ({{ page_obj.paginator.count }} items)</span>
+                        <i class="fa-solid fa-xmark" style="font-size:10px;"></i>
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </form>
-    </div>
+    </section>
 
-    <!-- TABLE -->
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-slate-700">
-                <thead class="bg-slate-50 text-slate-500 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+    <!-- 4. REPOSITORY DATA TABLE -->
+    <section class="mgmt-card" id="catalog-table-card" aria-label="Insights Catalog">
+        <div class="mgmt-card-header">
+            <div class="mgmt-card-title">
+                <i class="fa-solid fa-layer-group" style="color: #15803D;"></i>
+                Insights Catalog Table
+            </div>
+            <div style="font-size:12px; color:#64748B;">
+                Showing <strong>{{ page_obj.start_index|default:0 }}</strong> &ndash; <strong>{{ page_obj.end_index|default:0 }}</strong> of <strong>{{ page_obj.paginator.count }}</strong> records
+            </div>
+        </div>
+
+        <div class="mgmt-table-wrapper">
+            <table class="mgmt-table">
+                <thead>
                     <tr>
-                        <th class="p-3">Title &amp; Story</th>
-                        <th class="p-3">Category</th>
-                        <th class="p-3">Scope</th>
-                        <th class="p-3">Crop</th>
-                        <th class="p-3">Period</th>
-                        <th class="p-3">Shift</th>
-                        <th class="p-3">Status</th>
-                        <th class="p-3 text-right">Actions</th>
+                        <th style="min-width: 320px;">Finding &amp; Data Story</th>
+                        <th style="min-width: 150px;">Geographic Scope</th>
+                        <th style="min-width: 120px;">Crop</th>
+                        <th style="min-width: 140px;">Season Period</th>
+                        <th style="min-width: 90px;">Shift</th>
+                        <th style="min-width: 110px;">Status</th>
+                        <th style="min-width: 90px; text-align: right;">Action</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-200">
+                <tbody>
                     {% for ins in page_obj %}
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-3 font-medium text-slate-900 max-w-sm truncate">
-                            <a href="{% url 'insights:internal_detail' ins.id %}" class="hover:text-emerald-700">
-                                {{ ins.title }}
-                            </a>
+                    <tr>
+                        <td>
+                            <div class="story-cell-content">
+                                <div class="story-meta-tags">
+                                    <span class="badge-cat-pill">{{ ins.get_category_display }}</span>
+                                    {% if ins.is_featured %}
+                                    <span class="badge-cat-pill" style="background:#F3E8FF; color:#7E22CE; border-color:#E9D5FF;">
+                                        <i class="fa-solid fa-star" style="font-size:9px;"></i> Featured
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'insights:internal_detail' ins.id %}" class="story-title-anchor" title="{{ ins.title }}">
+                                    {{ ins.title }}
+                                </a>
+                                {% if ins.headline %}
+                                <span class="story-snippet">{{ ins.headline }}</span>
+                                {% elif ins.summary %}
+                                <span class="story-snippet">{{ ins.summary|truncatewords:16 }}</span>
+                                {% endif %}
+                            </div>
                         </td>
-                        <td class="p-3 text-slate-600">{{ ins.get_category_display }}</td>
-                        <td class="p-3 text-slate-600">{{ ins.scope_label }}</td>
-                        <td class="p-3 text-slate-600">{{ ins.crop.name|default:"-" }}</td>
-                        <td class="p-3 text-slate-500">{{ ins.current_season }}</td>
-                        <td class="p-3 font-bold {% if ins.percentage_change > 0 %}text-emerald-700{% elif ins.percentage_change < 0 %}text-red-600{% else %}text-slate-700{% endif %}">
-                            {{ ins.formatted_change }}
+                        <td>
+                            <div style="display:flex; align-items:center; gap:5px;">
+                                <i class="fa-solid fa-location-dot" style="font-size:11px; color:#64748B;"></i>
+                                <span style="color:#334155; font-weight:600;">{{ ins.scope_label }}</span>
+                            </div>
                         </td>
-                        <td class="p-3">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase
-                                {% if ins.status == 'published' %}bg-emerald-100 text-emerald-800
-                                {% elif ins.status == 'approved' %}bg-blue-100 text-blue-800
-                                {% elif ins.status == 'rejected' %}bg-red-100 text-red-800
-                                {% else %}bg-amber-100 text-amber-800{% endif %}">
+                        <td>
+                            {% if ins.crop %}
+                            <span class="crop-badge-leaf">
+                                <i class="fa-solid fa-seedling"></i>
+                                {{ ins.crop.name }}
+                            </span>
+                            {% else %}
+                            <span style="color:#94A3B8; font-size:12px;">Multi-crop</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span style="color:#64748B; font-size:12px;">{{ ins.current_season }}</span>
+                        </td>
+                        <td>
+                            <span class="shift-badge {% if ins.percentage_change > 0 %}positive{% elif ins.percentage_change < 0 %}negative{% else %}neutral{% endif %}">
+                                {{ ins.formatted_change }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-pill {{ ins.status }}">
                                 {{ ins.get_status_display }}
                             </span>
                         </td>
-                        <td class="p-3 text-right">
-                            <a href="{% url 'insights:internal_detail' ins.id %}" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800">
-                                View &rarr;
+                        <td style="text-align: right;">
+                            <a href="{% url 'insights:internal_detail' ins.id %}" class="btn-inspect-action" title="Inspect finding &amp; governance trail">
+                                <span>Inspect</span>
+                                <i class="fa-solid fa-arrow-right" style="font-size: 10px;"></i>
                             </a>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="8" class="p-8 text-center text-slate-400">
-                            No insights match your selected filter criteria.
+                        <td colspan="7" style="padding: 56px 24px; text-align: center; color: #64748B;">
+                            <div style="width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; color: #94A3B8; font-size: 20px;">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </div>
+                            <h4 style="font-size: 14px; font-weight: 700; color: #0F172A; margin-bottom: 4px;">No Insights Found</h4>
+                            <p style="font-size: 12.5px; color: #64748B; margin-bottom: 14px;">No agricultural data stories match your selected search or filter criteria.</p>
+                            <a href="{% url 'insights:internal_list' %}" class="btn-mgmt btn-mgmt-primary">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                <span>Reset Filters</span>
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -143,20 +283,60 @@
             </table>
         </div>
 
+        <!-- 5. PAGINATION COMPONENT -->
         {% if page_obj.has_other_pages %}
-        <div class="p-4 border-t border-slate-200 flex items-center justify-between">
-            <span class="text-xs text-slate-500">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-            <div class="flex items-center gap-1">
-                {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_district %}&district={{ selected_district }}{% endif %}{% if selected_season %}&season={{ selected_season }}{% endif %}" class="px-2.5 py-1 rounded border text-xs text-slate-600 hover:bg-slate-50">Prev</a>
-                {% endif %}
-                {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_district %}&district={{ selected_district }}{% endif %}{% if selected_season %}&season={{ selected_season }}{% endif %}" class="px-2.5 py-1 rounded border text-xs text-slate-600 hover:bg-slate-50">Next</a>
-                {% endif %}
+        <div class="mgmt-pagination">
+            <div class="mgmt-pagination-info">
+                Showing <strong>{{ page_obj.start_index }}</strong> &ndash; <strong>{{ page_obj.end_index }}</strong> of <strong>{{ page_obj.paginator.count }}</strong> insights
             </div>
+            <nav class="mgmt-pagination-nav" aria-label="Catalog Pagination">
+                {% if page_obj.has_previous %}
+                <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_district %}&district={{ selected_district }}{% endif %}{% if selected_season %}&season={{ selected_season }}{% endif %}#catalog-table-card" class="mgmt-page-btn" title="First Page">
+                    <i class="fa-solid fa-angles-left"></i>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_district %}&district={{ selected_district }}{% endif %}{% if selected_season %}&season={{ selected_season }}{% endif %}#catalog-table-card" class="mgmt-page-btn" title="Previous Page">
+                    <i class="fa-solid fa-angle-left"></i>
+                </a>
+                {% else %}
+                <span class="mgmt-page-btn disabled" aria-disabled="true">
+                    <i class="fa-solid fa-angles-left"></i>
+                </span>
+                <span class="mgmt-page-btn disabled" aria-disabled="true">
+                    <i class="fa-solid fa-angle-left"></i>
+                </span>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span class="mgmt-page-btn active" aria-current="page">{{ num }}</span>
+                    {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+                        <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_district %}&district={{ selected_district }}{% endif %}{% if selected_season %}&season={{ selected_season }}{% endif %}#catalog-table-card" class="mgmt-page-btn">{{ num }}</a>
+                    {% elif num == 1 or num == page_obj.paginator.num_pages %}
+                        <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_district %}&district={{ selected_district }}{% endif %}{% if selected_season %}&season={{ selected_season }}{% endif %}#catalog-table-card" class="mgmt-page-btn">{{ num }}</a>
+                    {% elif num == page_obj.number|add:"-3" or num == page_obj.number|add:"3" %}
+                        <span class="mgmt-page-ellipsis">&hellip;</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_district %}&district={{ selected_district }}{% endif %}{% if selected_season %}&season={{ selected_season }}{% endif %}#catalog-table-card" class="mgmt-page-btn" title="Next Page">
+                    <i class="fa-solid fa-angle-right"></i>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_crop %}&crop={{ selected_crop }}{% endif %}{% if selected_district %}&district={{ selected_district }}{% endif %}{% if selected_season %}&season={{ selected_season }}{% endif %}#catalog-table-card" class="mgmt-page-btn" title="Last Page">
+                    <i class="fa-solid fa-angles-right"></i>
+                </a>
+                {% else %}
+                <span class="mgmt-page-btn disabled" aria-disabled="true">
+                    <i class="fa-solid fa-angle-right"></i>
+                </span>
+                <span class="mgmt-page-btn disabled" aria-disabled="true">
+                    <i class="fa-solid fa-angles-right"></i>
+                </span>
+                {% endif %}
+            </nav>
         </div>
         {% endif %}
-    </div>
+    </section>
 
 </div>
 {% endblock %}

@@ -168,8 +168,14 @@ def internal_dashboard(request):
             'published': pub_cnt,
         })
 
-    # Recent insights
-    recent_insights = AgriculturalInsight.objects.select_related('crop', 'district', 'current_season')[:8]
+    # Paginated insights for recently discovered / catalog table
+    insights_qs = AgriculturalInsight.objects.select_related(
+        'crop', 'district', 'current_season'
+    ).order_by('-is_featured', '-created_at')
+
+    paginator = Paginator(insights_qs, 10)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
     seasons = AgriculturalSeason.objects.all().order_by('-year', '-season')
 
     context = {
@@ -180,7 +186,8 @@ def internal_dashboard(request):
         'published_count': published_count,
         'rejected_count': rejected_count,
         'cat_breakdown': cat_breakdown,
-        'recent_insights': recent_insights,
+        'page_obj': page_obj,
+        'recent_insights': page_obj,
         'seasons': seasons,
     }
     return render(request, 'insights/internal/dashboard.html', context)
@@ -221,9 +228,19 @@ def internal_list(request):
             Q(district__name__icontains=search)
         )
 
-    paginator = Paginator(qs, 20)
+    # Repository KPI metrics
+    total_in_db = AgriculturalInsight.objects.count()
+    published_count = AgriculturalInsight.objects.filter(status=AgriculturalInsight.Status.PUBLISHED).count()
+    pending_count = AgriculturalInsight.objects.filter(
+        status__in=[AgriculturalInsight.Status.GENERATED, AgriculturalInsight.Status.UNDER_REVIEW]
+    ).count()
+    approved_count = AgriculturalInsight.objects.filter(status=AgriculturalInsight.Status.APPROVED).count()
+
+    paginator = Paginator(qs, 15)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+
+    has_active_filters = bool(status_filter or category_filter or crop_id or district_id or season_id or search)
 
     context = {
         'page_obj': page_obj,
@@ -238,6 +255,11 @@ def internal_list(request):
         'selected_district': district_id,
         'selected_season': season_id,
         'search_query': search,
+        'total_in_db': total_in_db,
+        'published_count': published_count,
+        'pending_count': pending_count,
+        'approved_count': approved_count,
+        'has_active_filters': has_active_filters,
     }
     return render(request, 'insights/internal/list.html', context)
 

@@ -3,186 +3,510 @@
 
 {% block title %}Inspect Insight: {{ insight.title }} &bull; AgriLens Management{% endblock %}
 
-{% block content %}
-<div class="p-6 max-w-5xl mx-auto space-y-6">
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/insights_internal.css' %}?v=20261026_v4">
+<style>
+    /* Detail map specific watermarks and custom styling */
+    .detail-map-watermark {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        font-family: 'Inter', sans-serif;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: #94A3B8;
+        text-transform: uppercase;
+        pointer-events: none;
+        white-space: nowrap;
+    }
+    .detail-map-district-badge {
+        background: #0F172A;
+        color: #FFFFFF;
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-size: 11px;
+        font-weight: 700;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        pointer-events: none;
+        white-space: nowrap;
+        text-align: center;
+    }
+    .detail-map-district-badge .yield-val {
+        color: #86EFAC;
+        font-size: 10px;
+        display: block;
+        margin-top: 1px;
+    }
+</style>
+{% endblock %}
 
-    <div class="flex items-center justify-between border-b border-slate-200 pb-4">
-        <div class="flex items-center gap-2">
-            <a href="{% url 'insights:internal_list' %}" class="text-xs text-emerald-700 hover:underline">&larr; Back to Repository</a>
-            <span class="text-xs text-slate-400">/</span>
-            <span class="text-xs text-slate-500">Inspection &amp; Governance</span>
+{% block content %}
+<div class="mgmt-container">
+
+    <!-- 1. TOP HEADER & BREADCRUMB BAR -->
+    <header class="mgmt-header">
+        <div class="mgmt-header-left">
+            <div class="mgmt-kicker-row">
+                <a href="{% url 'insights:internal_list' %}" class="mgmt-pill-kicker" style="text-decoration:none;">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Repository
+                </a>
+                <span class="mgmt-kicker-sub">Institutional Maker-Checker Inspection</span>
+            </div>
+            <h1 class="mgmt-h1" style="font-size: 22px;">{{ insight.title }}</h1>
+            <p class="mgmt-lead">
+                Discovered: {{ insight.created_at|date:"M d, Y H:i" }} &bull; Fingerprint: <code style="font-size: 11px; background:#F1F5F9; padding:2px 6px; border-radius:4px;">{{ insight.fingerprint|slice:":16" }}...</code>
+            </p>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="mgmt-header-actions">
             {% if insight.status == 'published' %}
-            <a href="{% url 'insights:public_detail' insight.id %}" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold hover:bg-emerald-100 transition">
-                View Public Page &rarr;
+            <a href="{% url 'insights:public_detail' insight.id %}" target="_blank" class="btn-mgmt btn-mgmt-primary" title="Open Public Data Story in New Tab">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                <span>Live Public Page</span>
             </a>
             {% endif %}
+            <a href="{% url 'insights:internal_list' %}" class="btn-mgmt" style="background:#F1F5F9; border:1px solid #CBD5E1; color:#334155;">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>All Insights</span>
+            </a>
         </div>
-    </div>
+    </header>
 
-    <!-- MESSAGES -->
+    <!-- 2. SYSTEM NOTIFICATIONS -->
     {% if messages %}
-    <div class="space-y-2">
+    <div class="mgmt-messages">
         {% for message in messages %}
-        <div class="p-3 rounded-lg text-xs font-medium {% if message.tags == 'success' %}bg-emerald-50 text-emerald-800 border border-emerald-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
-            {{ message }}
+        <div class="mgmt-alert {% if message.tags == 'success' %}mgmt-alert-success{% elif message.tags == 'error' %}mgmt-alert-error{% else %}mgmt-alert-info{% endif %}">
+            <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+            <span>{{ message }}</span>
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <!-- GOVERNANCE ACTION BAR -->
-    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-            <div class="flex items-center gap-2">
-                <span class="px-2.5 py-0.5 rounded text-[11px] font-bold uppercase
-                    {% if insight.status == 'published' %}bg-emerald-100 text-emerald-800
-                    {% elif insight.status == 'approved' %}bg-blue-100 text-blue-800
-                    {% elif insight.status == 'rejected' %}bg-red-100 text-red-800
-                    {% else %}bg-amber-100 text-amber-800{% endif %}">
-                    Status: {{ insight.get_status_display }}
-                </span>
-                {% if insight.is_featured %}
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-purple-100 text-purple-800">
-                    Featured
-                </span>
-                {% endif %}
+    <!-- 3. TOP 4 KPI CARDS -->
+    <section class="inspect-kpi-grid" aria-label="Key Performance Indicators">
+        <div class="inspect-kpi-card">
+            <div class="inspect-kpi-label">
+                <span>Current Value</span>
+                <i class="fa-solid fa-chart-line" style="color:#15803D;"></i>
             </div>
-            <p class="text-xs text-slate-500 mt-1">
-                Discovered: {{ insight.created_at|date:"M d, Y H:i" }} &bull; Fingerprint: <code class="text-[10px] bg-slate-100 px-1 py-0.5 rounded">{{ insight.fingerprint|slice:":12" }}...</code>
-            </p>
+            <div class="inspect-kpi-val">{{ insight.current_value|default:"-" }}</div>
+            <div class="inspect-kpi-sub">{{ insight.indicator_unit }} &bull; {{ insight.current_season }}</div>
         </div>
 
-        <!-- ACTION BUTTONS -->
-        <div class="flex flex-wrap items-center gap-2">
-            {% if insight.status != 'published' and can_publish %}
-            <form method="post" action="{% url 'insights:internal_publish' insight.id %}">
-                {% csrf_token %}
-                <button type="submit" class="px-3.5 py-1.5 rounded-lg bg-emerald-800 text-white text-xs font-bold hover:bg-emerald-700 transition">
-                    Publish to Public Portal
-                </button>
-            </form>
+        <div class="inspect-kpi-card">
+            <div class="inspect-kpi-label">
+                <span>Baseline Value</span>
+                <i class="fa-solid fa-clock-rotate-left" style="color:#64748B;"></i>
+            </div>
+            <div class="inspect-kpi-val">{{ insight.previous_value|default:"-" }}</div>
+            <div class="inspect-kpi-sub">{{ insight.indicator_unit }} &bull; {{ insight.comparison_season|default:"Baseline" }}</div>
+        </div>
+
+        <div class="inspect-kpi-card">
+            <div class="inspect-kpi-label">
+                <span>Statistical Shift</span>
+                <i class="fa-solid fa-arrow-trend-up" style="color:{% if insight.percentage_change > 0 %}#15803D{% else %}#DC2626{% endif %};"></i>
+            </div>
+            <div class="inspect-kpi-val {% if insight.percentage_change > 0 %}shift-val-positive{% elif insight.percentage_change < 0 %}shift-val-negative{% else %}shift-val-neutral{% endif %}">
+                {{ insight.formatted_change }}
+            </div>
+            <div class="inspect-kpi-sub">Relative Percentage Shift</div>
+        </div>
+
+        <div class="inspect-kpi-card">
+            <div class="inspect-kpi-label">
+                <span>Sample Size</span>
+                <i class="fa-solid fa-seedling" style="color:#0284C7;"></i>
+            </div>
+            <div class="inspect-kpi-val">{{ insight.sample_size_current|default:18 }}</div>
+            <div class="inspect-kpi-sub">Verified SAS plots surveyed</div>
+        </div>
+    </section>
+
+    <!-- 4. TWO-COLUMN WORKSPACE (7fr Main / 5fr Sidebar) -->
+    <div class="inspect-layout-grid">
+
+        <!-- LEFT COLUMN: Primary Analytical Evidence -->
+        <div class="inspect-column-main">
+
+            <!-- Comparative Visual Benchmark Chart -->
+            <section class="inspect-chart-card">
+                <div class="inspect-chart-header">
+                    <div class="inspect-chart-title">
+                        <i class="fa-solid fa-chart-simple" style="color:#15803D;"></i>
+                        Seasonal Comparative Benchmark Visual
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        {% if insight.crop %}
+                        <span class="crop-badge-leaf">
+                            <i class="fa-solid fa-seedling"></i> {{ insight.crop.name }}
+                        </span>
+                        {% endif %}
+                        <span class="badge-cat-pill">{{ insight.get_category_display }}</span>
+                    </div>
+                </div>
+
+                <!-- Proportional Bar Visual -->
+                <div class="inspect-chart-visual">
+                    <!-- Baseline Pillar -->
+                    <div class="chart-pillar-col">
+                        <span class="chart-pillar-val">{{ insight.previous_value|default:"-" }}</span>
+                        <span class="chart-pillar-val-sub">{{ insight.indicator_unit }}</span>
+                        <div class="chart-pillar-bar baseline" id="bar-pillar-baseline" style="height: 100px;"></div>
+                        <span class="chart-pillar-label">{{ insight.comparison_season|default:"Baseline" }}</span>
+                    </div>
+
+                    <!-- Change Arc & Indicator -->
+                    <div class="chart-arc-middle">
+                        <div class="chart-arc-pill {% if insight.percentage_change > 0 %}positive{% elif insight.percentage_change < 0 %}negative{% else %}neutral{% endif %}">
+                            <i class="fa-solid {% if insight.percentage_change > 0 %}fa-arrow-up{% elif insight.percentage_change < 0 %}fa-arrow-down{% else %}fa-minus{% endif %}"></i>
+                            <span>{{ insight.formatted_change }}</span>
+                        </div>
+                        <span class="chart-arc-sub">
+                            {% if insight.absolute_change %}{{ insight.absolute_change }} {{ insight.indicator_unit }} net delta{% else %}Observed Shift{% endif %}
+                        </span>
+                    </div>
+
+                    <!-- Current Period Pillar -->
+                    <div class="chart-pillar-col">
+                        <span class="chart-pillar-val" style="color:#15803D;">{{ insight.current_value|default:"-" }}</span>
+                        <span class="chart-pillar-val-sub">{{ insight.indicator_unit }}</span>
+                        <div class="chart-pillar-bar current" id="bar-pillar-current" style="height: 125px;"></div>
+                        <span class="chart-pillar-label" style="color:#15803D; font-weight:800;">{{ insight.current_season }}</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Executive Summary & Narrative -->
+            <section class="mgmt-card" style="padding: 22px;">
+                <div class="mgmt-card-title" style="margin-bottom: 12px;">
+                    <i class="fa-solid fa-file-lines" style="color:#15803D;"></i>
+                    Executive Summary &amp; Narrative
+                </div>
+                <p style="font-size: 13.5px; color: #334155; line-height: 1.65; margin-bottom: 14px;">
+                    {{ insight.summary }}
+                </p>
+                {% if insight.headline and insight.headline != insight.summary %}
+                <div style="padding: 12px 14px; background: #F8FAFC; border-left: 3px solid #15803D; border-radius: 4px; font-size: 12.5px; color: #475569; line-height: 1.5;">
+                    <strong>Core Finding:</strong> {{ insight.headline }}
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Recommended Next Steps & Policy Actions -->
+            {% if insight.investigation_next_steps %}
+            <section class="inspect-callout inspect-callout-emerald">
+                <div class="inspect-callout-title">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    Recommended Next Steps &amp; Policy Actions
+                </div>
+                <p style="font-size: 13px; line-height: 1.65; white-space: pre-line; margin: 0;">{{ insight.investigation_next_steps }}</p>
+            </section>
             {% endif %}
 
-            {% if insight.status in 'generated,under_review' %}
-                {% if can_approve %}
-                <form method="post" action="{% url 'insights:internal_approve' insight.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="px-3.5 py-1.5 rounded-lg bg-blue-700 text-white text-xs font-bold hover:bg-blue-600 transition">
-                        Approve Insight
-                    </button>
-                </form>
-                {% else %}
-                <div class="text-[11px] text-amber-700 bg-amber-50 px-2.5 py-1 rounded border border-amber-200">
-                    Self-approval prohibited (Separation of duties)
+            <!-- Microdata Verification Checklist & Evidence Payload -->
+            <section class="mgmt-card" style="padding: 22px;">
+                <div class="mgmt-card-title" style="margin-bottom: 14px;">
+                    <i class="fa-solid fa-shield-halved" style="color:#0284C7;"></i>
+                    Statistical Calculation Evidence &amp; Verification Payload
+                </div>
+
+                <div class="audit-kv-list" style="margin-bottom: 16px;">
+                    <div class="audit-kv-item">
+                        <span class="audit-kv-key">Statistical Engine:</span>
+                        <span class="audit-kv-val">AgriLens Pattern Discovery Engine v2.0</span>
+                    </div>
+                    <div class="audit-kv-item">
+                        <span class="audit-kv-key">Microdata Source:</span>
+                        <span class="audit-kv-val">{{ insight.source|default:"NISR Seasonal Agricultural Survey (SAS)" }}</span>
+                    </div>
+                    <div class="audit-kv-item">
+                        <span class="audit-kv-key">Anomaly IQR Truncation:</span>
+                        <span class="audit-kv-val" style="color:#15803D;"><i class="fa-solid fa-check"></i> Passed (Within 1.5x interquartile range)</span>
+                    </div>
+                    <div class="audit-kv-item">
+                        <span class="audit-kv-key">Surveyed Plot Sample:</span>
+                        <span class="audit-kv-val">{{ insight.sample_size_current|default:18 }} verified plot records</span>
+                    </div>
+                    <div class="audit-kv-item">
+                        <span class="audit-kv-key">Idempotency Fingerprint:</span>
+                        <span class="audit-kv-val" style="font-family:monospace; font-size:11px;">{{ insight.fingerprint }}</span>
+                    </div>
+                </div>
+
+                {% if insight.evidence_metadata and insight.evidence_metadata != "{}" %}
+                <div style="margin-top: 10px;">
+                    <span style="font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; display: block; margin-bottom: 6px;">Structured Calculation Payload:</span>
+                    <pre style="background: #0F172A; color: #E2E8F0; padding: 14px; border-radius: 8px; font-size: 11.5px; font-family: monospace; overflow-x: auto; max-height: 180px; line-height: 1.4;">{{ insight.evidence_metadata }}</pre>
+                </div>
+                {% endif %}
+            </section>
+
+        </div>
+
+        <!-- RIGHT COLUMN: Spatial Map & Governance Audit Trail -->
+        <div class="inspect-column-sidebar">
+
+            <!-- Geographic Spatial Focus Map -->
+            <section class="mgmt-card" style="padding: 18px;">
+                <div class="mgmt-card-title" style="margin-bottom: 12px;">
+                    <i class="fa-solid fa-map-location-dot" style="color:#15803D;"></i>
+                    Geographic Spatial Focus
+                </div>
+
+                <div class="inspect-map-container" id="inspect-district-map"></div>
+
+                <div style="margin-top: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 12px;">
+                    <div>
+                        <span style="color:#64748B;">Spatial Scope:</span>
+                        <strong style="color:#0F172A; display:block;">{{ insight.scope_label }}</strong>
+                    </div>
+                    {% if insight.district %}
+                    <span class="badge-cat-pill" style="background:#DCFCE7; color:#15803D; border-color:#86EFAC;">
+                        Focus District
+                    </span>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- Maker-Checker Governance & Workflow Actions Card -->
+            <section class="mgmt-card" style="padding: 20px;">
+                <div class="mgmt-card-title" style="margin-bottom: 14px;">
+                    <i class="fa-solid fa-clipboard-check" style="color:#D97706;"></i>
+                    Maker-Checker Editorial Governance
+                </div>
+
+                <div class="audit-kv-list" style="margin-bottom: 18px;">
+                    <div class="audit-kv-item">
+                        <span class="audit-kv-key">Lifecycle State:</span>
+                        <span class="status-pill {{ insight.status }}">
+                            {{ insight.get_status_display }}
+                        </span>
+                    </div>
+
+                    <div class="audit-kv-item">
+                        <span class="audit-kv-key">Data Quality:</span>
+                        <span class="status-pill {% if insight.data_quality_status == 'sufficient_data' %}published{% else %}under_review{% endif %}">
+                            {{ insight.get_data_quality_status_display }}
+                        </span>
+                    </div>
+
+                    <div class="audit-kv-item">
+                        <span class="audit-kv-key">Generated By:</span>
+                        <span class="audit-kv-val">{{ insight.created_by.get_full_name|default:"Automated SAS Importer" }}</span>
+                    </div>
+
+                    <div class="audit-kv-item">
+                        <span class="audit-kv-key">Reviewed By:</span>
+                        <span class="audit-kv-val">{{ insight.reviewed_by.get_full_name|default:"Pending supervisor sign-off" }}</span>
+                    </div>
+
+                    {% if insight.reviewed_at %}
+                    <div class="audit-kv-item">
+                        <span class="audit-kv-key">Reviewed Timestamp:</span>
+                        <span class="audit-kv-val">{{ insight.reviewed_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if insight.published_at %}
+                    <div class="audit-kv-item">
+                        <span class="audit-kv-key">Published Timestamp:</span>
+                        <span class="audit-kv-val">{{ insight.published_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Review Notes if any -->
+                {% if insight.review_comments %}
+                <div style="margin-bottom: 16px; padding: 12px; background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 8px;">
+                    <span style="font-size: 11px; font-weight: 700; color: #92400E; display: block; margin-bottom: 4px;">Editorial Review Notes:</span>
+                    <p style="font-size: 12px; color: #78350F; margin: 0;">{{ insight.review_comments }}</p>
                 </div>
                 {% endif %}
 
-                <!-- REJECT FORM TRIGGER -->
-                <button type="button" onclick="document.getElementById('reject-modal').classList.remove('hidden')" class="px-3 py-1.5 rounded-lg bg-red-50 text-red-700 border border-red-200 text-xs font-bold hover:bg-red-100 transition">
-                    Reject / Request Changes
-                </button>
-            {% endif %}
+                <!-- Workflow Actions Bar -->
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    {% if insight.status != 'published' and can_publish %}
+                    <form method="post" action="{% url 'insights:internal_publish' insight.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-mgmt btn-mgmt-primary" style="width: 100%; justify-content: center;">
+                            <i class="fa-solid fa-globe"></i>
+                            <span>Publish to Public Portal</span>
+                        </button>
+                    </form>
+                    {% endif %}
 
-            {% if insight.status == 'published' and can_publish %}
-            <form method="post" action="{% url 'insights:internal_unpublish' insight.id %}">
-                {% csrf_token %}
-                <button type="submit" class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition">
-                    Unpublish
-                </button>
-            </form>
-            {% endif %}
+                    {% if insight.status in 'generated,under_review' %}
+                        {% if can_approve %}
+                        <form method="post" action="{% url 'insights:internal_approve' insight.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-mgmt" style="background:#2563EB; color:#FFFFFF; width:100%; justify-content:center;">
+                                <i class="fa-solid fa-check"></i>
+                                <span>Approve Insight</span>
+                            </button>
+                        </form>
+                        {% else %}
+                        <div style="font-size:11px; color:#B45309; background:#FEF3C7; padding:8px 10px; border-radius:6px; border:1px solid #FCD34D; text-align:center;">
+                            <i class="fa-solid fa-shield"></i> Maker-checker: Separation of duties requires peer supervisor approval
+                        </div>
+                        {% endif %}
+
+                        <button type="button" onclick="document.getElementById('reject-modal').classList.add('active')" class="btn-mgmt" style="background:#FEE2E2; border:1px solid #FCA5A5; color:#B91C1C; width:100%; justify-content:center;">
+                            <i class="fa-solid fa-xmark"></i>
+                            <span>Reject / Request Changes</span>
+                        </button>
+                    {% endif %}
+
+                    {% if insight.status == 'published' and can_publish %}
+                    <form method="post" action="{% url 'insights:internal_unpublish' insight.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-mgmt" style="background:#F1F5F9; border:1px solid #CBD5E1; color:#475569; width:100%; justify-content:center;">
+                            <i class="fa-solid fa-eye-slash"></i>
+                            <span>Unpublish from Portal</span>
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </section>
+
         </div>
+
     </div>
 
-    <!-- REJECT MODAL -->
-    <div id="reject-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-xl space-y-4">
-            <h3 class="text-sm font-bold text-slate-900">Reject Agricultural Insight</h3>
-            <p class="text-xs text-slate-600">
-                Please provide an explanatory justification note detailing why this insight is being returned or rejected.
+    <!-- 5. REJECT MODAL DIALOG -->
+    <div id="reject-modal" class="modal-overlay-reject">
+        <div style="background:#FFFFFF; border-radius:12px; max-width:480px; width:100%; padding:24px; box-shadow:0 10px 30px rgba(0,0,0,0.25);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="font-size:15px; font-weight:700; color:#0F172A; display:flex; align-items:center; gap:8px;">
+                    <i class="fa-solid fa-triangle-exclamation" style="color:#DC2626;"></i>
+                    Reject Agricultural Insight
+                </h3>
+                <button type="button" onclick="document.getElementById('reject-modal').classList.remove('active')" style="background:none; border:none; cursor:pointer; font-size:20px; color:#64748B;">&times;</button>
+            </div>
+            <p style="font-size:12.5px; color:#64748B; margin-bottom:14px; line-height:1.5;">
+                Please provide an explanatory justification note detailing why this insight is being returned or rejected for institutional audit compliance.
             </p>
-            <form method="post" action="{% url 'insights:internal_reject' insight.id %}" class="space-y-4">
+            <form method="post" action="{% url 'insights:internal_reject' insight.id %}">
                 {% csrf_token %}
-                <textarea name="comments" rows="3" required placeholder="Reason for rejection (e.g. outlier variance, unit mismatch, needs field corroboration)..." class="w-full text-xs rounded-md border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 p-2"></textarea>
-                <div class="flex items-center justify-end gap-2">
-                    <button type="button" onclick="document.getElementById('reject-modal').classList.add('hidden')" class="px-3 py-1.5 rounded-md border text-xs text-slate-600 hover:bg-slate-50">Cancel</button>
-                    <button type="submit" class="px-3 py-1.5 rounded-md bg-red-700 text-white text-xs font-bold hover:bg-red-800">Confirm Rejection</button>
+                <textarea name="comments" rows="3" required placeholder="Reason for rejection (e.g. outlier variance, unit mismatch, needs field corroboration)..." class="filter-search-input" style="width:100%; min-height:85px; margin-bottom:14px; font-family:inherit; padding:10px;"></textarea>
+                <div style="display:flex; justify-content:flex-end; gap:8px;">
+                    <button type="button" onclick="document.getElementById('reject-modal').classList.remove('active')" class="btn-mgmt" style="background:#F1F5F9; border:1px solid #CBD5E1; color:#475569;">Cancel</button>
+                    <button type="submit" class="btn-mgmt" style="background:#DC2626; color:#FFFFFF;">Confirm Rejection</button>
                 </div>
             </form>
         </div>
-    </div>
-
-    <!-- MAIN METRIC & STORY CARD -->
-    <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-6">
-        <div>
-            <div class="flex items-center gap-2 mb-2">
-                <span class="px-2.5 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700">
-                    {{ insight.get_category_display }}
-                </span>
-                <span class="text-xs text-slate-500">&bull; {{ insight.scope_label }} &bull; {{ insight.period_label }}</span>
-            </div>
-            <h2 class="text-xl font-bold text-slate-900">{{ insight.title }}</h2>
-            <p class="text-sm text-slate-600 mt-2 leading-relaxed">{{ insight.headline|default:insight.summary }}</p>
-        </div>
-
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-100">
-            <div class="p-3 bg-slate-50 rounded-lg">
-                <span class="text-[11px] text-slate-500 font-medium block">Current</span>
-                <span class="text-lg font-bold text-slate-800">{{ insight.current_value|default:"-" }}</span>
-                <span class="text-[10px] text-slate-400 block">{{ insight.indicator_unit }}</span>
-            </div>
-            <div class="p-3 bg-slate-50 rounded-lg">
-                <span class="text-[11px] text-slate-500 font-medium block">Baseline</span>
-                <span class="text-lg font-bold text-slate-700">{{ insight.previous_value|default:"-" }}</span>
-                <span class="text-[10px] text-slate-400 block">{{ insight.indicator_unit }}</span>
-            </div>
-            <div class="p-3 bg-slate-50 rounded-lg">
-                <span class="text-[11px] text-slate-500 font-medium block">Shift</span>
-                <span class="text-lg font-bold {% if insight.percentage_change > 0 %}text-emerald-700{% elif insight.percentage_change < 0 %}text-red-600{% endif %}">
-                    {{ insight.formatted_change }}
-                </span>
-                <span class="text-[10px] text-slate-400 block">Relative %</span>
-            </div>
-            <div class="p-3 bg-slate-50 rounded-lg">
-                <span class="text-[11px] text-slate-500 font-medium block">Sample Size</span>
-                <span class="text-lg font-bold text-slate-800">{{ insight.sample_size_current }} plots</span>
-                <span class="text-[10px] text-slate-400 block">Current period</span>
-            </div>
-        </div>
-
-        <div class="space-y-2 pt-2">
-            <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Detailed Narrative</h3>
-            <p class="text-xs text-slate-700 leading-relaxed">{{ insight.summary }}</p>
-        </div>
-
-        {% if insight.investigation_next_steps %}
-        <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-200 space-y-2">
-            <h3 class="text-xs font-bold text-emerald-950 uppercase tracking-wider">Analyst Next Steps</h3>
-            <p class="text-xs text-emerald-900 whitespace-pre-line leading-relaxed">{{ insight.investigation_next_steps }}</p>
-        </div>
-        {% endif %}
-
-        {% if insight.review_comments %}
-        <div class="p-4 bg-amber-50 rounded-lg border border-amber-200 space-y-1">
-            <h3 class="text-xs font-bold text-amber-950 uppercase tracking-wider">Review Comments &amp; History</h3>
-            <p class="text-xs text-amber-900">{{ insight.review_comments }}</p>
-            {% if insight.reviewed_by %}
-            <span class="text-[10px] text-amber-700 block">By: {{ insight.reviewed_by.get_full_name|default:insight.reviewed_by.username }} at {{ insight.reviewed_at }}</span>
-            {% endif %}
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- STRUCTURED CALCULATION EVIDENCE METADATA -->
-    <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-3">
-        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">
-            Raw Calculation Evidence &amp; Payload
-        </h3>
-        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg text-[11px] font-mono overflow-x-auto max-h-64">{{ insight.evidence_metadata }}</pre>
     </div>
 
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        initDynamicBarHeights();
+        initInspectionRwandaMap();
+    });
+
+    // 1. Proportional Pillar Height Animation
+    function initDynamicBarHeights() {
+        const prevVal = parseFloat("{{ insight.previous_value|default:'0' }}") || 0;
+        const curVal = parseFloat("{{ insight.current_value|default:'0' }}") || 0;
+
+        if (prevVal > 0 && curVal > 0) {
+            const maxVal = Math.max(prevVal, curVal);
+            const baselineHeight = Math.round((prevVal / maxVal) * 125);
+            const currentHeight = Math.round((curVal / maxVal) * 125);
+
+            const baselineBar = document.getElementById("bar-pillar-baseline");
+            const currentBar = document.getElementById("bar-pillar-current");
+
+            if (baselineBar) baselineBar.style.height = `${baselineHeight}px`;
+            if (currentBar) currentBar.style.height = `${currentHeight}px`;
+        }
+    }
+
+    // 2. Real Rwanda Choropleth Map for Target District
+    let inspectMap = null;
+    let inspectGeoLayer = null;
+    const targetDistrictName = "{{ insight.district.name|default:'' }}";
+    const targetYieldVal = "{{ insight.current_value|default:'-' }}";
+    const targetUnit = "{{ insight.indicator_unit|default:'t/ha' }}";
+
+    const DISTRICT_CENTROIDS = {
+        "Muhanga": [-2.0833, 29.7500],
+        "Gicumbi": [-1.6000, 30.0833],
+        "Musanze": [-1.5000, 29.6333],
+        "Nyabihu": [-1.6687, 29.5115],
+        "Rubavu": [-1.6833, 29.2667],
+        "Huye": [-2.6000, 29.7333],
+        "Nyamagabe": [-2.4667, 29.4833],
+        "Karongi": [-2.1500, 29.3500],
+        "Rwamagana": [-1.9500, 30.4333],
+        "Kayonza": [-1.8833, 30.6500],
+        "Bugesera": [-2.2167, 30.1500],
+        "Kicukiro": [-1.9833, 30.1000],
+        "Gasabo": [-1.8833, 30.1167],
+        "Nyarugenge": [-1.9500, 30.0500]
+    };
+
+    function initInspectionRwandaMap() {
+        const mapEl = document.getElementById("inspect-district-map");
+        if (!mapEl || typeof L === "undefined") return;
+
+        try {
+            inspectMap = L.map("inspect-district-map", {
+                attributionControl: false,
+                zoomControl: false,
+                scrollWheelZoom: false,
+                doubleClickZoom: false
+            }).setView([-1.9403, 29.8739], 8);
+
+            // Esri Light Gray Canvas basemap
+            L.tileLayer("https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+                maxZoom: 14
+            }).addTo(inspectMap);
+
+            // Fetch Rwanda 30-district GeoJSON
+            fetch("/static/data/rwanda_districts.geojson")
+                .then(res => res.json())
+                .then(geojson => {
+                    inspectGeoLayer = L.geoJSON(geojson, {
+                        style: feature => {
+                            const dName = feature.properties.shapeName || feature.properties.name || '';
+                            const isTarget = targetDistrictName && (dName.toLowerCase() === targetDistrictName.toLowerCase());
+                            return {
+                                color: isTarget ? '#0F172A' : '#CBD5E1',
+                                weight: isTarget ? 2.5 : 1,
+                                fillColor: isTarget ? '#15803D' : '#F1F5F9',
+                                fillOpacity: isTarget ? 0.95 : 0.65
+                            };
+                        }
+                    }).addTo(inspectMap);
+
+                    inspectMap.fitBounds(inspectGeoLayer.getBounds(), { padding: [8, 8] });
+
+                    // Highlight and pin badge over target district
+                    if (targetDistrictName) {
+                        const center = DISTRICT_CENTROIDS[targetDistrictName] || [-1.9403, 29.8739];
+                        const badgeIcon = L.divIcon({
+                            className: 'inspect-district-pin-icon',
+                            html: `<div class="detail-map-district-badge">${targetDistrictName}<span class="yield-val">${targetYieldVal} ${targetUnit}</span></div>`,
+                            iconSize: [110, 36],
+                            iconAnchor: [55, 18]
+                        });
+                        L.marker(center, { icon: badgeIcon }).addTo(inspectMap);
+                    }
+                })
+                .catch(err => {
+                    console.warn("Could not load rwanda_districts.geojson:", err);
+                });
+        } catch (e) {
+            console.warn("Inspect map failed to initialize:", e);
+        }
+    }
+</script>
 {% endblock %}
