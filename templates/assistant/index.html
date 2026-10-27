@@ -3,224 +3,761 @@
 
 {% block title %}Grounded AI Agricultural Data Assistant | AgriLens{% endblock %}
 
-{% block content %}
-<div class="dashboard-container" style="max-width: 1400px; margin: 0 auto; padding: 24px 20px;">
+{% block extra_css %}
+<style>
+/* ==========================================================================
+   AgriLens Conversational AI Interface (ChatGPT / Claude Style)
+   ========================================================================== */
 
-    <!-- 1. Header Banner -->
-    <div style="background: linear-gradient(135deg, #064E3B 0%, #065F46 60%, #047857 100%); border-radius: 12px; padding: 24px 28px; color: #FFFFFF; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(6, 78, 59, 0.15); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-        <div>
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-                <span style="background: rgba(255, 255, 255, 0.18); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
-                    <i class="fa-solid fa-shield-check" style="color: #6EE7B7;"></i> 100% Deterministic &bull; Zero Hallucination
-                </span>
-                <span style="background: rgba(16, 185, 129, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">
-                    <i class="fa-solid fa-database"></i> 23,833 Validated Observations
-                </span>
-            </div>
-            <h1 style="font-size: 24px; font-weight: 800; margin: 0 0 6px 0; color: #FFFFFF;">
-                Grounded AI Agricultural Data Assistant
-            </h1>
-            <p style="font-size: 13px; color: #D1FAE5; margin: 0; max-width: 780px; line-height: 1.5;">
-                Query sovereign agricultural survey microdata using conversational natural language. Every factual answer executes a strict, read-only PostgreSQL ORM aggregation with complete statistical sample lineage.
-            </p>
+/* Full-viewport canvas within the dashboard shell */
+.ai-app-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 65px);
+    background: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* 1. Sleek Minimal Top Navigation */
+.ai-topbar-strip {
+    height: 52px;
+    border-bottom: 1px solid #E5E7EB;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #FFFFFF;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.ai-model-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #0F172A;
+    cursor: default;
+}
+
+.ai-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10B981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.ai-model-subtag {
+    font-size: 11px;
+    background: #F1F5F9;
+    color: #475569;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.ai-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-btn-new-chat {
+    background: #F4F4F5;
+    border: 1px solid #E4E4E7;
+    color: #18181B;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+}
+
+.ai-btn-new-chat:hover {
+    background: #E4E4E7;
+    color: #09090B;
+}
+
+.ai-btn-nav-link {
+    font-size: 12.5px;
+    color: #71717A;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ai-btn-nav-link:hover {
+    color: #09090B;
+}
+
+/* 2. Scrollable Conversation Canvas */
+.ai-chat-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 20px 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    scroll-behavior: smooth;
+}
+
+.ai-chat-thread {
+    width: 100%;
+    max-width: 780px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+/* 3. Welcome / Empty State (ChatGPT Inspired) */
+.ai-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: 40px auto 20px;
+    width: 100%;
+    max-width: 780px;
+}
+
+.ai-empty-logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.25);
+}
+
+.ai-empty-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #09090B;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+}
+
+.ai-empty-subtitle {
+    font-size: 14px;
+    color: #71717A;
+    margin-bottom: 32px;
+    max-width: 540px;
+    line-height: 1.5;
+}
+
+/* Prompt Suggestion Cards (ChatGPT 2x2 Grid) */
+.ai-prompt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    width: 100%;
+}
+
+.ai-prompt-card {
+    background: #FFFFFF;
+    border: 1px solid #E4E4E7;
+    border-radius: 14px;
+    padding: 14px 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.ai-prompt-card:hover {
+    border-color: #A1A1AA;
+    background: #FAFAFA;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.ai-prompt-tag {
+    font-size: 11px;
+    font-weight: 700;
+    color: #059669;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ai-prompt-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #18181B;
+    line-height: 1.4;
+}
+
+/* 4. Chat Messages Stream */
+/* User Message Bubble */
+.chat-row-user {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.chat-bubble-user {
+    background: #F4F4F5;
+    color: #18181B;
+    padding: 10px 18px;
+    border-radius: 20px;
+    max-width: 78%;
+    font-size: 14.5px;
+    line-height: 1.5;
+    word-break: break-word;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Assistant Message Row */
+.chat-row-assistant {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    width: 100%;
+}
+
+.assistant-avatar-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #059669;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.assistant-content-body {
+    flex: 1;
+    min-width: 0;
+    font-size: 14.5px;
+    color: #0F172A;
+    line-height: 1.65;
+}
+
+/* Factual Answer Text */
+.answer-prose {
+    font-size: 14.5px;
+    color: #18181B;
+    line-height: 1.65;
+    margin-bottom: 14px;
+}
+
+.answer-prose strong {
+    font-weight: 700;
+    color: #09090B;
+}
+
+/* Rich Structured Cards (Rankings, Yield, Inputs) */
+.rich-result-card {
+    background: #FFFFFF;
+    border: 1px solid #E4E4E7;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 14px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Leaderboard Ranking Card */
+.leaderboard-top-item {
+    background: linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%);
+    border: 1px solid #A7F3D0;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.leaderboard-top-badge {
+    background: #059669;
+    color: #FFFFFF;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.leaderboard-top-name {
+    font-size: 18px;
+    font-weight: 800;
+    color: #064E3B;
+}
+
+.leaderboard-table-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 32px 1.2fr 2fr 1.2fr 80px;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #FAFAFA;
+    border: 1px solid #F4F4F5;
+    border-radius: 8px;
+    font-size: 13px;
+    transition: background 0.15s;
+}
+
+.leaderboard-row:hover {
+    background: #F4F4F5;
+}
+
+.rank-pill {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    background: #E4E4E7;
+    color: #3F3F46;
+}
+
+.rank-1 .rank-pill { background: #FEF3C7; color: #B45309; }
+.rank-2 .rank-pill { background: #F1F5F9; color: #475569; }
+.rank-3 .rank-pill { background: #FFEDD5; color: #C2410C; }
+
+.bar-track {
+    width: 100%;
+    height: 7px;
+    background: #E4E4E7;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10B981 0%, #059669 100%);
+    border-radius: 4px;
+}
+
+/* KPI Tiles Grid */
+.kpi-tiles-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 12px 0;
+}
+
+.kpi-tile {
+    background: #FAFAFA;
+    border: 1px solid #E4E4E7;
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.kpi-tile-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #71717A;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+}
+
+.kpi-tile-value {
+    font-size: 20px;
+    font-weight: 800;
+    color: #18181B;
+}
+
+.kpi-tile-sub {
+    font-size: 11px;
+    color: #71717A;
+    margin-top: 2px;
+}
+
+/* Modern Action Toolbar (Copy, Speak, Share, Lineage) */
+.ai-actions-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.ai-action-btn {
+    background: transparent;
+    border: none;
+    color: #71717A;
+    font-size: 13px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+}
+
+.ai-action-btn:hover {
+    background: #F4F4F5;
+    color: #18181B;
+}
+
+.ai-action-btn.active {
+    color: #059669;
+}
+
+.ai-deep-link-btn {
+    background: #ECFDF5;
+    border: 1px solid #A7F3D0;
+    color: #065F46;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    transition: all 0.15s;
+}
+
+.ai-deep-link-btn:hover {
+    background: #D1FAE5;
+    color: #047857;
+}
+
+/* Collapsible Query Lineage Box */
+.ai-lineage-box {
+    display: none;
+    margin-top: 12px;
+    background: #09090B;
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: #F4F4F5;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 11.5px;
+}
+
+/* Loading Pulse Indicator */
+.ai-typing-indicator {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    color: #71717A;
+    font-size: 13.5px;
+}
+
+.typing-dot {
+    width: 6px;
+    height: 6px;
+    background: #059669;
+    border-radius: 50%;
+    animation: typingPulse 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingPulse {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1.1); opacity: 1; }
+}
+
+/* 5. Floating Bottom Dock (ChatGPT Pill Style) */
+.ai-bottom-dock {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.95) 25%, #FFFFFF 100%);
+    padding: 18px 20px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    z-index: 20;
+}
+
+.ai-input-capsule {
+    pointer-events: auto;
+    width: 100%;
+    max-width: 780px;
+    background: #F4F4F5;
+    border: 1px solid #E4E4E7;
+    border-radius: 28px;
+    padding: 6px 8px 6px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ai-input-capsule:focus-within {
+    background: #FFFFFF;
+    border-color: #059669;
+    box-shadow: 0 6px 24px rgba(5, 150, 105, 0.16);
+}
+
+.ai-input-textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 14.5px;
+    color: #18181B;
+    padding: 8px 4px;
+    font-family: inherit;
+    resize: none;
+    height: 38px;
+    max-height: 120px;
+    line-height: 22px;
+}
+
+.ai-input-textarea::placeholder {
+    color: #A1A1AA;
+}
+
+.ai-dock-btn-send {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #18181B;
+    color: #FFFFFF;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.ai-dock-btn-send.active {
+    background: #059669;
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35);
+}
+
+.ai-dock-btn-send:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.ai-disclaimer-text {
+    font-size: 11.5px;
+    color: #71717A;
+    margin-top: 8px;
+    text-align: center;
+    pointer-events: auto;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ai-app-container">
+
+    <!-- 1. Sleek Topbar Strip -->
+    <div class="ai-topbar-strip">
+        <div class="ai-model-badge">
+            <span class="ai-status-dot"></span>
+            <span>Grounded AI Agricultural Data Assistant</span>
+            <span class="ai-model-subtag">23,833 NISR Records &bull; Zero Hallucination</span>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <a href="/indicators/productivity/" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); color: #FFFFFF; font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-chart-line"></i> Yield Indicators
+        <div class="ai-topbar-actions">
+            <button type="button" class="ai-btn-new-chat" onclick="startNewChat()">
+                <i class="fa-solid fa-plus"></i> New Chat
+            </button>
+            <a href="/indicators/productivity/" class="ai-btn-nav-link">
+                <i class="fa-solid fa-chart-line"></i> Yield Indicators ↗
             </a>
-            <a href="/decision-support/" style="background: #FFFFFF; color: #065F46; font-size: 12px; font-weight: 700; padding: 8px 16px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-                <i class="fa-solid fa-compass"></i> Decision Hub
+            <a href="/decision-support/" class="ai-btn-nav-link">
+                <i class="fa-solid fa-compass"></i> Decision Hub ↗
             </a>
         </div>
     </div>
 
-    <!-- 2. Main Two-Column Grid -->
-    <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 24px; align-items: start;">
+    <!-- 2. Scrollable Chat Stream -->
+    <div class="ai-chat-scroll" id="chatScrollArea">
+        <div class="ai-chat-thread" id="chatThread">
 
-        <!-- Left Column: Interactive Chat & Response Center -->
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-
-            <!-- Query Input Card -->
-            <div class="card" style="border: 1px solid #CBD5E1; background: #FFFFFF; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-                
-                <!-- Suggested Quick Query Chips -->
-                <div style="margin-bottom: 14px;">
-                    <span style="font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: block;">
-                        <i class="fa-solid fa-sparkles" style="color: #F59E0B;"></i> Suggested Empirical Queries:
-                    </span>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;" id="suggestedChipsContainer">
-                        {% for q in suggested_queries %}
-                        <button type="button" class="query-chip" onclick="applySuggestedQuery('{{ q|escapejs }}')" style="background: #F1F5F9; border: 1px solid #E2E8F0; color: #1E293B; font-size: 11.5px; font-weight: 600; padding: 6px 12px; border-radius: 20px; cursor: pointer; transition: all 0.15s ease; text-align: left;">
-                            {{ q }}
-                        </button>
-                        {% endfor %}
-                    </div>
+            <!-- Empty State / Starting Screen -->
+            <div class="ai-empty-state" id="emptyStateContainer">
+                <div class="ai-empty-logo">
+                    <i class="fa-solid fa-sparkles"></i>
                 </div>
+                <h2 class="ai-empty-title">What agricultural data would you like to explore?</h2>
+                <p class="ai-empty-subtitle">
+                    Ask questions in natural language. Every factual answer executes an audited calculation directly over official Rwanda NISR survey microdata.
+                </p>
 
-                <!-- Input Field Form -->
-                <form id="assistantQueryForm" onsubmit="submitAssistantQuery(event)">
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <div style="position: relative; flex: 1;">
-                            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94A3B8; font-size: 14px;"></i>
-                            <input type="text" id="assistantQueryInput" placeholder="Ask a question (e.g. What is the average Irish Potato yield in Musanze?)..." required style="width: 100%; padding: 12px 14px 12px 40px; font-size: 13.5px; border: 1.5px solid #CBD5E1; border-radius: 8px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#059669'" onblur="this.style.borderColor='#CBD5E1'">
-                        </div>
-                        <button type="submit" id="assistantSubmitBtn" style="background: #059669; color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 12px 20px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.15s; white-space: nowrap;">
-                            <i class="fa-solid fa-paper-plane"></i> Ask Assistant
-                        </button>
+                <!-- Prompt Cards -->
+                <div class="ai-prompt-grid">
+                    <div class="ai-prompt-card" onclick="selectPrompt('Which district produces the most beans?')">
+                        <div class="ai-prompt-tag"><i class="fa-solid fa-trophy"></i> Production Rankings</div>
+                        <div class="ai-prompt-text">Which district produces the most beans in Rwanda?</div>
                     </div>
-                </form>
-
-                <!-- Loading State Indicator -->
-                <div id="assistantLoadingIndicator" style="display: none; align-items: center; gap: 10px; margin-top: 14px; padding: 10px 14px; background: #F0FDF4; border-radius: 8px; border: 1px solid #A7F3D0;">
-                    <i class="fa-solid fa-spinner fa-spin" style="color: #059669;"></i>
-                    <span style="font-size: 12px; color: #065F46; font-weight: 600;">
-                        Parsing query &bull; Executing deterministic PostgreSQL aggregation over 23,833 survey records...
-                    </span>
+                    <div class="ai-prompt-card" onclick="selectPrompt('What is the average Irish Potato yield in Musanze?')">
+                        <div class="ai-prompt-tag"><i class="fa-solid fa-chart-simple"></i> Crop Yield &amp; Area</div>
+                        <div class="ai-prompt-text">What is the average Irish Potato yield in Musanze?</div>
+                    </div>
+                    <div class="ai-prompt-card" onclick="selectPrompt('What percentage of farmers in Nyagatare use mineral fertilizer?')">
+                        <div class="ai-prompt-tag"><i class="fa-solid fa-flask-round-potion"></i> Practice Adoption</div>
+                        <div class="ai-prompt-text">What percentage of farmers in Nyagatare use mineral fertilizer?</div>
+                    </div>
+                    <div class="ai-prompt-card" onclick="selectPrompt('What is the vulnerability index for Karongi?')">
+                        <div class="ai-prompt-tag"><i class="fa-solid fa-shield-heart"></i> Vulnerability (AVI)</div>
+                        <div class="ai-prompt-text">What is the vulnerability index for Karongi?</div>
+                    </div>
+                    <div class="ai-prompt-card" onclick="selectPrompt('What is the retail price of beans in monitored markets?')">
+                        <div class="ai-prompt-tag"><i class="fa-solid fa-tag"></i> Market Surveillance</div>
+                        <div class="ai-prompt-text">What is the retail price of beans in monitored markets?</div>
+                    </div>
+                    <div class="ai-prompt-card" onclick="selectPrompt('What is the average maize yield in Nyagatare?')">
+                        <div class="ai-prompt-tag"><i class="fa-solid fa-wheat-awn"></i> Benchmark Comparison</div>
+                        <div class="ai-prompt-text">What is the average maize yield in Nyagatare?</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Dynamic Conversation Timeline Container -->
-            <div id="assistantConversationContainer" style="display: flex; flex-direction: column; gap: 16px;">
-                <!-- Initial Welcome Message -->
-                <div class="assistant-message-card" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.03);">
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                        <div style="width: 32px; height: 32px; border-radius: 8px; background: #ECFDF5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 15px;">
-                            <i class="fa-solid fa-robot"></i>
-                        </div>
-                        <div>
-                            <div style="font-size: 13px; font-weight: 700; color: #0F172A;">AgriLens Grounded Assistant</div>
-                            <div style="font-size: 10.5px; color: #64748B;">Ready to query 2024–2025 Seasonal Agricultural Survey microdata</div>
-                        </div>
-                    </div>
-                    <p style="font-size: 13px; color: #334155; line-height: 1.6; margin: 0 0 12px 0;">
-                        Hello! I am your empirical agricultural intelligence assistant. Unlike generative AI chatbots that fabricate estimated figures, every answer I provide is calculated live from official National Institute of Statistics of Rwanda (NISR) microdata and MINAGRI price surveillance.
-                    </p>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <span style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 4px 10px; border-radius: 6px; font-size: 11px; color: #475569;">
-                            <i class="fa-solid fa-check" style="color: #059669;"></i> Crop Yields &amp; Gaps
-                        </span>
-                        <span style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 4px 10px; border-radius: 6px; font-size: 11px; color: #475569;">
-                            <i class="fa-solid fa-check" style="color: #059669;"></i> Production &amp; Acreage
-                        </span>
-                        <span style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 4px 10px; border-radius: 6px; font-size: 11px; color: #475569;">
-                            <i class="fa-solid fa-check" style="color: #059669;"></i> Fertilizer &amp; Seed Adoption
-                        </span>
-                        <span style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 4px 10px; border-radius: 6px; font-size: 11px; color: #475569;">
-                            <i class="fa-solid fa-check" style="color: #059669;"></i> Post-Harvest Loss Audits
-                        </span>
-                        <span style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 4px 10px; border-radius: 6px; font-size: 11px; color: #475569;">
-                            <i class="fa-solid fa-check" style="color: #059669;"></i> District Vulnerability (AVI)
-                        </span>
-                    </div>
-                </div>
-            </div>
+            <!-- Dynamic Messages will be appended here -->
 
         </div>
 
-        <!-- Right Column: Governance, Lineage & Query Log -->
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-
-            <!-- Grounded Architecture Card -->
-            <div class="card" style="border: 1px solid #CBD5E1; background: #FFFFFF; border-radius: 12px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.03);">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                    <i class="fa-solid fa-shield-halved" style="color: #059669; font-size: 16px;"></i>
-                    <span style="font-size: 13px; font-weight: 700; color: #0F172A;">Track 1 Governance Standards</span>
-                </div>
-                <div style="font-size: 11.5px; color: #475569; line-height: 1.5; display: flex; flex-direction: column; gap: 10px;">
-                    <div style="display: flex; gap: 8px; align-items: flex-start;">
-                        <i class="fa-solid fa-circle-check" style="color: #10B981; margin-top: 3px; font-size: 11px;"></i>
-                        <div><strong>Strict Read-Only:</strong> Text-to-ORM parser cannot modify database state.</div>
-                    </div>
-                    <div style="display: flex; gap: 8px; align-items: flex-start;">
-                        <i class="fa-solid fa-circle-check" style="color: #10B981; margin-top: 3px; font-size: 11px;"></i>
-                        <div><strong>Exact Code Provenance:</strong> Executed SQL/ORM queries are revealed verbatim.</div>
-                    </div>
-                    <div style="display: flex; gap: 8px; align-items: flex-start;">
-                        <i class="fa-solid fa-circle-check" style="color: #10B981; margin-top: 3px; font-size: 11px;"></i>
-                        <div><strong>Zero Hallucination:</strong> If survey data is unobserved, the engine halts rather than fabricating figures.</div>
-                    </div>
-                    <div style="display: flex; gap: 8px; align-items: flex-start;">
-                        <i class="fa-solid fa-circle-check" style="color: #10B981; margin-top: 3px; font-size: 11px;"></i>
-                        <div><strong>Audit Trail:</strong> All questions logged with sample counts and response latency.</div>
-                    </div>
-                </div>
+        <!-- Typing / Execution Indicator -->
+        <div class="ai-typing-indicator" id="typingIndicator">
+            <div class="assistant-avatar-circle" style="width: 26px; height: 26px; font-size: 12px;">
+                <i class="fa-solid fa-robot"></i>
             </div>
-
-            <!-- API Contract Card -->
-            <div class="card" style="border: 1px solid #E2E8F0; background: #F8FAFC; border-radius: 12px; padding: 16px;">
-                <div style="font-size: 12px; font-weight: 700; color: #1E293B; margin-bottom: 6px;">
-                    <i class="fa-solid fa-code" style="color: #2563EB;"></i> Automated REST API
-                </div>
-                <div style="font-size: 11px; color: #64748B; margin-bottom: 8px;">
-                    Query programmatically via HTTP:
-                </div>
-                <div style="background: #0F172A; color: #38BDF8; padding: 8px 10px; border-radius: 6px; font-size: 11px; font-family: monospace;">
-                    POST /api/v1/assistant/query/
-                </div>
-                <div style="font-size: 10px; color: #64748B; margin-top: 6px;">
-                    Payload: <code>{"query": "maize yield in Nyagatare"}</code>
-                </div>
+            <div style="display: flex; align-items: center; gap: 4px;">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
             </div>
-
-            <!-- Recent Queries Card -->
-            {% if recent_queries %}
-            <div class="card" style="border: 1px solid #E2E8F0; background: #FFFFFF; border-radius: 12px; padding: 16px;">
-                <div style="font-size: 12px; font-weight: 700; color: #1E293B; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                    <span><i class="fa-solid fa-clock-rotate-left" style="color: #64748B;"></i> Your Recent Queries</span>
-                    <span style="font-size: 10px; color: #94A3B8;">Audited</span>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                    {% for q in recent_queries %}
-                    <div style="background: #F8FAFC; border: 1px solid #F1F5F9; border-radius: 6px; padding: 8px 10px; cursor: pointer;" onclick="applySuggestedQuery('{{ q.query_text|escapejs }}')">
-                        <div style="font-size: 11.5px; font-weight: 600; color: #0F172A; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-                            {{ q.query_text }}
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 10px; color: #64748B;">
-                            <span>{{ q.sample_count }} samples &bull; {{ q.execution_time_ms|floatformat:0 }}ms</span>
-                            <span>{{ q.created_at|date:"M d, H:i" }}</span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
+            <span style="font-size: 13px; margin-left: 6px;">Querying PostgreSQL store &bull; Calculating over 23,833 survey plots...</span>
         </div>
+    </div>
 
+    <!-- 3. Floating Bottom Capsule Input (ChatGPT Style) -->
+    <div class="ai-bottom-dock">
+        <div class="ai-input-capsule">
+            <input type="text" id="aiInputText" class="ai-input-textarea" placeholder="Ask AgriLens AI (e.g. Which district produces the most beans?)..." autocomplete="off" oninput="handleInputState(this)" onkeydown="handleKeyDown(event)">
+            
+            <button type="button" id="aiSendBtn" class="ai-dock-btn-send" onclick="sendUserMessage()" disabled>
+                <i class="fa-solid fa-arrow-up"></i>
+            </button>
+        </div>
+        <div class="ai-disclaimer-text">
+            AgriLens Grounded AI calculates live from verified NISR microdata &bull; 100% Deterministic &bull; Zero Hallucination.
+        </div>
     </div>
 
 </div>
 
-<!-- Assistant Interactive JavaScript -->
+<!-- Assistant Script -->
 <script>
-function applySuggestedQuery(queryText) {
-    const input = document.getElementById('assistantQueryInput');
+function selectPrompt(queryText) {
+    const input = document.getElementById('aiInputText');
     if (input) {
         input.value = queryText;
-        input.focus();
-        // Automatically submit
-        submitAssistantQuery(new Event('submit'));
+        handleInputState(input);
+        sendUserMessage();
     }
 }
 
-async function submitAssistantQuery(event) {
-    if (event) event.preventDefault();
-    const input = document.getElementById('assistantQueryInput');
-    const submitBtn = document.getElementById('assistantSubmitBtn');
-    const loading = document.getElementById('assistantLoadingIndicator');
-    const container = document.getElementById('assistantConversationContainer');
+function handleInputState(inputEl) {
+    const sendBtn = document.getElementById('aiSendBtn');
+    const hasText = inputEl.value.trim().length > 0;
+    if (sendBtn) {
+        sendBtn.disabled = !hasText;
+        if (hasText) {
+            sendBtn.classList.add('active');
+        } else {
+            sendBtn.classList.remove('active');
+        }
+    }
+}
+
+function handleKeyDown(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendUserMessage();
+    }
+}
+
+function startNewChat() {
+    const thread = document.getElementById('chatThread');
+    const emptyState = document.getElementById('emptyStateContainer');
+    // Clear user and assistant messages, restore empty state
+    const messages = thread.querySelectorAll('.chat-row-user, .chat-row-assistant');
+    messages.forEach(m => m.remove());
+    if (emptyState) emptyState.style.display = 'flex';
+    const input = document.getElementById('aiInputText');
+    if (input) {
+        input.value = '';
+        input.focus();
+        handleInputState(input);
+    }
+}
+
+async function sendUserMessage() {
+    const input = document.getElementById('aiInputText');
+    const sendBtn = document.getElementById('aiSendBtn');
+    const typing = document.getElementById('typingIndicator');
+    const thread = document.getElementById('chatThread');
+    const emptyState = document.getElementById('emptyStateContainer');
+    const scrollArea = document.getElementById('chatScrollArea');
 
     const query = input.value.trim();
     if (!query) return;
 
-    // Render User Query Bubble
-    renderUserQueryBubble(container, query);
+    // Hide empty state if visible
+    if (emptyState) emptyState.style.display = 'none';
 
-    // Disable inputs while loading
-    input.disabled = true;
-    if (submitBtn) submitBtn.disabled = true;
-    if (loading) loading.style.display = 'flex';
+    // 1. Append User Bubble
+    appendUserBubble(thread, query);
+
+    // Reset input
+    input.value = '';
+    handleInputState(input);
+    input.focus();
+
+    // Show typing indicator
+    if (typing) typing.style.display = 'flex';
+    scrollArea.scrollTop = scrollArea.scrollHeight;
 
     try {
         const resp = await fetch('/api/v1/assistant/query/', {
@@ -233,110 +770,278 @@ async function submitAssistantQuery(event) {
         });
 
         if (!resp.ok) {
-            throw new Error(`Server returned HTTP ${resp.status}`);
+            throw new Error(`HTTP Error ${resp.status}`);
         }
 
         const data = await resp.json();
-        renderAssistantResponseCard(container, data);
+        appendAssistantMessage(thread, data);
     } catch (err) {
-        renderAssistantErrorCard(container, err.message);
+        appendErrorMessage(thread, err.message);
     } finally {
-        input.disabled = false;
-        input.value = '';
-        input.focus();
-        if (submitBtn) submitBtn.disabled = false;
-        if (loading) loading.style.display = 'none';
+        if (typing) typing.style.display = 'none';
+        scrollArea.scrollTop = scrollArea.scrollHeight;
     }
 }
 
-function renderUserQueryBubble(container, query) {
-    const bubble = document.createElement('div');
-    bubble.style.cssText = 'align-self: flex-end; background: #0F172A; color: #FFFFFF; padding: 12px 18px; border-radius: 12px 12px 2px 12px; max-width: 80%; font-size: 13px; font-weight: 500; box-shadow: 0 2px 6px rgba(0,0,0,0.08);';
-    bubble.innerHTML = `<i class="fa-solid fa-user" style="color: #38BDF8; margin-right: 6px;"></i> ${escapeHtml(query)}`;
-    container.appendChild(bubble);
-    bubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+function appendUserBubble(thread, query) {
+    const row = document.createElement('div');
+    row.className = 'chat-row-user';
+    row.innerHTML = `<div class="chat-bubble-user">${escapeHtml(query)}</div>`;
+    thread.appendChild(row);
 }
 
-function renderAssistantResponseCard(container, data) {
-    const card = document.createElement('div');
-    card.className = 'assistant-message-card';
-    card.style.cssText = 'background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);';
+function appendAssistantMessage(thread, data) {
+    const row = document.createElement('div');
+    row.className = 'chat-row-assistant';
+    const uniqueId = 'lineage_' + Math.random().toString(36).substr(2, 9);
 
-    const fmtAnswer = formatMarkdownText(data.answer);
+    const intent = (data.intent || 'INDICATOR').toUpperCase();
+    const metrics = data.metrics || {};
+    const latency = data.execution_latency_ms ? Math.round(data.execution_latency_ms) : 15;
+    const plots = data.sample_count ? data.sample_count.toLocaleString() : '0';
 
-    let ormSection = '';
-    if (data.orm_query && !data.orm_query.startsWith('# General')) {
-        ormSection = `
-            <div style="margin-top: 14px; background: #0F172A; border-radius: 8px; padding: 12px 14px; color: #E2E8F0; font-family: monospace; font-size: 11px; overflow-x: auto;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid #334155; padding-bottom: 4px;">
-                    <span style="color: #94A3B8; font-size: 10px; text-transform: uppercase; font-weight: 700;">
-                        <i class="fa-solid fa-terminal" style="color: #10B981;"></i> Executed ORM Query
-                    </span>
-                    <button type="button" onclick="navigator.clipboard.writeText(\`${escapeJs(data.orm_query)}\`)" style="background: rgba(255,255,255,0.1); border: none; color: #FFFFFF; font-size: 10px; padding: 2px 8px; border-radius: 4px; cursor: pointer;">
-                        <i class="fa-solid fa-copy"></i> Copy
-                    </button>
+    let richVisual = '';
+
+    // 1. RANKING INTENT (e.g. Which district produces the most beans?)
+    if (intent === 'RANKING' && metrics.ranking && Array.isArray(metrics.ranking) && metrics.ranking.length > 0) {
+        const ranks = metrics.ranking;
+        const topDistrict = ranks[0];
+        const topMT = (parseFloat(topDistrict.total_prod || 0) / 1000.0);
+        const topYield = (parseFloat(topDistrict.avg_yield || 0) / 1000.0);
+
+        let rowsHtml = '';
+        ranks.forEach((item, idx) => {
+            const rankNum = idx + 1;
+            const distName = item.district__name || 'Unknown';
+            const prodMT = (parseFloat(item.total_prod || 0) / 1000.0);
+            const yieldTha = (parseFloat(item.avg_yield || 0) / 1000.0);
+            const samplePlots = item.plots || 0;
+            const pctOfMax = topMT > 0 ? Math.round((prodMT / topMT) * 100) : 0;
+
+            rowsHtml += `
+                <div class="leaderboard-row rank-${rankNum}">
+                    <div class="rank-pill">${rankNum === 1 ? '🥇' : (rankNum === 2 ? '🥈' : (rankNum === 3 ? '🥉' : rankNum))}</div>
+                    <div style="font-weight: 700; color: #18181B;">${escapeHtml(distName)}</div>
+                    <div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: ${pctOfMax}%;"></div>
+                        </div>
+                        <div style="font-size: 10.5px; color: #71717A; margin-top: 3px;"><strong>${prodMT.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})} MT</strong> (${pctOfMax}%)</div>
+                    </div>
+                    <div style="text-align: right; font-weight: 600; color: #09090B;">
+                        ${yieldTha.toFixed(2)} t/ha
+                        <div style="font-size: 10.5px; color: #71717A; font-weight: 400;">${samplePlots} plots</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <a href="/indicators/productivity/?crop=${encodeURIComponent(metrics.crop || '')}&district=${encodeURIComponent(distName)}" style="color: #059669; font-size: 11.5px; font-weight: 700; text-decoration: none;">
+                            View ↗
+                        </a>
+                    </div>
                 </div>
-                <div style="color: #38BDF8; line-height: 1.4;">${escapeHtml(data.orm_query)}</div>
+            `;
+        });
+
+        richVisual = `
+            <div class="rich-result-card">
+                <div class="leaderboard-top-item">
+                    <div>
+                        <div class="leaderboard-top-badge"><i class="fa-solid fa-crown"></i> #1 Leading Producer</div>
+                        <div class="leaderboard-top-name">${escapeHtml(topDistrict.district__name)} District</div>
+                        <div style="font-size: 12px; color: #064E3B;">Highest production of ${escapeHtml(metrics.crop || 'Crop')} across Rwanda</div>
+                    </div>
+                    <div style="display: flex; gap: 16px; text-align: right;">
+                        <div>
+                            <div style="font-size: 10.5px; color: #047857; text-transform: uppercase; font-weight: 700;">Total Harvest</div>
+                            <div style="font-size: 18px; font-weight: 800; color: #064E3B;">${topMT.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})} MT</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 10.5px; color: #047857; text-transform: uppercase; font-weight: 700;">Avg Yield</div>
+                            <div style="font-size: 18px; font-weight: 800; color: #064E3B;">${topYield.toFixed(2)} t/ha</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="leaderboard-table-list">
+                    ${rowsHtml}
+                </div>
+            </div>
+        `;
+    }
+    // 2. YIELD INTENT
+    else if (intent === 'YIELD' && metrics.avg_yield_tha !== undefined) {
+        richVisual = `
+            <div class="kpi-tiles-row">
+                <div class="kpi-tile" style="background: #F0FDF4; border-color: #BBF7D0;">
+                    <div class="kpi-tile-label" style="color: #065F46;">Average Yield</div>
+                    <div class="kpi-tile-value" style="color: #064E3B;">${metrics.avg_yield_tha} <span style="font-size: 14px;">t/ha</span></div>
+                    <div class="kpi-tile-sub" style="color: #047857;">${metrics.avg_yield_kg_ha ? metrics.avg_yield_kg_ha.toLocaleString() : 0} kg/ha</div>
+                </div>
+                <div class="kpi-tile">
+                    <div class="kpi-tile-label">Cultivated Area</div>
+                    <div class="kpi-tile-value">${metrics.total_area_ha ? metrics.total_area_ha.toLocaleString() : 0} <span style="font-size: 14px;">ha</span></div>
+                    <div class="kpi-tile-sub">Surveyed acreage</div>
+                </div>
+                <div class="kpi-tile">
+                    <div class="kpi-tile-label">Sample Plots</div>
+                    <div class="kpi-tile-value">${metrics.plots_sampled || 0}</div>
+                    <div class="kpi-tile-sub">Validated NISR plots</div>
+                </div>
+            </div>
+        `;
+    }
+    // 3. INPUT ADOPTION INTENT
+    else if (intent === 'INPUT_ADOPTION' && metrics.fertilizer_adoption_pct !== undefined) {
+        richVisual = `
+            <div class="kpi-tiles-row">
+                <div class="kpi-tile" style="background: #F0FDF4; border-color: #BBF7D0;">
+                    <div class="kpi-tile-label" style="color: #065F46;">Mineral Fertilizer</div>
+                    <div class="kpi-tile-value" style="color: #064E3B;">${metrics.fertilizer_adoption_pct}%</div>
+                    <div class="kpi-tile-sub">Application rate</div>
+                </div>
+                <div class="kpi-tile" style="background: #EFF6FF; border-color: #BFDBFE;">
+                    <div class="kpi-tile-label" style="color: #1E40AF;">Improved Seed</div>
+                    <div class="kpi-tile-value" style="color: #1E3A8A;">${metrics.certified_seed_adoption_pct}%</div>
+                    <div class="kpi-tile-sub">Certified high-yield</div>
+                </div>
+                <div class="kpi-tile" style="background: #F0F9FF; border-color: #BAE6FD;">
+                    <div class="kpi-tile-label" style="color: #0369A1;">Irrigation</div>
+                    <div class="kpi-tile-value" style="color: #075985;">${metrics.irrigation_adoption_pct}%</div>
+                    <div class="kpi-tile-sub">Access rate</div>
+                </div>
+            </div>
+        `;
+    }
+    // 4. VULNERABILITY INTENT
+    else if (intent === 'VULNERABILITY' && metrics.avi_score !== undefined) {
+        const comps = metrics.components || {};
+        richVisual = `
+            <div class="rich-result-card" style="background: #FFFBEB; border-color: #FDE68A;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div>
+                        <span style="background: ${metrics.color || '#D97706'}; color: #FFFFFF; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 12px; text-transform: uppercase;">
+                            ${escapeHtml(metrics.risk_tier_label || 'Risk Tier')}
+                        </span>
+                        <div style="font-size: 16px; font-weight: 800; color: #78350F; margin-top: 4px;">
+                            ${escapeHtml(metrics.district_name || 'District')} Vulnerability Profile
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 10.5px; color: #92400E; font-weight: 700; text-transform: uppercase;">AVI Score</div>
+                        <div style="font-size: 22px; font-weight: 800; color: #78350F;">${metrics.avi_score} / 100</div>
+                    </div>
+                </div>
+                ${metrics.recommended_action ? `
+                    <div style="background: #FFFFFF; border-left: 3px solid #D97706; padding: 10px 12px; border-radius: 6px; font-size: 12.5px; color: #92400E; line-height: 1.4;">
+                        <strong>Policy Action:</strong> ${escapeHtml(metrics.recommended_action)}
+                    </div>
+                ` : ''}
             </div>
         `;
     }
 
-    let linkBtn = '';
+    // Dashboard link
+    let dashLink = '';
     if (data.dashboard_link) {
-        linkBtn = `
-            <a href="${data.dashboard_link}" style="background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; font-size: 11.5px; font-weight: 700; padding: 6px 12px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> Open in Dashboard
+        dashLink = `
+            <a href="${data.dashboard_link}" class="ai-deep-link-btn">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Deep Dive in Dashboard
             </a>
         `;
     }
 
-    card.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <div style="width: 26px; height: 26px; border-radius: 6px; background: #ECFDF5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 13px;">
-                    <i class="fa-solid fa-robot"></i>
+    row.innerHTML = `
+        <div class="assistant-avatar-circle">
+            <i class="fa-solid fa-sparkles"></i>
+        </div>
+        <div class="assistant-content-body">
+            <div class="answer-prose">
+                ${formatMarkdown(data.answer)}
+            </div>
+
+            ${richVisual}
+
+            <div class="ai-actions-toolbar">
+                <button type="button" class="ai-action-btn" title="Copy answer" onclick="copyAnswerText(this, \`${escapeJs(data.answer)}\`)">
+                    <i class="fa-regular fa-copy"></i> Copy
+                </button>
+                <button type="button" class="ai-action-btn" title="Listen" onclick="speakText(\`${escapeJs(data.answer)}\`)">
+                    <i class="fa-solid fa-volume-high"></i> Read
+                </button>
+                <button type="button" class="ai-action-btn" title="View ORM Lineage" onclick="toggleLineage('${uniqueId}')">
+                    <i class="fa-solid fa-code"></i> Lineage
+                </button>
+                ${data.synthesized_by ? '<span style="background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-sparkles" style="color: #059669;"></i> AgriLens AI</span>' : ''}
+                ${data.user_role ? '<span style="background: #F1F5F9; color: #475569; font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 12px;"><i class="fa-solid fa-user-shield"></i> ' + escapeHtml(data.user_role) + '</span>' : ''}
+                <span style="font-size: 11px; color: #A1A1AA; margin-left: 2px;">
+                    &bull; ${plots} plots &bull; ${latency}ms
+                </span>
+                ${dashLink}
+            </div>
+
+            <div class="ai-lineage-box" id="${uniqueId}">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; color: #A1A1AA; font-size: 10.5px;">
+                    <span><i class="fa-solid fa-database" style="color: #10B981;"></i> READ-ONLY ORM EXECUTION</span>
+                    <button type="button" onclick="navigator.clipboard.writeText(\`${escapeJs(data.orm_query || '')}\`)" style="background: rgba(255,255,255,0.15); border: none; color: #FFF; font-size: 10px; padding: 2px 6px; border-radius: 4px; cursor: pointer;">Copy Code</button>
                 </div>
-                <span style="font-size: 12px; font-weight: 700; color: #0F172A;">AgriLens Assistant</span>
-                <span style="background: #F1F5F9; color: #475569; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">
-                    ${data.intent || 'INDICATOR'}
-                </span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px; font-size: 10.5px; color: #64748B;">
-                <span style="background: #F0FDF4; color: #166534; padding: 2px 8px; border-radius: 4px; font-weight: 600;">
-                    <i class="fa-solid fa-check-circle" style="color: #16A34A;"></i> ${data.provenance || 'NISR SAS'}
-                </span>
-                <span><i class="fa-solid fa-bolt" style="color: #F59E0B;"></i> ${data.execution_latency_ms || 15}ms</span>
-                <span>n = <strong>${data.sample_count ? data.sample_count.toLocaleString() : 0}</strong> plots</span>
+                <div style="color: #38BDF8; word-break: break-all;">${escapeHtml(data.orm_query || '# Deterministic query')}</div>
             </div>
         </div>
-
-        <div style="font-size: 13px; color: #1E293B; line-height: 1.6;">
-            ${fmtAnswer}
-        </div>
-
-        ${linkBtn}
-        ${ormSection}
     `;
 
-    container.appendChild(card);
-    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    thread.appendChild(row);
 }
 
-function renderAssistantErrorCard(container, errMessage) {
-    const card = document.createElement('div');
-    card.style.cssText = 'background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 12px; padding: 16px; color: #991B1B; font-size: 12.5px;';
-    card.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="margin-right: 6px;"></i> Error processing query: ${escapeHtml(errMessage)}`;
-    container.appendChild(card);
-    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+function appendErrorMessage(thread, errMessage) {
+    const row = document.createElement('div');
+    row.className = 'chat-row-assistant';
+    row.innerHTML = `
+        <div class="assistant-avatar-circle" style="background: #DC2626;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="assistant-content-body">
+            <div style="background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; padding: 12px 16px; border-radius: 10px; font-size: 13.5px;">
+                <strong>Query Error:</strong> ${escapeHtml(errMessage)}
+            </div>
+        </div>
+    `;
+    thread.appendChild(row);
 }
 
-function formatMarkdownText(text) {
+function copyAnswerText(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = `<i class="fa-solid fa-check" style="color: #059669;"></i> Copied!`;
+        setTimeout(() => { btn.innerHTML = originalHtml; }, 2000);
+    });
+}
+
+function speakText(text) {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        // Clean markdown stars
+        const clean = text.replace(/\*\*/g, '').replace(/t\/ha/g, 'tonnes per hectare');
+        const utterance = new SpeechSynthesisUtterance(clean);
+        utterance.rate = 1.0;
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
+function toggleLineage(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+}
+
+function formatMarkdown(text) {
     if (!text) return '';
     let out = escapeHtml(text);
-    // Bold **text**
+    // Bold
     out = out.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     // Bullet points
     out = out.replace(/\n-\s+(.*)/g, '<br>&bull; $1');
+    // Numbered lists
+    out = out.replace(/\n(\d+)\.\s+(.*)/g, '<br><strong>$1.</strong> $2');
     // Newlines
     out = out.replace(/\n/g, '<br>');
     return out;

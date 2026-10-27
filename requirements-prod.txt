@@ -30,3 +30,7 @@ redis>=5.0.1
 gunicorn>=21.2.0
 whitenoise>=6.6.0
 sentry-sdk>=1.40.0
+
+# In-Process Neural LLM (Local Qwen 2.5 3B Inference)
+llama-cpp-python>=0.2.70
+

@@ -30,7 +30,7 @@ urlpatterns = [
     path('assistant/', include('apps.assistant.urls', namespace='assistant')),
     path('api/', include('apps.api.urls', namespace='api')),
     path('api/v1/ml/', include('apps.ml.urls', namespace='ml')),
-    path('api/v1/assistant/', include('apps.assistant.urls')),
+    path('api/v1/assistant/', include('apps.assistant.urls', namespace='assistant_api')),
 ]
 
 if settings.DEBUG:

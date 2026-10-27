@@ -77,6 +77,47 @@ class GroundedAgriculturalAssistant:
         intent = cls._detect_intent(clean_query, entities)
 
         result = cls._execute_grounded_intent(intent, entities, clean_query)
+
+        # Neural LLM Synthesis via in-process Qwen 2.5 3B with Role-Based Context
+        try:
+            from django.conf import settings
+            from apps.assistant.services.runtime import QwenModelRuntime
+            from apps.assistant.services.prompt_builder import AgronomicPromptBuilder
+
+            clearance = AgronomicPromptBuilder.get_user_clearance(user)
+            result['user_role'] = clearance['role_title']
+            result['user_clearance'] = clearance['clearance']
+
+            if QwenModelRuntime.is_available() and getattr(settings, 'QWEN_LLM_ENABLED', True):
+                messages = AgronomicPromptBuilder.build_chatml_messages(
+                    query=clean_query,
+                    intent=intent,
+                    metrics=result.get('metrics', {}),
+                    deterministic_answer=result.get('answer', ''),
+                    user=user,
+                )
+                qwen_reply = QwenModelRuntime.generate(messages=messages, max_tokens=420, temperature=0.3)
+                if qwen_reply and len(qwen_reply.strip()) > 15:
+                    result['synthesized_by'] = 'AgriLens AI (Neural Engine)'
+                    result['grounded_summary'] = result.get('answer', '')
+                    result['ai_analysis'] = qwen_reply.strip()
+
+                    # For empirical statistical queries, preserve authoritative NISR survey figures
+                    # and enrich with Qwen's role-aware agronomic analysis
+                    if result.get('status') == 'SUCCESS' and result.get('metrics'):
+                        result['answer'] = f"{result['grounded_summary']}\n\n**AgriLens AI Analysis**:\n{qwen_reply.strip()}"
+                    elif result.get('status') == 'GENERAL_GUIDANCE':
+                        result['answer'] = f"{result['grounded_summary']}\n\n**AgriLens AI Guidance**:\n{qwen_reply.strip()}"
+                    else:
+                        result['answer'] = qwen_reply.strip()
+                else:
+                    result['synthesized_by'] = 'Deterministic Grounded Engine'
+            else:
+                result['synthesized_by'] = 'Deterministic Grounded Engine'
+        except Exception as qwen_exc:
+            logger.warning("Qwen synthesis fallback: %s", qwen_exc)
+            result['synthesized_by'] = 'Deterministic Grounded Engine'
+
         latency_ms = round((time.time() - t0) * 1000.0, 1)
         result['execution_latency_ms'] = latency_ms
 
@@ -155,6 +196,17 @@ class GroundedAgriculturalAssistant:
     def _detect_intent(cls, text: str, entities: Dict[str, Any]) -> str:
         """Determines user analytical intent."""
         lower = text.lower()
+
+        # Conversational greetings, general agronomic advice, or farming practices
+        conversational_triggers = [
+            'hello', 'hi ', 'hey', 'morning', 'afternoon', 'evening',
+            'muraho', 'mwiriwe', 'amakuru', 'advice', 'advise', 'how to plant',
+            'how to grow', 'planting guide', 'tips for', 'best practice', 'what can you do'
+        ]
+        if any(w in lower for w in conversational_triggers):
+            # Only redirect if no specific empirical metric is explicitly requested
+            if not any(k in lower for k in ['yield', 'kg/ha', 't/ha', 'production', 'total produce', 'retail price', 'cost of', 'vulnerability', 'avi', 'loss rate']):
+                return 'GENERAL'
 
         if any(w in lower for w in ['vulnerability', 'avi', 'risk index', 'buffer stock', 'emergency', 'resilient']):
             return 'VULNERABILITY'

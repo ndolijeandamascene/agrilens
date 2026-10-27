@@ -1,0 +1,507 @@
+<!-- =========================================================================
+     AgriLens Floating Conversational AI Chatbot Widget (Public Portal)
+     Powered by Qwen 2.5 3B & Grounded in 23,833 NISR Microdata Records
+     ========================================================================= -->
+
+<style>
+/* Floating Trigger Button */
+.public-ai-widget-trigger {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: #FFFFFF;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 9999px;
+    box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35), 0 2px 6px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: inherit;
+}
+
+.public-ai-widget-trigger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(5, 150, 105, 0.45);
+    background: linear-gradient(135deg, #047857 0%, #065F46 100%);
+}
+
+.public-ai-trigger-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #34D399;
+    box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.3);
+    animation: triggerPulse 2s infinite;
+}
+
+@keyframes triggerPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.9); }
+}
+
+/* Floating Chat Drawer Window */
+.public-ai-widget-window {
+    position: fixed;
+    bottom: 84px;
+    right: 24px;
+    width: 410px;
+    max-width: calc(100vw - 32px);
+    height: 570px;
+    max-height: calc(100vh - 110px);
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 18px;
+    box-shadow: 0 16px 40px -6px rgba(15, 23, 42, 0.18), 0 6px 14px -4px rgba(15, 23, 42, 0.08);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10000;
+    font-family: inherit;
+    animation: widgetSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes widgetSlideUp {
+    from { opacity: 0; transform: translateY(12px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Header */
+.public-ai-header {
+    background: linear-gradient(135deg, #064E3B 0%, #065F46 100%);
+    color: #FFFFFF;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.public-ai-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.public-ai-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6EE7B7;
+    font-size: 14px;
+}
+
+.public-ai-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.public-ai-sub {
+    font-size: 10.5px;
+    color: #A7F3D0;
+    margin-top: 2px;
+}
+
+.public-ai-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.public-ai-btn-ctrl {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #FFFFFF;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+
+.public-ai-btn-ctrl:hover {
+    background: rgba(255, 255, 255, 0.28);
+    color: #FFFFFF;
+}
+
+/* Chat Messages Feed */
+.public-ai-feed {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: #F8FAFC;
+}
+
+/* User Message */
+.public-ai-msg-user {
+    align-self: flex-end;
+    background: #0F172A;
+    color: #FFFFFF;
+    padding: 9px 14px;
+    border-radius: 14px 14px 2px 14px;
+    max-width: 84%;
+    font-size: 13px;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+/* Assistant Message */
+.public-ai-msg-assistant {
+    align-self: flex-start;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px 14px 14px 2px;
+    padding: 12px 14px;
+    max-width: 90%;
+    font-size: 13px;
+    color: #1E293B;
+    line-height: 1.5;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.public-ai-msg-assistant strong {
+    color: #064E3B;
+}
+
+/* Suggested Question Chips */
+.public-ai-chips-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.public-ai-chip {
+    background: #F1F5F9;
+    border: 1px solid #E2E8F0;
+    color: #334155;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 7px 11px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1.35;
+}
+
+.public-ai-chip svg {
+    color: #059669;
+    flex-shrink: 0;
+}
+
+.public-ai-chip:hover {
+    background: #ECFDF5;
+    border-color: #A7F3D0;
+    color: #065F46;
+}
+
+.public-ai-chip:hover svg {
+    color: #047857;
+}
+
+/* Loading dots */
+.public-ai-loading {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    color: #64748B;
+    padding: 8px 0;
+}
+
+/* Input Bar */
+.public-ai-footer {
+    padding: 12px 14px;
+    background: #FFFFFF;
+    border-top: 1px solid #E2E8F0;
+}
+
+.public-ai-input-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.public-ai-input {
+    flex: 1;
+    background: #F8FAFC;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 13px;
+    outline: none;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+
+.public-ai-input:focus {
+    background: #FFFFFF;
+    border-color: #059669;
+    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.15);
+}
+
+.public-ai-btn-send {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #059669;
+    color: #FFFFFF;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+.public-ai-btn-send:hover {
+    background: #047857;
+}
+
+.public-ai-disclaimer {
+    font-size: 10px;
+    color: #94A3B8;
+    text-align: center;
+    margin-top: 6px;
+}
+</style>
+
+<!-- Floating Launcher Button -->
+<button type="button" class="public-ai-widget-trigger" id="publicAiWidgetTrigger" onclick="togglePublicAiWidget()" aria-label="Open AgriLens AI Chatbot">
+    <span class="public-ai-trigger-dot"></span>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/>
+    </svg>
+    <span>Ask AgriLens AI</span>
+</button>
+
+<!-- Slide-Up Floating Chat Window -->
+<div class="public-ai-widget-window" id="publicAiWidgetWindow">
+    <!-- Header -->
+    <div class="public-ai-header">
+        <div class="public-ai-title-wrap">
+            <div class="public-ai-avatar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/>
+                </svg>
+            </div>
+            <div>
+                <h4 class="public-ai-title">AgriLens AI Assistant</h4>
+                <div class="public-ai-sub">NISR SAS Grounded &bull; 23,833 Records</div>
+            </div>
+        </div>
+        <div class="public-ai-header-controls">
+            <a href="/assistant/" class="public-ai-btn-ctrl" title="Open Fullscreen Assistant">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <polyline points="9 21 3 21 3 15"></polyline>
+                    <line x1="21" y1="3" x2="14" y2="10"></line>
+                    <line x1="3" y1="21" x2="10" y2="14"></line>
+                </svg>
+            </a>
+            <button type="button" class="public-ai-btn-ctrl" onclick="togglePublicAiWidget()" title="Close Chatbot">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Feed -->
+    <div class="public-ai-feed" id="publicAiFeed">
+        <div class="public-ai-msg-assistant">
+            Hello! I am <strong>AgriLens AI</strong>. I can answer general farming questions or look up verified statistics from Rwanda's 2024–2025 Seasonal Agricultural Survey.
+            <div class="public-ai-chips-wrap">
+                <button type="button" class="public-ai-chip" onclick="submitPublicQuery('Which district produces the most beans in Rwanda?')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                        <path d="M4 22h16"></path>
+                        <path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path>
+                        <path d="M6 2v7a6 6 0 0 0 12 0V2Z"></path>
+                    </svg>
+                    <span>Which district produces the most beans?</span>
+                </button>
+                <button type="button" class="public-ai-chip" onclick="submitPublicQuery('What is the average Irish Potato yield in Musanze?')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="20" x2="12" y2="10"></line>
+                        <line x1="18" y1="20" x2="18" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="16"></line>
+                    </svg>
+                    <span>Irish Potato yield in Musanze?</span>
+                </button>
+                <button type="button" class="public-ai-chip" onclick="submitPublicQuery('What percentage of farmers in Nyagatare use mineral fertilizer?')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 2v7.31"></path>
+                        <path d="M14 9.3V2"></path>
+                        <path d="M8.5 2h7"></path>
+                        <path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path>
+                        <path d="M5.52 16h12.96"></path>
+                    </svg>
+                    <span>Fertilizer adoption in Nyagatare?</span>
+                </button>
+                <button type="button" class="public-ai-chip" onclick="submitPublicQuery('What are best agronomic practices for maize farming?')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+                        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+                    </svg>
+                    <span>Best practices for maize farming?</span>
+                </button>
+            </div>
+        </div>
+        <div class="public-ai-loading" id="publicAiLoading">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" class="fa-spin">
+                <line x1="12" y1="2" x2="12" y2="6"></line>
+                <line x1="12" y1="18" x2="12" y2="22"></line>
+                <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                <line x1="2" y1="12" x2="6" y2="12"></line>
+                <line x1="18" y1="12" x2="22" y2="12"></line>
+                <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+            </svg>
+            <span>AgriLens AI &bull; Analyzing survey microdata...</span>
+        </div>
+    </div>
+
+    <!-- Footer Input -->
+    <div class="public-ai-footer">
+        <form class="public-ai-input-form" onsubmit="handlePublicAiSubmit(event)">
+            <input type="text" id="publicAiInput" class="public-ai-input" placeholder="Ask about crops, yields, farming tips..." autocomplete="off">
+            <button type="submit" class="public-ai-btn-send" title="Send message">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </form>
+        <div class="public-ai-disclaimer">
+            Official Rwanda NISR Microdata &bull; Role-Aware Access
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePublicAiWidget() {
+    const win = document.getElementById('publicAiWidgetWindow');
+    if (!win) return;
+    const isVisible = win.style.display === 'flex';
+    win.style.display = isVisible ? 'none' : 'flex';
+    if (!isVisible) {
+        const input = document.getElementById('publicAiInput');
+        if (input) input.focus();
+    }
+}
+
+function submitPublicQuery(text) {
+    const input = document.getElementById('publicAiInput');
+    if (input) {
+        input.value = text;
+        handlePublicAiSubmit(new Event('submit'));
+    }
+}
+
+async function handlePublicAiSubmit(e) {
+    if (e) e.preventDefault();
+    const input = document.getElementById('publicAiInput');
+    const feed = document.getElementById('publicAiFeed');
+    const loading = document.getElementById('publicAiLoading');
+    if (!input || !feed) return;
+
+    const query = input.value.trim();
+    if (!query) return;
+
+    // Append User Bubble
+    const userBubble = document.createElement('div');
+    userBubble.className = 'public-ai-msg-user';
+    userBubble.textContent = query;
+    feed.appendChild(userBubble);
+
+    input.value = '';
+    if (loading) loading.style.display = 'flex';
+    feed.scrollTop = feed.scrollHeight;
+
+    try {
+        const resp = await fetch('/api/v1/assistant/query/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getWidgetCookie('csrftoken') || ''
+            },
+            body: JSON.stringify({ query: query })
+        });
+
+        if (!resp.ok) throw new Error('Query service unavailable');
+
+        const data = await resp.json();
+        const botBubble = document.createElement('div');
+        botBubble.className = 'public-ai-msg-assistant';
+
+        // Format response
+        let text = data.answer || 'No response generated.';
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        text = text.replace(/\n-\s+(.*)/g, '<br>&bull; $1');
+        text = text.replace(/\n/g, '<br>');
+
+        let deepLink = '';
+        if (data.dashboard_link) {
+            deepLink = `<div style="margin-top: 8px;"><a href="${data.dashboard_link}" style="color: #059669; font-weight: 700; text-decoration: none; font-size: 11.5px;">Inspect in Dashboard ↗</a></div>`;
+        }
+
+        botBubble.innerHTML = `<div>${text}</div>${deepLink}`;
+        feed.appendChild(botBubble);
+    } catch (err) {
+        const errBubble = document.createElement('div');
+        errBubble.className = 'public-ai-msg-assistant';
+        errBubble.style.color = '#991B1B';
+        errBubble.textContent = 'Sorry, could not process your query at this moment.';
+        feed.appendChild(errBubble);
+    } finally {
+        if (loading) loading.style.display = 'none';
+        feed.scrollTop = feed.scrollHeight;
+    }
+}
+
+function getWidgetCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>

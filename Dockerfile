@@ -17,10 +17,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Working directory
 WORKDIR /app
 
-# Install runtime dependencies (curl for healthcheck, libpq5 for PostgreSQL)
+# Install runtime dependencies (curl for healthcheck, libpq5 for PostgreSQL, libgomp1 for OpenMP/llama.cpp)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     libpq5 \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install python dependencies
@@ -36,7 +37,7 @@ RUN sed -i 's/\r$//' /app/docker-entrypoint.sh && \
     chmod +x /app/docker-entrypoint.sh
 
 # Create static, media, and data directories
-RUN mkdir -p /app/staticfiles /app/media /app/data
+RUN mkdir -p /app/staticfiles /app/media /app/data /app/data/models
 
 # Collect static assets into staticfiles
 RUN python manage.py collectstatic --noinput
@@ -49,4 +50,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:8000/health/ || exit 1
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--threads", "2", "--worker-class", "gthread", "--timeout", "60", "--access-logfile", "-", "--error-logfile", "-"]
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--threads", "2", "--worker-class", "gthread", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-"]
+
