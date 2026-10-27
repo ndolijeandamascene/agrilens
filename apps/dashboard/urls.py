@@ -23,6 +23,9 @@ urlpatterns = [
     # Public About Portal (Milestone 6 Design)
     path('about/', views.public_about, name='about'),
 
+    # Instant Live Search API
+    path('api/quick-search/', views.quick_search_api, name='quick_search_api'),
+
 
 
     # Official Intelligence Reports & Bulletins (Milestone 4 Module)

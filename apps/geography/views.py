@@ -73,6 +73,26 @@ def district_list(request):
     selected_season = request.GET.get('season', seasons_catalog[0]['code'] if seasons_catalog else '2025A')
     selected_indicator = request.GET.get('indicator', 'yield')
     selected_district_name = request.GET.get('district')
+
+    # Support direct global search terms passed from header search
+    search_term = (request.GET.get('search') or request.GET.get('q') or '').strip()
+    if search_term:
+        matching_dist = District.objects.filter(name__iexact=search_term).first() or District.objects.filter(name__icontains=search_term).first()
+        if matching_dist:
+            selected_district_name = matching_dist.name
+
+        matching_crop = Crop.objects.filter(name__iexact=search_term).first() or Crop.objects.filter(name__icontains=search_term).first()
+        if matching_crop:
+            selected_crop = matching_crop.name
+
+        term_lower = search_term.lower()
+        if 'yield' in term_lower or 'productiv' in term_lower:
+            selected_indicator = 'yield'
+        elif 'prod' in term_lower or 'harvest' in term_lower or 'volume' in term_lower:
+            selected_indicator = 'production'
+        elif 'area' in term_lower or 'hectare' in term_lower or 'ha' in term_lower:
+            selected_indicator = 'area'
+
     default_dist = district_data.get(selected_district_name) if selected_district_name else next(iter(district_data.values()), None)
 
     # Dynamic KPI computation from IndicatorService

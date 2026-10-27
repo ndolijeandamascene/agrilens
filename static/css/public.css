@@ -284,36 +284,261 @@ body.public-body {
     flex-shrink: 0;
 }
 
+/* ==========================================================================
+   INTERACTIVE QUICK SEARCH SYSTEM (DESKTOP & MOBILE)
+   ========================================================================== */
+.header-search-wrapper {
+    position: relative;
+}
+
 /* Rounded Search Pill */
 .header-search-pill {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #F1F5F9;
-    border: 1px solid #E2E8F0;
+    background: #F8FAFC;
+    border: 1px solid #CBD5E1;
     border-radius: 9999px;
-    padding: 6px 14px;
-    width: 210px;
-    transition: all 0.2s ease;
+    padding: 7px 14px;
+    width: 270px;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    box-sizing: border-box;
+}
+
+.header-search-pill:hover {
+    border-color: #94A3B8;
+    background: #FFFFFF;
 }
 
 .header-search-pill:focus-within {
     background: #FFFFFF;
-    border-color: var(--brand-action);
-    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
+    border-color: #16A34A;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.16), 0 4px 14px rgba(15, 23, 42, 0.06);
+    width: 320px;
+}
+
+.search-lens-icon {
+    flex-shrink: 0;
+    color: #64748B;
+    transition: color 0.15s ease;
+}
+
+.header-search-pill:focus-within .search-lens-icon {
+    color: #16A34A;
 }
 
 .header-search-pill input {
     border: none;
     background: transparent;
     outline: none;
-    font-size: 0.80rem;
+    font-size: 0.82rem;
+    font-weight: 500;
     color: #0F172A;
     width: 100%;
+    padding: 0;
 }
 
 .header-search-pill input::placeholder {
     color: #94A3B8;
+}
+
+.search-clear-btn {
+    background: transparent;
+    border: none;
+    color: #94A3B8;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.15s ease;
+}
+
+.search-clear-btn:hover {
+    color: #0F172A;
+    background: #E2E8F0;
+}
+
+/* Autocomplete Floating Dropdown */
+.header-search-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    max-height: 480px;
+    overflow-y: auto;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    box-shadow: 0 20px 45px -8px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    z-index: 2100;
+    padding: 8px 0;
+    animation: searchDropdownFade 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes searchDropdownFade {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.search-group-header {
+    padding: 8px 14px 4px 14px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 14px;
+    text-decoration: none;
+    color: #0F172A;
+    transition: background 0.12s ease;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+}
+
+.search-result-item:hover,
+.search-result-item.is-selected {
+    background: #F8FAFC;
+    border-left-color: #16A34A;
+}
+
+.search-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+}
+
+.search-item-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.search-item-icon.district { background: #DCFCE7; color: #15803D; }
+.search-item-icon.crop { background: #CCFBF1; color: #0F766E; }
+.search-item-icon.indicator { background: #DBEAFE; color: #1E40AF; }
+.search-item-icon.report { background: #FEF3C7; color: #B45309; }
+.search-item-icon.insight { background: #F3E8FF; color: #7E22CE; }
+
+.search-item-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.search-item-title {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #0F172A;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-item-title mark {
+    background: transparent;
+    color: #15803D;
+    font-weight: 800;
+    text-decoration: underline;
+}
+
+.search-item-sub {
+    font-size: 0.74rem;
+    color: #64748B;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+}
+
+.search-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+}
+
+.search-badge.district { background: #DCFCE7; color: #15803D; }
+.search-badge.crop { background: #CCFBF1; color: #0F766E; }
+.search-badge.indicator { background: #DBEAFE; color: #1E40AF; }
+.search-badge.report { background: #FEF3C7; color: #B45309; }
+.search-badge.insight { background: #F3E8FF; color: #7E22CE; }
+
+.search-empty-state {
+    padding: 24px 18px;
+    text-align: center;
+    color: #64748B;
+}
+
+.search-empty-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.search-empty-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 4px;
+}
+
+.search-empty-sub {
+    font-size: 0.76rem;
+    line-height: 1.4;
+    color: #64748B;
+}
+
+.search-dropdown-footer {
+    padding: 7px 14px;
+    background: #F8FAFC;
+    border-top: 1px solid #F1F5F9;
+    font-size: 0.68rem;
+    color: #94A3B8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Mobile search box inside nav drawer */
+.mobile-search-box {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.mobile-search-pill {
+    width: 100% !important;
+}
+
+.mobile-dropdown {
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
 }
 
 /* Action Green Sign In Pill Button */

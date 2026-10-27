@@ -1001,6 +1001,145 @@ def public_about(request):
     return render(request, 'dashboard/about.html', context)
 
 
+def quick_search_api(request):
+    """
+    Unified instant auto-complete search API across Rwanda districts, crops,
+    agricultural indicators, published reports, and market commodity prices.
+    Designed for sub-10ms response times.
+    """
+    q = request.GET.get('q', '').strip()
+    if not q or len(q) < 1:
+        return JsonResponse({'query': q, 'total': 0, 'results': []})
+
+    results = []
+    q_lower = q.lower()
+
+    # 1. Matching Districts (30 Districts of Rwanda)
+    from apps.geography.models import District
+    districts = District.objects.filter(
+        Q(name__icontains=q) | Q(province__name__icontains=q)
+    ).select_related('province')[:6]
+
+    for d in districts:
+        prov_label = d.province.name if ('Province' in d.province.name or 'Kigali' in d.province.name) else f"{d.province.name} Province"
+        results.append({
+            'type': 'district',
+            'category': 'District',
+            'title': f"{d.name} District",
+            'subtitle': f"{prov_label} • Agricultural GIS Map",
+            'url': f"/geography/?district={d.name}",
+            'badge': 'District',
+            'icon': 'pin'
+        })
+
+    # 2. Matching Crops (Priority and Tracked Crops)
+    from apps.agriculture.models import Crop
+    crops = Crop.objects.filter(
+        Q(name__icontains=q) | Q(kinyarwanda_name__icontains=q) | Q(category__name__icontains=q)
+    ).select_related('category')[:6]
+
+    for c in crops:
+        kiny = f" ({c.kinyarwanda_name})" if c.kinyarwanda_name else ""
+        results.append({
+            'type': 'crop',
+            'category': 'Crop',
+            'title': c.name,
+            'subtitle': f"{c.category.name}{kiny} • View Production & Yield",
+            'url': f"/geography/?crop={c.name}",
+            'badge': 'Crop',
+            'icon': 'leaf'
+        })
+
+    # 3. Matching Indicators
+    indicator_catalog = [
+        {
+            'name': 'Yield (t/ha)',
+            'desc': 'Agricultural Yield & Productivity across Rwanda',
+            'keywords': ['yield', 'productivity', 'umusaruro', 't/ha', 'tonnes', 'efficient', 'kg'],
+            'url': '/geography/?indicator=yield'
+        },
+        {
+            'name': 'Production Volume (MT)',
+            'desc': 'Total Harvest & Output Volume in Metric Tonnes',
+            'keywords': ['production', 'harvest', 'mt', 'metric', 'volume', 'umusaruro', 'tonne'],
+            'url': '/geography/?indicator=production'
+        },
+        {
+            'name': 'Cultivated Farmland Area (ha)',
+            'desc': 'Planted Farmland Surface Area in Hectares',
+            'keywords': ['area', 'hectare', 'ha', 'land', 'planted', 'ubuso', 'farm'],
+            'url': '/geography/?indicator=area'
+        },
+        {
+            'name': 'Productivity Intelligence & Yield Gaps',
+            'desc': 'Input impact analysis: Fertilizer, Irrigation & Improved Seed',
+            'keywords': ['gap', 'fertilizer', 'seed', 'irrigation', 'sns', 'input'],
+            'url': '/indicators/productivity/'
+        },
+        {
+            'name': 'Commodity Market Prices',
+            'desc': 'Real-time wholesale & retail prices across 30 districts',
+            'keywords': ['market', 'price', 'igiciro', 'cost', 'trade', 'wholesale', 'retail'],
+            'url': f"/markets/?q={q}"
+        }
+    ]
+
+    for ind in indicator_catalog:
+        if any(kw in q_lower for kw in ind['keywords']) or ind['name'].lower().find(q_lower) != -1:
+            results.append({
+                'type': 'indicator',
+                'category': 'Indicator',
+                'title': ind['name'],
+                'subtitle': ind['desc'],
+                'url': ind['url'],
+                'badge': 'Indicator',
+                'icon': 'chart'
+            })
+
+    # 4. Matching Published Reports & Bulletins
+    from apps.dashboard.models import PublishedReport
+    reports = PublishedReport.objects.filter(is_published=True).filter(
+        Q(title__icontains=q) | Q(crop__icontains=q) | Q(subtitle__icontains=q)
+    )[:4]
+
+    for r in reports:
+        results.append({
+            'type': 'report',
+            'category': 'Report',
+            'title': r.title,
+            'subtitle': f"{r.get_report_type_display()} • {r.date_display or r.season}",
+            'url': f"/reports/?q={q}",
+            'badge': 'Report',
+            'icon': 'file'
+        })
+
+    # 5. Matching Insights
+    try:
+        from apps.insights.models import AgriculturalInsight
+        stories = AgriculturalInsight.objects.published().filter(
+            Q(title__icontains=q) | Q(headline__icontains=q) | Q(crop__name__icontains=q)
+        )[:3]
+        for s in stories:
+            results.append({
+                'type': 'insight',
+                'category': 'Insight',
+                'title': s.title,
+                'subtitle': f"Data Story • {s.get_category_display() if hasattr(s, 'get_category_display') else s.category}",
+                'url': f"/insights/?search={q}",
+                'badge': 'Insight',
+                'icon': 'sparkle'
+            })
+    except Exception:
+        pass
+
+    return JsonResponse({
+        'query': q,
+        'total': len(results),
+        'results': results[:12]
+    })
+
+
+
 
 
 

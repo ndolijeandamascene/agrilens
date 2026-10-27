@@ -57,6 +57,21 @@
 
             <!-- Center Primary Navigation -->
             <nav class="public-nav-menu" id="public-nav-menu" aria-label="Main Navigation">
+                <!-- Mobile Quick Search Box inside Drawer -->
+                <div class="mobile-search-box">
+                    <div class="header-search-wrapper mobile-search-wrap">
+                        <form action="/geography/" method="GET" class="header-search-pill mobile-search-pill" id="mobile-search-form" role="search">
+                            <svg class="search-lens-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input type="text" id="mobile-search-input" name="search" placeholder="Search crops, districts, indicators..." aria-label="Search crops, districts, indicators" autocomplete="off" spellcheck="false">
+                            <button type="button" id="mobile-search-clear" class="search-clear-btn" aria-label="Clear search" style="display: none;">&times;</button>
+                        </form>
+                        <div id="mobile-search-dropdown" class="header-search-dropdown mobile-dropdown" style="display: none;" role="listbox"></div>
+                    </div>
+                </div>
+
                 <a href="/" class="public-nav-link {% if request.path == '/' %}active{% endif %}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -148,13 +163,17 @@
 
             <!-- Right Header Action Group: Search Pill + Only Dashboard (if logged in) or Login (if not logged in) -->
             <div class="header-action-group">
-                <!-- Search Input Pill -->
-                <div class="header-search-pill" role="search">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <input type="text" id="header-search-input" placeholder="Search crops, districts, or indicators..." aria-label="Search crops, districts, or indicators">
+                <!-- Search Input Pill & Live Autocomplete -->
+                <div class="header-search-wrapper" id="header-search-wrapper">
+                    <form action="/geography/" method="GET" class="header-search-pill" id="header-search-form" role="search">
+                        <svg class="search-lens-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="header-search-input" name="search" placeholder="Search crops, districts, or indicators..." aria-label="Search crops, districts, or indicators" autocomplete="off" spellcheck="false">
+                        <button type="button" id="header-search-clear" class="search-clear-btn" aria-label="Clear search" style="display: none;">&times;</button>
+                    </form>
+                    <div id="header-search-dropdown" class="header-search-dropdown" style="display: none;" role="listbox"></div>
                 </div>
 
                 {% if request.user.is_authenticated %}
@@ -272,6 +291,11 @@
             const btn = document.getElementById('mobile-menu-toggle');
             if (!menu) return;
 
+            // Do not close mobile drawer when interacting with the mobile search box
+            if (e.target.closest('.mobile-search-box')) {
+                return;
+            }
+
             // 1. If clicking any link or button inside the navigation menu
             const navLink = e.target.closest('#public-nav-menu a, #public-nav-menu button');
             if (navLink) {
@@ -294,6 +318,258 @@
                 }
             }
         });
+
+        /* ==========================================================================
+           AGRILENS INSTANT GLOBAL QUICK SEARCH ENGINE (DESKTOP & MOBILE)
+           ========================================================================== */
+        function initAgriLensQuickSearch() {
+            const searchPairs = [
+                {
+                    input: document.getElementById('header-search-input'),
+                    dropdown: document.getElementById('header-search-dropdown'),
+                    clearBtn: document.getElementById('header-search-clear'),
+                    form: document.getElementById('header-search-form')
+                },
+                {
+                    input: document.getElementById('mobile-search-input'),
+                    dropdown: document.getElementById('mobile-search-dropdown'),
+                    clearBtn: document.getElementById('mobile-search-clear'),
+                    form: document.getElementById('mobile-search-form')
+                }
+            ];
+
+            searchPairs.forEach(({ input, dropdown, clearBtn, form }) => {
+                if (!input || !dropdown) return;
+
+                let debounceTimer = null;
+                let selectedIndex = -1;
+                let currentResults = [];
+
+                function escapeHtml(str) {
+                    if (!str) return '';
+                    return String(str)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+                }
+
+                function highlightMatches(text, query) {
+                    if (!query) return escapeHtml(text);
+                    const escapedQ = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(`(${escapedQ})`, 'gi');
+                    return escapeHtml(text).replace(regex, '<mark>$1</mark>');
+                }
+
+                function getCategoryIconSvg(icon, type) {
+                    if (type === 'district' || icon === 'pin') {
+                        return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
+                    } else if (type === 'crop' || icon === 'leaf') {
+                        return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>';
+                    } else if (type === 'indicator' || icon === 'chart') {
+                        return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>';
+                    } else if (type === 'report' || icon === 'file') {
+                        return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>';
+                    }
+                    return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
+                }
+
+                function renderDropdown(query, results) {
+                    currentResults = results;
+                    selectedIndex = -1;
+                    if (!results || results.length === 0) {
+                        dropdown.innerHTML = `
+                            <div class="search-empty-state">
+                                <div class="search-empty-icon">🔍</div>
+                                <div class="search-empty-title">No direct matches for "${escapeHtml(query)}"</div>
+                                <div class="search-empty-sub">Try searching for a district (<em>Nyabihu</em>, <em>Musanze</em>), crop (<em>Maize</em>, <em>Beans</em>), or indicator (<em>Yield</em>, <em>Production</em>).</div>
+                            </div>
+                            <div class="search-dropdown-footer">
+                                <span>Press Enter to search platform</span>
+                                <span>AgriLens Search</span>
+                            </div>
+                        `;
+                        dropdown.style.display = 'block';
+                        return;
+                    }
+
+                    // Group results by category
+                    const groups = {};
+                    results.forEach(item => {
+                        const cat = item.category || 'Results';
+                        if (!groups[cat]) groups[cat] = [];
+                        groups[cat].push(item);
+                    });
+
+                    let html = '';
+                    for (const [catName, items] of Object.entries(groups)) {
+                        html += `<div class="search-group-header">${escapeHtml(catName)} <span style="opacity:0.6;font-size:10px;">${items.length}</span></div>`;
+                        items.forEach(item => {
+                            const globalIdx = results.indexOf(item);
+                            const iconSvg = getCategoryIconSvg(item.icon, item.type);
+                            const highlightedTitle = highlightMatches(item.title, query);
+                            html += `
+                                <a href="${item.url}" class="search-result-item" data-index="${globalIdx}" data-url="${item.url}">
+                                    <div class="search-item-left">
+                                        <div class="search-item-icon ${item.type}">${iconSvg}</div>
+                                        <div class="search-item-text">
+                                            <span class="search-item-title">${highlightedTitle}</span>
+                                            <span class="search-item-sub">${escapeHtml(item.subtitle)}</span>
+                                        </div>
+                                    </div>
+                                    <span class="search-badge ${item.type}">${escapeHtml(item.badge)}</span>
+                                </a>
+                            `;
+                        });
+                    }
+
+                    html += `
+                        <div class="search-dropdown-footer">
+                            <span>↑↓ navigate &bull; ↵ select &bull; esc dismiss</span>
+                            <span>${results.length} results</span>
+                        </div>
+                    `;
+
+                    dropdown.innerHTML = html;
+                    dropdown.style.display = 'block';
+
+                    // Attach click handler on items
+                    dropdown.querySelectorAll('.search-result-item').forEach(el => {
+                        el.addEventListener('click', function(e) {
+                            const url = this.getAttribute('data-url');
+                            if (url) {
+                                e.preventDefault();
+                                closeMobileNav();
+                                window.location.href = url;
+                            }
+                        });
+                    });
+                }
+
+                function updateSelection() {
+                    const items = dropdown.querySelectorAll('.search-result-item');
+                    items.forEach((item, idx) => {
+                        if (idx === selectedIndex) {
+                            item.classList.add('is-selected');
+                            item.scrollIntoView({ block: 'nearest' });
+                        } else {
+                            item.classList.remove('is-selected');
+                        }
+                    });
+                }
+
+                input.addEventListener('input', () => {
+                    const val = input.value.trim();
+                    if (clearBtn) {
+                        clearBtn.style.display = val.length > 0 ? 'flex' : 'none';
+                    }
+
+                    clearTimeout(debounceTimer);
+                    if (val.length < 1) {
+                        dropdown.style.display = 'none';
+                        dropdown.innerHTML = '';
+                        currentResults = [];
+                        return;
+                    }
+
+                    debounceTimer = setTimeout(() => {
+                        fetch(`/api/quick-search/?q=${encodeURIComponent(val)}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                renderDropdown(val, data.results || []);
+                            })
+                            .catch(err => {
+                                console.warn('Quick search failed:', err);
+                            });
+                    }, 120);
+                });
+
+                input.addEventListener('focus', () => {
+                    if (input.value.trim().length >= 1 && currentResults.length > 0) {
+                        dropdown.style.display = 'block';
+                    }
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    const items = dropdown.querySelectorAll('.search-result-item');
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        if (dropdown.style.display !== 'none' && items.length > 0) {
+                            selectedIndex = (selectedIndex + 1) % items.length;
+                            updateSelection();
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        if (dropdown.style.display !== 'none' && items.length > 0) {
+                            selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+                            updateSelection();
+                        }
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (dropdown.style.display !== 'none' && selectedIndex >= 0 && currentResults[selectedIndex]) {
+                            closeMobileNav();
+                            window.location.href = currentResults[selectedIndex].url;
+                        } else if (currentResults.length > 0) {
+                            closeMobileNav();
+                            window.location.href = currentResults[0].url;
+                        } else if (input.value.trim()) {
+                            closeMobileNav();
+                            window.location.href = `/geography/?search=${encodeURIComponent(input.value.trim())}`;
+                        }
+                    } else if (e.key === 'Escape') {
+                        dropdown.style.display = 'none';
+                        input.blur();
+                    }
+                });
+
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        input.value = '';
+                        clearBtn.style.display = 'none';
+                        dropdown.style.display = 'none';
+                        dropdown.innerHTML = '';
+                        input.focus();
+                    });
+                }
+
+                if (form) {
+                    form.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        if (currentResults.length > 0 && selectedIndex >= 0) {
+                            closeMobileNav();
+                            window.location.href = currentResults[selectedIndex].url;
+                        } else if (currentResults.length > 0) {
+                            closeMobileNav();
+                            window.location.href = currentResults[0].url;
+                        } else if (input.value.trim()) {
+                            closeMobileNav();
+                            window.location.href = `/geography/?search=${encodeURIComponent(input.value.trim())}`;
+                        }
+                    });
+                }
+            });
+
+            // Dismiss dropdown on outside clicks
+            document.addEventListener('click', (e) => {
+                searchPairs.forEach(({ dropdown, form }) => {
+                    if (dropdown && dropdown.style.display !== 'none') {
+                        if (form && !form.contains(e.target) && !dropdown.contains(e.target)) {
+                            dropdown.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        }
+
+        // Initialize immediately and on DOM load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initAgriLensQuickSearch);
+        } else {
+            initAgriLensQuickSearch();
+        }
     </script>
     <!-- Leaflet JS Library (Local vendor asset with unpkg fallback) -->
     <script src="/static/vendor/leaflet/leaflet.js"></script>
