@@ -395,11 +395,15 @@ def build_dynamic_reports_from_microdata():
     return dynamic_reports
 
 
-def ensure_approved_reports_seeded():
+def ensure_approved_reports_seeded(force=False):
     """
     Ensure the official publications exist in the database with verified dynamic metadata.
     Synthesizes microdata directly from ValidatedObservation and IndicatorService.
+    Fast-paths if reports are already seeded in the database.
     """
+    if not force and PublishedReport.objects.filter(is_published=True).exists():
+        return
+
     dynamic_catalog = build_dynamic_reports_from_microdata()
     type_labels = dict(PublishedReport.REPORT_TYPES)
 

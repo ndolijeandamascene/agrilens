@@ -244,20 +244,54 @@
             const menu = document.getElementById('public-nav-menu');
             const btn = document.getElementById('mobile-menu-toggle');
             if (!menu || !btn) return;
-            const expanded = btn.getAttribute('aria-expanded') === 'true';
-            btn.setAttribute('aria-expanded', !expanded);
-            menu.classList.toggle('open');
-            menu.classList.toggle('mobile-open');
-            btn.classList.toggle('is-active');
+            const isOpen = menu.classList.contains('open') || menu.classList.contains('mobile-open');
+            if (isOpen) {
+                closeMobileNav();
+            } else {
+                btn.setAttribute('aria-expanded', 'true');
+                btn.classList.add('is-active');
+                menu.classList.add('open', 'mobile-open');
+            }
         }
 
+        function closeMobileNav() {
+            const menu = document.getElementById('public-nav-menu');
+            const btn = document.getElementById('mobile-menu-toggle');
+            if (menu) {
+                menu.classList.remove('open', 'mobile-open');
+            }
+            if (btn) {
+                btn.setAttribute('aria-expanded', 'false');
+                btn.classList.remove('is-active');
+            }
+        }
+
+        // Close menu immediately on any link click and navigate cleanly
         document.addEventListener('click', function(e) {
             const menu = document.getElementById('public-nav-menu');
             const btn = document.getElementById('mobile-menu-toggle');
-            if (menu && (menu.classList.contains('open') || menu.classList.contains('mobile-open')) && !menu.contains(e.target) && !btn.contains(e.target)) {
-                menu.classList.remove('open', 'mobile-open');
-                btn.setAttribute('aria-expanded', 'false');
-                btn.classList.remove('is-active');
+            if (!menu) return;
+
+            // 1. If clicking any link or button inside the navigation menu
+            const navLink = e.target.closest('#public-nav-menu a, #public-nav-menu button');
+            if (navLink) {
+                closeMobileNav();
+                const href = navLink.getAttribute('href');
+                if (href) {
+                    const currentPath = window.location.pathname;
+                    if (href === currentPath || (href === '/' && (currentPath === '' || currentPath === '/'))) {
+                        e.preventDefault();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                }
+                return;
+            }
+
+            // 2. Outside click to close menu
+            if (btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+                if (menu.classList.contains('open') || menu.classList.contains('mobile-open')) {
+                    closeMobileNav();
+                }
             }
         });
     </script>
