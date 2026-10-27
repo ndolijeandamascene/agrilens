@@ -10,6 +10,7 @@ Developed for the **2026 NISR Big Data Hackathon – Track 1: Agricultural Produ
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![Django 5.2](https://img.shields.io/badge/Django-5.2-092E20.svg)](https://www.djangoproject.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-PostGIS-336791.svg)](https://www.postgresql.org/)
+[![AgriLens AI](https://img.shields.io/badge/AgriLens%20AI-Neural%20Assistant-059669.svg)](https://agrilens.ndoli.dev)
 [![Scikit-Learn](https://img.shields.io/badge/ML-Scikit--Learn-F7931E.svg)](https://scikit-learn.org/)
 [![Alpine.js](https://img.shields.io/badge/Frontend-Alpine.js%20%7C%20Vanilla%20CSS-77C1D2.svg)](https://alpinejs.dev/)
 [![Automated Tests](https://img.shields.io/badge/Tests-Passing-brightgreen.svg)]()
@@ -50,6 +51,7 @@ Rwanda generates rich agricultural datasets through the **National Institute of 
 - **Interactive Geospatial Analytics** spanning all 5 Provinces and 30 Districts of Rwanda.
 - **Productivity Gap Intelligence** contrasting yield disparities alongside correlated input adoption rates without claiming unproven causal links.
 - **Predictive Machine Learning** (Random Forest yield modeling, K-Means district clustering, and what-if input policy simulations).
+- **AgriLens AI Assistant**: An in-process neural and grounded conversational assistant powered by local quantized weights, answering over 23,833 NISR Seasonal Agricultural Survey records with role-based data clearance.
 - **Maker-Checker Data Governance** for official survey microdata ETL and validated field observations.
 - **Daily Commodity Market Surveillance** covering 30 districts with price dispersion analysis.
 - **Automated Multi-Channel Communication** delivering timely alerts, reports, and administrative notices to agricultural stakeholders.
@@ -81,7 +83,17 @@ Rwanda generates rich agricultural datasets through the **National Institute of 
 - **Explainability & Model Transparency (`/api/v1/ml/explainability/`, `/api/v1/ml/models/`)**: Detailed feature importance weights, performance metrics (R², RMSE, MAE), and model version registry.
 - **Automated Re-training Pipeline (`/api/v1/ml/train/` / `python manage.py train_ml_models`)**: Automated retraining pipeline refreshing models with newly verified survey cycles.
 
-### 4. Agricultural Data Management & Maker-Checker QA Hub
+### 4. AgriLens AI: Grounded Intelligence & Conversational Assistant
+- **100% In-Process Neural Engine**: High-performance local neural model operating directly in-process via C++ memory mapping (`llama-cpp-python`). Zero external daemons, zero third-party cloud API costs, and zero private data egress.
+- **Dual Grounding & Zero Hallucination**: Every empirical question executes deterministic read-only aggregations across 23,833 NISR Seasonal Agricultural Survey records first. Official numbers (yield, production, adoption rate, post-harvest loss) are presented with complete statistical lineage and sample size ($n$), enriched by contextual agronomic analysis.
+- **Conversational Agronomic Expertise**: Expert conversational guidance answering practical questions on Rwandan crop varieties, seasonal planting calendars (Season A/B/C), soil liming & NPK balance, and pest control.
+- **Role-Aware Context Clearance (RBAC)**: Automatically tailors responses based on the caller's authorization level:
+  - *Public Visitors / Citizens*: Access published national aggregates, market prices, and actionable farming guidance. Sensitive unapproved field drafts and data collector telemetry remain protected.
+  - *Institutional Officers (District Agronomists, Analysts, Administrators)*: Unlock tactical district intelligence, vulnerability scores (AVI), and policy workflows.
+- **Public Floating Chatbot Widget**: Interactive slide-up conversational widget accessible across all public pages (`/`, `/reports/`, `/data-api/`, `/about/`) with quick-action suggestions and complete API synchronization.
+- **Dedicated ChatGPT-Style Intelligence Console (`/assistant/`)**: Full-screen conversation stream with dynamic leaderboard visualizations, KPI tiles, adoption progress meters, text-to-speech audio, and transparent ORM lineage drawers.
+
+### 5. Agricultural Data Management & Maker-Checker QA Hub
 - **3-Tier Data Architecture**:
   1. *Raw Ingestion Layer*: Preserves original NISR SPSS/SAV survey records with checksums and provenance tags.
   2. *Normalized Operational Store*: Relational database mapping parcels, households, seasons, and crops to authoritative geographic codes.
@@ -89,30 +101,30 @@ Rwanda generates rich agricultural datasets through the **National Institute of 
 - **Maker-Checker Field Observation Workflow**: Multi-stage validation lifecycle (`Draft` ➔ `Submitted` ➔ `Approved` / `Needs Correction` / `Rejected`) with full immutable audit logs.
 - **Automated SAS Importer**: Custom ETL pipeline leveraging `pyreadstat` to ingest official SAS microdata with automated survey sampling weight calculation.
 
-### 5. Commodity Markets & Daily Price Surveillance
+### 6. Commodity Markets & Daily Price Surveillance
 - **Wholesale & Retail Price Monitoring**: Real-time price tracking across 30 district markets for essential staple food crops (Maize, Beans, Irish Potato, Rice, Cassava).
 - **5-Stage Publication Workflow**: `Collect` ➔ `Validate` ➔ `Review` ➔ `Approve` ➔ `Publish`.
 - **Market Dispersion & Corridors**: Highlights supply bottlenecks and inter-district price arbitrage margins.
 
-### 6. Decision Support & Strategic Agronomic Policies
+### 7. Decision Support & Strategic Agronomic Policies
 - **Prescriptive Intervention Triggers**: Automated recommendation rules covering:
   - Small-scale irrigation expansion in drought-prone Eastern lowlands.
   - Soil acidity liming & NPK balance in Northern and Southern volcanic highlands.
   - Post-harvest hermetic storage and drying infrastructure to curb storage losses.
 - **Actionable Policy Dossiers**: Quantified investment priorities and target beneficiary estimates per sector.
 
-### 7. Internal Report Center & Automated Schedules
+### 8. Internal Report Center & Automated Schedules
 - **On-Demand Exports**: Clean PDF briefings and structured CSV data extracts for researchers and government planners.
 - **Automated Background Dispatch**: Background cron task (`run_scheduled_reports`) that compiles and delivers recurring intelligence briefs.
 
-### 8. Institutional Notifications & Communication Center
+### 9. Institutional Notifications & Communication Center
 - **In-App Notification Hub & Dropdown Drawer (`/notifications/`)**: Real-time dropdown drawer with unread counter badges, instant mark-as-read, unread toggle, and direct navigation links to relevant platform records.
 - **Asynchronous Email Worker (`apps.notifications.tasks`)**: Non-blocking background worker daemon with `transaction.on_commit` hooks, ensuring zero request lag, idempotency, and dual HTML/plain-text responsive email templates.
 - **Platform Administrative Announcements (`/notifications/admin/`)**: Platform-wide broadcasts with customizable priority banners (`Normal`, `High`, `Critical`), target role filtering, and email delivery audit log with retry triggers.
 - **User Preference Matrix (`/notifications/preferences/`)**: Granular multi-channel toggles allowing users to subscribe/unsubscribe from specific notification types (Data Approvals, Commodity Prices, System Alerts, Security).
 - **Workflow-Triggered Communications**: Automatic alerts dispatched when field observations are submitted, approved, or rejected; when price anomalies occur; when scheduled reports are generated; and during user account provisioning.
 
-### 9. Enterprise Authentication, RBAC & Security
+### 10. Enterprise Authentication, RBAC & Security
 - **Institutional Access Tiers**: 7 role tiers enforcing strict role-based access control.
 - **Geographic Data Scoping**: Restricts regional agronomists and officers to their assigned Province, District, or Sector.
 - **Tokenized User Provisioning**: Secure, single-use tokenized setup links emailed to newly created users.
@@ -170,6 +182,7 @@ Rwanda generates rich agricultural datasets through the **National Institute of 
 | :--- | :--- | :--- |
 | **Backend Framework** | **Django 5.2 (Python 3.11+)** | High-security, enterprise-ready web platform with ORM, built-in auth, and transactional integrity. |
 | **API Layer** | **Django REST Framework (DRF)** | Clean RESTful endpoints for ML inference, notifications, and indicators. |
+| **Neural AI & Assistant** | **AgriLens AI (`llama-cpp-python`)** | In-process neural reasoning engine memory-mapped via C++, grounded in 23,833 NISR survey observations. |
 | **Database** | **PostgreSQL / PostGIS** | ACID compliance, robust spatial support, and scalable relational querying. |
 | **Machine Learning** | **Scikit-Learn, NumPy, Pandas** | `RandomForestRegressor` for yield inference; `KMeans` for agro-ecological district clustering. |
 | **ETL & Data Science** | **pyreadstat, openpyxl** | Ingestion of official NISR SPSS/SAV microdata dictionaries and weights. |
@@ -189,6 +202,7 @@ agrilens/
 │   ├── accounts/             # Custom User model, RBAC, single-use token activation, security
 │   ├── agriculture/          # Crops, seasons, parcels, and production statistics
 │   ├── api/                  # Public and authenticated REST endpoints
+│   ├── assistant/            # AgriLens AI conversational assistant, grounded parser, and role prompt builder
 │   ├── dashboard/            # National overview, executive KPIs, map views, scheduled reports
 │   ├── data_management/      # 3-tier SAS ingestion, maker-checker manual observations, audit log
 │   ├── decision_support/     # Policy recommendation engine and actionable agronomic dossiers
@@ -346,6 +360,8 @@ AgriLens implements 7 institutional role tiers with geographic scoping to enforc
 | `/markets/` | `markets:dashboard` | Daily Commodity Market surveillance, price dispersion, and 5-stage publishing. |
 | `/decision-support/` | `decision_support:index` | Agronomic policy recommendation dossiers and prioritized interventions. |
 | `/reports/` | `dashboard:report_center` | Internal Report Center for on-demand PDF and CSV export generation. |
+| `/assistant/` | `assistant:index` | Fullscreen ChatGPT-style conversational assistant with KPI tiles, ranking leaderboards, and ORM lineage. |
+| Floating Widget | Included on Public Pages | Interactive slide-up AI assistant available on all public pages (`/`, `/reports/`, `/data-api/`, `/about/`). |
 | `/notifications/` | `notifications:notification_center` | In-app notification center, unread alerts, and activity feed. |
 | `/notifications/preferences/` | `notifications:preferences` | User multi-channel notification settings & frequency matrix. |
 | `/notifications/admin/` | `notifications:admin_announcements` | System-wide broadcasts, announcement manager, and email delivery logs. |
@@ -354,6 +370,34 @@ AgriLens implements 7 institutional role tiers with geographic scoping to enforc
 ---
 
 ## 🔌 API Endpoints
+
+### AgriLens AI Assistant APIs
+
+```http
+POST /api/v1/assistant/query/
+Content-Type: application/json
+
+{
+  "query": "What is the average Irish Potato yield in Musanze?"
+}
+```
+
+```json
+{
+  "status": "SUCCESS",
+  "intent": "YIELD",
+  "synthesized_by": "AgriLens AI (Neural Engine)",
+  "user_role": "Public Agricultural Stakeholder / Citizen",
+  "user_clearance": "PUBLIC_AGGREGATES_ONLY",
+  "sample_count": 5,
+  "provenance": "NISR 2025A Microdata",
+  "dashboard_link": "/indicators/productivity/?crop=Irish Potato&district=Musanze",
+  "answer": "The survey-weighted average yield for Irish Potato in Musanze District (2025A) is 9.50 t/ha (9,500 kg/ha), based on 5 validated field survey plots covering 6.0 hectares.\n\n**AgriLens AI Analysis**:\nMusanze benefits from highly fertile volcanic soils and consistent rainfall, enabling superior Irish potato productivity compared to the national average. Continued focus on certified disease-free seed tubers and proper storage ventilation will help sustain these observed yield levels.",
+  "orm_query": "ValidatedObservation.objects.filter(crop__name__icontains='Irish Potato', district__name__iexact='Musanze').aggregate(avg_yield=Avg('calculated_yield_kg_per_ha'), plots=Count('id'))"
+}
+```
+
+- **`POST /api/v1/assistant/query/`**: Natural language query interface supporting empirical productivity queries, input adoption rates, district rankings, market surveillance, and general agricultural guidance. Enforces role-based clearance boundaries.
 
 ### Machine Learning APIs
 
