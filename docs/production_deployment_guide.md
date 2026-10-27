@@ -48,11 +48,8 @@ flowchart TD
    cd /opt/agrilens
    ```
 
-2. **Verify `.env.pro` Configuration**:
-   Ensure `.env.pro` is in place with your production settings:
-   ```bash
-   cp .env.pro .env
-   ```
+2. **Verify `.env` Configuration**:
+   Ensure `.env` is in place with your production settings.
 
 3. **Build and Launch via Docker Compose**:
    ```bash
@@ -77,7 +74,7 @@ If you already have `qwen2.5-3b-instruct-q4_k_m.gguf` (2.1 GB) on your local mac
      --name agrilens-web \
      --restart unless-stopped \
      -p 8000:8000 \
-     --env-file .env.pro \
+     --env-file .env \
      -v /opt/agrilens/data/models:/app/data/models \
      -v /opt/agrilens/media:/app/media \
      ndoli/agrilens:latest
@@ -113,7 +110,6 @@ If you already have `qwen2.5-3b-instruct-q4_k_m.gguf` (2.1 GB) on your local mac
 
 4. **Run Migrations & Static Collection**:
    ```bash
-   export ENV_FILE=.env.pro
    python manage.py migrate --noinput
    python manage.py collectstatic --noinput
    ```
@@ -164,7 +160,7 @@ curl -X POST http://localhost:8000/api/v1/assistant/query/ \
 
 ---
 
-## 4. Environment Variables Reference (`.env.pro`)
+## 4. Environment Variables Reference (`.env`)
 
 | Variable | Recommended Production Value | Description |
 |---|---|---|

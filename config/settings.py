@@ -13,14 +13,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Initialize environ helper
 env = environ.Env()
 
-# Load environment file (.env, .env.pro, or file defined by ENV_FILE)
+# Load environment file (.env or file defined by ENV_FILE)
 env_file_name = os.getenv('ENV_FILE')
 if env_file_name and (BASE_DIR / env_file_name).exists():
     environ.Env.read_env(BASE_DIR / env_file_name)
 elif (BASE_DIR / '.env').exists():
     environ.Env.read_env(BASE_DIR / '.env')
-elif (BASE_DIR / '.env.pro').exists():
-    environ.Env.read_env(BASE_DIR / '.env.pro')
 
 # ------------------------------------------------------------------------------
 # Core Settings

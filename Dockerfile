@@ -17,24 +17,32 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     QWEN_MODEL_PATH=/app/data/models/qwen2.5-3b-instruct-q4_k_m.gguf \
     QWEN_MODEL_N_CTX=2048 \
     QWEN_MODEL_N_THREADS=2 \
-    DOWNLOAD_QWEN_MODEL=1
+    DOWNLOAD_QWEN_MODEL=1 \
+    CMAKE_ARGS="-DGGML_BLAS=OFF" \
+    CMAKE_BUILD_PARALLEL_LEVEL=2
 
 # Working directory
 WORKDIR /app
 
-# Install runtime & build dependencies (libpq5 for PostgreSQL, libgomp1 for OpenMP, build-essential & cmake for C/C++ builds)
+# Install runtime & build dependencies (libpq5 for PostgreSQL, libgomp1 for OpenMP, build-essential & cmake for C/C++ builds, musl for musl-libc wheels)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     libpq5 \
     libgomp1 \
     build-essential \
     cmake \
+    musl \
+    musl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install python dependencies with pre-compiled binary wheel priority
+# Fix libc.musl-x86_64.so.1 shared library loader compatibility for libllama.so
+RUN ln -sf /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1 && \
+    ln -sf /usr/lib/x86_64-linux-musl/libc.so /usr/lib/libc.musl-x86_64.so.1 || true
+
+# Install python dependencies
 COPY requirements-prod.txt /app/
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu --prefer-binary -r requirements-prod.txt
+    pip install --no-cache-dir -r requirements-prod.txt
 
 
 # Copy source code

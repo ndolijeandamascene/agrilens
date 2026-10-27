@@ -181,8 +181,8 @@ def _load_qwen_model() -> Any:
 
     try:
         from llama_cpp import Llama
-    except ImportError:
-        _load_error = "llama-cpp-python is not installed in the active environment."
+    except Exception as exc:
+        _load_error = f"Failed to load llama-cpp-python: {exc}"
         logger.error(_load_error)
         return None
 

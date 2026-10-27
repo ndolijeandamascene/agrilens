@@ -57,9 +57,9 @@ For the **2026 NISR Big Data Hackathon Jury & Technical Reviewers**:
 
 ---
 
-## 2. Production Environment File (`.env.pro`)
+## 2. Production Environment File (`.env`)
 
-The `.env.pro` file contains production secrets and settings. It is excluded from version control via `.gitignore`.
+The `.env` file contains production secrets and settings. It is excluded from version control via `.gitignore`.
 
 | Environment Variable | Description | Production Value |
 | :--- | :--- | :--- |
@@ -88,7 +88,7 @@ docker build -t ndoli/agrilens:latest .
 
 ### Step 3.2: Verify the Image Locally
 ```bash
-docker run --rm -p 8000:8000 --env-file .env.pro ndoli/agrilens:latest
+docker run --rm -p 8000:8000 --env-file .env ndoli/agrilens:latest
 ```
 Check health endpoint in browser or terminal:
 ```bash
@@ -117,7 +117,7 @@ docker push ndoli/agrilens:latest
    - Port: `8000`
    - Enable SSL (Automatic Let's Encrypt certificate).
 6. Under **Environment Variables**:
-   - Paste the contents of `.env.pro`.
+   - Paste the contents of `.env`.
 7. Under **Volumes / Persistent Storage**:
    - Mount `/app/media` to a named volume.
 8. Click **Deploy**.

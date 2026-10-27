@@ -7,7 +7,7 @@ services:
     container_name: agrilens-web
     restart: unless-stopped
     env_file:
-      - .env.pro
+      - .env
     environment:
       - AUTO_MIGRATE=1
     ports:
