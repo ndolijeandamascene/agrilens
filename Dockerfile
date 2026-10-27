@@ -17,17 +17,20 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Working directory
 WORKDIR /app
 
-# Install runtime dependencies (curl for healthcheck, libpq5 for PostgreSQL, libgomp1 for OpenMP/llama.cpp)
+# Install runtime & build dependencies (libpq5 for PostgreSQL, libgomp1 for OpenMP, build-essential & cmake for C/C++ builds)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     libpq5 \
     libgomp1 \
+    build-essential \
+    cmake \
     && rm -rf /var/lib/apt/lists/*
 
-# Install python dependencies
+# Install python dependencies with pre-compiled binary wheel priority
 COPY requirements-prod.txt /app/
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements-prod.txt
+    pip install --no-cache-dir --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu --prefer-binary -r requirements-prod.txt
+
 
 # Copy source code
 COPY . /app/

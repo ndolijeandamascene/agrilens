@@ -46,3 +46,7 @@ ipython>=8.22.0
 # Exploratory Analysis & Notebooks
 jupyterlab>=4.1.0
 notebook>=7.1.0
+
+# In-Process Neural LLM (Pre-compiled CPU Wheels)
+--extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
+llama-cpp-python<=0.3.19
