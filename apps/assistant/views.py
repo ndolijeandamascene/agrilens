@@ -31,12 +31,12 @@ def assistant_view(request):
         'page_title': 'Grounded AI Agricultural Data Assistant',
         'recent_queries': recent_queries,
         'suggested_queries': [
+            "Simulate maize yield in Nyagatare with fertilizer and improved seed",
+            "What crop is best to grow in Gicumbi?",
+            "Compare current vs recommended practices for climbing beans in Burera",
+            "What agro-ecological cluster is Karongi in?",
+            "Forecast maize production for 2026A in Eastern Province",
             "What is the average Irish Potato yield in Musanze?",
-            "Which district produces the most beans?",
-            "What percentage of farmers in Nyagatare use mineral fertilizer?",
-            "What is the vulnerability index for Karongi?",
-            "What is the retail price of beans in monitored markets?",
-            "What is the average maize yield in Nyagatare?",
         ],
     }
     return render(request, 'assistant/index.html', context)

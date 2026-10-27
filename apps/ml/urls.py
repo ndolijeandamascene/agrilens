@@ -17,7 +17,8 @@ urlpatterns = [
     path('district-clusters/', views.DistrictClustersAPIView.as_view(), name='district_clusters'),
     path('vulnerability/', views.DistrictVulnerabilityAPIView.as_view(), name='district_vulnerability'),
 
-    # Seasonal Forecasting
+    # Seasonal Forecasting & Recommendations
+    path('recommend-crop/', views.CropRecommendationAPIView.as_view(), name='recommend_crop'),
     path('forecast/', views.ProductionForecastAPIView.as_view(), name='production_forecast'),
     path('price-forecast/', views.MarketPriceForecastAPIView.as_view(), name='price_forecast'),
 

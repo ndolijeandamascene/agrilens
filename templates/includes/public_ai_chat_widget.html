@@ -338,17 +338,35 @@
     <!-- Feed -->
     <div class="public-ai-feed" id="publicAiFeed">
         <div class="public-ai-msg-assistant">
-            Hello! I am <strong>AgriLens AI</strong>. I can answer general farming questions or look up verified statistics from Rwanda's 2024–2025 Seasonal Agricultural Survey.
+            Hello! I am the <strong>AgriLens Grounded Assistant</strong> powered by <strong>23,833 NISR survey records</strong> and <strong>Machine Learning models</strong>. What would you like to explore or simulate today?
             <div class="public-ai-chips-wrap">
-                <button type="button" class="public-ai-chip" onclick="submitPublicQuery('Which district produces the most beans in Rwanda?')">
+                <button type="button" class="public-ai-chip" onclick="submitPublicQuery('Simulate maize yield in Nyagatare with fertilizer and improved seed')">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-                        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-                        <path d="M4 22h16"></path>
-                        <path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path>
-                        <path d="M6 2v7a6 6 0 0 0 12 0V2Z"></path>
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                     </svg>
-                    <span>Which district produces the most beans?</span>
+                    <span>🌾 <strong>Simulate:</strong> Maize yield with fertilizer in Nyagatare</span>
+                </button>
+                <button type="button" class="public-ai-chip" onclick="submitPublicQuery('What crop is best to grow in Gicumbi?')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="m9 12 2 2 4-4"></path>
+                    </svg>
+                    <span>💡 <strong>Recommend:</strong> Best crops to grow in Gicumbi</span>
+                </button>
+                <button type="button" class="public-ai-chip" onclick="submitPublicQuery('Compare current vs recommended practices for climbing beans in Burera')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 3h5v5"></path>
+                        <path d="M8 21H3v-5"></path>
+                        <path d="M21 3l-7 7"></path>
+                        <path d="M3 21l7-7"></path>
+                    </svg>
+                    <span>⚖️ <strong>Compare:</strong> Traditional vs Modern Beans in Burera</span>
+                </button>
+                <button type="button" class="public-ai-chip" onclick="submitPublicQuery('What agro-ecological cluster is Karongi in?')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                    </svg>
+                    <span>🗺️ <strong>Cluster:</strong> Agro-ecological profile of Karongi</span>
                 </button>
                 <button type="button" class="public-ai-chip" onclick="submitPublicQuery('What is the average Irish Potato yield in Musanze?')">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -356,24 +374,14 @@
                         <line x1="18" y1="20" x2="18" y2="4"></line>
                         <line x1="6" y1="20" x2="6" y2="16"></line>
                     </svg>
-                    <span>Irish Potato yield in Musanze?</span>
+                    <span>📊 <strong>Yield:</strong> Irish Potato average in Musanze</span>
                 </button>
-                <button type="button" class="public-ai-chip" onclick="submitPublicQuery('What percentage of farmers in Nyagatare use mineral fertilizer?')">
+                <button type="button" class="public-ai-chip" onclick="submitPublicQuery('Forecast maize production for 2026A in Eastern Province')">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M10 2v7.31"></path>
-                        <path d="M14 9.3V2"></path>
-                        <path d="M8.5 2h7"></path>
-                        <path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path>
-                        <path d="M5.52 16h12.96"></path>
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                        <polyline points="17 6 23 6 23 12"></polyline>
                     </svg>
-                    <span>Fertilizer adoption in Nyagatare?</span>
-                </button>
-                <button type="button" class="public-ai-chip" onclick="submitPublicQuery('What are best agronomic practices for maize farming?')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
-                        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
-                    </svg>
-                    <span>Best practices for maize farming?</span>
+                    <span>📈 <strong>Forecast:</strong> 2026A Maize harvest production</span>
                 </button>
             </div>
         </div>

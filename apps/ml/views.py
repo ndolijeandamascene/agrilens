@@ -24,6 +24,7 @@ from .services.forecasting import (
 )
 from .services.explainability import ModelExplainabilityService
 from .services.training import YieldPredictionTrainer, DistrictClusteringTrainer
+from .services.recommendation import CropRecommendationService
 
 logger = logging.getLogger(__name__)
 
@@ -280,4 +281,25 @@ class DistrictVulnerabilityAPIView(APIView):
             use_cache=not refresh
         )
         return Response(data, status=status.HTTP_200_OK)
+
+
+class CropRecommendationAPIView(APIView):
+    """
+    GET /api/v1/ml/recommend-crop/?district=Musanze
+    Returns ranked crop suitability scorecard based on empirical microdata,
+    agro-ecological cluster typology, post-harvest resilience, and wholesale revenue potential.
+    """
+    permission_classes = [CanViewML]
+
+    def get(self, request):
+        district = request.GET.get('district', 'Musanze').strip()
+        try:
+            top_n = int(request.GET.get('top_n', 5))
+        except (ValueError, TypeError):
+            top_n = 5
+        result = CropRecommendationService.recommend_for_district(district, top_n=top_n)
+        return Response(
+            result,
+            status=status.HTTP_200_OK if result.get('success') else status.HTTP_400_BAD_REQUEST
+        )
 
