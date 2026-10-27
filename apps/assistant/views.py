@@ -62,3 +62,31 @@ class AssistantQueryAPIView(APIView):
         result = GroundedAgriculturalAssistant.answer_query(query_text, user=user)
 
         return Response(result, status=status.HTTP_200_OK)
+
+
+class AssistantStatusAPIView(APIView):
+    """
+    GET /api/v1/assistant/status/ or /assistant/api/status/
+    Provides live telemetry on AgriLens AI model file existence, loading state,
+    RAM memory mapping, and active background download progress.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        from .services.runtime import QwenModelRuntime
+        return Response(QwenModelRuntime.get_status(), status=status.HTTP_200_OK)
+
+
+class AssistantDownloadAPIView(APIView):
+    """
+    POST /api/v1/assistant/download/ or /assistant/api/download/
+    Manually initiates or verifies the background download of the 2.1 GB neural weights.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        from .services.runtime import trigger_model_download_if_needed, QwenModelRuntime
+        triggered = trigger_model_download_if_needed()
+        info = QwenModelRuntime.get_status()
+        info['download_triggered'] = triggered
+        return Response(info, status=status.HTTP_200_OK)

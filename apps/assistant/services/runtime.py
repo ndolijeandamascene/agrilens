@@ -1,11 +1,13 @@
 """
-AgriLens Qwen 2.5 3B Model Runtime Service.
+AgriLens Local Neural Model Runtime Service.
 Provides 100% in-process local neural LLM inference via llama-cpp-python.
 Operates with zero external network dependencies (no Ollama, no cloud API keys).
 """
 import os
+import time
 import logging
 import threading
+import urllib.request
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from django.conf import settings
@@ -14,17 +16,29 @@ logger = logging.getLogger(__name__)
 
 _model_instance: Any = None
 _model_lock = threading.Lock()
-_load_attempted: bool = False
 _load_error: Optional[str] = None
+
+_download_lock = threading.Lock()
+_download_thread: Optional[threading.Thread] = None
+_download_progress: Dict[str, Any] = {
+    'is_downloading': False,
+    'total_bytes': 0,
+    'downloaded_bytes': 0,
+    'speed_mb_s': 0.0,
+    'progress_pct': 0.0,
+    'error': None,
+}
+
+HF_DOWNLOAD_URL = "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf"
+MIN_FILE_BYTES = 1_900_000_000
 
 
 def _get_configured_model_path() -> str:
-    """Retrieves and validates the GGUF model path from settings or default location."""
+    """Retrieves and validates the GGUF model path from settings or default locations."""
     configured = getattr(settings, 'QWEN_MODEL_PATH', '')
-    if configured and os.path.isfile(configured):
+    if configured and os.path.isfile(configured) and os.path.getsize(configured) >= MIN_FILE_BYTES:
         return configured
 
-    # Candidate paths ordered by priority (Linux Docker container paths + local dev paths)
     candidates = [
         str(settings.BASE_DIR / 'data' / 'models' / 'qwen2.5-3b-instruct-q4_k_m.gguf'),
         '/app/data/models/qwen2.5-3b-instruct-q4_k_m.gguf',
@@ -33,10 +47,87 @@ def _get_configured_model_path() -> str:
         r'C:\Users\ndoli\Documents\WEBAPP\agrilens\data\models\qwen2.5-3b-instruct-q4_k_m.gguf',
     ]
     for c in candidates:
-        if os.path.isfile(c):
+        if os.path.isfile(c) and os.path.getsize(c) >= MIN_FILE_BYTES:
             return c
-    return configured or candidates[0]
 
+    # Fallback preferred target path for saving
+    return configured or ('/app/data/models/qwen2.5-3b-instruct-q4_k_m.gguf' if os.name != 'nt' else str(settings.BASE_DIR / 'data' / 'models' / 'qwen2.5-3b-instruct-q4_k_m.gguf'))
+
+
+def _run_background_download(dest_file_path: str):
+    global _download_progress
+    part_path = dest_file_path + ".part"
+    os.makedirs(os.path.dirname(dest_file_path), exist_ok=True)
+
+    with _download_lock:
+        _download_progress['is_downloading'] = True
+        _download_progress['error'] = None
+        _download_progress['progress_pct'] = 0.0
+
+    logger.info("Starting background download of AgriLens AI weights to: %s", dest_file_path)
+    start_time = time.time()
+    try:
+        req = urllib.request.Request(
+            HF_DOWNLOAD_URL,
+            headers={"User-Agent": "AgriLens-Neural-Runtime/1.0"}
+        )
+        with urllib.request.urlopen(req, timeout=60) as resp, open(part_path, "wb") as f_out:
+            total_size = resp.headers.get("Content-Length")
+            total_bytes = int(total_size) if total_size else 0
+            _download_progress['total_bytes'] = total_bytes
+            downloaded = 0
+            block_size = 1024 * 1024  # 1 MB
+
+            while True:
+                chunk = resp.read(block_size)
+                if not chunk:
+                    break
+                f_out.write(chunk)
+                downloaded += len(chunk)
+                now = time.time()
+                elapsed = max(1.0, now - start_time)
+                _download_progress['downloaded_bytes'] = downloaded
+                _download_progress['progress_pct'] = round((downloaded / total_bytes * 100), 1) if total_bytes else 0.0
+                _download_progress['speed_mb_s'] = round((downloaded / (1024 * 1024)) / elapsed, 2)
+
+        if os.path.exists(dest_file_path):
+            os.remove(dest_file_path)
+        os.rename(part_path, dest_file_path)
+        logger.info("AgriLens AI weights successfully downloaded to: %s in %.1fs", dest_file_path, time.time() - start_time)
+        with _download_lock:
+            _download_progress['is_downloading'] = False
+            _download_progress['progress_pct'] = 100.0
+
+        QwenModelRuntime.reload_model()
+    except Exception as exc:
+        logger.error("Failed to download neural model weights in background: %s", exc)
+        with _download_lock:
+            _download_progress['is_downloading'] = False
+            _download_progress['error'] = str(exc)
+        if os.path.exists(part_path):
+            try:
+                os.remove(part_path)
+            except OSError:
+                pass
+
+
+def trigger_model_download_if_needed(target_path: Optional[str] = None) -> bool:
+    global _download_thread
+    dest_path = target_path or _get_configured_model_path()
+    if os.path.isfile(dest_path) and os.path.getsize(dest_path) >= MIN_FILE_BYTES:
+        return False
+
+    with _download_lock:
+        if _download_progress['is_downloading']:
+            return True
+        _download_thread = threading.Thread(
+            target=_run_background_download,
+            args=(dest_path,),
+            daemon=True,
+            name="AgriLensModelDownloader"
+        )
+        _download_thread.start()
+        return True
 
 
 def _load_qwen_model() -> Any:
@@ -45,14 +136,17 @@ def _load_qwen_model() -> Any:
 
     enabled = getattr(settings, 'QWEN_LLM_ENABLED', True)
     if not enabled:
-        _load_error = "Qwen LLM is disabled via settings (QWEN_LLM_ENABLED=False)."
+        _load_error = "AgriLens AI LLM is disabled via settings (QWEN_LLM_ENABLED=False)."
         logger.info(_load_error)
         return None
 
     model_path = _get_configured_model_path()
-    if not model_path or not os.path.isfile(model_path):
-        _load_error = f"Qwen GGUF model file not found at: {model_path}"
+    if not model_path or not os.path.isfile(model_path) or os.path.getsize(model_path) < MIN_FILE_BYTES:
+        _load_error = f"AgriLens AI GGUF model file not found at: {model_path}"
         logger.warning(_load_error)
+        # Automatically trigger background download if enabled
+        if getattr(settings, 'DOWNLOAD_QWEN_MODEL', True):
+            trigger_model_download_if_needed(model_path)
         return None
 
     try:
@@ -62,11 +156,13 @@ def _load_qwen_model() -> Any:
         logger.error(_load_error)
         return None
 
-    n_ctx = int(getattr(settings, 'QWEN_MODEL_N_CTX', 4096))
-    n_threads = int(getattr(settings, 'QWEN_MODEL_N_THREADS', min(8, max(2, (os.cpu_count() or 4) - 1))))
+    n_ctx = int(getattr(settings, 'QWEN_MODEL_N_CTX', 2048))
+    n_threads = int(getattr(settings, 'QWEN_MODEL_N_THREADS', 2))
+    if n_threads <= 0:
+        n_threads = min(4, max(2, (os.cpu_count() or 4) - 1))
     n_batch = int(getattr(settings, 'QWEN_MODEL_N_BATCH', 512))
 
-    logger.info("Initializing in-process Qwen 2.5 3B from: %s (n_ctx=%d, threads=%d)", model_path, n_ctx, n_threads)
+    logger.info("Initializing in-process AgriLens AI from: %s (n_ctx=%d, threads=%d)", model_path, n_ctx, n_threads)
 
     try:
         model = Llama(
@@ -79,7 +175,8 @@ def _load_qwen_model() -> Any:
             verbose=False,
             chat_format="chatml",
         )
-        logger.info("Qwen 2.5 3B model loaded successfully into process memory.")
+        _load_error = None
+        logger.info("AgriLens AI neural model loaded successfully into process memory.")
         return model
     except Exception as exc:
         _load_error = f"Failed to instantiate Llama model: {exc}"
@@ -88,29 +185,53 @@ def _load_qwen_model() -> Any:
 
 
 class QwenModelRuntime:
-    """Thread-safe gateway to the local Qwen 2.5 3B neural LLM."""
+    """Thread-safe gateway to the local AgriLens AI neural LLM."""
 
     @classmethod
     def _get_model(cls) -> Any:
-        global _model_instance, _load_attempted
-        if _load_attempted:
+        global _model_instance
+        if _model_instance is not None:
             return _model_instance
 
         with _model_lock:
-            if not _load_attempted:
+            if _model_instance is None:
                 _model_instance = _load_qwen_model()
-                _load_attempted = True
         return _model_instance
 
     @classmethod
     def is_available(cls) -> bool:
-        """Returns True if Qwen 2.5 3B is loaded and ready for inference."""
+        """Returns True if the neural model is loaded and ready for inference."""
         return cls._get_model() is not None
+
+    @classmethod
+    def reload_model(cls) -> bool:
+        """Forces a reload attempt of the model from disk into RAM."""
+        global _model_instance
+        with _model_lock:
+            _model_instance = _load_qwen_model()
+        return _model_instance is not None
 
     @classmethod
     def get_load_error(cls) -> Optional[str]:
         cls._get_model()
         return _load_error
+
+    @classmethod
+    def get_status(cls) -> Dict[str, Any]:
+        """Provides operational telemetry on model file, loading state, and downloads."""
+        target_path = _get_configured_model_path()
+        file_exists = os.path.isfile(target_path) if target_path else False
+        file_size_mb = round(os.path.getsize(target_path) / (1024 * 1024), 1) if file_exists else 0.0
+
+        return {
+            'ai_engine': 'AgriLens AI (Local In-Process Neural Runtime)',
+            'model_loaded': cls.is_available(),
+            'model_path': target_path,
+            'file_exists': file_exists,
+            'file_size_mb': file_size_mb,
+            'download': dict(_download_progress),
+            'load_error': _load_error,
+        }
 
     @classmethod
     def generate(
@@ -121,7 +242,7 @@ class QwenModelRuntime:
         stop: Optional[List[str]] = None,
     ) -> Optional[str]:
         """
-        Executes one ChatML inference pass over Qwen 2.5 3B.
+        Executes one ChatML inference pass over AgriLens AI.
         Returns the generated text string, or None if unavailable.
         """
         model = cls._get_model()
@@ -144,5 +265,5 @@ class QwenModelRuntime:
                 return content.strip() if content else None
             return None
         except Exception as exc:
-            logger.warning("Qwen inference error: %s", exc)
+            logger.warning("AgriLens AI inference error: %s", exc)
             return None

@@ -11,8 +11,13 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PORT=8000 \
-    WEB_CONCURRENCY=3 \
-    DJANGO_SETTINGS_MODULE=config.settings
+    WEB_CONCURRENCY=2 \
+    DJANGO_SETTINGS_MODULE=config.settings \
+    QWEN_LLM_ENABLED=True \
+    QWEN_MODEL_PATH=/app/data/models/qwen2.5-3b-instruct-q4_k_m.gguf \
+    QWEN_MODEL_N_CTX=2048 \
+    QWEN_MODEL_N_THREADS=2 \
+    DOWNLOAD_QWEN_MODEL=1
 
 # Working directory
 WORKDIR /app

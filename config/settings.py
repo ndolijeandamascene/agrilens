@@ -113,18 +113,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 ML_MODEL_DIR = BASE_DIR / 'data' / 'models'
 ML_MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
-# ------------------------------------------------------------------------------
-# Qwen 2.5 3B In-Process LLM Configuration (Zero Ollama, Local GGUF Inference)
-# ------------------------------------------------------------------------------
-QWEN_MODEL_PATH = env.str(
-    'QWEN_MODEL_PATH',
-    default=r'C:\Users\ndoli\Documents\WEBAPP\IHKIP\models\qwen2.5-3b-instruct-q4_k_m.gguf'
-)
-QWEN_LLM_ENABLED = env.bool('QWEN_LLM_ENABLED', default=True)
-QWEN_MODEL_N_CTX = env.int('QWEN_MODEL_N_CTX', default=2048)
-QWEN_MODEL_N_THREADS = env.int('QWEN_MODEL_N_THREADS', default=4)
-QWEN_MODEL_TEMPERATURE = env.float('QWEN_MODEL_TEMPERATURE', default=0.3)
-QWEN_MODEL_MAX_TOKENS = env.int('QWEN_MODEL_MAX_TOKENS', default=250)
+
 
 
 
@@ -310,12 +299,16 @@ if SENTRY_DSN and not DEBUG:
         pass
 
 # ------------------------------------------------------------------------------
-# Qwen 2.5 3B In-Process Neural LLM (llama-cpp-python)
+# AgriLens AI In-Process Local Neural LLM (llama-cpp-python)
 # ------------------------------------------------------------------------------
 QWEN_LLM_ENABLED = env.bool('QWEN_LLM_ENABLED', default=True)
-QWEN_MODEL_PATH = env.str('QWEN_MODEL_PATH', default='')
+QWEN_MODEL_PATH = env.str(
+    'QWEN_MODEL_PATH',
+    default='/app/data/models/qwen2.5-3b-instruct-q4_k_m.gguf' if os.name != 'nt' else r'C:\Users\ndoli\Documents\WEBAPP\IHKIP\models\qwen2.5-3b-instruct-q4_k_m.gguf'
+)
 QWEN_MODEL_N_CTX = env.int('QWEN_MODEL_N_CTX', default=2048)
-QWEN_MODEL_N_THREADS = env.int('QWEN_MODEL_N_THREADS', default=0)
+QWEN_MODEL_N_THREADS = env.int('QWEN_MODEL_N_THREADS', default=2)
 QWEN_MODEL_TEMPERATURE = env.float('QWEN_MODEL_TEMPERATURE', default=0.3)
 QWEN_MODEL_MAX_TOKENS = env.int('QWEN_MODEL_MAX_TOKENS', default=350)
+DOWNLOAD_QWEN_MODEL = env.bool('DOWNLOAD_QWEN_MODEL', default=True)
 

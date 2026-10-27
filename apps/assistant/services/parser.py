@@ -103,12 +103,11 @@ class GroundedAgriculturalAssistant:
                     result['ai_analysis'] = qwen_reply.strip()
 
                     # For empirical statistical queries, preserve authoritative NISR survey figures
-                    # and enrich with Qwen's role-aware agronomic analysis
+                    # and enrich with AgriLens AI's role-aware agronomic analysis
                     if result.get('status') == 'SUCCESS' and result.get('metrics'):
                         result['answer'] = f"{result['grounded_summary']}\n\n**AgriLens AI Analysis**:\n{qwen_reply.strip()}"
-                    elif result.get('status') == 'GENERAL_GUIDANCE':
-                        result['answer'] = f"{result['grounded_summary']}\n\n**AgriLens AI Guidance**:\n{qwen_reply.strip()}"
                     else:
+                        # For general conversation, agronomic reasoning, and advice, provide the direct neural response
                         result['answer'] = qwen_reply.strip()
                 else:
                     result['synthesized_by'] = 'Deterministic Grounded Engine'

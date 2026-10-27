@@ -19,10 +19,11 @@ if [ ! -d "/app/staticfiles" ] || [ -z "$(ls -A /app/staticfiles 2>/dev/null)" ]
     python manage.py collectstatic --noinput
 fi
 
-# Check or download Qwen 2.5 3B neural model if configured
-if [ "$DOWNLOAD_QWEN_MODEL" = "true" ] || [ "$DOWNLOAD_QWEN_MODEL" = "1" ]; then
-    echo "==> Checking Qwen 2.5 3B neural model weights..."
-    python scripts/download_qwen_model.py || echo "[WARN] Qwen model download skipped/failed; continuing in deterministic grounded mode."
+# Ensure AgriLens AI neural weights are present
+mkdir -p /app/data/models
+if [ "$DOWNLOAD_QWEN_MODEL" != "0" ] && [ "$DOWNLOAD_QWEN_MODEL" != "false" ]; then
+    echo "==> Verifying AgriLens AI neural model weights (~2.1 GB)..."
+    python scripts/download_qwen_model.py || echo "[WARN] AgriLens model download skipped/failed; background downloader will retry."
 fi
 
 echo "==> AgriLens initialization complete. Starting application server..."

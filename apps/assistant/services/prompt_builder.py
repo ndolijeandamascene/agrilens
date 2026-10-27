@@ -102,9 +102,12 @@ class AgronomicPromptBuilder:
         # Build context prompt based on intent
         if intent == 'GENERAL':
             user_content = (
-                f"User Question: {query}\n\n"
-                "Provide a helpful, articulate, and professional agricultural response. If this is a greeting, "
-                "welcome the user as AgriLens AI and briefly mention how you can assist with Rwandan agricultural data and agronomic decisions."
+                f"User Inquiry: {query}\n\n"
+                "=== INSTRUCTION FOR AGRI-LENS AI ===\n"
+                "- If this is a greeting (e.g. 'hello', 'hi', 'muraho'): Warmly welcome the user as AgriLens AI and let them know you are ready to assist with agricultural data, crop advice, and farming insights in Rwanda.\n"
+                "- If this is a question about weather, seasons, or climate: Provide the agronomic context for Rwanda's seasons (Season A: Sep-Feb, Season B: Mar-Jun, Season C: marshlands) and how weather impacts current crop management.\n"
+                "- If this is farming reasoning or agronomic guidance: Provide clear, expert, actionable agronomic advice grounded in Rwandan farming practices and agro-ecological zones.\n"
+                "- Respond directly, articulately, and concisely. Do not regurgitate prompt templates or canned lists."
             )
         else:
             user_content = (
