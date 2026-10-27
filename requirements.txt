@@ -22,8 +22,6 @@ scikit-learn>=1.4.0
 openpyxl>=3.1.2
 pyreadstat>=1.2.0
 requests>=2.31.0
-llama-cpp-python>=0.2.70
-
 
 # Asynchronous Background Processing
 celery>=5.3.6
@@ -46,7 +44,3 @@ ipython>=8.22.0
 # Exploratory Analysis & Notebooks
 jupyterlab>=4.1.0
 notebook>=7.1.0
-
-# In-Process Neural LLM (Pre-compiled CPU Wheels)
---extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
-llama-cpp-python<=0.3.19

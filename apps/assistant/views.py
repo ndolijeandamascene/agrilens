@@ -67,26 +67,25 @@ class AssistantQueryAPIView(APIView):
 class AssistantStatusAPIView(APIView):
     """
     GET /api/v1/assistant/status/ or /assistant/api/status/
-    Provides live telemetry on AgriLens AI model file existence, loading state,
-    RAM memory mapping, and active background download progress.
+    Provides live operational telemetry on AgriLens Grounded ML & Empirical Intelligence Engine.
     """
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        from .services.runtime import QwenModelRuntime
-        return Response(QwenModelRuntime.get_status(), status=status.HTTP_200_OK)
+        from .services.runtime import GroundedModelRuntime
+        return Response(GroundedModelRuntime.get_status(), status=status.HTTP_200_OK)
 
 
 class AssistantDownloadAPIView(APIView):
     """
     POST /api/v1/assistant/download/ or /assistant/api/download/
-    Manually initiates or verifies the background download of the 2.1 GB neural weights.
+    Status verification for in-process ML pipelines (zero external weight download required).
     """
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        from .services.runtime import trigger_model_download_if_needed, QwenModelRuntime
-        triggered = trigger_model_download_if_needed()
-        info = QwenModelRuntime.get_status()
-        info['download_triggered'] = triggered
+        from .services.runtime import GroundedModelRuntime
+        info = GroundedModelRuntime.get_status()
+        info['download_triggered'] = False
+        info['message'] = 'ML models and Grounded Engine operate 100% in-process with zero external weight downloads.'
         return Response(info, status=status.HTTP_200_OK)
