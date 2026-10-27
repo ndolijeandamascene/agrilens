@@ -157,7 +157,7 @@ class TestPublicChatbotWidget:
         assert 'publicAiWidgetTrigger' in content
         assert 'publicAiWidgetWindow' in content
         assert 'AgriLens Grounded Assistant' in content
-        assert 'Ask AgriLens Assistant' in content
+        assert 'AgriLens AI' in content
 
     def test_public_api_endpoint_handles_general_queries(self):
         """Assistant API /api/v1/assistant/query/ accepts general agronomic queries from public widget."""
