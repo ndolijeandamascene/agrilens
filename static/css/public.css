@@ -523,12 +523,11 @@ body.public-body {
     align-items: center;
 }
 
-/* Mobile search box inside nav drawer */
+/* Mobile search box inside nav drawer - hidden on desktop */
 .mobile-search-box {
-    margin-bottom: 12px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border-subtle);
+    display: none;
 }
+
 
 .mobile-search-pill {
     width: 100% !important;
@@ -708,6 +707,12 @@ body.public-body {
         gap: 10px;
         -webkit-tap-highlight-color: rgba(22, 163, 74, 0.15);
         touch-action: manipulation;
+    }
+    .mobile-search-box {
+        display: block;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border-subtle);
     }
     .mobile-login-drawer-item {
         display: block;
