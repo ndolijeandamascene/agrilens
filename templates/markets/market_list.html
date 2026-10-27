@@ -944,6 +944,65 @@
   opacity: 0.4;
   pointer-events: none;
 }
+
+@media (max-width: 640px) {
+  .public-market-inner {
+    padding: 0 12px;
+  }
+  .market-hero-content {
+    padding: 24px 18px;
+  }
+  .market-hero-title {
+    font-size: 1.5rem;
+  }
+  .market-hero-subtitle {
+    font-size: 0.88rem;
+  }
+  .market-filter-form {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .filter-input-wrap.search-col,
+  .filter-input-wrap.select-col {
+    min-width: 100%;
+    width: 100%;
+  }
+  .btn-filter-apply,
+  .btn-filter-reset {
+    width: 100%;
+    justify-content: center;
+    padding: 10px;
+  }
+  .map-header-row {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .map-legend-box {
+    align-items: flex-start;
+  }
+  .map-legend-items {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .market-panel-card {
+    padding: 16px 12px;
+  }
+  .market-table-card {
+    padding: 16px 12px;
+  }
+  .table-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .table-footer-pagination {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+}
 </style>
 {% endblock %}
 

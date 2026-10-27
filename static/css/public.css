@@ -422,10 +422,28 @@ body.public-body {
 }
 
 @media (max-width: 1100px) {
+    .public-header {
+        position: relative;
+        z-index: 1000;
+    }
     .mobile-menu-toggle {
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        border: 1px solid var(--border-medium);
+        background: #FFFFFF;
+        color: var(--text-main);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .mobile-menu-toggle:hover,
+    .mobile-menu-toggle[aria-expanded="true"] {
+        background: var(--bg-subtle);
+        border-color: var(--brand-action);
+        color: var(--brand-action);
     }
     .header-action-group {
         display: none;
@@ -438,29 +456,37 @@ body.public-body {
         right: 0;
         background: #FFFFFF;
         border-bottom: 2px solid var(--border-subtle);
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.16);
         flex-direction: column;
         align-items: stretch;
-        padding: 16px 20px;
+        padding: 16px 20px 20px 20px;
         gap: 6px;
+        z-index: 1001;
     }
+    .public-nav-menu.open,
     .public-nav-menu.mobile-open {
-        display: flex;
+        display: flex !important;
+        animation: mobileMenuSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes mobileMenuSlide {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     .public-nav-link {
         padding: 10px 14px;
         font-size: 0.88rem;
-        border-radius: 6px;
+        border-radius: 8px;
     }
     .mobile-login-drawer-item {
         display: block;
         margin-top: 10px;
-        padding-top: 10px;
+        padding-top: 12px;
         border-top: 1px solid var(--border-subtle);
     }
     .btn-mobile-login {
         width: 100%;
         justify-content: center;
+        padding: 10px 16px;
     }
 }
 
@@ -2500,6 +2526,22 @@ body.public-body {
     }
 }
 
+@media (max-width: 480px) {
+    .login-hero-pane {
+        padding: 28px 16px;
+    }
+    .login-hero-title {
+        font-size: 1.65rem;
+    }
+    .login-card-pane {
+        padding: 24px 12px 48px 12px;
+    }
+    .officer-login-card {
+        padding: 24px 16px;
+        border-radius: 16px;
+    }
+}
+
 /* ==========================================================================
    ENTERPRISE COMMERCIAL PRESENTATION & SALES STYLES
    ========================================================================== */
@@ -4001,43 +4043,197 @@ body.public-body {
 @media (max-width: 1200px) {
     .kpi-cards-grid {
         grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
     }
 }
 
 @media (max-width: 992px) {
     .lower-three-columns-grid {
         grid-template-columns: 1fr;
-        gap: 16px;
+        gap: 20px;
     }
 }
 
 @media (max-width: 960px) {
+    .portal-hero-section {
+        padding: 36px 0 44px 0;
+    }
     .hero-flex-layout {
         grid-template-columns: 1fr;
         gap: 32px;
     }
+    .hero-map-column {
+        width: 100%;
+    }
+    .floating-hero-map-card {
+        width: 100%;
+        max-width: 100%;
+    }
     .portal-hero-headline {
-        font-size: 2.2rem;
+        font-size: 2.15rem;
+        line-height: 1.2;
     }
     .hero-feature-pills-row {
         grid-template-columns: 1fr;
+        gap: 10px;
+        max-width: 100%;
+    }
+    .glass-feature-pill {
+        border-radius: 12px;
+        padding: 10px 14px;
     }
     .header-search-pill {
         display: none;
     }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+    .portal-container {
+        padding: 0 18px;
+    }
+    .portal-kpi-strip {
+        padding: 20px 0;
+    }
     .kpi-cards-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    .kpi-metric-card {
+        padding: 14px 12px;
+        gap: 10px;
+    }
+    .kpi-icon-avatar {
+        width: 32px;
+        height: 32px;
+    }
+    .kpi-value {
+        font-size: 1.3rem;
+    }
+    .map-selectors-toolbar {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 12px 14px;
+    }
+    .map-selector-item:nth-child(3) {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 640px) {
+    .portal-container {
+        padding: 0 14px;
+    }
+    .portal-hero-section {
+        padding: 24px 0 32px 0;
+    }
+    .hero-kicker-tag {
+        font-size: 0.68rem;
+        letter-spacing: 0.08em;
+        margin-bottom: 8px;
+    }
+    .portal-hero-headline {
+        font-size: 1.65rem;
+        line-height: 1.22;
+        letter-spacing: -0.02em;
+        margin-bottom: 12px;
+    }
+    .portal-hero-lead {
+        font-size: 0.88rem;
+        line-height: 1.5;
+        margin-bottom: 18px;
+    }
+    .map-selectors-toolbar {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 10px 12px;
+    }
+    .map-selector-item:nth-child(3) {
+        grid-column: auto;
+    }
+    .map-stage-container {
+        height: 320px;
+    }
+    .floating-choropleth-legend {
+        top: 8px;
+        right: 8px;
+        padding: 6px 10px;
+        font-size: 0.66rem;
+    }
+    .floating-choropleth-legend .swatch-row {
+        font-size: 0.64rem;
+        gap: 6px;
+        margin-bottom: 2px;
+    }
+    .map-floating-controls {
+        bottom: 8px;
+        right: 8px;
+    }
+    .map-geog-scale-box {
+        bottom: 8px;
+        left: 8px;
+    }
+    .neighbor-country-tag {
+        font-size: 0.60rem;
     }
     .action-tiles-grid {
         grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    .action-tile-card {
+        padding: 10px 12px;
+    }
+    /* Overflow-fix for .scenic-cta-card */
+    .scenic-cta-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 18px 16px;
+        width: 100%;
+        max-width: 100%;
+    }
+    .scenic-cta-content {
+        max-width: 100%;
+        width: 100%;
+    }
+    .scenic-cta-title {
+        font-size: 1.05rem;
+    }
+    .scenic-cta-visual {
+        width: 100%;
+        max-width: 180px;
+        align-self: center;
+        margin: 16px 0 0 0;
+        justify-content: center;
+    }
+    .scenic-tablet-svg {
+        max-width: 160px;
     }
     .footer-reference-inner {
         flex-direction: column;
         align-items: flex-start;
-        gap: 14px;
+        gap: 16px;
+    }
+    .footer-ref-right {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        width: 100%;
+    }
+    .footer-nav-links {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 420px) {
+    .portal-hero-headline {
+        font-size: 1.48rem;
+    }
+    .kpi-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    .map-stage-container {
+        height: 270px;
     }
 }
 
@@ -5136,6 +5332,39 @@ body.public-body {
     }
 }
 
+@media (max-width: 480px) {
+    .district-modal-card {
+        max-height: 96vh;
+        border-radius: 12px;
+    }
+    .district-modal-header {
+        padding: 14px 14px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .modal-header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .modal-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+    .district-modal-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .modal-footer-right {
+        width: 100%;
+        flex-direction: column;
+    }
+    .btn-modal-action-secondary,
+    .btn-modal-action-primary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 /* ==========================================================================
    Public Reports & Bulletins Page (Milestone 4 Official Design System)
    Matches media_1792436169286.png specifications
@@ -5334,6 +5563,9 @@ body.public-body {
     padding: 8px 24px 16px;
     border: 1px solid #e2e8f0;
     box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05);
+    overflow-x: auto;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
 }
 
 .reports-table {
@@ -5719,6 +5951,53 @@ body.public-body {
     .reports-main-container {
         margin-top: -20px;
         padding: 0 16px;
+    }
+}
+
+@media (max-width: 640px) {
+    .reports-hero-banner {
+        padding: 28px 16px 36px;
+    }
+    .reports-hero-title {
+        font-size: 1.5rem;
+    }
+    .reports-hero-subtitle {
+        font-size: 0.88rem;
+    }
+    .reports-hero-icon-card {
+        display: none;
+    }
+    .reports-main-container {
+        margin-top: -12px;
+        padding: 0 12px;
+    }
+    .reports-filter-card {
+        padding: 16px 14px;
+    }
+    .reports-table-card {
+        padding: 6px 10px 14px;
+        border-radius: 10px;
+    }
+    .reports-table th,
+    .reports-table td {
+        padding: 12px 8px;
+        font-size: 0.82rem;
+    }
+    .reports-table .th-date {
+        width: 100px;
+    }
+    .reports-table .th-download {
+        width: 64px;
+    }
+    .btn-pdf-download {
+        padding: 4px 10px;
+        font-size: 0.76rem;
+    }
+    .reports-pagination-container {
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+        text-align: center;
     }
 }
 
@@ -7028,6 +7307,28 @@ body.public-body {
     }
     .cta-left {
         flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-hero-banner-new {
+        padding: 24px 16px;
+    }
+    .about-hero-headline {
+        font-size: 1.5rem;
+    }
+    .about-hero-paragraph {
+        font-size: 0.88rem;
+    }
+    .about-pillar-card {
+        padding: 20px 16px;
+    }
+    .about-bottom-cta {
+        padding: 20px 14px;
+    }
+    .btn-explore-map {
+        width: 100%;
+        justify-content: center;
     }
 }
 
