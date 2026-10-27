@@ -503,8 +503,22 @@ class GroundedAgriculturalAssistant:
         cid = res.get('cluster_id', 0)
         cname = res.get('cluster_name', 'Commercial Hub')
         summary = res.get('profile_summary', '')
-        constraints = res.get('main_constraints', '')
-        interventions = res.get('recommended_interventions', '')
+
+        def format_bullet_list(raw):
+            if isinstance(raw, list):
+                return "\n".join([f"- {item}" for item in raw])
+            if isinstance(raw, str) and raw.strip().startswith('[') and raw.strip().endswith(']'):
+                import ast
+                try:
+                    parsed = ast.literal_eval(raw)
+                    if isinstance(parsed, list):
+                        return "\n".join([f"- {item}" for item in parsed])
+                except Exception:
+                    pass
+            return raw
+
+        constraints = format_bullet_list(res.get('main_constraints', ''))
+        interventions = format_bullet_list(res.get('recommended_interventions', ''))
         avg_y = res.get('avg_yield_kg_per_ha', 0.0)
         avg_y_t = round(avg_y / 1000.0, 2)
         seed_pct = res.get('seed_adoption_rate', 0.0)
