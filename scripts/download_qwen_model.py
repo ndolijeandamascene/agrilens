@@ -17,15 +17,19 @@ EXPECTED_MIN_BYTES = 1_900_000_000  # ~1.9 GB minimum
 
 
 def find_existing_model(target_dir: Path) -> Path | None:
-    """Checks common locations for the Qwen model file."""
+    """Checks common locations for the Qwen model file before downloading."""
+    env_path = os.environ.get("QWEN_MODEL_PATH")
     candidates = [
         target_dir / MODEL_FILENAME,
         Path("/app/data/models") / MODEL_FILENAME,
         Path("/app/models") / MODEL_FILENAME,
         Path(r"C:\Users\ndoli\Documents\WEBAPP\IHKIP\models") / MODEL_FILENAME,
+        Path(r"C:\Users\ndoli\Documents\WEBAPP\agrilens\data\models") / MODEL_FILENAME,
+        Path(env_path) if env_path else None,
+        Path.home() / ".cache" / "agrilens" / "models" / MODEL_FILENAME,
     ]
     for c in candidates:
-        if c.is_file() and c.stat().st_size >= EXPECTED_MIN_BYTES:
+        if c and c.is_file() and c.stat().st_size >= EXPECTED_MIN_BYTES:
             return c
     return None
 

@@ -33,29 +33,50 @@ HF_DOWNLOAD_URL = "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/
 MIN_FILE_BYTES = 1_900_000_000
 
 
-def _get_configured_model_path() -> str:
-    """Retrieves and validates the GGUF model path from settings or default locations."""
+def find_any_existing_model() -> Optional[str]:
+    """
+    Checks all candidate paths and environment configurations to verify
+    if the neural model weights already exist on disk (size >= 1.9 GB).
+    """
     configured = getattr(settings, 'QWEN_MODEL_PATH', '')
-    if configured and os.path.isfile(configured) and os.path.getsize(configured) >= MIN_FILE_BYTES:
-        return configured
-
     candidates = [
+        configured,
         str(settings.BASE_DIR / 'data' / 'models' / 'qwen2.5-3b-instruct-q4_k_m.gguf'),
         '/app/data/models/qwen2.5-3b-instruct-q4_k_m.gguf',
         '/app/models/qwen2.5-3b-instruct-q4_k_m.gguf',
         r'C:\Users\ndoli\Documents\WEBAPP\IHKIP\models\qwen2.5-3b-instruct-q4_k_m.gguf',
         r'C:\Users\ndoli\Documents\WEBAPP\agrilens\data\models\qwen2.5-3b-instruct-q4_k_m.gguf',
+        str(Path.home() / '.cache' / 'agrilens' / 'models' / 'qwen2.5-3b-instruct-q4_k_m.gguf'),
     ]
     for c in candidates:
-        if os.path.isfile(c) and os.path.getsize(c) >= MIN_FILE_BYTES:
+        if c and os.path.isfile(c) and os.path.getsize(c) >= MIN_FILE_BYTES:
             return c
+    return None
 
-    # Fallback preferred target path for saving
+
+def _get_configured_model_path() -> str:
+    """Retrieves and validates the GGUF model path from settings or default locations."""
+    existing = find_any_existing_model()
+    if existing:
+        return existing
+
+    configured = getattr(settings, 'QWEN_MODEL_PATH', '')
     return configured or ('/app/data/models/qwen2.5-3b-instruct-q4_k_m.gguf' if os.name != 'nt' else str(settings.BASE_DIR / 'data' / 'models' / 'qwen2.5-3b-instruct-q4_k_m.gguf'))
 
 
 def _run_background_download(dest_file_path: str):
     global _download_progress
+
+    # Pre-check: Ensure model was not downloaded or copied concurrently
+    existing = find_any_existing_model()
+    if existing:
+        logger.info("[OK] Model already present at %s. Cancelling download.", existing)
+        with _download_lock:
+            _download_progress['is_downloading'] = False
+            _download_progress['progress_pct'] = 100.0
+        QwenModelRuntime.reload_model()
+        return
+
     part_path = dest_file_path + ".part"
     os.makedirs(os.path.dirname(dest_file_path), exist_ok=True)
 
@@ -112,9 +133,18 @@ def _run_background_download(dest_file_path: str):
 
 
 def trigger_model_download_if_needed(target_path: Optional[str] = None) -> bool:
+    """Verifies whether model exists on disk before initiating background download."""
     global _download_thread
+
+    # Check all candidate paths first
+    existing = find_any_existing_model()
+    if existing:
+        logger.info("[SKIP DOWNLOAD] Neural weights already exist on disk at: %s (%.1f MB).", existing, os.path.getsize(existing) / (1024 * 1024))
+        return False
+
     dest_path = target_path or _get_configured_model_path()
     if os.path.isfile(dest_path) and os.path.getsize(dest_path) >= MIN_FILE_BYTES:
+        logger.info("[SKIP DOWNLOAD] Target path already has verified model file: %s", dest_path)
         return False
 
     with _download_lock:
@@ -140,13 +170,13 @@ def _load_qwen_model() -> Any:
         logger.info(_load_error)
         return None
 
-    model_path = _get_configured_model_path()
-    if not model_path or not os.path.isfile(model_path) or os.path.getsize(model_path) < MIN_FILE_BYTES:
-        _load_error = f"AgriLens AI GGUF model file not found at: {model_path}"
+    model_path = find_any_existing_model()
+    if not model_path:
+        _load_error = "AgriLens AI GGUF model file not found in any candidate directory."
         logger.warning(_load_error)
-        # Automatically trigger background download if enabled
+        # Check and initiate download only if missing everywhere
         if getattr(settings, 'DOWNLOAD_QWEN_MODEL', True):
-            trigger_model_download_if_needed(model_path)
+            trigger_model_download_if_needed()
         return None
 
     try:
