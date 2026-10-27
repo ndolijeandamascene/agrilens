@@ -187,9 +187,11 @@ def _load_qwen_model() -> Any:
         return None
 
     n_ctx = int(getattr(settings, 'QWEN_MODEL_N_CTX', 2048))
-    n_threads = int(getattr(settings, 'QWEN_MODEL_N_THREADS', 2))
-    if n_threads <= 0:
-        n_threads = min(4, max(2, (os.cpu_count() or 4) - 1))
+    configured_threads = getattr(settings, 'QWEN_MODEL_N_THREADS', 0)
+    if configured_threads and int(configured_threads) > 0:
+        n_threads = int(configured_threads)
+    else:
+        n_threads = max(2, min(8, os.cpu_count() or 4))
     n_batch = int(getattr(settings, 'QWEN_MODEL_N_BATCH', 512))
 
     logger.info("Initializing in-process AgriLens AI from: %s (n_ctx=%d, threads=%d)", model_path, n_ctx, n_threads)
@@ -287,7 +289,7 @@ class QwenModelRuntime:
                 messages=messages,
                 max_tokens=_max_tokens,
                 temperature=_temperature,
-                stop=stop or ["<|im_end|>", "<|endoftext|>"],
+                stop=stop or ["<|im_end|>", "<|endoftext|>", "<|im_start|>", "\n\nUser Question:", "\n\nUser Inquiry:"],
             )
             choices = output.get('choices', [])
             if choices and 'message' in choices[0] and 'content' in choices[0]['message']:

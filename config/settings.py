@@ -305,8 +305,10 @@ QWEN_MODEL_PATH = env.str(
     default='/app/data/models/qwen2.5-3b-instruct-q4_k_m.gguf' if os.name != 'nt' else r'C:\Users\ndoli\Documents\WEBAPP\IHKIP\models\qwen2.5-3b-instruct-q4_k_m.gguf'
 )
 QWEN_MODEL_N_CTX = env.int('QWEN_MODEL_N_CTX', default=2048)
-QWEN_MODEL_N_THREADS = env.int('QWEN_MODEL_N_THREADS', default=2)
+QWEN_MODEL_N_THREADS = env.int('QWEN_MODEL_N_THREADS', default=4)
 QWEN_MODEL_TEMPERATURE = env.float('QWEN_MODEL_TEMPERATURE', default=0.3)
-QWEN_MODEL_MAX_TOKENS = env.int('QWEN_MODEL_MAX_TOKENS', default=650)
+QWEN_MODEL_MAX_TOKENS = env.int('QWEN_MODEL_MAX_TOKENS', default=200)
+QWEN_GENERAL_MAX_TOKENS = env.int('QWEN_GENERAL_MAX_TOKENS', default=160)
+QWEN_EMPIRICAL_MAX_TOKENS = env.int('QWEN_EMPIRICAL_MAX_TOKENS', default=220)
 DOWNLOAD_QWEN_MODEL = env.bool('DOWNLOAD_QWEN_MODEL', default=True)
 

@@ -111,13 +111,12 @@ class AgronomicPromptBuilder:
             user_content = (
                 f"User Inquiry: {query}\n\n"
                 "=== INSTRUCTION FOR AGRI-LENS AI (AGRICULTURE EXPERT) ===\n"
-                "1. Agricultural Expert Persona: Answer this question authoritatively as the AgriLens Agricultural Expert. "
-                "Even for general, scientific, technological, or conversational topics, maintain your expert perspective, "
-                "combining rigorous analytical depth with practical real-world insight.\n"
-                "2. Deliberate Reasoning: Reason through the question thoroughly before answering. Break down the core principles, "
-                "mechanisms, and implications step-by-step.\n"
+                "1. Agricultural Expert Persona: Answer authoritatively as the AgriLens Agricultural Expert. "
+                "Maintain your expert agricultural perspective, delivering practical, real-world insight.\n"
+                "2. Concise & Direct Reasoning: Provide a clear, focused, and well-reasoned answer in 2-3 concise paragraphs. "
+                "Avoid unnecessary filler or repetitive preambles.\n"
                 "3. Articulate Response: If this is a greeting, warmly welcome the user as AgriLens AI and state your readiness "
-                "to provide expert agricultural and decision-support guidance. Otherwise, deliver a comprehensive, logically reasoned response."
+                "to provide expert agricultural and decision-support guidance. Otherwise, deliver a punchy, logically reasoned response."
             )
         else:
             user_content = (
@@ -126,11 +125,9 @@ class AgronomicPromptBuilder:
                 f"Computed Summary: {deterministic_answer}\n"
                 f"Structured Metrics: {metrics}\n\n"
                 "=== INSTRUCTION FOR AGRI-LENS AI (AGRICULTURE EXPERT) ===\n"
-                "1. Expert Agronomic Reasoning: Deliberately reason through these figures as a senior agronomist and data scientist. "
-                "Analyze the underlying agro-ecological drivers (soil fertility, input adoption, rainfall variability, topography, "
-                "or seasonal dynamics) that explain this observed performance in Rwanda.\n"
-                "2. Executive Synthesis: Synthesize the verified survey figures and your expert reasoning into a clear, executive-grade "
-                "analysis, followed by 1-2 practical, high-impact agronomic recommendations tailored to the user's role."
+                "1. Concise Agronomic Reasoning: Briefly analyze the underlying agro-ecological drivers (inputs, rainfall, topography, soil) "
+                "explaining this observed performance in Rwanda.\n"
+                "2. Executive Action: Deliver a focused 2-3 paragraph analysis followed by 1-2 practical, high-impact recommendations."
             )
 
         return [

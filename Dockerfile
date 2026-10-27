@@ -16,7 +16,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     QWEN_LLM_ENABLED=True \
     QWEN_MODEL_PATH=/app/data/models/qwen2.5-3b-instruct-q4_k_m.gguf \
     QWEN_MODEL_N_CTX=2048 \
-    QWEN_MODEL_N_THREADS=2 \
+    QWEN_MODEL_N_THREADS=4 \
     DOWNLOAD_QWEN_MODEL=1 \
     CMAKE_ARGS="-DGGML_BLAS=OFF" \
     CMAKE_BUILD_PARALLEL_LEVEL=2
@@ -66,5 +66,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:8000/health/ || exit 1
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--threads", "2", "--worker-class", "gthread", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-"]
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--threads", "4", "--worker-class", "gthread", "--timeout", "180", "--access-logfile", "-", "--error-logfile", "-"]
 

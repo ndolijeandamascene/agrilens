@@ -96,7 +96,10 @@ class GroundedAgriculturalAssistant:
                     deterministic_answer=result.get('answer', ''),
                     user=user,
                 )
-                max_toks = int(getattr(settings, 'QWEN_MODEL_MAX_TOKENS', 650))
+                if intent == 'GENERAL':
+                    max_toks = int(getattr(settings, 'QWEN_GENERAL_MAX_TOKENS', 180))
+                else:
+                    max_toks = int(getattr(settings, 'QWEN_EMPIRICAL_MAX_TOKENS', 240))
                 qwen_reply = QwenModelRuntime.generate(messages=messages, max_tokens=max_toks, temperature=0.3)
                 if qwen_reply and len(qwen_reply.strip()) > 15:
                     result['synthesized_by'] = 'AgriLens AI (Neural Engine)'
