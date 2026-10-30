@@ -28,7 +28,6 @@ staticfiles/
 .env.dev    
 
 # Data folders (keep structures, ignore data dumps)
-Datasets/
 backups/*.sql
 data/raw/*
 !data/raw/.gitkeep
