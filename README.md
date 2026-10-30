@@ -13,15 +13,18 @@ Developed for the **2026 NISR Big Data Hackathon – Track 1: Agricultural Produ
 [![AgriLens AI](https://img.shields.io/badge/AgriLens%20AI-Neural%20Assistant-059669.svg)](https://agrilens.ndoli.dev)
 [![Scikit-Learn](https://img.shields.io/badge/ML-Scikit--Learn-F7931E.svg)](https://scikit-learn.org/)
 [![Alpine.js](https://img.shields.io/badge/Frontend-Alpine.js%20%7C%20Vanilla%20CSS-77C1D2.svg)](https://alpinejs.dev/)
+[![Video Walkthrough](https://img.shields.io/badge/🎬%20Demo-Video%20Walkthrough-E11D48.svg)](https://drive.google.com/file/d/1ifLBSVwtlDGiR3tZiCt9HYd0bp2pXBz4/view?usp=sharing)
 [![Automated Tests](https://img.shields.io/badge/Tests-Passing-brightgreen.svg)]()
 
 ---
 
 ### 🚀 Live Hackathon Submission & Evaluation
 
-| **Live Platform URL** | **Username** | **Password** | **Role** |
-| :--- | :--- | :--- | :--- |
-| **[https://agrilens.ndoli.dev](https://agrilens.ndoli.dev)** | `admin` | `AgriLens2026!` | `System Administrator (Full Superuser)` |
+| **Platform Resource** | **Direct Link / Credentials** | **Role / Notes** |
+| :--- | :--- | :--- |
+| 🌐 **Live Web Application** | **[https://agrilens.ndoli.dev](https://agrilens.ndoli.dev)** | Public Portal & Staff Management |
+| 🎬 **Video Demonstration** | **[Watch Video Walkthrough (Google Drive Stream)](https://drive.google.com/file/d/1ifLBSVwtlDGiR3tZiCt9HYd0bp2pXBz4/view?usp=sharing)** | Instant video preview (stream without download) |
+| 👤 **Evaluator Credentials** | Username: `admin` &bull; Password: `AgriLens2026!` | System Administrator (Full Superuser) |
 
 *Full platform access enabled for the hackathon evaluation jury and reviewers.*
 
@@ -30,6 +33,7 @@ Developed for the **2026 NISR Big Data Hackathon – Track 1: Agricultural Produ
 ---
 
 [Live Demo](https://agrilens.ndoli.dev) •
+[Video Walkthrough](https://drive.google.com/file/d/1ifLBSVwtlDGiR3tZiCt9HYd0bp2pXBz4/view?usp=sharing) •
 [Key Capabilities](#-key-capabilities) •
 [Architecture](#-system-architecture) •
 [Quickstart](#-quickstart--installation) •
