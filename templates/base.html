@@ -1260,7 +1260,7 @@
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
     <!-- SIDEBAR -->
     {% include "includes/sidebar.html" %}
     <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="window.closeAgriLensSidebar(event)" aria-hidden="true"></div>

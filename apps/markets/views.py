@@ -478,6 +478,8 @@ def internal_dashboard(request):
     flagged_records = CommodityPrice.objects.exclude(validation_flags=[]).select_related('market', 'crop')[:5]
 
     context = {
+        'page_heading': 'Commodity Price Intelligence Dashboard',
+        'page_subheading': "Operational surveillance across Rwanda's commercial hubs • 5-Stage Verification Workflow",
         'active_subnav': 'dashboard',
         'total_published': total_published,
         'pending_approvals': pending_approvals,
@@ -522,6 +524,8 @@ def internal_records(request):
     page_obj = paginator.get_page(request.GET.get('page'))
 
     context = {
+        'page_heading': 'Price Records Registry',
+        'page_subheading': 'Filter, inspect, and manage verified commodity price records',
         'active_subnav': 'records',
         'page_obj': page_obj,
         'status_choices': CommodityPrice.Status.choices,
@@ -614,6 +618,8 @@ def internal_record_create(request):
         form = CommodityPriceForm()
 
     context = {
+        'page_heading': 'Record Commodity Price Observation',
+        'page_subheading': 'Submit market price observation for verification',
         'active_subnav': 'records',
         'form': form,
         'page_title': 'Record New Commodity Price Observation',
@@ -679,6 +685,8 @@ def internal_record_edit(request, pk):
         form = CommodityPriceCorrectionForm(instance=record)
 
     context = {
+        'page_heading': f'Audit Correction: Record #{record.id}',
+        'page_subheading': f'Update price observation for {record.crop.name} in {record.market.name}',
         'active_subnav': 'records',
         'form': form,
         'record': record,
@@ -781,6 +789,8 @@ def internal_records_import(request):
         form = PriceCSVImportForm()
 
     context = {
+        'page_heading': 'Bulk Import Price Observations',
+        'page_subheading': 'Upload CSV files for automated ingestion and QA validation',
         'active_subnav': 'records',
         'form': form,
     }
@@ -805,6 +815,8 @@ def internal_markets(request):
     ).order_by('district__province__name', 'name')
 
     context = {
+        'page_heading': 'Market Locations & Hubs',
+        'page_subheading': "Administrative trading hubs across Rwanda's 30 districts",
         'active_subnav': 'markets',
         'markets': markets,
         'form': form,
@@ -828,6 +840,8 @@ def internal_commodities(request):
     commodities = MarketCommodity.objects.select_related('crop').all().order_by('category', 'name')
 
     context = {
+        'page_heading': 'Commodity Catalog',
+        'page_subheading': 'Standard units, crop classifications, and expected price bands',
         'active_subnav': 'commodities',
         'commodities': commodities,
         'form': form,
@@ -850,6 +864,8 @@ def internal_market_edit(request, pk):
         form = MarketLocationForm(instance=market)
 
     return render(request, 'markets/internal/market_form.html', {
+        'page_heading': f"Edit Market: {market.name}",
+        'page_subheading': 'Update market location metadata and hub classification',
         'active_subnav': 'markets',
         'form': form,
         'market': market,
@@ -888,6 +904,8 @@ def internal_commodity_edit(request, pk):
         form = MarketCommodityForm(instance=comm)
 
     return render(request, 'markets/internal/commodity_form.html', {
+        'page_heading': f"Edit Commodity: {comm.name}",
+        'page_subheading': 'Update price sanity boundaries and standard measurement units',
         'active_subnav': 'commodities',
         'form': form,
         'commodity': comm,
@@ -924,6 +942,8 @@ def internal_collection(request):
     ).select_related('market', 'crop').order_by('-id')
 
     context = {
+        'page_heading': 'Price Surveillance Collection',
+        'page_subheading': 'Field observation scheduling, enumerators, and daily intake',
         'active_subnav': 'collection',
         'assignments': assignments,
         'today_logs': today_logs,
@@ -950,6 +970,8 @@ def internal_approvals(request):
     ).select_related('market__district', 'crop', 'collected_by').order_by('-date_recorded', '-id')
 
     context = {
+        'page_heading': 'Validation & Approval Queue',
+        'page_subheading': 'Maker-checker review workflow and QA anomaly verification',
         'active_subnav': 'approvals',
         'queue_records': queue_records,
         'pending_count': queue_records.count(),
@@ -1117,6 +1139,8 @@ def internal_analytics(request):
     ).order_by('-avg_retail')[:10]
 
     context = {
+        'page_heading': 'Commodity Price Analytics',
+        'page_subheading': 'Spatial price variation, rural-urban spreads, and historical trends',
         'active_subnav': 'analytics',
         'disparities': disparities,
         'market_averages': market_averages,
@@ -1164,6 +1188,8 @@ def internal_reports(request):
         return response
 
     context = {
+        'page_heading': 'Price Reports & Data Exports',
+        'page_subheading': 'Authoritative market surveillance records and printable bulletins',
         'active_subnav': 'reports',
         'total_records': CommodityPrice.objects.count(),
         'published_records': CommodityPrice.objects.filter(status=CommodityPrice.Status.PUBLISHED).count(),
@@ -1192,6 +1218,8 @@ def internal_publications(request):
     notices = PricePublicNotice.objects.all().order_by('-effective_date', '-id')
 
     context = {
+        'page_heading': 'Market Price Publications',
+        'page_subheading': 'Official public bulletins and market notices',
         'active_subnav': 'publications',
         'notices': notices,
         'form': form,
@@ -1216,6 +1244,8 @@ def internal_audit_log(request):
     page_obj = paginator.get_page(request.GET.get('page'))
 
     context = {
+        'page_heading': 'Surveillance Audit Trail',
+        'page_subheading': 'Immutable system audit log of recordings, corrections, and approvals',
         'active_subnav': 'audit',
         'page_obj': page_obj,
         'selected_action': action_filter,
