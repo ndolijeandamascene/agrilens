@@ -37,6 +37,7 @@ db.sqlite3-journal
 
 # Heavy datasets and local dumps
 Datasets/
+demo/
 backups/*.sql
 data/raw/*
 !data/raw/.gitkeep
